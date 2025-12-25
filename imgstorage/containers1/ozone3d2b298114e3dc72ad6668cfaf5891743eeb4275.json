@@ -1,0 +1,42 @@
+{
+  "contract": "0x30E2515f7dB9E84aa1e9c21D67605000ABC93361",
+  "cid": "ozone3d2b298114e3dc72ad6668cfaf5891743eeb4275",
+  "name": "Monalisa",
+  "NFTs": [
+    {
+      "name": "Mona-lisa 1",
+      "description": "Mona-lisa-with-black-glasses-holding-a-smartphone-__55413",
+      "image": "https://ozonef7feca55a74bd25b8d0c880581a79cc984c6100f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "1"
+    },
+    {
+      "name": "Mona-lisa 2",
+      "description": "Mona-lisa-with-black-glasses-holding-a-smartphone-__55413",
+      "image": "https://ozone577444d1a2705ffb748dc3d4d019b5c723e1ee14.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "2"
+    },
+    {
+      "name": "Mona-lisa 3",
+      "description": "Mona-lisa-with-black-glasses-holding-a-smartphone-__55413",
+      "image": "https://ozoned5b572b0910c287687272a6d6705e14760ccef5e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "3"
+    },
+    {
+      "name": "Mona-lisa 4",
+      "description": "Mona-lisa-with-black-glasses-holding-a-smartphone-__55413",
+      "image": "https://ozoned56fb50a1f51f079616fd3c6f2868634b06ebcff.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "4"
+    }
+  ],
+  "baseURL": "https://ozone3d2b298114e3dc72ad6668cfaf5891743eeb4275.ozonestore.io",
+  "tokennames": [
+    "Mona-lisa 1",
+    "Mona-lisa 2",
+    "Mona-lisa 3",
+    "Mona-lisa 4"
+  ]
+}

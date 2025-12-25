@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DAO</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 30px;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e3a59;
+      margin-bottom: 25px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    thead {
+      background-color: #f1f3f6;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    th {
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #555;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    tr:hover {
+      background-color: #f0f7ff;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .vote-btn {
+      font-size: 11px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+
+    .vote-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .upvote {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .downvote {
+      background-color: #f44336;
+      color: white;
+      margin-left: 4px;
+    }
+
+    .creator {
+      font-family: monospace;
+      color: #555;
+      font-size: 12px;
+    }
+
+    .table-container {
+      max-width: 1200px;
+      margin: auto;
+      overflow-x: auto;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 10px;
+      color: #777;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <script>
+
+  </script>
+</head>
+<body>
+  <header>
+    <h2>DAO Authority</h2>
+    <div id="walletInfo">
+      <span id="walletAddress">Not connected</span>
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    </div>
+  </header>
+  
+ 
+<h3 class="rptname">Proposals</h3>
+
+<table id="proposalsTable">
+  <thead>
+    <tr>
+      <th>#</th>
+          <th>Desc</th>
+          <th>Target</th>
+         
+          <th>Up</th>
+          <th>Dn</th>
+          <th>Win</th>
+          <th>status</th>
+          <th>Creator</th>
+          <th>Vote</th>
+          <th>Sign</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+  </tbody>
+</table>
+
+<script>
+  // Replace with your API URL
+  let apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_OfferData"; 
+  const params = new URLSearchParams(window.location.search);
+  let page = params.get("page");  // will give "1" if ?forprime=1
+  
+  if(!page){
+     page=1;
+   }
+    
+  apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_OfferData&page="+page;
+  document.querySelector(".rptname").textContent = "Proposals";
+
+  // Fetch data from API
+fetch(apiUrl)
+      .then(response => response.json())
+      .then(apiResponse => {
+        // Ensure API returned the expected structure
+        if (!apiResponse.success || !apiResponse.data || !apiResponse.data[0]) {
+          console.error("Unexpected API response:", apiResponse);
+          return;
+        }
+
+        // Extract only the inner data array
+        const jsonData = apiResponse.data[0];
+
+        const tableHeader = document.getElementById("tableHeader");
+        const tbody = document.querySelector("#dataTable tbody");
+
+        // --- Create dynamic headers ---
+        const keys = Object.keys(jsonData[0]);
+        keys.forEach(key => {
+          const th = document.createElement("th");
+          th.textContent = key;
+          tableHeader.appendChild(th);
+        });
+
+        // --- Fill table rows dynamically ---
+        jsonData.forEach(item => {
+          const row = document.createElement("tr");
+          keys.forEach(key => {
+            const td = document.createElement("td");
+            td.textContent = item[key];
+            row.appendChild(td);
+          });
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error("Error fetching data:", error));
+
+
+
+</script>
+
+<script>
+  const contractAddress = "0xCE20d2841779Ca3448B47F522dB00a9E6Fa5c55e";
+  const abi = [{"type":"constructor","inputs":[{"name":"_hex","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"fallback","stateMutability":"payable"},{"type":"receive","stateMutability":"payable"},{"type":"function","name":"Burn","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"_delegatorCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"_getImplementation","inputs":[{"name":"clone","type":"address","internalType":"address"}],"outputs":[{"name":"impl","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"_isDelegatorNode","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"_isSafe","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"_isSecureBase","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"_isSigner","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"addblacklist","inputs":[{"name":"d","type":"address","internalType":"address"},{"name":"op","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"blacklisted","inputs":[{"name":"","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"execute","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"},{"name":"isapproved","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"getBalance","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"getProposal","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"string","internalType":"string"},{"name":"","type":"address","internalType":"address"},{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"address","internalType":"address"},{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"getProposalsCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"getResult","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"getsign","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"bool","internalType":"bool"},{"name":"","type":"bool","internalType":"bool"},{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"hasVoted","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"},{"name":"voter","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"isNodeStopped","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"newProposal","inputs":[{"name":"desc","type":"string","internalType":"string"},{"name":"target","type":"address","internalType":"address"},{"name":"value","type":"uint256","internalType":"uint256"},{"name":"data","type":"bytes","internalType":"bytes"},{"name":"_deadline","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},{"type":"function","name":"owner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"proposals","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"description","type":"string","internalType":"string"},{"name":"target","type":"address","internalType":"address"},{"name":"value","type":"uint256","internalType":"uint256"},{"name":"data","type":"bytes","internalType":"bytes"},{"name":"votesup","type":"uint256","internalType":"uint256"},{"name":"sign","type":"uint256","internalType":"uint256"},{"name":"votesdown","type":"uint256","internalType":"uint256"},{"name":"deadline","type":"uint256","internalType":"uint256"},{"name":"wincount","type":"uint256","internalType":"uint256"},{"name":"exist","type":"bool","internalType":"bool"},{"name":"creator","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"setWinPer","inputs":[{"name":"_per","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"systemAge","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"vote","inputs":[{"name":"proposalId","type":"uint256","internalType":"uint256"},{"name":"updown","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"}];
+
+    async function loadProposals() {
+    const web3 = new Web3(window.ethereum);
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    const contract = new web3.eth.Contract(abi, contractAddress);
+    
+      const count = await contract.methods.getProposalsCount().call();
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      let limit = 3;
+      for (let i = count; i >= 1 && limit>0; i--) {
+        debugger;
+        const p = await contract.methods.getProposal(i).call();
+        const r = await contract.methods.getResult(i).call();
+        console.log(p);
+        const shortTarget = p[1].slice(0, 8) + "..." + p[1].slice(-4);
+        const shortCreator = p[3].slice(0, 8) + "..." + p[3].slice(-4);
+        let sgn =r[5];
+        if(r[4]==4) sgn = "RESOLVE";
+        else if(r[4]==3) sgn = "REJECT";
+        else if(r[4]==2) sgn = "SIGN-APPROVED2";
+        else if(r[4]==1) sgn = "SIGN-APPROVED1";
+        else sgn = "PENDING";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i}</td>
+          <td class="desc" title="${p[0]}">${p[0]}</td>
+          <td title="${p[1]}">${shortTarget}</td>
+          
+          <td>${r[0]}</td>
+          <td>${r[1]}</td>
+          <td>${r[3]}</td>
+          <td>${sgn}</td>
+          <td class="creator" title="${p[5]}">${shortCreator}</td>
+          <td>
+            <button class="vote-btn upvote" onclick="vote(${i}, true)">Vote(Y)</button>
+            <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
+          </td>
+          <td>
+            <button class="vote-btn upvote" onclick="execute(${i}, true)">Sign(Y)</button>
+            <button class="vote-btn downvote" onclick="execute(${i}, false)">Sign(N)</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+        limit--;
+      }
+    }
+
+  window.onload = loadProposals;
+</script>
+<script>
+  let userAccount = null;
+
+  async function connectWallet() {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+      }
+
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      userAccount = accounts[0];
+      updateWalletUI(userAccount);
+      await loadProposals();
+    } catch (err) {
+      console.error(err);
+      alert("Connection failed: " + err.message);
+    }
+  }
+
+  function updateWalletUI(address) {
+    const walletEl = document.getElementById("walletAddress");
+    const btn = document.getElementById("connectBtn");
+
+    if (address) {
+      const shortAddr = address.slice(0, 6) + "..." + address.slice(-4);
+      walletEl.textContent = address;
+      btn.textContent = "Connected";
+      btn.style.backgroundColor = "#28a745";
+      btn.style.cursor = "default";
+    }
+  }
+  </script>
+<script>
+
+async function vote(proposalId, support) {
+	try {
+	  const web3 = new Web3(window.ethereum);
+	  
+	  let accounts = await ethereum.enable();
+	  await window.ethereum.request({ method: "eth_requestAccounts" });
+	  const contract = new web3.eth.Contract(abi, contractAddress);
+	  
+	  const tx = await contract.methods.vote(proposalId, support).send({ from: accounts[0] });
+	  //alert(`✅ Vote submitted!\nTx: ${tx.transactionHash}`);
+	} catch (err) {
+	  console.error(err);
+	  //alert("❌ Vote failed: " + (err.message || err));
+	}
+  }
+  async function execute(proposalId, isapproved) {
+	try {
+	  const web3 = new Web3(window.ethereum);
+	  
+	  let accounts = await ethereum.enable();
+	  await window.ethereum.request({ method: "eth_requestAccounts" });
+	  const contract = new web3.eth.Contract(abi, contractAddress);
+	  
+	  const tx = await contract.methods.execute(proposalId, isapproved).send({ from: accounts[0] });
+	  alert(`✅ executed! \nTx: ${tx.transactionHash}`);
+	} catch (err) {
+	  console.error(err);
+	  alert("❌ failed: " + (err.message || err));
+	}
+  }
+
+  window.onload = connectWallet;
+</script>
+</body>
+</html>

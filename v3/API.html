@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NFTWall API Documentation</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; line-height: 1.6; }
+  h1 { text-align: center; }
+  h2 { color: #2c3e50; }
+  pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+  hr { margin: 30px 0; }
+</style>
+</head>
+<body>
+<h1>NFTWall API Documentation</h1>
+<p>This document outlines the API endpoints provided by nftwall.io for accessing business data, user statistics, and token information from the ORC1155 ecosystem.</p>
+
+<hr />
+
+<h2>1. Get Business Data</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_business</pre>
+<p><strong>Description:</strong> Retrieves overall business performance and metrics.</p>
+
+<hr />
+
+<h2>2. Get User's Statistics</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_users_stats&forprime=0&node=0xD8431759f5DE64477967aC5F01c6FbA219312964</pre>
+<p><strong>Description:</strong> Fetches key statistics for a user identified by the node address.</p>
+
+<hr />
+
+<h2>3. Get User's Data</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_users_data&forprime=0&node=0x5E2C717FD7f262158ADf02f54fED327E3aC98182</pre>
+<p><strong>Description:</strong> Returns user-specific data and activity logs.</p>
+
+<hr />
+
+<h2>4. Get ORC1155 Details and Current Supply</h2>
+<p><strong>Endpoint (Prime = 0):</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_orc1155_data&forprime=0</pre>
+<p><strong>Endpoint (Prime = 1):</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_orc1155_data&forprime=1</pre>
+<p><strong>Description:</strong> Provides metadata and supply details of ORC1155 tokens for both prime and non-prime collections.</p>
+
+<hr />
+
+<h2>5. Verify Old Ozone Data</h2>
+<p><strong>Node 1:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_oldusers_data&node=0x3823e5e0Eb109Adf74E1b5c52b9d996277d6635c</pre>
+<p><strong>Node 2:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_oldusers_data&node=0x5E2C717FD7f262158ADf02f54fED327E3aC98182</pre>
+<p><strong>Description:</strong> Used to verify legacy user data from the ozone platform.</p>
+
+
+<hr />
+
+<h2>6. Get User Downline</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_user_downline&forprime=0&node=0xD8431759f5DE64477967aC5F01c6FbA219312964</pre>
+<p><strong>Description:</strong> Retrieves the downline hierarchy for a specific user based on their node address.</p>
+
+
+<hr />
+
+<h2>7. Button Action</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_btn_actions&node=0xD8431759f5DE64477967aC5F01c6FbA219312964</pre>
+<p><strong>Description:</strong> Buttton Action.</p>
+
+<hr />
+
+<h2>8. Offers</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_OfferData&node=0xD8431759f5DE64477967aC5F01c6FbA219312964</pre>
+<p><strong>Description:</strong> Offers APi.</p>
+
+</body>
+</html>

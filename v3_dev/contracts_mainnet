@@ -1,0 +1,57 @@
+ For activate - 
+ uInst.Txn{value: val}(p, 0, 0, 0, 200);
+
+For minting - 
+ uInst.Txn{value: val}(p, 0, 0, 0, 201);
+
+For claim - 
+ uInst.Txn{value: val}(0, 600, 0, 0, 202);
+
+
+testnet:
+-------
+https://rpc-testnet.ozonescan.com
+export hexbase='0x6aC9DA38Ee0e727697bCB10c3FeEBfb6DefB74ac'
+export lib723Safeguard='0x3cD3Fb8DB8Ac0C1A2C24aFF4f53eBD8fB7C3F83c'
+export DAOAssemblyCore='0x2C10045dff58D0eE5CcA87F28C3ED2827Ea1D73c'
+export lib741Rules='0xfc4AF66E9bfCA37343D0122eff057e8BB64c82d3'
+export lib741Price='0x7729406B98bf315CF98C5fADC6c780aDB55BE559'
+export PrimeData='0x3af8C750623B020128d8dBedD6c805dB76f9B775'
+export Nested741='0xD3103fbc8e338d163840e51752F7a0B9e27D7C30'
+export InstanceBackendPrime='0x87e95bBC10695d05C07553abDc54d0E2059fc551'
+export NodeInstance='0xecBa9139cf3b2C69436b613B38085078DfFa84Da'
+export ORC1155='0xE7E64BE390e57cdF65143ee73729bC038D741311'
+export TreaseryTVLMiningPrime='0x67601961b5edee3b9E9C47112dAcBd6659B3BDB4'
+export NodeInstance='0x432a5cDa71d38aC9BbBC6120E9907899Cc3E70b6'
+export RootInstance='0x432a5cDa71d38aC9BbBC6120E9907899Cc3E70b6'
+export NodeInstance='0x77dFB336aBE3F60355645b95aD53E8f152cca66C'
+
+
+mainnet:
+-------
+
+https://chain.ozonescan.com
+export hexbase='0x9b3D18024fd51961230ef88d6a43BAbdf0F5E8d6'
+export lib723Safeguard='0x029EEd0dFAA59F5ED14190c3c2796B7f1fc805FB'
+export DAOAssemblyCore='0xC17221da0E7dF64e1b5Fb53e1302ABaD0B2f9Ef1'
+export lib741Rules='0xFC950f23e712C48618a0e79EB783048d0a41BE27'
+export lib741Price='0x84FD67c618862aEaf27a4ecc59E5EbfE2eAbD2dD'
+export Nested741='0x92C4044249f296cc50e1E3e26afd37283D966Bcc'
+export PrimeData='0x29700A64da7E4DF83f1F13502296Fb0775dEE8A7'
+export InstanceBackendPrime='0xe0C17819ae673C74C42dA7A84DDB05d4714242a6'
+export NodeInstance='0x4424A58935C1cf4B65d55b9b2217D3F976BEC881'
+export ORC1155='0x16ea6bb29e35439fC9f0CEc9EC84514532B4B77C'
+export TreaseryTVLMiningPrime='0x740d690d227dab9a43fDf0c0b984D6c388765864'
+export NodeInstance='0x951F417969FB2AB3817dA44073a00D4985D309F3'
+export RootInstance='0x951F417969FB2AB3817dA44073a00D4985D309F3'
+export NodeInstance='0xed3ed1AA4a9f1e0AbA68Dc0f533ecf5E968E9EE4'
+
+
+helpful
+------
+function _primeIncomeInfo(uint maxinterwal) external virtual view returns (uint256 income, uint256 compincome, uint claimedage);
+function _getNodeLBPrime() external virtual view returns (uint256 business, uint qty);
+function getdetail1() external virtual view returns (uint id, uint256 bonus_, uint joinage_, address parent_, uint mintCount_, bool isStop_);
+function getMint(uint inx) external virtual view returns (address orc1155);
+function getBackendBal() external view returns(uint256 standard,uint256 prime);
+function ibkprm() external view returns(address);

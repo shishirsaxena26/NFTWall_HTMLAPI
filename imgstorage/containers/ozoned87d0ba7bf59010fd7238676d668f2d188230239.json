@@ -1,0 +1,170 @@
+{
+  "contract": "0x4961D6C6b6756E452DBC8a8a594ba5Be5949A5A5",
+  "cid": "ozoned87d0ba7bf59010fd7238676d668f2d188230239",
+  "name": "Tiger",
+  "NFTs": [
+    {
+      "name": "Tiger__1",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40327",
+      "image": "https://ozone284a27ba8a3e4355f937aaf927445f2af9dc059b.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 1
+    },
+    {
+      "name": "Tiger__2",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40328",
+      "image": "https://ozone286ccc572a3e49ef0a26ed96ce5aeda51061567d.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 2
+    },
+    {
+      "name": "Tiger__3",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40329",
+      "image": "https://ozone722551a470a627656d6400321e8c283b3abab11e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 3
+    },
+    {
+      "name": "Tiger__4",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40330",
+      "image": "https://ozone62fd0ea2a9910c2e0ec1cfaa9944c8476fb3b6bd.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 4
+    },
+    {
+      "name": "Tiger__5",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40331",
+      "image": "https://ozoned75a6b1cb9833c498d1e69aa8e61caef5fc90438.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 5
+    },
+    {
+      "name": "Tiger__6",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40332",
+      "image": "https://ozone674fdf953c8b1ea1bf02805d3da582ae6afa09f3.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 6
+    },
+    {
+      "name": "Tiger__7",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40333",
+      "image": "https://ozone895dda585458f2df228d7a9d19c9fd42982e6731.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 7
+    },
+    {
+      "name": "Tiger__8",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40334",
+      "image": "https://ozone1f66f796c9d7394daf8cd55e07bb3ce4ee5ce017.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 8
+    },
+    {
+      "name": "Tiger__9",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40335",
+      "image": "https://ozone7df53b6a6c818a2505c63edbdefc5e12369345f0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 9
+    },
+    {
+      "name": "Tiger__10",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40336",
+      "image": "https://ozonea256504c3d979edd7bd164a85b62758b7114483a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 10
+    },
+    {
+      "name": "Tiger__11",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40337",
+      "image": "https://ozone9ec743c103a53aa8a8276d08e57fa9dde5065a73.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 11
+    },
+    {
+      "name": "Tiger__12",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40338",
+      "image": "https://ozonea22242e939cb53b6a48635cc1089b544b621a652.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 12
+    },
+    {
+      "name": "Tiger__13",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40339",
+      "image": "https://ozone6aededc4ca066f8aa2f936146ce9ac9c1516b25d.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 13
+    },
+    {
+      "name": "Tiger__14",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40340",
+      "image": "https://ozone2762b60047c1f8e346fb8d8a276aad9317ab2fbf.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 14
+    },
+    {
+      "name": "Tiger__15",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40341",
+      "image": "https://ozone03e7d6f9b98cad3ef3b1f158d7d6ebd23c7b23c6.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 15
+    },
+    {
+      "name": "Tiger__16",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40342",
+      "image": "https://ozoned2d31f0c9713edadab38255a928034a448e741c1.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 16
+    },
+    {
+      "name": "Tiger__17",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40343",
+      "image": "https://ozone159888a36f0cfedf25c8d04a2eb4471a54f9c533.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 17
+    },
+    {
+      "name": "Tiger__18",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40344",
+      "image": "https://ozone478e19c4923e8ea1da1a8bf25a900be7f742687c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 18
+    },
+    {
+      "name": "Tiger__19",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40345",
+      "image": "https://ozone0b5b54ed002f211cb8cc3c602d8e5a4ce4e0437e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 19
+    },
+    {
+      "name": "Tiger__20",
+      "description": "colossal-mechanical-tiger-forged-from-molten-obs__40346",
+      "image": "https://ozoned2a2f3b804ef0b15951241ffc0f731327693ce21.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 20
+    }
+  ],
+  "baseURL": "https://ozoned87d0ba7bf59010fd7238676d668f2d188230239.ozonestore.io",
+  "tokennames": [
+    "Tiger__1",
+    "Tiger__2",
+    "Tiger__3",
+    "Tiger__4",
+    "Tiger__5",
+    "Tiger__6",
+    "Tiger__7",
+    "Tiger__8",
+    "Tiger__9",
+    "Tiger__10",
+    "Tiger__11",
+    "Tiger__12",
+    "Tiger__13",
+    "Tiger__14",
+    "Tiger__15",
+    "Tiger__16",
+    "Tiger__17",
+    "Tiger__18",
+    "Tiger__19",
+    "Tiger__20"
+  ]
+}

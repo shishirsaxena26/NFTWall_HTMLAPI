@@ -1,0 +1,202 @@
+{
+  "contract": "0x3DBd81ab6B37360016fbc6C96937C60334AaEdE4",
+  "cid": "ozone9b784636ab8c6e41bccddd36da65b4f4abc4276e",
+  "name": "Neonlit",
+  "NFTs": [
+    {
+      "name": "Neonlit__1",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40372",
+      "image": "https://ozone336f2eeb704ec827dc5f06da3a982cd45fc789bd.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 1
+    },
+    {
+      "name": "Neonlit__2",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40373",
+      "image": "https://ozoned43d14d363660ce819007d3242da88b2232aa624.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 2
+    },
+    {
+      "name": "Neonlit__3",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40374",
+      "image": "https://ozone740c891df631fa905385d74b72eb2f823191320e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 3
+    },
+    {
+      "name": "Neonlit__4",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40375",
+      "image": "https://ozone394ea0a134f3e6c3cbf95f7d724ddda75c19e223.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 4
+    },
+    {
+      "name": "Neonlit__5",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40376",
+      "image": "https://ozonee7563b072486688ef1e2c7bc764fbc70ce9b2239.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 5
+    },
+    {
+      "name": "Neonlit__6",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40377",
+      "image": "https://ozone7b3e8070423a6ff24070add1993ad905b2fe7a29.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 6
+    },
+    {
+      "name": "Neonlit__7",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40378",
+      "image": "https://ozone876236e5f6e8ddbdbd52a01607117dc90ff28b6f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 7
+    },
+    {
+      "name": "Neonlit__8",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40379",
+      "image": "https://ozone2d8abfb42e2261a73cad10e3ca019142bd7650b8.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 8
+    },
+    {
+      "name": "Neonlit__9",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40380",
+      "image": "https://ozone635eba16d1388ea3353aac23b7f892189dd1c960.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 9
+    },
+    {
+      "name": "Neonlit__10",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40381",
+      "image": "https://ozone288ff16936d6489e349310d19fbf75cdd4b65a2a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 10
+    },
+    {
+      "name": "Neonlit__11",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40382",
+      "image": "https://ozone4f45aee7e1f1acf2e34da050c81304ee3b4132a2.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 11
+    },
+    {
+      "name": "Neonlit__12",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40383",
+      "image": "https://ozone33279bc8995a981e294dff8bc1b3d12b53f9b8ec.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 12
+    },
+    {
+      "name": "Neonlit__13",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40384",
+      "image": "https://ozonee1ff71db04e9de672789395d9beb0de87867aea5.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 13
+    },
+    {
+      "name": "Neonlit__14",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40385",
+      "image": "https://ozone2f722614eb00681cc4f85ad1b6db32d48992e5db.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 14
+    },
+    {
+      "name": "Neonlit__15",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40386",
+      "image": "https://ozonef8660bf91116cb4ee18514c39d20162de48d4fec.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 15
+    },
+    {
+      "name": "Neonlit__16",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40387",
+      "image": "https://ozone79a9a85b27ec9c11a4dbfb115b7ced8114b494bb.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 16
+    },
+    {
+      "name": "Neonlit__17",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40388",
+      "image": "https://ozonef0380f523369ca59ca5a0433972d266f83b10f26.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 17
+    },
+    {
+      "name": "Neonlit__18",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40389",
+      "image": "https://ozonec6d86da3ddc114a0184f8153ae2a84e074c1a413.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 18
+    },
+    {
+      "name": "Neonlit__19",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40390",
+      "image": "https://ozoneceeefb0b2c7cbed6df070d27b349634f4a05c3b2.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 19
+    },
+    {
+      "name": "Neonlit__20",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40391",
+      "image": "https://ozone9232195fa9d1a15dfbba1bbc18c21f0d0fa0fe55.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 20
+    },
+    {
+      "name": "Neonlit__21",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40392",
+      "image": "https://ozoneaaf3de9a6bc503f1e3c6f4fc89f7431e10c6aab0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 21
+    },
+    {
+      "name": "Neonlit__22",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40393",
+      "image": "https://ozone1a25faa4cc58bebaa40eec0debb139460a9dfc7b.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 22
+    },
+    {
+      "name": "Neonlit__23",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40394",
+      "image": "https://ozonea3b0fe3c4a5eebc0d5810b10c0a7f432cb0cbd92.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 23
+    },
+    {
+      "name": "Neonlit__24",
+      "description": "neonlit-unicorn-with-prism-armor-galloping-throu__40395",
+      "image": "https://ozone9e94f1382275cd0ab111944b105eb01ecbac6454.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 24
+    }
+  ],
+  "baseURL": "https://ozone9b784636ab8c6e41bccddd36da65b4f4abc4276e.ozonestore.io",
+  "tokennames": [
+    "Neonlit__1",
+    "Neonlit__2",
+    "Neonlit__3",
+    "Neonlit__4",
+    "Neonlit__5",
+    "Neonlit__6",
+    "Neonlit__7",
+    "Neonlit__8",
+    "Neonlit__9",
+    "Neonlit__10",
+    "Neonlit__11",
+    "Neonlit__12",
+    "Neonlit__13",
+    "Neonlit__14",
+    "Neonlit__15",
+    "Neonlit__16",
+    "Neonlit__17",
+    "Neonlit__18",
+    "Neonlit__19",
+    "Neonlit__20",
+    "Neonlit__21",
+    "Neonlit__22",
+    "Neonlit__23",
+    "Neonlit__24"
+  ]
+}

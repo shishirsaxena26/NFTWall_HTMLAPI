@@ -1,0 +1,106 @@
+{
+  "contract": "ozonef27297d8a95c4c32f00b9def95d3cad789308b08",
+  "cid": "ozonef27297d8a95c4c32f00b9def95d3cad789308b08",
+  "name": "Parrot",
+  "NFTs": [
+    {
+      "name": "Parrot 1",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone456365a7bc78c856b86d3305ef9763527436e0cc.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "1"
+    },
+    {
+      "name": "Parrot 2",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone7c4782e2d81e0fe5780a69a2d80ca591db11fe39.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "2"
+    },
+    {
+      "name": "Parrot 3",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone62b64e2a25c925f13b434b305e589b86c8b1d2e8.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "3"
+    },
+    {
+      "name": "Parrot 4",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone8b9ae9e57bcade9261489c31897649b66aa0756c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "4"
+    },
+    {
+      "name": "Parrot 5",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone546c2745f869e824da627a3928ea30a61a9df004.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "5"
+    },
+    {
+      "name": "Parrot 6",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone4451c9d748b4e7936853ac763e692e0942557f90.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "6"
+    },
+    {
+      "name": "Parrot 7",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozonef24dd1fe8de495f017b90e86011c5d06b12c7bfb.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "7"
+    },
+    {
+      "name": "Parrot 8",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone465967d88d8857d1cfecc1342a2d6b05862eb1ac.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "8"
+    },
+    {
+      "name": "Parrot 9",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone0dfbfaff7154dd55734bf51a2131e9908f43da60.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "9"
+    },
+    {
+      "name": "Parrot 10",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone73a5dd65e5a9edd4e38f288a1e051c6e35d736e5.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "10"
+    },
+    {
+      "name": "Parrot 11",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozone2c57ebfc052564a49f0a80df9c57436ed3e50645.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "11"
+    },
+    {
+      "name": "Parrot 12",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri__17744",
+      "image": "https://ozonead5c24916d4959a3f87834f2fdab64129c4cf4d6.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "12"
+    }
+  ],
+  "baseURL": "https://ozonef27297d8a95c4c32f00b9def95d3cad789308b08.ozonestore.io",
+  "tokennames": [
+    "Parrot 1",
+    "Parrot 2",
+    "Parrot 3",
+    "Parrot 4",
+    "Parrot 5",
+    "Parrot 6",
+    "Parrot 7",
+    "Parrot 8",
+    "Parrot 9",
+    "Parrot 10",
+    "Parrot 11",
+    "Parrot 12"
+  ]
+}

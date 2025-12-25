@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Transfer Form</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; font-size:small; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    table td:nth-child(5),
+    table th:nth-child(5) {
+      background-color: #ABE098;  /* light highlight */
+      font-weight: bold;          /* example styling */
+      color: #333;
+    }
+
+    table td:nth-child(6),
+    table th:nth-child(6) {
+      background-color: #83D475;  /* light highlight */
+      font-weight: bold;          /* example styling */
+      color: #333;
+    }
+
+    table td:nth-child(7),
+    table th:nth-child(7) {
+      background-color: #57C84D;  /* light highlight */
+      font-weight: bold;          /* example styling */
+      color: #333;
+    }
+
+    table td:nth-child(11),
+    table th:nth-child(11) {
+      background-color: #000;  /* light highlight */
+      font-weight: bold;          /* example styling */
+      color: #FFDF00;
+      text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px red;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    
+  </style>
+  <style>
+    .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    max-width: 1000px; /* set a max width to keep layout under control */
+    margin: 30px auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* prevents overflow */
+    flex: 1;
+  }
+
+  label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+
+  .form-actions {
+    flex-shrink: 0; /* prevent button from shrinking */
+  }
+
+  button {
+    padding: 10px 16px;
+    border: none;
+    background-color: #2563eb;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #1e40af;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <script>
+
+  </script>
+</head>
+<body>
+
+<h2 class="rptname">Transfer Form</h2>
+
+<div class="form-row">
+  <div class="form-group">
+    <label for="field1">Origin</label>
+    <input id="field1" type="text" placeholder="0x0000000000000000000000000000000000000000">
+  </div>
+
+  <div class="form-group">
+    <label for="field2">Required Approver (multiple)</label>
+    <input id="field2" type="text" placeholder="0x.....,0x.....,0x.....">
+  </div>
+
+  <div class="form-actions">
+    <button onclick="submitValues()">Submit</button>
+  </div>
+</div>
+
+<table id="tabTransferForm">
+  <thead>
+    <tr id="tableHeader"></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  // Replace with your API URL
+  let apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_OfferData"; 
+  const params = new URLSearchParams(window.location.search);
+  let page = params.get("page");  // will give "1" if ?forprime=1
+  
+  if(!page){
+     page=1;
+   }
+    
+  apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_OfferData&page="+page;
+  document.querySelector(".rptname").textContent = "Transfer Form";
+
+  // Fetch data from API
+fetch(apiUrl)
+      .then(response => response.json())
+      .then(apiResponse => {
+        // Ensure API returned the expected structure
+        if (!apiResponse.success || !apiResponse.data || !apiResponse.data[0]) {
+          console.error("Unexpected API response:", apiResponse);
+          return;
+        }
+
+        // Extract only the inner data array
+        const jsonData = apiResponse.data[0];
+
+        const tableHeader = document.getElementById("tableHeader");
+        const tbody = document.querySelector("#dataTable tbody");
+
+        // --- Create dynamic headers ---
+        const keys = Object.keys(jsonData[0]);
+        keys.forEach(key => {
+          const th = document.createElement("th");
+          th.textContent = key;
+          tableHeader.appendChild(th);
+        });
+
+        // --- Fill table rows dynamically ---
+        jsonData.forEach(item => {
+          const row = document.createElement("tr");
+          keys.forEach(key => {
+            const td = document.createElement("td");
+            td.textContent = item[key];
+            row.appendChild(td);
+          });
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error("Error fetching data:", error));
+
+
+
+</script>
+
+</body>
+</html>

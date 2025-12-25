@@ -1,0 +1,221 @@
+let safe='0x747B3b2cF0A9Eb3E28e2dd2f0b03a276d141BE10'
+let rule='0x8D8c8B45f6167a8dc43260e861D5B517FEC079Cd'
+let nested='0x134c3CC120f301f64A7A47E7F4091C3F861887Cd'
+
+let orc1155='0xF908c6fCc2D606b34B9c45a3548Cc0BA0d556c36'
+let orc1155Cat = '0xa321C4a2814C866468517D72c34c0B51cfEeE0d0'
+
+let transfer='0x838945a6b917Abff22990C9670142DFaF8748875'
+let cloneIns='0x856c85A1D14AB43dbE14Cb60A967708811B5329F'
+
+let factory='0x4707A65946577842081cA2b9Ab25242B4586245b'
+
+let rootSponser='0x7Ab9df72fe514f374Aa2e1153C0d04621794aB8F'
+let blankAddress='0x0000000000000000000000000000000000000000'
+
+
+async function onJoin() {
+	$("#lblmsg").text('');
+	
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		var parent = $("#txtparent").val();
+		if (!parent) { msg('parent is blank'); return; }
+
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		if ((await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('instance already exists.'); return; }
+		
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		let response = await window.factorycontract.methods.createInstance(accounts[0], parent).send(
+			{ from: accounts[0] }) 
+			.on('error', function (error) { msg(error.message); console.log(error); })
+			.then(function (Obj) {
+				if (Obj.status == true) {
+					$("#lblmsg").text('Joined succeeded');
+				}
+				else {
+					$("#lblmsg").text('Joined failed');
+				}
+			});
+
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Initialized failed');
+		//  myalert("Registration failed");
+	}
+}
+
+
+
+async function onMint(orctype) {
+	let orc1155Add = orctype==1?orc1155:orc1155Cat;
+	$("#lblmsg").text('');
+	try {
+
+		var txtqty = $("#txtAmount").val();
+		if (!txtqty) { msg('qty is empty'); return; }
+		
+		let qty = BigInt(txtqty);
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		debugger;
+
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		if (!(await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('user not found.'); return; }
+		debugger;
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+		
+		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+		
+		let _value=BigInt(0);
+	
+		window.orc1155contract = new window.web3.eth.Contract(ORCABI.abi, orc1155Add);
+		let fee =BigInt(await window.orc1155contract.methods.mintFee().call());
+		
+		_value=fee*qty;
+		
+		//let balanceWei = BigInt(await web3.eth.getBalance(instance)); 
+		let bonus = BigInt(await window.instancecontract.methods.bonus().call());   // returns balance in Wei (as a string)
+		//balanceWei = balanceWei+bonus;
+		
+		_value=bonus>=_value?(0):(_value-bonus); // if bonus is used, it should not exceed the total value
+		debugger;
+		let response = await window.instancecontract.methods.Txn(orc1155Add,2,qty,1).send(
+			{ from: accounts[0], value: _value.toString() }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Minted succeeded');
+				}
+				else {
+					$("#lblmsg").text('Minted failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Staking failed');
+	}
+}
+
+
+
+
+
+async function onClaim() {
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		if (!(await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('user not found'); return; }
+		
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+		
+		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+		//debugger;
+		let response = await window.instancecontract.methods.Txn(blankAddress,9999,0,7).send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Claimed succeeded');
+				}
+				else {
+					$("#lblmsg").text('Claimed failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Staking failed');
+		//  myalert("Registration failed");
+	}
+}
+
+
+
+
+
+
+async function onNFTTransfer(orc1155, tokenid, to, amount) {
+	alert("Contract: " + orc1155 + ", Token ID: " + tokenid + ", To: " + to + ", Amount: " + amount);
+
+	//debugger;
+
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc1155);
+		let response = await window.orc1155contract.methods.safeTransferFrom(accounts[0], to, tokenid, amount, "0x").send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+	
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Transfer succeeded');
+				}
+				else {
+					$("#lblmsg").text('Transfer failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Transfer failed');
+		//  myalert("Registration failed");
+	}
+	
+}
+
+
+
+
+
+async function loadlevelbusiness(instance) {
+	var tr1 = $($("#tabLevel").find('tr')[0]).clone();
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	let level = (await window.nestedcontract.methods.getNodeLvlDepth(instance).call());
+	
+	for (let i=0; i<level; i++) {
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		var td = '<td>' + (i==0?"self":i) + '</td>';
+		let lb = await window.nestedcontract.methods.getNodeLB(instance,i).call();
+		td =td + '<td>' + web3.utils.fromWei(lb[0], 'ether') + '</td>';
+		td =td + '<td>' + lb[1] + '</td>';
+		$("#tabLevel").append('<tr>' + td + '</tr>');
+	}
+	
+}
+

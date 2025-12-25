@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Socket Rooms with JWT</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    #app { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>Signup</h2>
+<div id="signupDiv">
+  <input id="signupUser" placeholder="username">
+  <input id="signupPass" type="password" placeholder="password">
+  <button onclick="signup()">Signup</button>
+</div>
+
+<h2>Login</h2>
+<div id="loginDiv">
+  <input id="loginUser" placeholder="username">
+  <input id="loginPass" type="password" placeholder="password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="app">
+  <h2>Welcome <span id="username"></span></h2>
+  <button onclick="logout()">Logout</button>
+
+  <hr>
+
+  <h3>Create / Join Room</h3>
+  <input id="roomId" placeholder="Room ID">
+  <button onclick="createRoom()">Create Room</button>
+  <button onclick="joinRoom()">Join Room</button>
+  <button onclick="leaveRoom()">Leave Room</button>
+  <button onclick="destroyRoom()">Destroy Room</button>
+
+  <h3>Rooms List</h3>
+  <button onclick="listRooms()">Refresh Rooms</button>
+  <div id="roomsList"></div>
+
+  <h3>Chat in Room</h3>
+  <input id="message" placeholder="Message">
+  <button onclick="sendMessage()">Send</button>
+
+  <h3>Event Output</h3>
+  <div id="output"></div>
+</div>
+
+<script>
+  let token = "";
+  let currentRoom = "";
+  const URL = 'http://localhost:5000';
+  const socket = io(URL);
+
+  function log(msg) {
+    output.innerHTML += `<p>${msg}</p>`;
+  }
+
+  async function signup() {
+    const res = await fetch(URL+"/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: signupUser.value, password: signupPass.value })
+    });
+    const data = await res.json();
+    alert(JSON.stringify(data));
+  }
+
+  async function login() {
+    const res = await fetch(URL+"/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: loginUser.value, password: loginPass.value })
+    });
+    const data = await res.json();
+    if (data.error) return alert(data.error);
+
+    token = data.token;
+    socket.emit("auth:token", { token });
+
+    socket.on("auth:success", (d) => {
+      username.innerText = d.username;
+      loginDiv.style.display = "none";
+      signupDiv.style.display = "none";
+      app.style.display = "block";
+    });
+
+    socket.on("auth:failed", (msg) => alert(msg));
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  function createRoom() {
+    const room = roomId.value;
+    currentRoom = room;
+    socket.emit("room:create", { roomId: room }, (res) => {
+      if (res.error) alert(res.error);
+      else log(`Room Created: ${room}`);
+    });
+  } 
+
+  function joinRoom() {
+    alert(1);
+    const room = roomId.value;
+    currentRoom = room;
+    alert(currentRoom);
+    socket.emit("room:join", { roomId: room }, (res) => {
+      if (res.error) alert(res.error);
+      else log(`Joined Room: ${room}, Users: ${res.room.users.join(", ")}`);
+    });
+    alert(currentRoom);
+  }
+
+  function leaveRoom() {
+    const room = roomId.value;
+    socket.emit("room:leave", { roomId: room }, (res) => {
+      if (res.error) alert(res.error);
+      else log(`Left Room: ${room}`);
+      if (currentRoom === room) currentRoom = "";
+    });
+  }
+
+  function destroyRoom() {
+    const room = roomId.value;
+    socket.emit("room:destroy", { roomId: room }, (res) => {
+      if (res.error) alert(res.error);
+      else log(`Room Destroyed: ${room}`);
+      if (currentRoom === room) currentRoom = "";
+    });
+  }
+
+  function listRooms() {
+    socket.emit("room:list", {}, (res) => {
+      if (res.error) return alert(res.error);
+      roomsList.innerHTML = "";
+      res.rooms.forEach(r => {
+        roomsList.innerHTML += `<p>${r.roomId} (${r.users.join(", ")})</p>`;
+      });
+    });
+  }
+
+  function sendMessage() {
+    if (!currentRoom) return alert("Join a room first");
+    socket.emit("send_message", { roomId: currentRoom, message: message.value }, (res) => {
+      if (res.error) return alert(res.error);
+    });
+  }
+
+  // Receive chat messages
+  socket.on("message", (data) => {
+    log(`<b>${data.from}:</b> ${data.message}`);
+  });
+
+  socket.on("room_users", (data) => {
+    log(`Room Users Updated: ${data.users.join(", ")}`);
+  });
+
+  socket.on("room_destroyed", (data) => {
+    log(`Room Destroyed: ${data.roomId}`);
+    if (currentRoom === data.roomId) currentRoom = "";
+  });
+</script>
+</body>
+</html>

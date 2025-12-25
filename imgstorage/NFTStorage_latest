@@ -1,0 +1,56 @@
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    server_name ashokaverse.io www.ashokaverse.io *.ashokaverse.io;
+    return 301 https://$host$request_uri;
+}
+
+# --------------------------
+# Main domain (ashokaverse.io)
+# --------------------------
+server {
+    listen 443 ssl http2;
+    server_name ashokaverse.io www.ashokaverse.io;
+
+    ssl_certificate     /etc/ssl/cloudflare/origin.crt;
+    ssl_certificate_key /etc/ssl/cloudflare/origin.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    root /var/www/NFTStorage;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+# --------------------------
+# Wildcard subdomains (*.ashokaverse.io)
+# Each folder = subdomain
+# Example: /var/www/NFTStorage/test -> https://test.ashokaverse.io
+# --------------------------
+
+# Map subdomain name
+map $host $subfolder {
+    default "";
+    ~^(?<subd>[^.]+)\.ashokaverse\.io$ $subd;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name *.ashokaverse.io;
+
+    ssl_certificate     /etc/ssl/cloudflare/origin.crt;
+    ssl_certificate_key /etc/ssl/cloudflare/origin.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    root /var/www/NFTStorage/$subfolder;
+    index index.html default.png;
+
+    location / {
+        try_files $uri $uri/ /default.png =404;
+    }
+}
+

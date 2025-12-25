@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            font-size:11px;
+        }
+        #txtPrimeAddress {
+            width: 300px;
+            padding: 2px;
+           
+            border: 1px solid #7ac9b7;
+            box-sizing: border-box;
+            
+             
+        }
+       
+    </style>
+</head>
+<body>
+    <div>
+      
+    <table  width="100%">
+        <tr>
+            <td valign="top"  style=" background-color:#110550; color:white;  font-size:large; border: burlywood thick solid;">
+                <table width="100%" cellpadding="10">
+                    <tr><td><input type="text" width="200px"  id="txtPrimeAddress" placeholder="address" value="" /><button id="btngetPrimeData" onclick="onGetPrimeData()" value="Get">Get</button> </td><td><span id="lblmsg"></span></td></tr>
+                </table> 
+                    <table id="tabPrimeData"  width="100%" cellpadding="10">
+                        <tr><td>Address</td><td>Business</td><td>Exist</td></tr></table> 
+            </td>
+        <tr>
+    </table>
+
+    </div>
+    <hr />
+   
+
+   
+    <script>
+        
+        const ConnectWallet = async () => {
+            window.selectedaddress = null;
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('MetaMask is installed!');
+                if (!window.ethereum.isConnected()) {
+                    alert("Please connect metamask wallet."); return;
+                }
+
+                await window.ethereum.enable();
+
+                // window.web3 = new Web3(window.ethereum);
+
+                window.web3 = new Web3(window.ethereum);
+
+                const accounts = await window.ethereum.request({
+                    method: "eth_accounts",
+                    params: [],
+                });
+                if (accounts.length === 0) {
+                    alert('Please connect to MetaMask.');
+                }
+                else {         
+                    window.selectedaddress = accounts[0];
+                    return accounts[0];
+
+                }
+
+            }
+            else
+                alert("Please download metamask");
+
+            return false;
+        };
+       // ConnectWallet();
+    </script>
+
+    <script src="factory2js.v1/FactoryABI.js"></script>
+    <script src="factory2js.v1/InstanceABI.js"></script>
+    <script src="factory2js.v1/RoyalityABI.js"></script>
+    
+
+    <script>
+        var version = Date.now();
+      
+        function loadScript(src, callback) {
+          var script = document.createElement('script');
+          script.src = src + '?v=' + version;
+          script.onload = callback;
+          document.head.appendChild(script);
+        }
+      
+        loadScript('factory2js.v1/walletaddress.js', function () {
+          loadScript('factory2js.v1/walletlayer.js', function () {
+            loadScript('factory2js.v1/walletlayerPrime.js', function () {
+              console.log('All scripts loaded in order!');
+              // You can now safely use functions from all 3 scripts
+            });
+          });
+        });
+    </script>
+
+</body>
+</html>
+

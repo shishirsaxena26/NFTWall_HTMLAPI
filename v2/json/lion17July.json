@@ -1,0 +1,210 @@
+{
+  "contract": "0xd03060e8ED7754AeEd63e4E56b0457662D8164aA",
+  "cid": "ozone13adc7da8d257cacd611c0d28e986af257b22910",
+  "name": "Lion",
+  "NFTs": [
+    {
+      "name": "Lion__1",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40347",
+      "image": "https://ozone7936844e8cfe7c5d0ce09db85fdd8def82df8d98.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 1
+    },
+    {
+      "name": "Lion__2",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40348",
+      "image": "https://ozone399d6bc2ac23a56d58510623e548f65a65131730.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 2
+    },
+    {
+      "name": "Lion__3",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40349",
+      "image": "https://ozonebb7794e58cecfae7ff15f013da7ce747ceae6f81.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 3
+    },
+    {
+      "name": "Lion__4",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40350",
+      "image": "https://ozone3a3d10ab1e7f7776a0fbd022b4cd466ac14e53c0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 4
+    },
+    {
+      "name": "Lion__5",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40351",
+      "image": "https://ozonee0b1a3cf56e08c0b8fa8f644a9ea08f9b7dad139.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 5
+    },
+    {
+      "name": "Lion__6",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40352",
+      "image": "https://ozonec77e16d0d8af2c65628e003b25ac90997a56b21e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 6
+    },
+    {
+      "name": "Lion__7",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40353",
+      "image": "https://ozone9292247f1162e3f5d2b5e89543a9f9e9c7af0bf6.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 7
+    },
+    {
+      "name": "Lion__8",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40354",
+      "image": "https://ozone37f9c50d4610719556b8cb3bda0b324dda0a2763.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 8
+    },
+    {
+      "name": "Lion__9",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40355",
+      "image": "https://ozone5b0b249c5d5d52ea4bf8285b45b7966355745f73.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 9
+    },
+    {
+      "name": "Lion__10",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40356",
+      "image": "https://ozone45c8dc7f76a37ac6240417d3ac667da5718fb5c6.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 10
+    },
+    {
+      "name": "Lion__11",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40357",
+      "image": "https://ozone1e019a670c86edebc2baa2b5aedc09619224f695.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 11
+    },
+    {
+      "name": "Lion__12",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40358",
+      "image": "https://ozone0f8395625b69e93041ce45e804265cb82a4b8c81.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 12
+    },
+    {
+      "name": "Lion__13",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40359",
+      "image": "https://ozoneafeb9a9b66f3166bdace0fbcb9d37beb7aaa4c0c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 13
+    },
+    {
+      "name": "Lion__14",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40360",
+      "image": "https://ozone79717d8d4715abe01e111462c3b2865ff597b966.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 14
+    },
+    {
+      "name": "Lion__15",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40361",
+      "image": "https://ozonea9aebfc2c4cedf47f061b7cbd9884b437a4c5c7a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 15
+    },
+    {
+      "name": "Lion__16",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40362",
+      "image": "https://ozone6a30aaa15c7fcf999fbccdff5e820f8f8b1f59b7.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 16
+    },
+    {
+      "name": "Lion__17",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40363",
+      "image": "https://ozone6f1a32b54c0beaf3185cc2c53567ecf5e24df201.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 17
+    },
+    {
+      "name": "Lion__18",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40364",
+      "image": "https://ozoneda3818b50e6e4cd22078cae585faeeedbd3be308.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 18
+    },
+    {
+      "name": "Lion__19",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40365",
+      "image": "https://ozonee8bf6f0d600bd67067be658386644ca9c9d0e7f6.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 19
+    },
+    {
+      "name": "Lion__20",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40366",
+      "image": "https://ozoneb9cc69d2eee69b5d7e62bb8281db55dcecbecbcd.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 20
+    },
+    {
+      "name": "Lion__21",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40367",
+      "image": "https://ozone2eedb1ea5a621760d3322db408cab9b0cfce7fbd.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 21
+    },
+    {
+      "name": "Lion__22",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40368",
+      "image": "https://ozone7ca58cec87b1913c8d1608ef67f036715bcf68a0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 22
+    },
+    {
+      "name": "Lion__23",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40369",
+      "image": "https://ozoneca6ea963279250e63761cf9b984e5edca8dd5bde.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 23
+    },
+    {
+      "name": "Lion__24",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40370",
+      "image": "https://ozonec4a9d4e974bedf3807e0bef337a3d0f46be20b67.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 24
+    },
+    {
+      "name": "Lion__25",
+      "description": "towering-mechanical-lion-built-from-obsidian-arm__40371",
+      "image": "https://ozone2daab2f9f2af92e2152309045d02a9c7d10d1fad.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 25
+    }
+  ],
+  "baseURL": "https://ozone13adc7da8d257cacd611c0d28e986af257b22910.ozonestore.io",
+  "tokennames": [
+    "Lion__1",
+    "Lion__2",
+    "Lion__3",
+    "Lion__4",
+    "Lion__5",
+    "Lion__6",
+    "Lion__7",
+    "Lion__8",
+    "Lion__9",
+    "Lion__10",
+    "Lion__11",
+    "Lion__12",
+    "Lion__13",
+    "Lion__14",
+    "Lion__15",
+    "Lion__16",
+    "Lion__17",
+    "Lion__18",
+    "Lion__19",
+    "Lion__20",
+    "Lion__21",
+    "Lion__22",
+    "Lion__23",
+    "Lion__24",
+    "Lion__25"
+  ]
+}

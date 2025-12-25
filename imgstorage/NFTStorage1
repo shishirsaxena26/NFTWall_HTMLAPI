@@ -1,0 +1,30 @@
+# Redirect all HTTP to HTTPS
+server {
+    listen 80;
+    server_name ashokaverse.io www.ashokaverse.io;
+
+    # Redirect to the same host and URI but on HTTPS
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS block
+server {
+    listen 443 ssl http2;
+    server_name ashokaverse.io www.ashokaverse.io;
+
+    # Cloudflare Origin Certificates
+    ssl_certificate     /etc/ssl/cloudflare/origin.crt;
+    ssl_certificate_key /etc/ssl/cloudflare/origin.key;
+
+    # Optional: Improve SSL security
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    root /var/www/NFTStorage;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+

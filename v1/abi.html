@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="output"></div>
+    <hr />
+    <script>
+         let version = Date.now();
+        function loadScript(src, callback) {
+          var script = document.createElement('script');
+          script.src = src + '?v=' + version;
+          script.onload = callback;
+          document.head.appendChild(script);
+        }
+      
+        loadScript('factory2js/walletaddress.js', function () { 
+
+            let heads = ["safe", "rule", "nested", "transfer", "instance", "factory", "orc"];
+           // pageload(heads);
+            pageloadPrime(heads);
+        });
+
+        async function pageload(hd) {
+            const output = document.getElementById('output');
+            
+            for (const o of hd) {
+                let abi = [];
+                if (o === 'safe')
+                abi = await fetch('abi.v1/lib723Common.sol/lib723Common.json?v=' + version).then(res => res.json());
+                if (o === 'factory')
+                abi = await fetch('abi.v1/Nftwall-Factory.sol/NFTWallFactory.json?v=' + version).then(res => res.json());
+                if (o === 'nested')
+                abi = await fetch('abi.v1/Nested741.sol/Nested741.json?v=' + version).then(res => res.json());
+                if (o === 'rule')
+                abi = await fetch('abi.v1/lib741Rules.sol/lib741Rules.json?v=' + version).then(res => res.json());
+                if (o === 'instance')
+                abi = await fetch('abi.v1/Nftwall-Instance.sol/NodeInstance.json?v=' + version).then(res => res.json());
+                if (o === 'orc')
+                abi = await fetch('abi.v1/ORC1155.sol/ORC1155.json?v=' + version).then(res => res.json());
+                if (o === 'transfer')
+                abi = await fetch('abi.v1/Transfer.sol/Transfer.json?v=' + version).then(res => res.json());
+        
+                const key = o + "ABI";
+                const value = JSON.stringify(abi.abi).replace(/"/g, "'");
+                output.innerHTML +=`&lt;add key="${key}" value="${value}" /&gt;`;
+                output.innerHTML += "<br>";
+            }
+        }
+            
+    
+        async function pageloadPrime(hd) {
+        const output = document.getElementById('output');
+        for (const o of hd) {
+           let abi = [];
+           if (o === 'safe')
+             abi = await fetch('abi.v1/lib723CommonPrime.sol/lib723CommonPrime.json?v='+version).then(res => res.json());
+           if (o === 'factory')
+             abi = await fetch('abi.v1/Nftwall-FactoryPrime.sol/NFTWallFactoryPrime.json?v='+version).then(res => res.json());
+	       if (o === 'nested')
+             abi = await fetch('abi.v1/Nested741Prime.sol/Nested741Prime.json?v='+version).then(res => res.json());
+	       if (o === 'rule')
+             abi = await fetch('abi.v1/lib741RulesPrime.sol/lib741RulesPrime.json?v='+version).then(res => res.json());
+	       if (o === 'instance')
+             abi = await fetch('abi/Nftwall-InstancePrime.sol/NodeInstancePrime.json?v='+version).then(res => res.json());
+           if (o === 'orc')
+            abi = await fetch('abi.v1/ORC1155Prime.sol/ORC1155Prime.json?v='+version).then(res => res.json());
+           if (o === 'transfer')
+             abi = await fetch('abi.v1/TransferPrime.sol/TransferPrime.json?v=' + version).then(res => res.json());
+   
+           const key = o + "PrimeABI";
+           const value = JSON.stringify(abi.abi).replace(/"/g, "'");
+           output.innerHTML +=`&lt;add key="${key}" value="${value}" /&gt;`;
+           output.innerHTML += "<br>";
+         }
+       }
+       
+    
+      </script>
+      
+
+</body>
+</html>
+

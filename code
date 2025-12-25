@@ -1,0 +1,305 @@
+
+async function onMint() {
+	//let orc1155Add = orctype==1?orc1155:orc1155Cat;
+	let orc1155Add = orc1155;
+	
+	$("#lblmsg").text('');
+	try {
+
+		var txtqty = $("#txtAmount").val();
+		if (!txtqty) { msg('qty is empty'); return; }
+		
+		let qty = BigInt(txtqty);
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		if (!(await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('user not found.'); return; }
+		
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+		
+		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+		
+		let _value = BigInt(await window.instancecontract.methods.computeMintValue(qty).call());
+		
+		
+		//let balanceWei = BigInt(await web3.eth.getBalance(instance)); 
+		let bonus = BigInt(await window.instancecontract.methods.bonus().call());   // returns balance in Wei (as a string)
+		//balanceWei = balanceWei+bonus;
+		
+		_value=bonus>=_value?(0):(_value-bonus); // if bonus is used, it should not exceed the total value
+		
+		let response = await window.instancecontract.methods.Txn(orc1155Add,4,qty,1).send(
+			{ from: accounts[0], value: _value.toString() }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Minted succeeded');
+				}
+				else {
+					$("#lblmsg").text('Minted failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Staking failed');
+		//  myalert("Registration failed");
+	}
+}
+
+
+async function onClaim() {
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+
+		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
+		if (!(await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('user not found'); return; }
+		
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+		
+		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+		//
+		let response = await window.instancecontract.methods.Txn(blankAddress,9999,0,7).send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Claimed succeeded');
+				}
+				else {
+					$("#lblmsg").text('Claimed failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Staking failed');
+		//  myalert("Registration failed");
+	}
+}
+
+
+async function onNFTBurn(orc1155, tokenid, to, amount) {
+	alert("Contract: " + orc1155 + ", Token ID: " + tokenid + ", To: " + to + ", Amount: " + amount);
+
+	//
+
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc1155);
+		let response = await window.orc1155contract.methods.burn(accounts[0], tokenid, amount).send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+	
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Transfer succeeded');
+				}
+				else {
+					$("#lblmsg").text('Transfer failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Transfer failed');
+		//  myalert("Registration failed");
+	}
+	
+}
+
+async function onNFTTransfer(orc1155, tokenid, to, amount) {
+	alert("Contract: " + orc1155 + ", Token ID: " + tokenid + ", To: " + to + ", Amount: " + amount);
+
+	//
+
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc1155);
+		let response = await window.orc1155contract.methods.safeTransferFrom(accounts[0], to, tokenid, amount, "0x").send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+	
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Transfer succeeded');
+				}
+				else {
+					$("#lblmsg").text('Transfer failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Transfer failed');
+		//  myalert("Registration failed");
+	}
+	
+}
+
+
+
+
+
+async function onActivate()
+{
+	msgPrime('');
+
+	try {
+		
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		window.factorycontract = new web3.eth.Contract(factoryABI.abi, factory);
+		if (!(await window.factorycontract.methods.isuser(accounts[0]).call())) 
+		{ msg('Instance is not created.'); return; }
+		
+		await _activate(accounts[0]);
+	}
+	catch (ex) {
+		console.log(ex);
+
+		//  myalert("Registration failed");
+	}
+}
+
+
+
+async function onMintPrime() {
+	//let orc1155Add = orctype==1?orc1155:orc1155Cat;
+	let orc1155Add = orc1155Prime;
+	debugger;
+	$("#lblmsgPrime").text('');
+	try {
+
+		var txtqty = $("#txtAmount").val();
+		if (!txtqty) { msg('qty is empty'); return; }
+		
+		let qty = BigInt(txtqty);
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		window.factoryprimecontract = new web3.eth.Contract(factoryABIPrime.abi, factoryPrime);
+		if (!(await window.factoryprimecontract.methods.isuser(accounts[0]).call())) 
+		{ msg('user not found.'); return; }
+		
+		window.nestedprimecontract = new web3.eth.Contract(NestedABIPrime.abi, nestedPrime);
+		let instance = await window.nestedprimecontract.methods.UserToInst(accounts[0]).call();
+		window.instancePrimecontract = new web3.eth.Contract(insABIPrime.abi, instance);
+	
+	
+		
+		let _value = BigInt(await window.instancePrimecontract.methods.computeMintValue(qty).call());
+		//_value = BigInt(2*(parseFloat(10)**parseFloat(18)));
+		
+		//let balanceWei = BigInt(await web3.eth.getBalance(instance)); 
+		let bonus = BigInt(await window.instancePrimecontract.methods.bonus().call());   // returns balance in Wei (as a string)
+		//balanceWei = balanceWei+bonus;
+		
+		_value=bonus>=_value?(0):(_value-bonus); // if bonus is used, it should not exceed the total value
+		
+		
+		
+		let response = await window.instancePrimecontract.methods.Txn(orc1155Add,2,qty,1).send(
+			{ from: accounts[0], value: _value.toString() }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsgPrime").text('Minted succeeded');
+				}
+				else {
+					$("#lblmsgPrime").text('Minted failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsgPrime").text('Staking failed');
+		//  myalert("Registration failed");
+	}
+}
+
+
+async function _activate(account)
+{
+	msgPrime('');
+
+	try {
+		  
+		
+		window.web3 = new Web3(window.ethereum);
+		window.PrimeDataContract = new web3.eth.Contract(PrimeData.abi, primeData);
+		debugger;
+		if (!(await window.PrimeDataContract.methods.isExist(account).call())) 
+		{ msgPrime('account not exists in prime.'); return; }
+
+		window.importprimecontract = new web3.eth.Contract(ImportForgePrime.abi, importForgePrime);
+		  
+		let _value = BigInt(await window.importprimecontract.methods.getComputedAmount(account).call());
+		  
+		let response = await window.importprimecontract.methods.activate(account).send(
+			{ from: account, value:_value.toString() }
+		)
+			.on('error', function (error) { msgPrime(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				
+				if (Obj.status == true) {
+					$("#lblmsgPrime").text('Activate succeeded');
+				}
+				else {
+					$("#lblmsgPrime").text('Activate failed');
+				}
+			});
+
+	}
+	catch (ex) {
+		console.log(ex);
+	}
+}
+
+
+
+
+
+

@@ -1,0 +1,130 @@
+{
+  "contract": "0x1c95a6Ed3Ef78589DF553c9b1C5033eE024f0421",
+  "cid": "ozonec843191107f51efe67b76cf73926ec58152244a3",
+  "name": "Cat",
+  "NFTs": [
+    {
+      "name": "The Style Cat 1",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonefd331b66b0bc8584fa5f0d32f713cf5710a09e5c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "1"
+    },
+    {
+      "name": "The Style Cat 2",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonee6aa55f4ff7d98f0d033ac5fbceeb55aca6df791.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "2"
+    },
+    {
+      "name": "The Style Cat 3",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozoneb50ef48dfd007607a2151bf9edda7e3e5421065a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "3"
+    },
+    {
+      "name": "The Style Cat 4",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozoneb5fb01a8e8f6fcb181985ccb759d0a278b13d1ca.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "4"
+    },
+    {
+      "name": "The Style Cat 5",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone27b48b110ac0cf2bb82ccfdad0009e785db2a759.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "5"
+    },
+    {
+      "name": "The Style Cat 6",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozoned02d8aff64799f4bcade98e7b5924dc03757764f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "6"
+    },
+    {
+      "name": "The Style Cat 7",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone26101e7f0b6047ee8869460ef3b29db8d7a71f59.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "7"
+    },
+    {
+      "name": "The Style Cat 8",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone002d53f93ae4880cc96d3c5b53d8779028515cec.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "8"
+    },
+    {
+      "name": "The Style Cat 9",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozoneeb3a5c2b7a8318df91bf63bff56df037a92768e0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "9"
+    },
+    {
+      "name": "The Style Cat 10",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonef73e8ac4f7c473522887d48d9fd1330045baeb4e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "10"
+    },
+    {
+      "name": "The Style Cat 11",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone794dc2d62c41c1b3b71b33ee7530422b71d77132.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "11"
+    },
+    {
+      "name": "The Style Cat 12",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone6986944abd3cc77e4c02fa51598cac7c37c99f4b.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "12"
+    },
+    {
+      "name": "The Style Cat 13",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone0971f960f00966b2f7fd39151fd7b9f1430acc25.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "13"
+    },
+    {
+      "name": "The Style Cat 14",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone2b3593e80349b497f2ee578b1f4f7315d74c7350.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "14"
+    },
+    {
+      "name": "The Style Cat 15",
+      "description": "The-style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozoned985ba11905a61d991395ed83232aa559eaece85.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "15"
+    }
+  ],
+  "baseURL": "https://ozonec843191107f51efe67b76cf73926ec58152244a3.ozonestore.io",
+  "tokennames": [
+    "The Style Cat 1",
+    "The Style Cat 2",
+    "The Style Cat 3",
+    "The Style Cat 4",
+    "The Style Cat 5",
+    "The Style Cat 6",
+    "The Style Cat 7",
+    "The Style Cat 8",
+    "The Style Cat 9",
+    "The Style Cat 10",
+    "The Style Cat 11",
+    "The Style Cat 12",
+    "The Style Cat 13",
+    "The Style Cat 14",
+    "The Style Cat 15"
+  ]
+}

@@ -1,0 +1,17 @@
+Prime Profile
+
+ContractName: ImportPrimeForge
+ContractNameAddress: '0xc6E2B2a6e4DCE0be5e70073514C56CFD19485c24'
+User: '0xAea09ea04FF5B6B2ADf89dd11111F948620a6d44' //(Going to be active)
+window.importPrimeForgeContract = new window.web3.eth.Contract(ImportPrimeForge.abi, ContractNameAddress);
+
+Code to call activation method
+=========================================
+
+let response = await window.importPrimeForgeContract.methods.activate(User).send(
+	{ from: accounts[0], value: 10000000000000000.toString() }
+	
+Code to check whether user is Prime or Not, if yes the show Prime dashbaord & ask for activation:
+==================================================================================================
+
+let isPrime = await window.importPrimeForgeContract.methods.isuser(User).call();

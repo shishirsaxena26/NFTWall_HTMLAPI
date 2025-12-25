@@ -1,0 +1,32 @@
+{
+    "name": "dynamic-socket-project",
+    "version": "1.0.0",
+    "description": "Dynamic Socket.IO project with real-time rooms and events",
+    "main": "src/server.js",
+    "scripts": {
+      "start": "node src/server.js",
+      "dev": "nodemon src/server.js"
+    },
+    "keywords": [
+      "socket.io",
+      "real-time",
+      "rooms",
+      "dynamic-events",
+      "nodejs"
+    ],
+    "author": "Azam",
+    "license": "MIT",
+    "dependencies": {
+      "body-parser": "^1.20.2",
+      "cors": "^2.8.5",
+      "dotenv": "^16.3.1",
+      "express": "^4.18.2",
+      "helmet": "^7.0.0",
+      "jsonwebtoken": "^9.0.1",
+      "socket.io": "^4.7.5"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1"
+    }
+  }
+  

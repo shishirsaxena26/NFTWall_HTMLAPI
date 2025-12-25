@@ -1,0 +1,334 @@
+{
+  "Access": {
+    "haveaccess": "",
+    "accountInfo": {
+      "userAvatar": "",
+      "userName": "",
+      "userEmail": "",
+      "userLinks": {
+        "FaceBookLink": "",
+        "disCordLink": "",
+        "youtubeLink": "",
+        "xLink": "",
+        "instgramLink": ""
+      },
+      "userBio": "",
+      "userPassword": "",
+      "useraddress":"",
+      "balance": 0,
+      "instance": "",
+      "nestedA": "0x21eF0267d1817d004D16152168328c0dF5Afd94d",
+      "nestedB": "0x1894a47c5595939844471b2303986411D9D4fc9E",
+      "isUser": "",
+      "reward":0,
+      "royality":0,
+      "yeild":0,
+      "yeildlevel":0,
+      "sponser":"",
+      "computereward":0,
+      "computeroyality":0,
+      "computeyeild":0,
+      "computeyeildlevel":0,
+      "business":0
+    },
+    "systemRequerd": {
+      "userPanar": "/images/Panners/Rayna Bator.jpg",
+      "userID": "0x000...0000",
+      "Verified": 0,
+      "userAcountDetalise": {
+        "Volume": 0,
+        "NFTsSold": 0,
+        "Followers": 0
+      },
+      "NFTs": [],
+      "collection": []
+    }
+  },
+  
+  "DefaultAccess": {
+    "haveaccess": "",
+    "accountInfo": {
+      "userAvatar": "",
+      "userName": "",
+      "userEmail": "",
+      "userLinks": {
+        "FaceBookLink": "",
+        "disCordLink": "",
+        "youtubeLink": "",
+        "xLink": "",
+        "instgramLink": ""
+      },
+      "userBio": "",
+      "userPassword": "",
+      "useraddress":"",
+      "balance":0,
+      "instance": "",
+      "nestedA": "0x21eF0267d1817d004D16152168328c0dF5Afd94d",
+      "nestedB": "0x1894a47c5595939844471b2303986411D9D4fc9E",
+      "isUser": "",
+      "reward":0,
+      "royality":0,
+      "yeild":0,
+      "yeildlevel":0,
+      "sponser":"",
+      "computereward":0,
+      "computeroyality":0,
+      "computeyeild":0,
+      "computeyeildlevel":0,
+      "business":0
+    },
+    "systemRequerd": {
+      "userPanar": "/images/Panners/Rayna Bator.jpg",
+      "userID": "0x000...0000",
+      "Verified": 0,
+      "userAcountDetalise": {
+        "Volume": 0,
+        "NFTsSold": 0,
+        "Followers": 0
+      },
+      "NFTs": [],
+      "collection": []
+    }
+  },
+  "Home": {
+    "Hero": {
+      "status": {
+        "TotalSale": 600,
+        "Auctions": 80,
+        "Artists": 300
+      },
+      "userInfo": {
+        "name": "Allison Torff",
+        "img": "/images/creators/Allison Torff.png",
+        "postInfo": {
+          "img": "/images/hero/hero-Imag.png",
+          "imgTitel": "Lime Chibi Fighter",
+          "targetDate": "2024-10-01T12:43:00",
+          "price": 2.23
+        }
+      }
+    },
+    "BC": [
+      {
+        "CategorieName": "Art",
+        "CategorieImg": "/images/categorie/art.png"
+      },
+      {
+        "CategorieName": "Collectibles",
+        "CategorieImg": "/images/categorie/collectibles.png"
+      },
+      {
+        "CategorieName": "Music",
+        "CategorieImg": "/images/categorie/music.png"
+      },
+      {
+        "CategorieName": "Photography",
+        "CategorieImg": "/images/categorie/photography.png"
+      },
+      {
+        "CategorieName": "Video",
+        "CategorieImg": "/images/categorie/video.png"
+      },
+      {
+        "CategorieName": "Utility",
+        "CategorieImg": "/images/categorie/utility.png"
+      },
+      {
+        "CategorieName": "Sport",
+        "CategorieImg": "/images/categorie/sport.png"
+      },
+      {
+        "CategorieName": "Virtual Worlds",
+        "CategorieImg": "/images/categorie/virtualWorlds.png"
+      }
+    ],
+    "MM": {
+      "auctionImg": "/images/auction/Magic-Mashrooms.png",
+      "auctionname": "Magic Mashrooms",
+      "auctionTimer": "2024-10-01T12:43:00",
+      "userInfo": {
+        "name": "Phillip Lipshutz",
+        "img": "/images/creators/Phillip Lipshutz.png"
+      }
+    },
+    "HIW": [
+      {
+        "img": "/images/howItWork/setup.png",
+        "title": "Setup Your wallet",
+        "paregraf": "Set up your wallet of choice. Connect it to by clicking the wallet icon in the top right."
+      },
+      {
+        "img": "/images/howItWork/create.png",
+        "title": "Create Collection",
+        "paregraf": "Upload your work and setup your collection Add a description, social links and floor price."
+      },
+      {
+        "img": "/images/howItWork/start.png",
+        "title": "Start Earning",
+        "paregraf": "Choose between auctions and fixed-price listings. Start earning by selling your NFTs or trading."
+      }
+    ],
+    "NMAT": {
+      "img": "/images/NMAT/Photo.png"
+    }
+  },
+  "NFTsMarket": {
+    "FilterItems": [],
+    "FilterSliderItem": [
+      {
+        "filterTitlel": "Sort by:",
+        "filterItems": [
+          { "filterItemName": "Most relevant", "filterItemState": "" },
+          { "filterItemName": "Recent", "filterItemState": "" }
+        ]
+      },
+      {
+        "filterTitlel": "License:",
+        "filterItems": [
+          { "filterItemName": "Free", "filterItemState": "" },
+          { "filterItemName": "Premium", "filterItemState": "" }
+        ]
+      },
+      {
+        "filterTitlel": "NFTs type:",
+        "filterItems": [
+          { "filterItemName": "DSGN Animals", "filterItemState": "" },
+          { "filterItemName": "Magic Mushrooms", "filterItemState": "" },
+          { "filterItemName": "Disco Machines", "filterItemState": "" },
+          { "filterItemName": "Space", "filterItemState": "" }
+        ]
+      }
+    ],
+    "NFTs": [
+      {
+        "id": 1,
+        "postTitle": "Distant Galaxy",
+        "postImg": "/images/NTFs/Distant Galaxy.png",
+        "postPrice": 1.63,
+        "postHightesBid": 0.33,
+        "postdescreption": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem obcaecati libero sed dolores illum minima enim, quisquam laborum recusandae ut ducimus sequi deserunt ex magnam accusantium aliquid, repudiandae ea nam?",
+        "filter": ["Recent", "Premium", "Space"],
+        "userInfo": {
+          "name": "Rayna Bator",
+          "img": "/images/creators/Rayna Bator.png"
+        },
+        "orc1155":"0x5779bed4a84b80eCc57eFD3592138aaDD2098f1F",
+        "name": "Mercury",
+        "description": "This is a collection of the planet Mercury",
+        "image": "https://bafkreiguko7x4lsimaatsms7sfelf472orvysdgeyyec667dbtaywy4ose.ipfs.nftstorage.link/"
+      },
+      {
+        "id": 2,
+        "postTitle": "Life On Edena",
+        "postImg": "/images/NTFs/Life On Edena.png",
+        "postPrice": 2.63,
+        "postHightesBid": 0.83,
+        "postdescreption": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem obcaecati libero sed dolores illum minima enim, quisquam laborum recusandae ut ducimus sequi deserunt ex magnam accusantium aliquid, repudiandae ea nam?",
+        "filter": ["Recent", "Premium"],
+        "userInfo": {
+          "name": "Angel Lubin",
+          "img": "/images/creators/Angel Lubin.png"
+        },
+        "orc1155":"0x5779bed4a84b80eCc57eFD3592138aaDD2098f1F",
+        "name": "Venus",
+        "description": "This is a collection of the planet Venus",
+        "image": "https://bafkreicqwmkbpcg3ki2pz6qee45qiq53oaypfmpoaddacho7qftpdj4g6i.ipfs.nftstorage.link/"
+      },
+      {
+        "id": 3,
+        "postTitle": "Astro Fiction",
+        "postImg": "/images/NTFs/Astro Fiction.png",
+        "postPrice": 2.93,
+        "postHightesBid": 0.2,
+        "postdescreption": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem obcaecati libero sed dolores illum minima enim, quisquam laborum recusandae ut ducimus sequi deserunt ex magnam accusantium aliquid, repudiandae ea nam?",
+        "filter": ["Recent", "Premium", "Space"],
+        "userInfo": {
+          "name": "Allison Torff",
+          "img": "/images/creators/Allison Torff.png"
+        },
+        "orc1155":"0x5779bed4a84b80eCc57eFD3592138aaDD2098f1F",
+        "name": "Mars",
+        "description": "This is a collection of the planet Mars",
+        "image": "https://bafkreicjuqf7x4f5jrkw2rvrlcfgxnajqp27nusvezkgk2zsplx27vsgeq.ipfs.nftstorage.link/"
+      }
+    ],
+    "Collections": [
+      {
+        "id": 1,
+        "collectionName": "Art Gallery",
+        "orc1155":"0x5779bed4a84b80eCc57eFD3592138aaDD2098f1F",
+        "primaryImg": "/images/T-C/F/Primary Photo Placeholder.png",
+        "secondaryImg": [
+          "/images/T-C/F/Secondary Photo Placeholder.png",
+          "/images/T-C/F/Secondary Photo Placeholder (1).png"
+        ],
+        "collectionNumper": 105,
+        "userInfo": {
+          "name": "NFT Wall",
+          "img": "/images/creators/Azam Hussian.png"
+        }
+      },
+      {
+        "id": 11,
+        "collectionName": "DSGN Animals",
+        "primaryImg": "/images/T-C/F/Primary Photo Placeholder.png",
+        "secondaryImg": [
+          "/images/T-C/F/Secondary Photo Placeholder.png",
+          "/images/T-C/F/Secondary Photo Placeholder (1).png"
+        ],
+        "collectionNumper": 105,
+        "userInfo": {
+          "name": "Kianna Donin",
+          "img": "/images/creators/Kianna Donin.png"
+        }
+      },
+      {
+        "id": 2,
+        "collectionName": "Magic Mushrooms",
+        "primaryImg": "/images/T-C/S/Primary Photo Placeholder.png",
+        "secondaryImg": [
+          "/images/T-C/S/Secondary Photo Placeholder.png",
+          "/images/T-C/S/Secondary Photo Placeholder (1).png"
+        ],
+        "collectionNumper": 540,
+        "userInfo": {
+          "name": "Phillip Lipshutz",
+          "img": "/images/creators/Phillip Lipshutz.png"
+        }
+      },
+      {
+        "id": 3,
+        "collectionName": "Disco Machines",
+        "primaryImg": "/images/T-C/T/Primary Photo Placeholder.png",
+        "secondaryImg": [
+          "/images/T-C/T/Secondary Photo Placeholder.png",
+          "/images/T-C/T/Secondary Photo Placeholder (1).png"
+        ],
+        "collectionNumper": 110,
+        "userInfo": {
+          "name": "Davis Workman",
+          "img": "/images/creators/Davis Workman.png"
+        }
+      }
+    ]
+  },
+  "creators": [
+    {
+      "Verified": 1,
+      "userName": "",
+      "userImg": "/images/creators/Alfredo Septimus.png",
+      "NFTsSold": 200,
+      "userTotalSales": 27.05,
+      "Volume": 125,
+      "Followers": 254,
+      "rankingState": "up",
+      "bio": "Pushing pixels and pushing boundaries. NFT artist inspired by cyberpunk and digital surrealism. Let's redefine art together!",
+      "userLinks": ["faceBook", "Discord", "YouTube", "Twitter", "Instagram"],
+      "userPanar": "/images/Panners/Alfredo Septimus.jpg",
+      "userID": "7BVsIfiAsH3Kg",
+      "NFTs": [],
+      "collection": [] 
+    }
+  ],
+  "WatchLater": []
+}

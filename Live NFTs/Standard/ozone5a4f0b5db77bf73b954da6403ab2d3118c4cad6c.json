@@ -1,0 +1,122 @@
+{
+  "contract": "0x085052532254e12989413f7C84dD32686BCe74E1",
+  "cid": "ozone5a4f0b5db77bf73b954da6403ab2d3118c4cad6c",
+  "name": "Machine Bull",
+  "NFTs": [
+    {
+      "name": "Machine Bull__1",
+      "description": "divine-mechanical-bull-sculpted-from-interlockin__40320",
+      "image": "https://ozone8e85015d16efe3afb4a7b4a01b99640f865fea5d.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 1
+    },
+    {
+      "name": "Machine Bull__2",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40321",
+      "image": "https://ozone08c18955d03b145478d24a49a6e4763122fa099f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 2
+    },
+    {
+      "name": "Machine Bull__3",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40322",
+      "image": "https://ozone4887be46043eaf2354b509894d968a1d0a7978d4.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 3
+    },
+    {
+      "name": "Machine Bull__4",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40323",
+      "image": "https://ozonec891105d6bc29ca9a83e7d70759d769c736286de.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 4
+    },
+    {
+      "name": "Machine Bull__5",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40324",
+      "image": "https://ozone1f3561d4b15b3757ae6f7889db4694e28050184c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 5
+    },
+    {
+      "name": "Machine Bull__6",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40325",
+      "image": "https://ozone0d0331c5b31fb1d7fbf98bd539d3f757189c68c4.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 6
+    },
+    {
+      "name": "Machine Bull__7",
+      "description": "futuristic-mechanical-bull-forged-from-polished-__40326",
+      "image": "https://ozonefb48f718ab42f269d5b1d9337e08ac25b77aa40f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 7
+    },
+    {
+      "name": "Machine Bull__8",
+      "description": "mechanical-bull-made-of-gold-and-diamond-with-gl__40317",
+      "image": "https://ozonebc01762626a8056719be869af116fe13247820f7.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 8
+    },
+    {
+      "name": "Machine Bull__9",
+      "description": "mechanical-bull-made-of-gold-and-diamond-with-gl__40318",
+      "image": "https://ozonedd65551c3aff41853a8818d2045552ddd8a6217a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 9
+    },
+    {
+      "name": "Machine Bull__10",
+      "description": "mechanical-bull-made-of-gold-and-diamond-with-gl__40319",
+      "image": "https://ozoneb2989bda23901a8dfc0627a1ffb55e8e088c3b2c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 10
+    },
+    {
+      "name": "Machine Bull__11",
+      "description": "freepik__the-style-is-3d-model-with-octane-render-volumetri__40313",
+      "image": "https://ozoneee9ed5bd185145f4bf2b85bde9f941b0c8b4d34b.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 11
+    },
+    {
+      "name": "Machine Bull__12",
+      "description": "freepik__the-style-is-3d-model-with-octane-render-volumetri__40314",
+      "image": "https://ozone39c8d69ccc46485e549b644b7b7cefbfed0db4a3.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 12
+    },
+    {
+      "name": "Machine Bull__13",
+      "description": "freepik__the-style-is-3d-model-with-octane-render-volumetri__40315",
+      "image": "https://ozone2b7068a56420e13dd9ddee9ea382493b4daca5be.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 13
+    },
+    {
+      "name": "Machine Bull__14",
+      "description": "freepik__the-style-is-3d-model-with-octane-render-volumetri__40316",
+      "image": "https://ozone4b64efe7d973e1c0a4a39f1d331eafb10205acfa.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 14
+    }
+  ],
+  "baseURL": "https://ozone5a4f0b5db77bf73b954da6403ab2d3118c4cad6c.ozonestore.io",
+  "tokennames": [
+    "Machine Bull__1",
+    "Machine Bull__2",
+    "Machine Bull__3",
+    "Machine Bull__4",
+    "Machine Bull__5",
+    "Machine Bull__6",
+    "Machine Bull__7",
+    "Machine Bull__8",
+    "Machine Bull__9",
+    "Machine Bull__10",
+    "Machine Bull__11",
+    "Machine Bull__12",
+    "Machine Bull__13",
+    "Machine Bull__14"
+  ]
+}

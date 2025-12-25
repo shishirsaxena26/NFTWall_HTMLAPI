@@ -1,0 +1,62 @@
+#MetaMaskWallet  {
+    background-color: var(--gray);
+    border-radius: var(--_15px);
+    width: 100%;
+}
+
+#MetaMaskWallet .det
+{
+    color: white;
+}
+
+#MetaMaskWallet .sochialButtonComponant {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--dark-white);
+    border-radius: var(--_5px);
+    transition: .2s all;
+}
+
+#MetaMaskWallet .sochialButtonComponant .sochialIcon {
+    font-size: 1.3rem;
+    color: var(--lemon);
+}
+
+#MetaMaskWallet .sochialButtonComponant .sochialButtonComponantTitle {
+    color: var(--dark-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: .8rem;
+}
+
+#MetaMaskWallet .sochialButtonComponant:hover,
+#MetaMaskWallet .sochialButtonComponant:focus {
+    background-color: var(--lemon);
+    border: 2px solid var(--lemon);
+}
+
+#MetaMaskWallet .sochialButtonComponant:hover .sochialIcon,
+#MetaMaskWallet .sochialButtonComponant:focus .sochialIcon {
+    color: var(--black);
+}
+
+#MetaMaskWallet .sochialButtonComponant:hover .sochialButtonComponantTitle>span,
+#MetaMaskWallet .sochialButtonComponant:focus .sochialButtonComponantTitle>span {
+    color: var(--black) !important;
+}
+
+
+#MetaMaskWallet .F1 {
+    font-size: calc(100% + 1.8vw + 1.8vh);
+    background: linear-gradient(to right, var(--lemon), var(--white));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#MetaMaskWallet .F4 {
+    font-size: calc(100% + .01rem + .01rem - .12rem);
+}

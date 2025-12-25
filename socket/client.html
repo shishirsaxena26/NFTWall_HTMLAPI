@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Socket.IO Room Test</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+input { margin: 5px; padding: 5px; width: 150px; }
+button { margin: 5px; padding: 5px; }
+pre { background: #f4f4f4; padding: 10px; max-height: 300px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<h2>Socket.IO Room Demo</h2>
+
+<input id="user" placeholder="User Name" />
+<input id="room" placeholder="Room Name" />
+
+<br>
+
+<button onclick="auth()">Authenticate</button>
+<button onclick="createRoom()">Create Room</button>
+<button onclick="joinRoom()">Join Room</button>
+<button onclick="leaveRoom()">Leave Room</button>
+<button onclick="destroyRoom()">Destroy Room</button>
+<button onclick="listRooms()">List Rooms</button>
+
+<br><br>
+
+<input id="msg" placeholder="Type message..." style="width:300px;" />
+<button onclick="sendMessage()">Send Message</button>
+
+<br>
+
+<h3>Logs:</h3>
+<pre id="log"></pre>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const PORT = 8443;
+const HOST = `https://api.stbots.io`;
+//    const socket = io(`http://localhost:${PORT}`);
+const socket = io(HOST);
+function log(msg) {
+    const pre = document.getElementById("log");
+    pre.textContent += msg + "\n";
+    pre.scrollTop = pre.scrollHeight;
+}
+
+// --- Connection Events ---
+socket.on("connect", () => log("✅ Connected: " + socket.id));
+socket.on("disconnect", reason => log("❌ Disconnected: " + reason));
+
+// --- Server Events ---
+socket.on("room_created", data => log("🏠 Room Created: " + JSON.stringify(data)));
+socket.on("room_users", data => log("👥 Room Users: " + JSON.stringify(data)));
+socket.on("room_destroyed", data => log("💥 Room Destroyed: " + JSON.stringify(data)));
+socket.on("message", data => log("💬 Message: " + JSON.stringify(data)));
+
+// --- Helper Functions ---
+function auth() {
+    const userName = document.getElementById("user").value.trim();
+    if (!userName) return alert("Enter userName first!");
+    socket.emit("auth", { userName:userName, userId:crypto.randomUUID() });
+    log(`🔑 Auth sent for user: ${userName} userId: ${userName}`);
+}
+
+function createRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    if (!roomId) return alert("Enter roomId first!");
+    socket.emit("room:create", { roomId, maxSize: 4 }, res => {
+        log("ACK Create Room: " + JSON.stringify(res));
+    });
+}
+
+function joinRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:join", { roomId }, res => {
+        log("ACK Join Room: " + JSON.stringify(res));
+    });
+}
+
+function leaveRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:leave", { roomId }, res => {
+        log("ACK Leave Room: " + JSON.stringify(res));
+    });
+}
+
+function destroyRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:destroy", { roomId }, res => {
+        log("ACK Destroy Room: " + JSON.stringify(res));
+    });
+}
+
+function listRooms() {
+    socket.emit("room:list", {}, res => {
+        log("🏘️ List Rooms: " + JSON.stringify(res));
+    });
+}
+
+// --- Send Message ---
+function sendMessage() {
+    const roomId = document.getElementById("room").value.trim();
+    const message = document.getElementById("msg").value.trim();
+    if (!roomId) return alert("Enter roomId");
+    if (!message) return alert("Enter message");
+
+    socket.emit("send_message", { roomId, message }, (res) => {
+        log("ACK Send Message: " + JSON.stringify(res));
+    });
+    document.getElementById("msg").value = "";
+}
+</script>
+
+</body>
+</html>

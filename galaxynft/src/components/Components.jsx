@@ -1,0 +1,7 @@
+export { default as Navbar } from "./navbar/Navbar";
+export { default as Footer } from "./footer/Footer";
+export { default as ScrollToTop } from "./scrollToTop/ScrollToTop";
+export { default as Presentation } from "./presentation/presentation";
+export { default as MetaMaskWallet } from "./MetaMaskWallet/MetaMaskWallet";
+
+

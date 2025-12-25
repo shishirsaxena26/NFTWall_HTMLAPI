@@ -1,0 +1,253 @@
+/* ------------------
+# profile Panner
+--------------------- */
+
+#memberAcount .profilePanner {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    background-Size: cover;
+    background-Position: center;
+    background-Repeat: no-repeat;
+}
+
+#memberAcount .profilePanner .colorLayr {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: linear-gradient(to top, var(--lemon), rgba(255, 255, 255, 0));
+    opacity: .4;
+}
+
+#memberAcount .profilePanner .Lgimg,
+#memberAcount .profilePanner .smimg {
+    border-radius: var(--_15px);
+    border: 3px solid var(--dark-gray);
+    overflow: hidden;
+    background-color: var(--dark-gray);
+}
+
+#memberAcount .profilePanner .Lgimg {
+    width: 123px;
+    height: 123px;
+    position: absolute;
+    top: 100%;
+    left: 8%;
+    transform: translate(-8%, -100%);
+    margin-top: 50px;
+
+}
+
+#memberAcount .profilePanner .smimg {
+    width: 110px;
+    height: 110px;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    margin-top: 50px;
+}
+
+/* ------------------
+# Button Section
+--------------------- */
+#memberAcount .buttonSection .btnSection,
+#memberAcount .buttonSection .btnSectionoutLone {
+    cursor: pointer;
+    font-size: .8rem;
+    font-family: WorkSans-S;
+    border-radius: var(--_15px);
+    border: 2px solid var(--lemon);
+}
+
+#memberAcount .buttonSection .btnSection {
+    color: var(--black);
+    background-color: var(--lemon);
+}
+
+#memberAcount .buttonSection .btnSectionoutLone {
+    color: var(--white);
+}
+
+#memberAcount .buttonSection .reactIcons {
+    font-size: 1.1rem;
+}
+
+
+/* ------------------
+# user Info Section
+--------------------- */
+
+#memberAcount .userInfoSection span {
+    font-family: Rubik-B;
+    color: var(--white);
+    font-size: calc(100% + .65vw + .56vh);
+}
+
+#memberAcount .userInfoSection span.F2 {
+    font-family: Rubik-B;
+    color: var(--white);
+    font-size: calc(100% + 0vw + 0vh);
+}
+
+#memberAcount .userInfoSection .VerifiedIcon {
+    color: var(--lemon);
+    font-size: 1.15rem;
+}
+
+#memberAcount .userInfoSection .userState .stateNumper,
+#memberAcount .userInfoSection .userState .stateName {
+    color: var(--white);
+}
+
+#memberAcount .userInfoSection .userState .stateNumper {
+    font-size: calc(100% + .55vw + .55vh);
+    font-family: SpaceMono-B;
+}
+
+#memberAcount .userInfoSection .userState .stateName {
+    font-size: calc(100% - .01vw - .01vh);
+    opacity: .8;
+    font-family: WorkSans-M;
+}
+
+/* -----------Btn SectionFor Smole Screen */
+#memberAcount .userInfoSection .smbuttonSection .btnSection,
+#memberAcount .smbuttonSection .btnSectionoutLone {
+    cursor: pointer;
+    font-size: .45rem;
+    font-family: WorkSans-S;
+    border-radius: var(--_15px);
+    border: 2px solid var(--lemon);
+}
+
+#memberAcount .smbuttonSection .btnSectionoutLone span {
+    font-size: .9rem;
+}
+
+#memberAcount .userInfoSection .smbuttonSection .btnSection {
+    color: var(--black);
+    background-color: var(--lemon);
+}
+
+#memberAcount .userInfoSection .smbuttonSection .btnSection span {
+    color: var(--black);
+}
+
+#memberAcount .userInfoSection .smbuttonSection .btnSectionoutLone {
+    color: var(--white);
+}
+
+#memberAcount .userInfoSection .smbuttonSection .reactIcons {
+    font-size: 1.1rem;
+}
+
+
+/* ------------------
+# user Bio
+--------------------- */
+#memberAcount .userBio .bioContant,
+#memberAcount .therdBart .userBio .bioTitle {
+    color: var(--white);
+}
+
+#memberAcount .userBio .bioTitle {
+    font-size: calc(100% - .01vw - .01vh);
+    font-family: SpaceMono-B;
+    opacity: .45;
+}
+
+#memberAcount .userBio .bioContant {
+    font-size: calc(100% + .01vw + .01vh);
+    font-family: WorkSans-R;
+    opacity: .85;
+}
+
+/* ------------------
+# user Links
+--------------------- */
+#memberAcount .userLinks .bioContant,
+#memberAcount .therdBart .userBio .bioTitle {
+    color: var(--white);
+}
+
+#memberAcount .userLinks .Title {
+    font-size: calc(100% - .01vw - .01vh);
+    font-family: SpaceMono-B;
+    opacity: .45;
+}
+
+#memberAcount .userLinks .Contant {
+    font-size: calc(100% + .45vw + .45vh);
+    color: var(--white);
+    opacity: .5;
+}
+
+#memberAcount .userLinks .Contant .linkIcon {
+    cursor: pointer;
+}
+
+#memberAcount .userLinks .Contant .linkIcon:hover {
+    color: var(--lemon);
+}
+
+#memberAcount .F1 {
+    font-size: calc(100% + 1.8vw + 1.8vh);
+    background: linear-gradient(to right, var(--lemon), var(--white));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#memberAcount .F4 {
+    font-size: calc(100% + .01rem + .01rem - .12rem);
+}
+
+#memberAcount .subbortSearchSection>span {
+    font-family: Rubik-B;
+    color: var(--white);
+    opacity: .9;
+    font-size: calc(100% + 0vw + 0.5vh);
+}
+
+#memberAcount .subbortSearchSection .inbutSection {
+    background-color: var(--gray);
+    border-radius: var(--_5px);
+    font-size: 1.15rem;
+}
+
+#memberAcount .subbortSearchSection .inbutSection .searchIcon {
+    font-size: 1.3em;
+    color: var(--dark-white);
+    opacity: .5;
+}
+
+#memberAcount .subbortSearchSection .inbutSection input {
+    all: unset;
+    width: 100%;
+    text-align: start;
+    font-family: WorkSans-M;
+    box-sizing: border-box;
+    padding-right: 8px;
+    color: var(--white);
+    font-size: 1.1rem;
+}
+
+#memberAcount .subbortSearchSection .inbutSection input::placeholder {
+    font-size: .9rem;
+}
+
+#memberAcount .subbortSearchSection .inbutSection>span {
+    cursor: pointer;
+    background-color: var(--lemon);
+    border-radius: var(--_5px);
+    font-family: WorkSans-M;
+    font-size: .9rem;
+    margin: 3px;
+}
+
+#memberAcount .subbortSearchSection .inbutSection>span:hover {
+    filter: brightness(.95);
+}

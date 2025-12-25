@@ -1,0 +1,98 @@
+{
+  "contract": "ozone7f8a4117fea559f102db7a90a9235346e0beac1d",
+  "cid": "ozone7f8a4117fea559f102db7a90a9235346e0beac1d",
+  "name": "Man With Litere",
+  "NFTs": [
+    {
+      "name": "The 3D girl 1",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone46c4c19c7f596ac7657cf8641f1da39953f9de1c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "1"
+    },
+    {
+      "name": "The 3D girl 2",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonefdeb481fdb373e19e3fdaf22b719611f35bacced.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "2"
+    },
+    {
+      "name": "The 3D girl 3",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone31247444b14c4bd052f12c18ea3b9a9dd6772687.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "3"
+    },
+    {
+      "name": "The 3D girl 4",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone0bf5baae2b821ad19279a318ecaf3d97874b96b3.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "4"
+    },
+    {
+      "name": "The 3D girl 5",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone5dcedfd7eb4e2422180dd4f0bf18d54eddb60e6b.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "5"
+    },
+    {
+      "name": "The 3D girl 6",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone5ba621b248e6d99714ccbf6e4a436a806a210bce.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "6"
+    },
+    {
+      "name": "The 3D girl 7",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonec54b5e6bac01e73d4388593a774dad98d8b8f968.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "7"
+    },
+    {
+      "name": "The 3D girl 8",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozonec4c442bf3d0f74039571195efc9e09a38c995eaa.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "8"
+    },
+    {
+      "name": "The 3D girl 9",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone5f60b512c3f4a4fd5c8acb957c967e09a67d15c0.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "9"
+    },
+    {
+      "name": "The 3D girl 10",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone04976495bdb4954936904b70332dba9bb2cd681a.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "10"
+    },
+    {
+      "name": "The 3D girl 11",
+      "description": "The style-is-3d-model-with-octane-render-volumetri",
+      "image": "https://ozone2a1ebad31a53d5c0917bbc5870f4fa499e8b631c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "11"
+    }
+  ],
+  "baseURL": "https://ozone7f8a4117fea559f102db7a90a9235346e0beac1d.ozonestore.io",
+  "tokennames": [
+    "The 3D girl 1",
+    "The 3D girl 2",
+    "The 3D girl 3",
+    "The 3D girl 4",
+    "The 3D girl 5",
+    "The 3D girl 6",
+    "The 3D girl 7",
+    "The 3D girl 8",
+    "The 3D girl 9",
+    "The 3D girl 10",
+    "The 3D girl 11"
+  ]
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Socket Client with JWT</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    #app { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>Signup</h2>
+<div id="signupDiv">
+  <input id="signupUser" placeholder="username">
+  <input id="signupPass" type="password" placeholder="password">
+  <button onclick="signup()">Signup</button>
+</div>
+
+<h2>Login</h2>
+<div id="loginDiv">
+  <input id="loginUser" placeholder="username">
+  <input id="loginPass" type="password" placeholder="password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="app">
+  <h2>Welcome <span id="username"></span></h2>
+  <button onclick="logout()">Logout</button>
+
+  <hr>
+
+  <h3>Create Dynamic Event</h3>
+  <input id="eventName" placeholder="event name">
+  <button onclick="registerEvent()">Register Event</button>
+
+  <h3>Fire Event</h3>
+  <input id="message" placeholder="message">
+  <button onclick="fireEvent()">Send</button>
+
+  <h3>Event Output</h3>
+  <div id="output"></div>
+</div>
+
+<script>
+  let token = "";
+  const socket = io("http://localhost:3000");
+  let currentEvent = "";
+
+  async function signup() {
+    const res = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: signupUser.value, password: signupPass.value })
+    });
+    const data = await res.json();
+    alert(JSON.stringify(data));
+  }
+
+  async function login() {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: loginUser.value, password: loginPass.value })
+    });
+    const data = await res.json();
+    if (data.error) return alert(data.error);
+
+    token = data.token;
+    socket.emit("auth:token", { token });
+
+    socket.on("auth:success", (d) => {
+      username.innerText = d.username;
+      loginDiv.style.display = "none";
+      signupDiv.style.display = "none";
+      app.style.display = "block";
+    });
+
+    socket.on("auth:failed", (msg) => alert(msg));
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  function registerEvent() {
+    currentEvent = eventName.value;
+    socket.emit("register:event", { eventName: currentEvent });
+
+    socket.on(currentEvent, (msg) => {
+      output.innerHTML += `<p><b>${msg.from}:</b> ${msg.data}</p>`;
+    });
+
+    alert("Event registered: " + currentEvent);
+  }
+
+  function fireEvent() {
+    if (!currentEvent) return alert("Register event first!");
+    socket.emit(currentEvent, message.value);
+  }
+</script>
+
+</body>
+</html>

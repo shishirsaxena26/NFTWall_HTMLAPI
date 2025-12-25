@@ -1,0 +1,35 @@
+npm install -g pm2
+pm2 start server.js --name nodeapi
+pm2 stop server.js --name nodeapi
+pm2 logs nodeapi
+pm2 restart nodeapi
+
+To getting business data:
+=========================
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_business
+
+
+To getting user's statistics
+=========================
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_users_stats&forprime=0&node=0xD8431759f5DE64477967aC5F01c6FbA219312964
+
+
+To getting user's data
+=========================
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_users_data&forprime=0&node=0x5E2C717FD7f262158ADf02f54fED327E3aC98182
+
+
+To getting the ORC1155 Details and Current Supply
+=========================
+
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_orc1155_data&forprime=0
+
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_orc1155_data&forprime=1
+
+
+To verify old ozone data
+=========================
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_oldusers_data&node=0x3823e5e0Eb109Adf74E1b5c52b9d996277d6635c
+
+https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_oldusers_data&node=0x5E2C717FD7f262158ADf02f54fED327E3aC98182
+

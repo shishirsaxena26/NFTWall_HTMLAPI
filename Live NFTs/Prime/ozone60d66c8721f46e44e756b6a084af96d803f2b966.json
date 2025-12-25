@@ -1,0 +1,146 @@
+{
+  "contract": "0x951A7Bbd21b4A6f49E62e040b992EED7120FcdD9",
+  "cid": "ozone60d66c8721f46e44e756b6a084af96d803f2b966",
+  "name": "Dragon",
+  "NFTs": [
+    {
+      "name": "Dragon__1",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33718",
+      "image": "https://ozone0e8be3c326122961a490e560c78dbf7c96c7208c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 1
+    },
+    {
+      "name": "Dragon__2",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33719",
+      "image": "https://ozone88d662c9de803e4d9a24664b19ae1490c07bac72.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 2
+    },
+    {
+      "name": "Dragon__3",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33720",
+      "image": "https://ozone08e7b43a4c6c5bcc4b9589f259395f3201524f8e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 3
+    },
+    {
+      "name": "Dragon__4",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33721",
+      "image": "https://ozoneaae6a0ec87c4acda548aadfa28efec56b5d7801c.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 4
+    },
+    {
+      "name": "Dragon__5",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33722",
+      "image": "https://ozone783845187a5baa54285f69fc3c1deb2eac0c56fe.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 5
+    },
+    {
+      "name": "Dragon__6",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33723",
+      "image": "https://ozonec9877262e25c47ee1d4931e44fc7f153a2686de5.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 6
+    },
+    {
+      "name": "Dragon__7",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33724",
+      "image": "https://ozone7035b8557d6d011cfdb0c7c552522de9781fc3dc.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 7
+    },
+    {
+      "name": "Dragon__8",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33725",
+      "image": "https://ozone6c1eb85f70cf75d63284207597d1dc7f8a643d7e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 8
+    },
+    {
+      "name": "Dragon__9",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33726",
+      "image": "https://ozone053379a944776afa2e8d162c01506d52d7267e48.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 9
+    },
+    {
+      "name": "Dragon__10",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33727",
+      "image": "https://ozonef11998321f621e15e3dd035307637a8288e48006.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 10
+    },
+    {
+      "name": "Dragon__11",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33728",
+      "image": "https://ozone198d3aeacea7d6a075a7437a885ad51f78ec6aca.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 11
+    },
+    {
+      "name": "Dragon__12",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33729",
+      "image": "https://ozone24451a70e3d1df7152646f97a383593e9831a218.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 12
+    },
+    {
+      "name": "Dragon__13",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33730",
+      "image": "https://ozone3822f90f84b9b12256314f2085e54f7ceb9cb11e.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 13
+    },
+    {
+      "name": "Dragon__14",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33731",
+      "image": "https://ozone1ece8903a02ed47683b562f7d1ccedd76d2a36f1.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 14
+    },
+    {
+      "name": "Dragon__15",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33732",
+      "image": "https://ozone5e83b2bb4bbe2b03e782810e0684503dfc135f2f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 15
+    },
+    {
+      "name": "Dragon__16",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33733",
+      "image": "https://ozoneeead6772a30d1d62dc8d68e45add921c33631647.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 16
+    },
+    {
+      "name": "Dragon__17",
+      "description": "small-dragon-with-scales-made-of-shifting-gemsto__33734",
+      "image": "https://ozonee383438c2cdca4defac725b55fe6c2091970f43f.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": 17
+    }
+  ],
+  "baseURL": "https://ozone60d66c8721f46e44e756b6a084af96d803f2b966.ozonestore.io",
+  "tokennames": [
+    "Dragon__1",
+    "Dragon__2",
+    "Dragon__3",
+    "Dragon__4",
+    "Dragon__5",
+    "Dragon__6",
+    "Dragon__7",
+    "Dragon__8",
+    "Dragon__9",
+    "Dragon__10",
+    "Dragon__11",
+    "Dragon__12",
+    "Dragon__13",
+    "Dragon__14",
+    "Dragon__15",
+    "Dragon__16",
+    "Dragon__17"
+  ]
+}

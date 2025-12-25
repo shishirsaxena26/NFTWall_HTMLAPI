@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Business Report</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; font-size:small; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <script>
+
+  </script>
+</head>
+<body>
+
+<h2 class="rptname">Business Report</h2>
+<a href="business.html" target="_blank">Standard</a> || <a href="business.html?forprime=1" target="_blank">Prime</a>
+<table id="dataTable">
+  <thead>
+    <tr id="tableHeader"></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  // Replace with your API URL
+  let apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_business"; 
+  const params = new URLSearchParams(window.location.search);
+    const forprime = params.get("forprime");  // will give "1" if ?forprime=1
+   
+    if(forprime==1){
+      apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_business&forprime=1";
+      document.querySelector(".rptname").textContent = "Business Report - Prime";
+    }
+    else 
+    document.querySelector(".rptname").textContent = "Business Report - Standard";
+
+  // Fetch data from API
+fetch(apiUrl)
+      .then(response => response.json())
+      .then(apiResponse => {
+        // Ensure API returned the expected structure
+        if (!apiResponse.success || !apiResponse.data || !apiResponse.data[0]) {
+          console.error("Unexpected API response:", apiResponse);
+          return;
+        }
+
+        // Extract only the inner data array
+        const jsonData = apiResponse.data[0];
+
+        const tableHeader = document.getElementById("tableHeader");
+        const tbody = document.querySelector("#dataTable tbody");
+
+        // --- Create dynamic headers ---
+        const keys = Object.keys(jsonData[0]);
+        keys.forEach(key => {
+          const th = document.createElement("th");
+          th.textContent = key;
+          tableHeader.appendChild(th);
+        });
+
+        // --- Fill table rows dynamically ---
+        jsonData.forEach(item => {
+          const row = document.createElement("tr");
+          keys.forEach(key => {
+            const td = document.createElement("td");
+            td.textContent = item[key];
+            row.appendChild(td);
+          });
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error("Error fetching data:", error));
+
+
+
+</script>
+
+</body>
+</html>

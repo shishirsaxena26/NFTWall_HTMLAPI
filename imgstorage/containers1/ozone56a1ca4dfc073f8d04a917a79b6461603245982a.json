@@ -1,0 +1,50 @@
+{
+  "contract": "ozone56a1ca4dfc073f8d04a917a79b6461603245982a",
+  "cid": "ozone56a1ca4dfc073f8d04a917a79b6461603245982a",
+  "name": "Animal",
+  "NFTs": [
+    {
+      "name": "Digi Dog",
+      "description": "peX Legends are more than just collectibles—they're a gateway to an exclusive community of visionaries and innovators. Whether you're a collector, investor, or a fan of monkey mayhem, this collection promises to add a touch of fun and exclusivity to your portfolio",
+      "image": "https://ozonee2c3ca8e880dc80372830bec2dad57d50b611b05.ozonestore.io",
+      "amount": "0.223295",
+      "tokenid": "1"
+    },
+    {
+      "name": "Bored Ape",
+      "description": "peX Legends are more than just collectibles—they're a gateway to an exclusive community of visionaries and innovators. Whether you're a collector, investor, or a fan of monkey mayhem, this collection promises to add a touch of fun and exclusivity to your portfolio",
+      "image": "https://ozone6f6df675493e39ff845a079f153a6b8431a17e06.ozonestore.io",
+      "amount": "10.29010",
+      "tokenid": "2"
+    },
+    {
+      "name": "Colorful Monkey",
+      "description": "peX Legends are more than just collectibles—they're a gateway to an exclusive community of visionaries and innovators. Whether you're a collector, investor, or a fan of monkey mayhem, this collection promises to add a touch of fun and exclusivity to your portfolio",
+      "image": "https://ozone9a6d925474e7b2710e8930743d84d7cea9832f29.ozonestore.io",
+      "amount": "0.090293",
+      "tokenid": "3"
+    },
+    {
+      "name": "Monkey Style Ape",
+      "description": "peX Legends are more than just collectibles—they're a gateway to an exclusive community of visionaries and innovators. Whether you're a collector, investor, or a fan of monkey mayhem, this collection promises to add a touch of fun and exclusivity to your portfolio",
+      "image": "https://ozone8d7fe33557bfb3306346cc7841b5d6254a4ce3b4.ozonestore.io",
+      "amount": "12.2832",
+      "tokenid": "4"
+    },
+    {
+      "name": "Magic Monkey",
+      "description": "peX Legends are more than just collectibles—they're a gateway to an exclusive community of visionaries and innovators. Whether you're a collector, investor, or a fan of monkey mayhem, this collection promises to add a touch of fun and exclusivity to your portfolio",
+      "image": "https://ozoneb61beb426878007fda41ba74813315bb140ce1a9.ozonestore.io",
+      "amount": "0.020213",
+      "tokenid": "5"
+    }
+  ],
+  "baseURL": "https://ozone56a1ca4dfc073f8d04a917a79b6461603245982a.ozonestore.io",
+  "tokennames": [
+    "Digi Dog",
+    "Bored Ape",
+    "Colorful Monkey",
+    "Monkey Style Ape",
+    "Magic Monkey"
+  ]
+}

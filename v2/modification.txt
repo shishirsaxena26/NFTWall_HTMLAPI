@@ -1,0 +1,14 @@
+const PrimeDataOwnerBase='0x89a688208Fb14dC525D5310AFBE5C3d482E0B024'
+const PrimeDataQueue='0xEB1C3c60754c3e4D95360662173509f37794908c'
+
+# activate
+send "$PrimeDataOwnerBase" "activateAsOnOld(address)" "$ADDRESS1" 
+
+# sync with old
+send "$PrimeDataOwnerBase" "syncWithOld(address user)" "$ADDRESS1"
+
+# claim requet
+send "$PrimeDataQueue" "requestClaim()"  
+
+# claim 
+send "$PrimeDataQueue" "processQueue(uint)" "10" 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dynamic Socket.IO Test</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+input { margin: 5px; padding: 5px; width: 150px; }
+button { margin: 5px; padding: 5px; }
+pre { background: #f4f4f4; padding: 10px; max-height: 400px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<h2>Dynamic Socket.IO Demo</h2>
+
+<input id="user" placeholder="User ID">
+<input id="room" placeholder="Room ID">
+
+<br>
+<button onclick="auth()">Authenticate</button>
+<button onclick="createRoom()">Create Room</button>
+<button onclick="joinRoom()">Join Room</button>
+<button onclick="leaveRoom()">Leave Room</button>
+<button onclick="destroyRoom()">Destroy Room</button>
+<button onclick="listRooms()">List Rooms</button>
+
+<h3>Logs:</h3>
+<pre id="log"></pre>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const PORT = 5000; // match your server port
+const socket = io(`http://localhost:${PORT}`);
+
+function log(msg){
+    const pre = document.getElementById("log");
+    pre.textContent += msg + "\n";
+    pre.scrollTop = pre.scrollHeight;
+}
+
+// --- Connection Events ---
+socket.on("connect", () => log("✅ Connected: " + socket.id));
+socket.on("disconnect", reason => log("❌ Disconnected: " + reason));
+
+// --- Dynamic Event Listeners ---
+socket.on("room_created", data => log("🏠 Room Created: " + JSON.stringify(data)));
+socket.on("room_users", data => log("👥 Room Users: " + JSON.stringify(data)));
+socket.on("room_destroyed", data => log("💥 Room Destroyed: " + JSON.stringify(data)));
+socket.on("message", data => log("💬 Message: " + JSON.stringify(data)));
+
+// --- Actions ---
+function auth() {
+    const userId = document.getElementById("user").value.trim();
+    if(!userId) return alert("Enter userId first!");
+    socket.emit("auth", { userId });
+    log("🔑 Auth sent for userId: " + userId);
+}
+
+function createRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:create", { roomId, maxSize:4 }, res => log("ACK Create Room: " + JSON.stringify(res)));
+}
+
+function joinRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:join", { roomId }, res => log("ACK Join Room: " + JSON.stringify(res)));
+}
+
+function leaveRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:leave", { roomId }, res => log("ACK Leave Room: " + JSON.stringify(res)));
+}
+
+function destroyRoom() {
+    const roomId = document.getElementById("room").value.trim();
+    socket.emit("room:destroy", { roomId }, res => log("ACK Destroy Room: " + JSON.stringify(res)));
+}
+
+function listRooms() {
+    socket.emit("room:list", {}, res => log("🏘️ List Rooms: " + JSON.stringify(res)));
+}
+</script>
+
+</body>
+</html>

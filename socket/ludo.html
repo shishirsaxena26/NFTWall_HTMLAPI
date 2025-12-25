@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Socket.IO Real Ludo</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+input { margin: 5px; padding: 5px; width: 150px; }
+button { margin: 5px; padding: 5px; }
+pre {  background: #f4f4f4;
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  white-space: pre-wrap;   /* Wrap text */
+  word-wrap: break-word;   /* Break long words */ }
+#ludo-container { display: flex; gap: 20px; margin-top: 20px; display: none; }
+canvas { border: 2px solid #333; background: #f0f0f0; cursor: pointer; }
+#dice { font-size: 24px; margin-top: 10px; }
+#turn { margin-top: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>Socket.IO Real Ludo</h2>
+
+<input id="user" placeholder="User Name" />
+<input id="room" placeholder="Room Name" />
+
+<br>
+
+<button onclick="auth()">Authenticate</button>
+<button onclick="createRoom()">Create Room</button>
+<button onclick="joinRoom()">Join Room</button>
+<button onclick="leaveRoom()">Leave Room</button>
+<!--<button onclick="destroyRoom()">Destroy Room</button>-->
+<button onclick="listRooms()">List Rooms</button>
+
+<br><br>
+
+<input id="msg" placeholder="Type message..." style="width:300px;" />
+<button onclick="sendMessage()">Send Message</button>
+
+<h3>Logs:</h3>
+<pre id="log"></pre>
+
+<div id="ludo-container">
+    <canvas id="ludoBoard" width="450" height="450"></canvas>
+    <div>
+        <button id="rollBtn" onclick="rollDice()">🎲 Roll Dice</button>
+        <div id="dice">Dice: -</div>
+        <div id="turn">Turn: -</div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+    const PORT = 8443;
+    const HOST = `ws://api.stbots.io`;
+    //const socket = io(`${HOST}:${PORT}`);
+    const socket = io(HOST);
+    function log(msg){ const pre=document.getElementById("log"); pre.textContent+=msg+"\n"; pre.scrollTop=pre.scrollHeight; }
+    
+    // --- User & Game State ---
+    let myUserId=null, myName=null;
+    const colors=["red","green","yellow","blue"];
+    let gameState={ users:{}, tokens:{}, turnOrder:[], currentTurnIndex:0, dice:0 };
+    
+    // --- Ludo Board ---
+    const canvas=document.getElementById("ludoBoard");
+    const ctx=canvas.getContext("2d");
+    const cellSize=30;
+    const path=[[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[7,6],[8,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0],[14,1],[14,2],[14,3],[14,4],[14,5],[14,6],[13,7],[12,7],[11,7],[10,7],[9,7],[8,7],[8,8],[8,9],[8,10],[8,11],[8,12],[8,13],[8,14],[7,14],[6,14],[6,13],[6,12],[6,11],[6,10],[6,9],[5,14],[4,14],[3,14],[2,14],[1,14],[0,14],[0,13],[0,12],[0,11],[0,10],[0,9],[0,8],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]];
+    const safeSpots = path.filter((_,i)=>[0,8,13,21,26,34,39,47].includes(i));
+    
+    // --- Draw Board & Tokens ---
+    function drawBoard(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        // Homes
+        ctx.fillStyle="red"; ctx.fillRect(0,0,6*cellSize,6*cellSize);
+        ctx.fillStyle="green"; ctx.fillRect(9*cellSize,0,6*cellSize,6*cellSize);
+        ctx.fillStyle="yellow"; ctx.fillRect(0,9*cellSize,6*cellSize,6*cellSize);
+        ctx.fillStyle="blue"; ctx.fillRect(9*cellSize,9*cellSize,6*cellSize,6*cellSize);
+        // Grid
+        for(let i=0;i<15;i++){ for(let j=0;j<15;j++){ ctx.strokeStyle="#aaa"; ctx.strokeRect(i*cellSize,j*cellSize,cellSize,cellSize); } }
+    
+        // Tokens and names
+        for(const uid in gameState.tokens){
+            const tokens = gameState.tokens[uid];
+            const color = gameState.users[uid]?.color || "black";
+            const name = gameState.users[uid]?.name || uid;
+    
+            // Draw tokens
+            tokens.forEach((t,i)=>{
+                let drawX=t.x, drawY=t.y;
+                if(drawX===-1 && drawY===-1){
+                    // Assign home positions for 4 colors
+                    switch(color){
+                        case "red": drawX=1+ i%2; drawY=1+ Math.floor(i/2); break;
+                        case "green": drawX=10 + i%2; drawY=1+ Math.floor(i/2); break;
+                        case "yellow": drawX=1 + i%2; drawY=10+ Math.floor(i/2); break;
+                        case "blue": drawX=10 + i%2; drawY=10+ Math.floor(i/2); break;
+                    }
+                }
+                ctx.fillStyle=color;
+                ctx.beginPath();
+                ctx.arc((drawX+0.5)*cellSize,(drawY+0.5)*cellSize,cellSize/2.2,0,Math.PI*2);
+                ctx.fill();
+            });
+    
+            // Draw name near home area
+            let nameX=0, nameY=0;
+            switch(color){
+                case "red": nameX=3; nameY=0; break;
+                case "green": nameX=11; nameY=0; break;
+                case "yellow": nameX=3; nameY=11; break;
+                case "blue": nameX=11; nameY=11; break;
+            }
+            ctx.fillStyle="black";
+            ctx.font="14px Arial";
+            ctx.fillText(name, nameX*cellSize, nameY*cellSize-2);
+        }
+    }
+    
+    // --- Ludo Message Handling ---
+    socket.on("message", data=>{
+        if(typeof data.message==="object" && data.message.type) handleLudoMessage(data.message);
+    });
+    
+    function handleLudoMessage(msg){
+        const {type,payload}=msg;
+        if(type==="ludo:state") updateBoardState(payload);
+    }
+    
+    // --- Update Board ---
+    function updateBoardState(state){
+        for(const uid in state.users){
+            if(!gameState.users[uid]){
+                const usedColors = Object.values(gameState.users).map(u=>u.color).filter(Boolean);
+                const available = colors.find(c=>!usedColors.includes(c)) || colors[0];
+                state.users[uid].color = state.users[uid].color || available;
+                state.tokens[uid] = state.tokens[uid] || Array(4).fill(0).map(_=>({x:-1,y:-1,steps:0,finished:false}));
+                if(!state.turnOrder.includes(uid)) state.turnOrder.push(uid);
+            }
+        }
+        gameState=state;
+        drawBoard();
+        document.getElementById("dice").textContent="Dice: "+(gameState.dice||'-');
+        if(gameState.turnOrder.length>0){
+            const turnUser = gameState.turnOrder[gameState.currentTurnIndex];
+            document.getElementById("turn").textContent="Turn: "+(gameState.users[turnUser]?.color||turnUser);
+        }
+    }
+    
+    // --- Dice & Token Moves ---
+    function rollDice(){
+        if(gameState.turnOrder[gameState.currentTurnIndex]!==myUserId){ alert("Not your turn"); return; }
+        const dice=Math.floor(Math.random()*6)+1;
+        gameState.dice=dice;
+        sendGameState();
+    }
+    
+    function moveToken(tokenIndex){
+        if(gameState.turnOrder[gameState.currentTurnIndex]!==myUserId){ alert("Not your turn"); return; }
+        const tokens = gameState.tokens[myUserId];
+        let t = tokens[tokenIndex];
+        t.steps=(t.steps||0)+gameState.dice;
+        const idx=t.steps-1;
+        if(idx<path.length){ t.x=path[idx][0]; t.y=path[idx][1]; } else { t.finished=true; }
+        // Capture opponents
+        for(const uid in gameState.tokens){
+            if(uid===myUserId) continue;
+            gameState.tokens[uid].forEach(ot=>{
+                if(!ot.finished && ot.x===t.x && ot.y===t.y && !safeSpots.some(p=>p[0]===t.x && p[1]===t.y)){
+                    ot.steps=0; ot.x=-1; ot.y=-1;
+                }
+            });
+        }
+        if(gameState.dice!==6) gameState.currentTurnIndex=(gameState.currentTurnIndex+1)%gameState.turnOrder.length;
+        gameState.dice=0;
+        sendGameState();
+    }
+    
+    // --- Send Updated State ---
+    function sendGameState(){
+        const roomId=document.getElementById("room").value.trim();
+        socket.emit("send_message",{roomId,message:{type:"ludo:state",payload:gameState}});
+    }
+    
+    // --- Canvas Click to Move ---
+    canvas.addEventListener("click", (e)=>{
+        if(gameState.turnOrder[gameState.currentTurnIndex]!==myUserId) return;
+        const tokenIndex=gameState.tokens[myUserId].findIndex(t=>!t.finished);
+        if(tokenIndex>=0) moveToken(tokenIndex);
+    });
+    
+    // --- Add user on join/create ---
+    function addUserToGameState(userId,name){
+        if(gameState.users[userId]) return;
+        const usedColors = Object.values(gameState.users).map(u=>u.color);
+        const color = colors.find(c=>!usedColors) || colors[0];
+        gameState.users[userId]={name,color};
+        gameState.tokens[userId]=Array(4).fill(0).map(_=>({x:-1,y:-1,steps:0,finished:false}));
+        if(!gameState.turnOrder.includes(userId)) gameState.turnOrder.push(userId);
+        drawBoard();
+        sendGameState();
+    }
+    
+    // --- ROOM & AUTH EVENTS ---
+    socket.on("connect",()=>{ myUserId=socket.id; log("✅ Connected: " + socket.id); });
+    drawBoard();
+    
+    // Connection events
+    socket.on("disconnect", reason => log("❌ Disconnected: " + reason));
+    
+    // Server events
+    socket.on("room_created", data => log("🏠 Room Created: " + JSON.stringify(data)));
+    socket.on("room_users", data => log("👥 Room Users: " + JSON.stringify(data)));
+    socket.on("room_destroyed", data => log("💥 Room Destroyed: " + JSON.stringify(data)));
+    socket.on("message", data => log("💬 Message: " + JSON.stringify(data)));
+    
+    // Helper functions
+    function auth(){
+        myName=document.getElementById("user").value.trim();
+        if(!myName) return alert("Enter userName first!");
+        socket.emit("auth",{userName:myName,userId:crypto.randomUUID()},res=>{
+            log("Authenticated user:"+JSON.stringify(res));
+            //if(res.ok) addUserToGameState(myUserId,myName);
+        });
+        
+    }
+    
+    function createRoom(){
+        const roomId=document.getElementById("room").value.trim();
+        if(!roomId) return alert("Enter roomId first!");
+        socket.emit("room:create",{roomId,maxSize:4},res=>{
+            log("ACK Create Room:"+JSON.stringify(res));
+            //if(res.ok) addUserToGameState(myUserId,myName);
+        });
+    }
+    
+    function joinRoom(){
+        const roomId=document.getElementById("room").value.trim();
+        if(!roomId) return alert("Enter roomId first!");
+        socket.emit("room:join",{roomId},res=>{
+            log("ACK Join Room:"+JSON.stringify(res));
+            //if(res.ok) addUserToGameState(myUserId,myName);
+        });
+    }
+    
+    function leaveRoom(){
+        const roomId=document.getElementById("room").value.trim();
+        socket.emit("room:leave",{roomId},res=>log("ACK Leave Room:"+JSON.stringify(res)));
+    }
+    
+    function destroyRoom(){
+        const roomId=document.getElementById("room").value.trim();
+        socket.emit("room:destroy",{roomId},res=>log("ACK Destroy Room:"+JSON.stringify(res)));
+    }
+    
+    function listRooms(){
+        socket.emit("room:list",{},res=>log("🏘️ List Rooms:"+JSON.stringify(res)));
+    }
+    
+    function sendMessage(){
+        const roomId=document.getElementById("room").value.trim();
+        const message=document.getElementById("msg").value.trim();
+        if(!roomId) return alert("Enter roomId");
+        if(!message) return alert("Enter message");
+        socket.emit("send_message",{roomId,message},res=>log("ACK Send Message:"+JSON.stringify(res)));
+        document.getElementById("msg").value="";
+    }
+
+    log("⚡ Ludo Client Loaded");
+    log(`📡 ${HOST} - Socket Server connecting.`);
+    </script>
+    
+</body>
+</html>
