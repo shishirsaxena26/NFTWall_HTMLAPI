@@ -67,6 +67,7 @@ let NestedABI = {};
 let insABI = {};
 let ORCABI = {};
 let safeABI = {};
+let validatorLocalABI = {};
 
 pageload();
 
@@ -79,7 +80,7 @@ async function pageload() {
 	NestedABI = await fetch('abi/Nested741.sol/Nested741.json?v='+version).then(res => res.json());
 	insABI = await fetch('abi/Nftwall-Instance.sol/NodeInstance.json?v='+version).then(res => res.json());
 	ORCABI = await fetch('abi/ORC1155.sol/ORC1155.json?v='+version).then(res => res.json());
-	
+	validatorLocalABI = await fetch('abiv3/Nftwall-ValidatorsLocals.sol/NFTValidatorsLocals.json?v='+version).then(res => res.json());
 	await web3.eth.getBlock(4564345).then((e) => { 
 		console.log(e); 
 	}).catch((e) => {});
@@ -1844,3 +1845,40 @@ async function OnTest()
 		//  myalert("Registration failed");
 	}
 }
+
+
+
+
+async function onSignDelegator() {
+	$("#lblmsg").text('');
+	
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		var n = $("#txtAdd").val();
+		if (!n) { msg('address is blank'); return; }
+
+		if (!(await isUser(n))) 
+		{ msg('user instance not exists.'); return; }
+		
+		window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+		let response = await window.validatorcontract.methods.mapDelegator(n).send(
+			{ from: accounts[0] }) 
+			.on('error', function (error) { msg(error.message); console.log(error); })
+			.then(function (Obj) {
+				if (Obj.status == true) {
+					$("#lblmsg").text('Sign Delegator succeeded');
+				}
+				else {
+					$("#lblmsg").text('Sign Delegator failed');
+				}
+			});
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text(ex.message);
+		//  myalert("Registration failed");
+	}
+}
+
