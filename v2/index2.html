@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            font-size:11px;
+        }
+        td, th {
+            width:80px;
+             
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <span id="lblmsg"></span>
+        <div id="profilelist"></div>
+        <div id="adminDiv"><button id="btnApprove1" onclick="onApprove1()" value="Approve1">Approve 1</button><button id="btnApprove2" onclick="onApprove2()" value="Approve2">Approve 2</button> &nbsp;&nbsp;&nbsp; <a id="btnShowNodes " href="company.html" value="Nodes">Company Validators</a> -- Today -> <span id="day1"></span> -- Yesterday ->  <span id="day2"></span> -- Range (<span id="range"></span>) -- Calculated --> <span id="day2cal"></span> <button id="btnRoyal" onclick="OnSendingSyncNRoyality()" value="Royal Sync and Send">Royal Sync and Send</button> </div>
+        <table width="1200"><tr><td><input type="text" size="48" id="txtparent" placeholder="parent" /><button id="btndeploy" onclick="onDeploy()" value="Deploy">Deploy</button></td><td><input id="txtprofile" type="text" size="48" placeholder="profile contract" /><button id="btnUnlock" style="display:none;" onclick="onUnlock()" value="Unlock">Unlock</button> <button id="btnInit" onclick="onInit()" value="Init">Init</button></td><td><input id="txtAmount" type="text" size="15" placeholder="Staking Amount" /><button id="btnStake" onclick="onStake()" value="Stake">Stake</button></td></tr></table>
+        <table width="1200"><tr><td><div id="loadDiv"><input type="number" size="48" id="txtFrom" placeholder="From" /><input type="number" size="48" id="txtTo" placeholder="To" /><button id="btnload" onclick="loadData()" value="Load">Load</button></div></td><td><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="loadAddressData()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button></td></tr></table>
+
+    </div>
+    <hr />
+    <table id="tab" width="100%" cellpadding="10"><tr style="background-color:darksalmon;"><th valign="top" >Id</th><th width="150">Sponser</th><th width="150">Node</th><th width="150">Profile</th><th>stakeCount</th><th>TotalStaked</th><th>levelinc</th><th>reward</th><th>royality</th><th>selfmining</th><th>levelmining</th><th>childCount</th><th>Rank</th><th>Status</th><th style="border-left:5px dashed red;">TB(5)</th><th>TB(30)</th><th>TB(150)</th><th>TB(600)</th><th>TB(1500)</th><th>TB(3000)</th><th>TB(5000)</th></tr></table>
+    <table id="abc" width="100%" style="width: 100%; table-layout: fixed;">
+        <tr>
+            <td width="50%" valign="top" style=" background-color:black; color:white; font-weight:bold; font-size:large; border: black thick solid; max-width: 50%;">
+                <span>New Instance</span>
+            </td>
+            <td width="50%" valign="top" style="background-color: black; color: white; font-weight: bold; font-size: large; border: black thick solid; max-width: 50%; ">
+                <span>Old Contract</span>
+            </td>
+        </tr>
+        <tr>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <table id="tabStake" width="100%" cellpadding="10"><tr style="background-color:darkkhaki;"><th>StakeId/StakeTime</th><th>Date</th><th>Amount</th><th>UnStaked</th><th>Imported</th><th>LastMiningOn</th></tr></table>
+            </td>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <table id="tabStakeOld" width="100%" cellpadding="10"><tr style="background-color:khaki;"><th>StakeId/StakeTime</th><th>Date</th><th>Amount</th><th>Instance</th></tr></table>
+            </td>
+        </tr>
+        <tr>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <button style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">SelfMining</button>  <button  style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">Staked</button><button  style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">Unstaked</button>
+            </td>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <button style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">SelfMining</button>  <button style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">Staked</button><button style=" background-color:black; color:white; font-weight:bold;" onclick="getTxn()">Unstaked</button>
+            </td>
+        </tr>
+        <tr>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <table id="tabTxn" width="100%" cellpadding="10"><tr style="background-color:bisque;"><th>Txnhash</th><th>blockNumber -- blocktime</th><th>Date</th><th>Type</th><th>Amount</th><th>Stake Id</th></tr></table>
+            </td>
+            <td width="50%" valign="top" style=" border: black thick solid; max-width: 50%;">
+                <table id="tabStakeOldUnstake" width="100%" cellpadding="10"><tr style="background-color:aqua;"><th>Block/Time</th><th>Amount</th><th>Transaction</th></tr></table>
+            </td>
+        </tr>
+    </table>
+    <script>
+        const ConnectWallet = async () => {
+            window.selectedaddress = null;
+            if (typeof window.ethereum !== 'undefined') {
+                console.log('MetaMask is installed!');
+                if (!window.ethereum.isConnected()) {
+                    alert("Please connect metamask wallet."); return;
+                }
+
+                await window.ethereum.enable();
+
+                // window.web3 = new Web3(window.ethereum);
+
+                window.web3 = new Web3(window.ethereum);
+
+                const accounts = await window.ethereum.request({
+                    method: "eth_accounts",
+                    params: [],
+                });
+                if (accounts.length === 0) {
+                    alert('Please connect to MetaMask.');
+                }
+                else {            //console.log(window.ethereum._state.account);
+
+                    // selected_chainId = await ethereum.request({ method: 'eth_chainId' });
+                    window.selectedaddress = accounts[0];
+                    return accounts[0];
+
+                }
+
+            }
+            else
+                alert("Please download metamask");
+
+            return false;
+        };
+
+    </script>
+    <script src="factory2js.v1/FactoryABI.js"></script>
+    <script src="factory2js.v1/InstanceABI.js"></script>
+    <script src="factory2js.v1/RoyalityABI.js"></script>
+    <script src="factory2js.v1/walletlayer.js"></script>
+</body>
+</html>
