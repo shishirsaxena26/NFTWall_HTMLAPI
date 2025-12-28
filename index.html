@@ -33,6 +33,29 @@
         button:hover {
             background: #1d4ed8;
         }
+
+        /* Module styles */
+        .modules {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .module-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .module-card a {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .module-card a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +67,25 @@
 <main>
     <p>This is a sample <strong>index.html</strong> file.</p>
     <button onclick="sayHello()">Click Me</button>
+
+    <!-- Modules Section -->
+    <h2 style="margin-top:40px;">Modules</h2>
+    <div class="modules">
+        <div class="module-card">
+            <h3>Module V1</h3>
+            <a href="https://eze.stbots.io/v1/" target="_blank">Open Module</a>
+        </div>
+
+        <div class="module-card">
+            <h3>Module V2</h3>
+            <a href="https://eze.stbots.io/v2/" target="_blank">Open Module</a>
+        </div>
+
+        <div class="module-card">
+            <h3>Module V3</h3>
+            <a href="https://eze.stbots.io/v3/" target="_blank">Open Module</a>
+        </div>
+    </div>
 </main>
 
 <!-- JavaScript -->
