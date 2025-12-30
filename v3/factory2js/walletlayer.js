@@ -743,6 +743,24 @@ async function loadPool(n, instance, dage) {
 	td =td + '<td>' + (await window.instancecontract.methods.royaldage(7).call()) + '</td>';
 
 	$("#tabRoyalityIncome").append('<tr>' + td + '</tr>');
+
+
+	td= '';//
+	debugger;
+	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+	td =td + '<td>' + (await window.validatorcontract.methods.getDelegator(n).call()) + '</td>';
+	
+	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.incomeOf(n).call()), 'ether')  + '</td>';
+	
+	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.withdrawnIncomeOf(n).call()), 'ether')  + '</td>';
+	
+	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.balanceOf(n).call()), 'ether')  + '</td>';
+	
+	$("#tabDelegator").append('<tr>' + td + '</tr>');
+
 	
 }
 
@@ -1891,7 +1909,7 @@ async function onValidatorIncomeClaim() {
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
 		
-		if (!(await isUser(accounts[0])))_
+		if (!(await isUser(accounts[0])))
 		{ msg('user instance not exists.'); return; }
 		
 		window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
