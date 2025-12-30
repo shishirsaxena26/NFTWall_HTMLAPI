@@ -1882,3 +1882,35 @@ async function onSignDelegator() {
 	}
 }
 
+
+async function onValidatorIncomeClaim() {
+	$("#lblmsg").text('');
+	
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		if (!(await isUser(accounts[0])))_
+		{ msg('user instance not exists.'); return; }
+		
+		window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
+		let response = await window.validatorcontract.methods.claim().send(
+			{ from: accounts[0] }) 
+			.on('error', function (error) { msg(error.message); console.log(error); })
+			.then(function (Obj) {
+				if (Obj.status == true) {
+					$("#lblmsg").text('Sign Delegator succeeded');
+				}
+				else {
+					$("#lblmsg").text('Sign Delegator failed');
+				}
+			});
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text(ex.message);
+		//  myalert("Registration failed");
+	}
+}
+
