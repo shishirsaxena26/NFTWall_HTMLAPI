@@ -59,7 +59,8 @@
             <table><tr><td colspan="2"> <input type="text" size="48" id="txtRootAdd" disabled ></input><button id="btnload" onclick="onLoadRootAddress()" value="Load">Load</button> &nbsp;&nbsp;&nbsp; Transferred Address <span id="transferAdd"></span>  -  <span id="transferBal"></span> 
             </td> </tr>
             <tr><td><input type="text" size="48" id="txtparent" placeholder="parent" /><button id="btndeploy" onclick="onJoin()" value="Deploy">Join</button><button id="btndeployPrime" onclick="onJoinPrime()" value="DeployPrime">JoinPrime</button><button id="btndeployPrime" onclick="onDeployTest()" value="onDeployTest">onDeployTest</button></td><td><input id="txtAmount" type="text" size="15" placeholder="Staking Amount" /><button id="btnStake" onclick="onMint(1)" value="Stake">Mint </button><button id="btnStake" onclick="onMintPrime(1)" value="Stake">Mint (Prime)</button></td></tr>
-            <tr><td colspan="2" ><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="onLoadAddress()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button><button id="btnSetFreeIntervals" onclick="onSetFreeIntervals()" value="btnSetFreeIntervals">FreeIntervals</button> <button id="btnSignDeligate" onclick="onSignDelegator()" value="btnonSignDelegator">Sign Delegator</button>  
+            <tr><td colspan="2" ><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="onLoadAddress()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button><button id="btnSetFreeIntervals" onclick="onSetFreeIntervals()" value="btnSetFreeIntervals">FreeIntervals</button> <button id="btnSignDeligate" onclick="onSignDelegator()" value="btnSignDelegator">Sign Delegator</button> 
+                
                 </td>
             </tr></table>
         </td>
@@ -157,7 +158,7 @@
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                 <button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(1)">ReActivate (Free)</button><button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(2)">ReActivate (10USDT)</button><button style=" background-color:black; color:white; font-weight:bold;" onclick="onClaim()">Withdraw</button>
+                                 <button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(1)">ReActivate (Free)</button><button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(2)">ReActivate (10USDT)</button><button style=" background-color:black; color:white; font-weight:bold;" onclick="onClaim()">Withdraw</button><button   style=" background-color:black; color:white; font-weight:bold;" id="btnValidatorIncomeClaim" onclick="onValidatorIncomeClaim()" value="btnValidatorIncomeClaim">Validator Income Claim</button>  
                                 </td>
                                 
                             </tr>
