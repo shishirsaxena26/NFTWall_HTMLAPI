@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EZETrade · Crypto Trading API Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg: radial-gradient(circle at top, #0f1a2b, #05070f);
+  --card: rgba(255,255,255,0.08);
+  --glass: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.18);
+  --accent: #3fa9ff;
+  --accent2: #00ffd5;
+  --danger: #ff5f5f;
+  --text: #e8ecff;
+  --green: #00ff90;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+/* 📱 Phone-like frame */
+.phone {
+  width: 420px;
+  max-width: 94vw;
+  border-radius: 28px;
+  padding: 14px;
+  background: linear-gradient(180deg, #111, #000);
+  box-shadow: 0 40px 80px rgba(0,0,0,.8);
+}
+
+/* Glass trading panel */
+.container {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 22px;
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.1);
+  transform-style: preserve-3d;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: .8px;
+  color: var(--accent2);
+}
+
+/* Fake trading status LED */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: .8;
+}
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+/* Inputs */
+.section {
+  margin-bottom: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.45);
+  color: var(--text);
+  outline: none;
+  transition: .25s;
+}
+
+input::placeholder {
+  color: rgba(255,255,255,.45);
+}
+
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(63,169,255,.25);
+}
+
+/* Button grids */
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: #020617;
+  background: linear-gradient(145deg, var(--accent), var(--accent2));
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.5);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button.danger {
+  background: linear-gradient(145deg, #ff4d4d, #ff9a9a);
+}
+
+/* Trading console output */
+pre {
+  margin-top: 12px;
+  padding: 14px;
+  background: #03050b;
+  border-radius: 16px;
+  color: var(--green);
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 12.5px;
+  line-height: 1.4;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 11px;
+  opacity: .6;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+  <div class="container">
+
+    <div class="header">
+      <h2>EZETrade · API Console</h2>
+      <div class="status">LIVE</div>
+    </div>
+
+    <div class="section">
+      <input id="username" placeholder="Email / Username" value="testuser@gmail.com">
+      <input id="password" type="password" placeholder="Password" value="password123">
+    </div>
+
+    <div class="buttons">
+      <button onclick="signup()">Signup</button>
+      <button onclick="login()">Login</button>
+      <button onclick="dashboard()">Dashboard</button>
+      <button onclick="sendOTP()">Send OTP</button>
+    </div>
+
+    <div class="section">
+      <input id="otp" placeholder="OTP">
+      <input id="apikey" placeholder="Binance API Key">
+      <input id="secretkey" placeholder="Binance Secret Key">
+    </div>
+
+    <div class="buttons">
+      <button onclick="apiBind()">API Bind</button>
+      <button onclick="getKeys()">Get Keys</button>
+      <button class="danger" onclick="logout()">Logout</button>
+    </div>
+
+    <pre id="output">// Trading API responses</pre>
+
+    <div class="footer">Ezefi · Crypto Trading Terminal</div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = "https://api.stbots.io";
+let TOKEN = "";
+
+// Safe response handler
+async function handleResponse(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: text, status: res.status };
+  }
+}
+
+function show(data) {
+  document.getElementById("output").textContent =
+    JSON.stringify(data, null, 2);
+}
+
+async function signup() {
+  const res = await fetch(BASE_URL + "/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+  show(await handleResponse(res));
+}
+
+async function login() {
+  const res = await fetch(BASE_URL + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+  const data = await handleResponse(res);
+  TOKEN = data.token || "";
+  show(data);
+}
+
+async function dashboard() {
+  const res = await fetch(BASE_URL + "/dashboard", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + TOKEN }
+  });
+  show(await handleResponse(res));
+}
+
+async function sendOTP() {
+  const res = await fetch(BASE_URL + "/sendotp", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + TOKEN }
+  });
+  show(await handleResponse(res));
+}
+
+async function apiBind() {
+  const res = await fetch(BASE_URL + "/apibind", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + TOKEN
+    },
+    body: JSON.stringify({
+      apikey: apikey.value,
+      secretkey: secretkey.value,
+      keyotp: otp.value
+    })
+  });
+  show(await handleResponse(res));
+}
+
+async function getKeys() {
+  const res = await fetch(BASE_URL + "/getapikeys", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + TOKEN }
+  });
+  show(await handleResponse(res));
+}
+
+async function logout() {
+  const res = await fetch(BASE_URL + "/logout", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + TOKEN }
+  });
+  TOKEN = "";
+  show(await handleResponse(res));
+}
+</script>
+
+</body>
+</html>
