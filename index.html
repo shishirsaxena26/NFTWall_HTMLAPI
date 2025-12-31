@@ -1,103 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>My First Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZETrade · 3D Crypto Dashboard</title>
 
-    <!-- CSS -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #1e293b;
-            color: white;
-            padding: 16px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        button {
-            padding: 10px 16px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #1d4ed8;
-        }
+<style>
+:root {
+  --bg-gradient: linear-gradient(160deg, #0d0f1a, #1c0323);
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.12);
+  --text-color: #e0e0ff;
+  --accent-primary: #ff4c8b;
+  --accent-secondary: #00fff6;
+  --shadow-color: rgba(0,0,0,0.7);
+}
 
-        /* Module styles */
-        .modules {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
-        .module-card {
-            background: white;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .module-card a {
-            text-decoration: none;
-            color: #2563eb;
-            font-weight: bold;
-        }
-        .module-card a:hover {
-            text-decoration: underline;
-        }
-    </style>
+/* Global Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* Container */
+.container {
+  width: 95%;
+  max-width: 1200px;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-size: 2.4rem;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+/* Modules Grid */
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 50px;
+}
+
+/* Module Cards */
+.module-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 12px 32px var(--shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.module-card:hover {
+  transform: rotateX(5deg) rotateY(10deg) scale(1.06);
+  box-shadow: 0 20px 48px var(--shadow-color), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.module-card h3 {
+  margin-bottom: 12px;
+  color: var(--accent-secondary);
+  font-size: 1.3rem;
+}
+
+.module-card a {
+  display: block;
+  color: var(--accent-primary);
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.module-card a:hover {
+  text-decoration: underline;
+}
+
+/* EZETrade Section */
+.ezetrade {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px var(--shadow-color);
+  margin-bottom: 50px;
+}
+
+.ezetrade h2 {
+  font-size: 2rem;
+  margin-bottom: 16px;
+  color: var(--accent-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.ezetrade p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  color: #c0d8ff;
+}
+
+.ezetrade a {
+  display: inline-block;
+  padding: 14px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #0b0b12;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: glow 2s infinite alternate;
+}
+
+.ezetrade a:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Footer Glow */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #a0b0ff;
+  letter-spacing: 0.5px;
+  margin-top: 40px;
+}
+
+/* Button Glow Animation */
+@keyframes glow {
+  0% { box-shadow: 0 0 8px var(--accent-primary); }
+  50% { box-shadow: 0 0 20px var(--accent-secondary); }
+  100% { box-shadow: 0 0 8px var(--accent-primary); }
+}
+</style>
 </head>
 <body>
 
-<header>
-    <h1>Your Gateway to Insights</h1>
-</header>
-
-<main>
-    <p>This is a sample <strong>index.html</strong> file.</p>
-    <button onclick="sayHello()">Click Me</button>
+<div class="container">
+    <header>
+        <h1>Root Gateway to Insights</h1>
+    </header>
 
     <!-- Modules Section -->
-    <h2 style="margin-top:40px;">Modules</h2>
     <div class="modules">
         <div class="module-card">
             <h3>Module V1</h3>
             <a href="https://eze.stbots.io/v1/" target="_blank">Open Module</a>
         </div>
-
         <div class="module-card">
             <h3>Module V2</h3>
             <a href="https://eze.stbots.io/v2/" target="_blank">Open Module</a>
         </div>
-
         <div class="module-card">
             <h3>Module V3</h3>
-            <a href="https://eze.stbots.io/v3/" target="_blank">Open Module</a><br/>
+            <a href="https://eze.stbots.io/v3/" target="_blank">Open Module</a>
             <a href="https://eze.stbots.io/v3/business.html" target="_blank">Business Report</a>
         </div>
     </div>
-</main>
 
-<!-- JavaScript -->
-<script>
-    function sayHello() {
-        alert("Hello, Dear 👋");
-    }
-</script>
+    <!-- EZETrade Section -->
+    <div class="ezetrade">
+        <h2>EZETrade Simulation</h2>
+        <p>Start trading simulation in a visually stunning 3D dashboard. Experience interactive cards, live market view, and crypto analytics with futuristic neon vibes.</p>
+        <a href="https://eze.stbots.io/trade/" target="_blank">Launch Simulator</a>
+    </div>
+
+    <footer>© 2025 EZETrade · NextGen Trading Dashboard</footer>
+</div>
 
 </body>
 </html>
