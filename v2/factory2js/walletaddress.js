@@ -58,6 +58,7 @@ const orc1155Monalisa9Oct='0x7117638C0DC12fffFDDdF3630AC4CE5c9705e6Ff'
 const hexbase9Oct='0x1Bc69f0F0C7a03AF94293a5A3c8664be6a29Aaa3'
 const ActivateProcess9Oct='0x677C758Fa9901B7dd05190C14AA29Ee7F7B6964C'
 const importContract9Oct='0x1D702C9F2d7EFA3b00dC1941A03dDA7B393A263b'
+const ImportParentWithdrawal='0x6650e044cd5EE908A54bd7e468cA9226E7cb13F0'
 //Live settings 1pl
 /*
 const provider = "https://chain.ozonescan.com";

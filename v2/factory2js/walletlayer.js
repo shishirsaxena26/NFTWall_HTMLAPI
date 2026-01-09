@@ -807,6 +807,7 @@ async function loadApprove()
 	
 	await addSafeOwner("Service(Temp) for ActivateProcess9Oct", ActivateProcess9Oct);
 	await addSafeOwner("Updating Owner import ", importContract9Oct);
+	await addSafeOwner("Updating Owner import2 ", ImportParentWithdrawal);
 	
 
 	await _loadApprovePrime();
