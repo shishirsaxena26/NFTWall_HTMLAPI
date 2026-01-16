@@ -477,10 +477,10 @@ async function loadPoolPrime(n, instance, dage) {
 	$("#idPrime").text(primeid);
 	
 	window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);
-	let inc = await window.instancePrimecontract.methods.compute(999).call();
+	let inc = await window.instancePrimecontract.methods.compute(200).call();
 	
 	let td= '';
-	td =td + '<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
+	td =td + '<td>' + web3.utils.fromWei(inc.toString(), 'ether') + '</td>';
 	td =td + '<td>' + dage + '</td>';
 	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
 	
