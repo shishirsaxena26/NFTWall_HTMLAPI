@@ -65,7 +65,7 @@ fetch(apiUrl)
           const row = document.createElement("tr");
           keys.forEach(key => {
             const td = document.createElement("td");
-            td.textContent = item[key];
+            td.textContent = parseInt(item[key])==-2?'Total':(parseInt(item[key])==-1?'Imported':(parseInt(item[key])==0?'SUM (not imported)':item[key]));
             row.appendChild(td);
           });
           tbody.appendChild(row);
