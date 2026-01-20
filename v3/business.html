@@ -63,11 +63,35 @@ fetch(apiUrl)
         // --- Fill table rows dynamically ---
         jsonData.forEach(item => {
           const row = document.createElement("tr");
+          const age = parseInt(item.age, 10);
+
+          // --- Row colors ---
+          if (age === -2) {
+            row.style.backgroundColor = "#d1f7c4"; // light green (TOTAL)
+            row.style.fontWeight = "bold";
+          } else if (age === -1) {
+            row.style.backgroundColor = "#fff3cd"; // light yellow (OPENING)
+            row.style.fontWeight = "bold";
+          } else if (age === 0) {
+            row.style.backgroundColor = "#dbeafe"; // light blue (SUM)
+            row.style.fontWeight = "bold";
+          }
+
           keys.forEach(key => {
             const td = document.createElement("td");
-            td.textContent = parseInt(item[key])==-2?'Total':(parseInt(item[key])==-1?'Imported':(parseInt(item[key])==0?'SUM (not imported)':item[key]));
+
+            if (key === "age") {
+              if (age === -2) td.textContent = "TOTAL";
+              else if (age === -1) td.textContent = "IMPORTED";
+              else if (age === 0) td.textContent = "SUM";
+              else td.textContent = item[key];
+            } else {
+              td.textContent = item[key];
+            }
+
             row.appendChild(td);
           });
+
           tbody.appendChild(row);
         });
       })
