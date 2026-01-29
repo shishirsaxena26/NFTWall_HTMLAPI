@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EZETrade · Crypto Trading API Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg: radial-gradient(circle at top, #0f1a2b, #05070f);
+  --card: rgba(255,255,255,0.08);
+  --glass: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.18);
+  --accent: #3fa9ff;
+  --accent2: #00ffd5;
+  --danger: #ff5f5f;
+  --text: #e8ecff;
+  --green: #00ff90;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+/* 📱 Phone-like frame */
+.phone {
+  width: 420px;
+  max-width: 94vw;
+  border-radius: 28px;
+  padding: 14px;
+  background: linear-gradient(180deg, #111, #000);
+  box-shadow: 0 40px 80px rgba(0,0,0,.8);
+}
+
+/* Glass trading panel */
+.container {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 22px;
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.1);
+  transform-style: preserve-3d;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: .8px;
+  color: var(--accent2);
+}
+
+/* Fake trading status LED */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: .8;
+}
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+/* Logs panel */
+pre#output {
+  margin-top: 12px;
+  padding: 14px;
+  background: #03050b;
+  border-radius: 16px;
+  color: var(--green);
+  max-height: 500px;
+  overflow-y: auto;
+  font-size: 12.5px;
+  line-height: 1.4;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  white-space: pre-wrap;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 11px;
+  opacity: .6;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+  <div class="container">
+
+    <div class="header">
+      <h2>EZETrade · Bot Logs</h2>
+      <div class="status">LIVE</div>
+    </div>
+
+    <div>🐱: <span id="userId" style=
+        "background: linear-gradient(90deg, #fff9c4, #ffe033);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 1.2em;
+        text-shadow: 0 0 12px rgba(255, 224, 51, 0.8);"
+    >unknown</span>
+    </div>
+
+    <pre id="output">// Bot logs will appear here</pre>
+
+    <div class="footer">Ezefi · Crypto Trading Terminal</div>
+  </div>
+</div>
+
+<script>
+  // 1️⃣ Read USER_ID from URL query param
+  const params = new URLSearchParams(window.location.search);
+  const USER_ID = params.get('userid') || 'unknown';
+  const userEl = document.getElementById('userId');
+  userEl.textContent = USER_ID;
+  userEl.style.fontWeight = 'bold';
+  userEl.style.color = 'goldenrod'; // Highlight in yellow/orange
+
+  // 2️⃣ Get output container
+  const outputEl = document.getElementById('output');
+  outputEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+  outputEl.style.fontFamily = 'monospace';
+  outputEl.style.background = '#111';
+  outputEl.style.color = '#eee';
+  outputEl.style.padding = '10px';
+  outputEl.style.height = '500px';
+  outputEl.style.overflowY = 'auto';
+  outputEl.style.borderRadius = '8px';
+  outputEl.style.border = '1px solid #444';
+
+  // 3️⃣ Connect to WebSocket
+    const WS_HOST = "localhost:8080";
+    const ws = new WebSocket(`ws://${WS_HOST}/?userid=${USER_ID}`);
+
+  ws.onopen = () => {
+      appendLog(`✅ WebSocket connected for ${USER_ID}`);
+  };
+
+  ws.onmessage = (event) => {
+      // Filter logs for this user (simpler check)
+      if (event.data.includes(USER_ID)) {
+          appendLog(event.data);
+      }
+  };
+
+  ws.onerror = (err) => {
+      appendLog(`❌ WebSocket error: ${err.message || err}`);
+  };
+
+  ws.onclose = () => {
+      appendLog(`⚠️ WebSocket closed. Reconnecting in 5s...`);
+      setTimeout(() => location.reload(), 5000);
+  };
+
+  // 4️⃣ Helper function to append logs
+  function appendLog(msg) {
+      outputEl.textContent += msg + '\n';
+      outputEl.scrollTop = outputEl.scrollHeight; // Auto-scroll
+  }
+</script>
+
+</body>
+</html>
