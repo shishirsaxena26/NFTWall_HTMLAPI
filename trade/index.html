@@ -205,6 +205,7 @@ pre {
       <button onclick="apiBind()">API Bind</button>
       <button onclick="getKeys()">Get Keys</button>
       <button class="danger" onclick="logout()">Logout</button>
+      <button onclick="showbothtml()">BOT Status</button>
     </div>
 
     <pre id="output">// Trading API responses</pre>
@@ -305,6 +306,11 @@ async function logout() {
   });
   TOKEN = "";
   show(await handleResponse(res));
+}
+
+function showbothtml() {
+  const userId = username.value.trim();
+  window.open(`/bot.html?userid=${encodeURIComponent(userId)}`, "_self");
 }
 </script>
 
