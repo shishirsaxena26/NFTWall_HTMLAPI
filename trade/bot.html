@@ -150,7 +150,7 @@ pre#output {
   const outputEl = document.getElementById('output');
   outputEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
   outputEl.style.fontFamily = 'monospace';
-  outputEl.style.background = '#111';
+  outputEl.style.background = 'rgb(18 103 17)';
   outputEl.style.color = '#eee';
   outputEl.style.padding = '10px';
   outputEl.style.height = '500px';
@@ -168,9 +168,16 @@ pre#output {
 
   ws.onmessage = (event) => {
       // Filter logs for this user (simpler check)
-      if (event.data.includes(USER_ID)) {
-          appendLog(event.data);
-      }
+      let data;
+        try {
+            data = JSON.parse(event.data);
+        } catch {
+            return; // ignore non-JSON messages
+        }
+
+        if (data.userId !== USER_ID) return;
+
+        data.logs.forEach(line => appendLog(line));
   };
 
   ws.onerror = (err) => {
