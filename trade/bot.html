@@ -159,7 +159,7 @@ pre#output {
   outputEl.style.border = '1px solid #444';
 
   // 3️⃣ Connect to WebSocket
-    const WS_HOST = "localhost:9080";
+    const WS_HOST = "http://3.7.47.17:9080";
     const ws = new WebSocket(`ws://${WS_HOST}/?userid=${USER_ID}`);
 
   ws.onopen = () => {
