@@ -150,7 +150,7 @@ pre#output {
   const outputEl = document.getElementById('output');
   outputEl.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
   outputEl.style.fontFamily = 'monospace';
-  outputEl.style.background = 'rgb(18 103 17)';
+  outputEl.style.background = 'rgb(64 65 64)';
   outputEl.style.color = '#eee';
   outputEl.style.padding = '10px';
   outputEl.style.height = '500px';
@@ -159,7 +159,7 @@ pre#output {
   outputEl.style.border = '1px solid #444';
 
   // 3️⃣ Connect to WebSocket
-    const WS_HOST = "localhost:8080";
+    const WS_HOST = "localhost:9080";
     const ws = new WebSocket(`ws://${WS_HOST}/?userid=${USER_ID}`);
 
   ws.onopen = () => {
