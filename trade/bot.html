@@ -160,7 +160,7 @@ pre#output {
 
   // 3️⃣ Connect to WebSocket
     const WS_HOST = "3.7.47.17:9080";
-    const ws = new WebSocket(`ws://${WS_HOST}/?userid=${USER_ID}`);
+    const ws = new WebSocket(`wss://${WS_HOST}/?userid=${USER_ID}`);
 
   ws.onopen = () => {
       appendLog(`✅ WebSocket connected for ${USER_ID}`);
