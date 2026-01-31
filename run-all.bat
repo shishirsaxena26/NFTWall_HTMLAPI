@@ -23,5 +23,8 @@ REM -----------------------------
 REM Step 3: Git push
 REM -----------------------------
 echo.
-echo [3/3] Git push to master...
-git push -u origin master
+echo [3/3] Git push to main...
+git push -u origin main
+
+
+REM .\run-all
