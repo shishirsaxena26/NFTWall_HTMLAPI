@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Above Rank 5 Users Report</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; }
+
+    .tabs {
+      margin-bottom: 10px;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      margin-right: 5px;
+      border: 1px solid #aaa;
+      background: #f2f2f2;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #dbeafe;
+      font-weight: bold;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: small;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr.total {
+      background-color: #dbeafe;
+      font-weight: bold;
+    }
+
+    .loading {
+      padding: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 class="rptname">Above Rank 5 Users Report</h2>
+
+<div id="loading" class="loading">Loading report data...</div>
+
+<div id="tabs" class="tabs" style="display:none;"></div>
+<div id="tabContents"></div>
+
+<script>
+const apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_5Star_user";
+
+fetch(apiUrl)
+  .then(res => res.json())
+  .then(apiResponse => {
+    document.getElementById("loading").style.display = "none";
+
+    if (!apiResponse.success || !Array.isArray(apiResponse.data)) {
+      console.error("Invalid API response", apiResponse);
+      return;
+    }
+
+    const tabsDiv = document.getElementById("tabs");
+    const contentsDiv = document.getElementById("tabContents");
+
+    tabsDiv.style.display = "block";
+
+    apiResponse.data.forEach((dataset, index) => {
+      if (!dataset.length) return;
+
+      /* ---------- TAB NAME ---------- */
+      const tabName = index === 0 ? "Main" : "Set " + index;
+
+      /* ---------- TAB BUTTON ---------- */
+      const tabBtn = document.createElement("button");
+      tabBtn.className = "tab-btn";
+      tabBtn.textContent = tabName;
+      tabBtn.onclick = () => activateTab(index);
+      tabsDiv.appendChild(tabBtn);
+
+      /* ---------- TAB CONTENT ---------- */
+      const tabContent = document.createElement("div");
+      tabContent.className = "tab-content";
+      tabContent.id = "tab-" + index;
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tbody = document.createElement("tbody");
+
+      /* ---------- HEADER ---------- */
+      const keys = Object.keys(dataset[0]);
+      const headerRow = document.createElement("tr");
+      keys.forEach(k => {
+        const th = document.createElement("th");
+        th.textContent = k;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      /* ---------- BODY ---------- */
+      dataset.forEach(row => {
+        const tr = document.createElement("tr");
+
+        if (row.childNode === "DOWNLINE_TOTAL") {
+          tr.classList.add("total");
+        }
+
+        keys.forEach(k => {
+          const td = document.createElement("td");
+          td.textContent = row[k] ?? "";
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      tabContent.appendChild(table);
+      contentsDiv.appendChild(tabContent);
+    });
+
+    activateTab(0); // open Main tab by default
+  })
+  .catch(err => {
+    document.getElementById("loading").textContent = "Failed to load data.";
+    console.error("API error:", err);
+  });
+
+function activateTab(index) {
+  document.querySelectorAll(".tab-btn").forEach((btn, i) => {
+    btn.classList.toggle("active", i === index);
+  });
+
+  document.querySelectorAll(".tab-content").forEach((div, i) => {
+    div.classList.toggle("active", i === index);
+  });
+}
+</script>
+
+</body>
+</html>
