@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Validator Income Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input {
+            width: 420px;
+            padding: 8px;
+        }
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            margin-top: 10px;
+            color: blue;
+        }
+        .error {
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Validator Income Details</h2>
+
+<input type="text" id="addressInput" placeholder="Enter Node Address (0x...)" />
+<button onclick="fetchData()">Fetch Data</button>
+
+<div id="status"></div>
+<div id="result"></div>
+
+<script>
+async function fetchData() {
+    const address = document.getElementById("addressInput").value.trim();
+    const statusDiv = document.getElementById("status");
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = "";
+    statusDiv.innerHTML = "";
+
+    if (!address) {
+        statusDiv.innerHTML = "<div class='error'>Please enter an address.</div>";
+        return;
+    }
+
+    const url = `https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_validator_income_details&node=${address}`;
+
+    try {
+        statusDiv.innerHTML = "<div class='loading'>Loading...</div>";
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        statusDiv.innerHTML = "";
+
+        if (!data.success) {
+            statusDiv.innerHTML = "<div class='error'>API returned failure.</div>";
+            return;
+        }
+
+        const records = data.data[0]; // your API returns nested array
+
+        if (!records || records.length === 0) {
+            resultDiv.innerHTML = "<p>No data found.</p>";
+            return;
+        }
+
+        let table = `
+            <table>
+                <tr>
+                    <th>Delegator</th>
+                    <th>Validator</th>
+                    <th>Total Share</th>
+                    <th>Pre Share</th>
+                    <th>Diff Share</th>
+                    <th>Value</th>
+                    <th>StakePer25</th>
+                    <th>Income</th>
+                    <th>Active</th>
+                    <th>Age</th>
+                </tr>
+        `;
+
+        records.forEach(item => {
+            table += `
+                <tr>
+                    <td>${item.delegatoraddress0x}</td>
+                    <td>${item.validatoraddress}</td>
+                    <td>${item.totalshare}</td>
+                    <td>${item.preshare}</td>
+                    <td>${item.diffShare}</td>
+                    <td>${item.value}</td>
+                    <td>${item.StakePer25}</td>
+                    <td>${item.income}</td>
+                    <td>${item.active}</td>
+                    <td>${item.age}</td>
+                </tr>
+            `;
+        });
+
+        table += "</table>";
+        resultDiv.innerHTML = table;
+
+    } catch (error) {
+        statusDiv.innerHTML = "<div class='error'>Error fetching data.</div>";
+        console.error(error);
+    }
+}
+</script>
+
+</body>
+</html>
