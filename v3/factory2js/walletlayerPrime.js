@@ -60,11 +60,12 @@ async function pageload() {
 }
 
 async function onGetPrimeDataOnHome(add) {
-	
+
 	window.web3 = new Web3(window.ethereum);
 	window.PrimeDataContract = new web3.eth.Contract(PrimeDataV2ABI.abi, PrimeDataV3);
 
 	var d =	await window.PrimeDataContract.methods.nodesStr(add).call();
+	debugger;
 	var td= '';
 	td= '<td>' + add + '</td>';
 	td= td + '<td>' + d.exist + '</td>';
@@ -81,13 +82,33 @@ async function onGetPrimeData() {
 	if (!n) { msg('address is blank'); return; }
 
 	window.web3 = new Web3(window.ethereum);
+	window.PrimeDataContract = new web3.eth.Contract(PrimeDataV2ABI.abi, PrimeDataV3);
+
+	var d =	await window.PrimeDataContract.methods.nodesStr(n).call();
+		debugger
+	var td= '';
+	td= '<td>' + n + '</td>';
+	td= td + '<td>' + web3.utils.fromWei(d[1]) + '</td>';
+	td= td + '<td>' + web3.utils.fromWei(d[2]) + '</td>'
+	td= td + '<td>' + d[0] + '</td>';
+
+	$("#tabPrimeData").append('<tr>' + td + '</tr>');
+}
+async function onGetPrimeDataOld() {
+	
+	if (!$("#txtPrimeAddress").length) return;
+	var n = $("#txtPrimeAddress").val();
+	if (!n) { msg('address is blank'); return; }
+
+	window.web3 = new Web3(window.ethereum);
 	window.PrimeDataContract = new web3.eth.Contract(PrimeData.abi, primeData);
 
 	var d =	await window.PrimeDataContract.methods.nodesStr(n).call();
+	
 	var td= '';
 	td= '<td>' + n + '</td>';
-	td= td + '<td>' + d.bal + '</td>';
-	td= td + '<td>' + d.exist + '</td>';
+	td= td + '<td>' +  web3.utils.fromWei(d[1])  + '</td>';
+	td= td + '<td>' +d[0]+ '</td>';
 
 	$("#tabPrimeData").append('<tr>' + td + '</tr>');
 }
