@@ -205,7 +205,7 @@ async function handleResponse(res) {
 
 // Fetch table data when button is clicked
 async function fetchTableData() {
-  const table = document.getElementById("tableSelect").value;
+  const table = document.getElementById("tableSelect").value.trim();
   if (!table) return show({ error: "Please select a table" });
 
   try {
@@ -216,7 +216,10 @@ async function fetchTableData() {
 
     const data = await handleResponse(res);
     debugger;
-    if (data[table]) {
+    console.log("Available tables in response:", Object.keys(data)); // debug
+    console.log("Selected table:", table);
+
+    if (data.hasOwnProperty(table)) {
       show(data[table]);
     } else {
       show({ error: "No data found for table: " + table });
