@@ -469,8 +469,10 @@ async function saveSettings() {
   }));
 
   const payload = {
+  pair: document.getElementById("symbols").value,  // maps to backend `pair`
+  setting: {                                      // THIS is what backend expects
     mode: document.getElementById("mode").value,
-    pair: document.getElementById("symbols").value,
+    symbols: document.getElementById("symbols").value,
     spotConfig: {
       initialBuyPercent: parseFloat(document.getElementById("initialBuyPercent").value),
       maxDcaCount: parseInt(document.getElementById("maxDcaCount").value),
@@ -479,14 +481,18 @@ async function saveSettings() {
       rsiEntry: parseInt(document.getElementById("rsiEntry").value),
       rsiDca: parseInt(document.getElementById("rsiDca").value),
       useEmaFilter: document.getElementById("useEmaFilter").checked,
-      dcaLevels
+      dcaLevels: Array.from(document.querySelectorAll("#dcaLevels .dca-row")).map(row => ({
+        priceDrop: parseFloat(row.querySelector(".priceDrop").value),
+        capitalPercent: parseFloat(row.querySelector(".capitalPercent").value)
+      }))
     },
     futuresConfig: {
       riskPerTrade: parseFloat(document.getElementById("riskPerTrade").value),
       leverage: parseInt(document.getElementById("leverage").value),
       atrMultiplier: parseFloat(document.getElementById("atrMultiplier").value)
     }
-  };
+  }
+};
 
   const res = await fetch(BASE_URL + "/savesettings", {
     method: "POST",
