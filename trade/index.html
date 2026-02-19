@@ -207,16 +207,16 @@ pre {
 
     <div class="buttons">
       <button onclick="signup()">Signup</button>
-      <button onclick="login()">Login</button>
+      <button id="btnLogin" onclick="login()">Login</button>
+      <button id="btnLogout" class="danger" onclick="logout()">Logout</button>
       <button onclick="dashboard()">Dashboard</button>
-      <button onclick="sendOTP()">Send OTP</button>
     </div>
 
     <div class="section">
 
       <div class="otp-row">
         <input id="otp" placeholder="Enter OTP">
-        <button onclick="apiBind()">Verify OTP</button>
+        <button onclick="sendOTP()">Send OTP</button>
       </div>
 
       <input id="apikey" placeholder="Binance API Key">
@@ -225,9 +225,9 @@ pre {
     </div>
 
     <div class="buttons">
-      <button onclick="apiBind()">API Bind</button>
       <button onclick="getKeys()">Get Keys</button>
-      <button class="danger" onclick="logout()">Logout</button>
+      
+      <button onclick="apiBind()">API Bind</button>
       <button onclick="showbothtml()">BOT Status</button>
     </div>
 
@@ -238,6 +238,7 @@ pre {
 </div>
 
 <script>
+document.getElementById("btnLogout").style.display = "none";
 const BASE_URL = "https://gateway.stbots.io";
 let TOKEN = "";
 
@@ -292,6 +293,8 @@ async function login() {
   const data = await handleResponse(res);
 
   if (data.token) {
+    document.getElementById("btnLogin").style.display = "none";
+    document.getElementById("btnLogout").style.display = "block";
     TOKEN = data.token;
   }
 
@@ -353,6 +356,8 @@ async function getKeys() {
 
 // ================= LOGOUT =================
 async function logout() {
+  document.getElementById("btnLogin").style.display = "block";
+  document.getElementById("btnLogout").style.display = "none";
   if (!TOKEN) return show({ error: "Already logged out" });
 
   const res = await fetch(BASE_URL + "/logout", {
