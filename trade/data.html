@@ -219,8 +219,8 @@ async function fetchTableData() {
     console.log("Available tables in response:", Object.keys(data)); // debug
     console.log("Selected table:", table);
 
-    if (data.hasOwnProperty(table)) {
-      show(data[table]);
+    if (data.data.hasOwnProperty(table)) {
+      show(data.data[table]);
     } else {
       show({ error: "No data found for table: " + table });
     }
