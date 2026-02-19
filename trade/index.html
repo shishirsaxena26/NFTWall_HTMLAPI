@@ -89,6 +89,22 @@ body {
 /* Inputs */
 .section {
   margin-bottom: 14px;
+
+  .otp-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .otp-row input {
+    flex: 1;
+    margin-top: 8px;
+  }
+
+  .otp-row button {
+    margin-top: 8px;
+    white-space: nowrap;
+  }
 }
 
 input {
@@ -184,7 +200,8 @@ pre {
     </div>
 
     <div class="section">
-      <input id="username" placeholder="Email / Username" value="testuser@gmail.com">
+      <input id="username" placeholder="username" value="ABC123">
+      <input id="useremail" placeholder="email" value="testuser@gmail.com">
       <input id="password" type="password" placeholder="Password" value="password123">
     </div>
 
@@ -196,9 +213,15 @@ pre {
     </div>
 
     <div class="section">
-      <input id="otp" placeholder="OTP">
+
+      <div class="otp-row">
+        <input id="otp" placeholder="Enter OTP">
+        <button onclick="apiBind()">Verify OTP</button>
+      </div>
+
       <input id="apikey" placeholder="Binance API Key">
       <input id="secretkey" placeholder="Binance Secret Key">
+
     </div>
 
     <div class="buttons">
@@ -247,7 +270,7 @@ async function signup() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       username: username.value.trim(),
-      useremail: username.value.trim(),   // backend expects this
+      useremail: useremail.value.trim(),   // backend expects this
       password: password.value
     })
   });
