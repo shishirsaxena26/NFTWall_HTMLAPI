@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>EZETrade · Table Viewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg: radial-gradient(circle at top, #0f1a2b, #05070f);
+  --card: rgba(255,255,255,0.08);
+  --glass: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.18);
+  --accent: #3fa9ff;
+  --accent2: #00ffd5;
+  --text: #e8ecff;
+  --green: #00ff90;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+}
+
+.phone {
+  width: 420px;
+  max-width: 94vw;
+  border-radius: 28px;
+  padding: 14px;
+  background: linear-gradient(180deg, #111, #000);
+  box-shadow: 0 40px 80px rgba(0,0,0,.8);
+}
+
+.container {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 22px;
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.1);
+  transform-style: preserve-3d;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: .8px;
+  color: var(--accent2);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: .8;
+}
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.section {
+  margin-bottom: 14px;
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.45);
+  color: var(--text);
+  outline: none;
+  transition: .25s;
+}
+
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(63,169,255,.25);
+}
+
+pre {
+  margin-top: 12px;
+  padding: 14px;
+  background: #03050b;
+  border-radius: 16px;
+  color: var(--green);
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 12.5px;
+  line-height: 1.4;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.footer {
+  text-align: center;
+  font-size: 11px;
+  opacity: .6;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+  <div class="container">
+
+    <div class="header">
+      <h2>EZETrade · Table Viewer</h2>
+      <div class="status">LIVE</div>
+    </div>
+
+    <div class="section">
+      <label for="tableSelect">Select Table:</label>
+      <select id="tableSelect" onchange="fetchTableData()">
+        <option value="">-- Select a table --</option>
+        <option value="users_account">users_account</option>
+        <option value="user_bnbkeys">user_bnbkeys</option>
+        <option value="symbol_manualsetting">symbol_manualsetting</option>
+        <option value="symbol_smartsettings">symbol_smartsettings</option>
+        <option value="symbol_usersetting">symbol_usersetting</option>
+        <option value="docker_user_mapping">docker_user_mapping</option>
+      </select>
+    </div>
+
+    <pre id="output">// Table data will appear here</pre>
+
+    <div class="footer">Ezefi · Crypto Trading Terminal</div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = "https://gateway.stbots.io";
+let TOKEN = ""; // Put your JWT token here if needed
+
+function show(data) {
+  document.getElementById("output").textContent =
+    JSON.stringify(data, null, 2);
+}
+
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + TOKEN
+  };
+}
+
+async function handleResponse(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: text, status: res.status };
+  }
+}
+
+// Fetch and display table data
+async function fetchTableData() {
+  const table = document.getElementById("tableSelect").value;
+  if (!table) return;
+
+  try {
+    const res = await fetch(BASE_URL + "/getAllData", {
+      method: "POST",
+      headers: TOKEN ? authHeaders() : { "Content-Type": "application/json" }
+    });
+
+    const data = await handleResponse(res);
+
+    if (data[table]) {
+      show(data[table]);
+    } else {
+      show({ error: "No data found for table: " + table });
+    }
+  } catch (err) {
+    show({ error: err.message });
+  }
+}
+</script>
+
+</body>
+</html>
