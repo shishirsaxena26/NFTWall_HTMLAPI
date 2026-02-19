@@ -233,81 +233,116 @@ function show(data) {
     JSON.stringify(data, null, 2);
 }
 
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + TOKEN
+  };
+}
+
+// ================= SIGNUP =================
 async function signup() {
   const res = await fetch(BASE_URL + "/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      username: username.value,
+      username: username.value.trim(),
+      useremail: username.value.trim(),   // backend expects this
       password: password.value
     })
   });
+
   show(await handleResponse(res));
 }
 
+// ================= LOGIN =================
 async function login() {
   const res = await fetch(BASE_URL + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      username: username.value,
+      username: username.value.trim(),
       password: password.value
     })
   });
+
   const data = await handleResponse(res);
-  TOKEN = data.token || "";
+
+  if (data.token) {
+    TOKEN = data.token;
+  }
+
   show(data);
 }
 
+// ================= DASHBOARD =================
 async function dashboard() {
+  if (!TOKEN) return show({ error: "Login required" });
+
   const res = await fetch(BASE_URL + "/dashboard", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + TOKEN }
+    headers: authHeaders()
   });
+
   show(await handleResponse(res));
 }
 
+// ================= SEND OTP =================
 async function sendOTP() {
+  if (!TOKEN) return show({ error: "Login required" });
+
   const res = await fetch(BASE_URL + "/sendotp", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + TOKEN }
+    headers: authHeaders()
   });
+
   show(await handleResponse(res));
 }
 
+// ================= API BIND =================
 async function apiBind() {
+  if (!TOKEN) return show({ error: "Login required" });
+
   const res = await fetch(BASE_URL + "/apibind", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + TOKEN
-    },
+    headers: authHeaders(),
     body: JSON.stringify({
-      apikey: apikey.value,
-      secretkey: secretkey.value,
-      keyotp: otp.value
+      apikey: apikey.value.trim(),
+      secretkey: secretkey.value.trim(),
+      keyotp: otp.value.trim()
     })
   });
+
   show(await handleResponse(res));
 }
 
+// ================= GET KEYS =================
 async function getKeys() {
+  if (!TOKEN) return show({ error: "Login required" });
+
   const res = await fetch(BASE_URL + "/getapikeys", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + TOKEN }
+    headers: authHeaders()
   });
+
   show(await handleResponse(res));
 }
 
+// ================= LOGOUT =================
 async function logout() {
+  if (!TOKEN) return show({ error: "Already logged out" });
+
   const res = await fetch(BASE_URL + "/logout", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + TOKEN }
+    headers: authHeaders()
   });
+
   TOKEN = "";
+
   show(await handleResponse(res));
 }
 
+// ================= BOT STATUS =================
 function showbothtml() {
   const userId = username.value.trim();
   window.open(`/trade/bot.html?userid=${encodeURIComponent(userId)}`, "_self");
