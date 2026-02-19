@@ -102,6 +102,29 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(63,169,255,.25);
 }
 
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: #020617;
+  background: linear-gradient(145deg, var(--accent), var(--accent2));
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  margin-top: 8px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.5);
+}
+
 pre {
   margin-top: 12px;
   padding: 14px;
@@ -136,7 +159,7 @@ pre {
 
     <div class="section">
       <label for="tableSelect">Select Table:</label>
-      <select id="tableSelect" onchange="fetchTableData()">
+      <select id="tableSelect">
         <option value="">-- Select a table --</option>
         <option value="users_account">users_account</option>
         <option value="user_bnbkeys">user_bnbkeys</option>
@@ -145,6 +168,8 @@ pre {
         <option value="symbol_usersetting">symbol_usersetting</option>
         <option value="docker_user_mapping">docker_user_mapping</option>
       </select>
+
+      <button onclick="fetchTableData()">Fetch Data</button>
     </div>
 
     <pre id="output">// Table data will appear here</pre>
@@ -155,7 +180,7 @@ pre {
 
 <script>
 const BASE_URL = "https://gateway.stbots.io";
-let TOKEN = ""; // Put your JWT token here if needed
+let TOKEN = ""; // Add JWT token if required
 
 function show(data) {
   document.getElementById("output").textContent =
@@ -178,10 +203,10 @@ async function handleResponse(res) {
   }
 }
 
-// Fetch and display table data
+// Fetch table data when button is clicked
 async function fetchTableData() {
   const table = document.getElementById("tableSelect").value;
-  if (!table) return;
+  if (!table) return show({ error: "Please select a table" });
 
   try {
     const res = await fetch(BASE_URL + "/getAllData", {
@@ -190,7 +215,7 @@ async function fetchTableData() {
     });
 
     const data = await handleResponse(res);
-debugger;
+
     if (data[table]) {
       show(data[table]);
     } else {
