@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>EZETrade · Crypto Trading API Console</title>
+<title>SecureTrade · Crypto Trading API Console</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -42,7 +42,7 @@ body {
 }
 
 /* Glass trading panel */
-.container {
+.container, .createBotContainer {
   background: var(--card);
   border-radius: 22px;
   padding: 22px;
@@ -192,10 +192,10 @@ pre {
 <body>
 
 <div class="phone">
-  <div class="container">
+  <div class="container" id="apiContainer">
 
     <div class="header">
-      <h2>EZETrade · API Console</h2>
+      <h2>SecureTrade · API Console</h2>
       <div class="status">LIVE</div>
     </div>
 
@@ -228,14 +228,76 @@ pre {
       <button onclick="getKeys()">Get Keys</button>
       
       <button onclick="apiBind()">API Bind</button>
-      <button onclick="showbothtml()">BOT Status</button>
+      <button onclick="toggleContainer(2)">CREATE BOT</button>
       <button onclick="showtablehtml()">Tables</button>
     </div>
 
     <pre id="output">// Trading API responses</pre>
 
-    <div class="footer">Ezefi · Crypto Trading Terminal</div>
+    <div class="footer">SecureTrade · Crypto Trading Terminal</div>
   </div>
+
+  <div class="container" id="botContainer" style="display: none;">
+
+  <div class="header">
+    <h2>Create / Update BOT</h2>
+    <button onclick="toggleContainer(1)">Back</button>
+  </div>
+
+  <div class="section">
+    <h3>General Settings</h3>
+    <input id="mode" placeholder="Mode (HYBRID/SPOT/FUTURES)" value="HYBRID">
+    <input id="symbols" placeholder="Symbols (e.g., BTC/USDT)" value="NONE/NONE">
+  </div>
+
+  <div class="section">
+    <h3>Spot Config</h3>
+    <input id="initialBuyPercent" placeholder="Initial Buy Percent (0-1)" value="0.10">
+    <input id="maxDcaCount" placeholder="Max DCA Count" value="4">
+    <input id="takeProfitPercent" placeholder="Take Profit Percent (0-1)" value="0.015">
+    <input id="trailingStopPercent" placeholder="Trailing Stop Percent (0-1)" value="0.007">
+    <input id="rsiEntry" placeholder="RSI Entry" value="40">
+    <input id="rsiDca" placeholder="RSI DCA" value="36">
+    <label>
+      <input type="checkbox" id="useEmaFilter" checked> Use EMA Filter
+    </label>
+
+    <h4>DCA Levels</h4>
+    <div id="dcaLevels">
+      <div class="dca-row">
+        <input placeholder="Price Drop" class="priceDrop" value="-0.02">
+        <input placeholder="Capital Percent" class="capitalPercent" value="0.10">
+      </div>
+      <div class="dca-row">
+        <input placeholder="Price Drop" class="priceDrop" value="-0.04">
+        <input placeholder="Capital Percent" class="capitalPercent" value="0.12">
+      </div>
+      <div class="dca-row">
+        <input placeholder="Price Drop" class="priceDrop" value="-0.07">
+        <input placeholder="Capital Percent" class="capitalPercent" value="0.15">
+      </div>
+      <div class="dca-row">
+        <input placeholder="Price Drop" class="priceDrop" value="-0.10">
+        <input placeholder="Capital Percent" class="capitalPercent" value="0.18">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Futures Config</h3>
+    <input id="riskPerTrade" placeholder="Risk Per Trade (0-1)" value="0.015">
+    <input id="leverage" placeholder="Leverage" value="3">
+    <input id="atrMultiplier" placeholder="ATR Multiplier" value="2">
+  </div>
+
+  <div class="buttons">
+    <button onclick="saveSettings()">Save Settings</button>
+  </div>
+
+  <div class="footer">SecureTrade · Crypto Trading Terminal</div>
+
+</div>
+
 </div>
 
 <script>
@@ -371,6 +433,20 @@ async function logout() {
   show(await handleResponse(res));
 }
 
+
+
+async function toggleContainer(type) {
+  if(type==1) {
+    document.getElementById("apiContainer").style.display = "block";
+    document.getElementById("botContainer").style.display = "none";
+  }
+
+  if(type==2) {
+    document.getElementById("apiContainer").style.display = "none";
+    document.getElementById("botContainer").style.display = "block";
+  }
+}
+
 // ================= BOT STATUS =================
 function showbothtml() {
   const userId = username.value.trim();
@@ -381,6 +457,46 @@ function showbothtml() {
 function showtablehtml() {
   const userId = username.value.trim();
   window.open(`/trade/data.html`, "_blank");
+}
+</script>
+
+
+<script>
+async function saveSettings() {
+  const dcaRows = document.querySelectorAll("#dcaLevels .dca-row");
+  const dcaLevels = Array.from(dcaRows).map(row => ({
+    priceDrop: parseFloat(row.querySelector(".priceDrop").value),
+    capitalPercent: parseFloat(row.querySelector(".capitalPercent").value)
+  }));
+
+  const payload = {
+    mode: document.getElementById("mode").value,
+    symbols: document.getElementById("symbols").value,
+    spotConfig: {
+      initialBuyPercent: parseFloat(document.getElementById("initialBuyPercent").value),
+      maxDcaCount: parseInt(document.getElementById("maxDcaCount").value),
+      takeProfitPercent: parseFloat(document.getElementById("takeProfitPercent").value),
+      trailingStopPercent: parseFloat(document.getElementById("trailingStopPercent").value),
+      rsiEntry: parseInt(document.getElementById("rsiEntry").value),
+      rsiDca: parseInt(document.getElementById("rsiDca").value),
+      useEmaFilter: document.getElementById("useEmaFilter").checked,
+      dcaLevels
+    },
+    futuresConfig: {
+      riskPerTrade: parseFloat(document.getElementById("riskPerTrade").value),
+      leverage: parseInt(document.getElementById("leverage").value),
+      atrMultiplier: parseFloat(document.getElementById("atrMultiplier").value)
+    }
+  };
+
+  const res = await fetch(BASE_URL + "/savesettings", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload)
+  });
+
+  const data = await handleResponse(res);
+  show(data); // reuse existing function to show response
 }
 </script>
 
