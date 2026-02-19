@@ -185,12 +185,12 @@ async function fetchTableData() {
 
   try {
     const res = await fetch(BASE_URL + "/getAllData", {
-      method: "POST",
+      method: "GET",
       headers: TOKEN ? authHeaders() : { "Content-Type": "application/json" }
     });
 
     const data = await handleResponse(res);
-
+debugger;
     if (data[table]) {
       show(data[table]);
     } else {
