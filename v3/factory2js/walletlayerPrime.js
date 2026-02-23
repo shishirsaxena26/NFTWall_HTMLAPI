@@ -21,6 +21,7 @@ let insv3ABIPrime = {};
 let ORCv3ABIPrime = {};
 let Pricev3ABI = {};
 
+let systemAgePrime = 0;
 
 pageload();
 
@@ -65,13 +66,13 @@ async function onGetPrimeDataOnHome(add) {
 	window.PrimeDataContract = new web3.eth.Contract(PrimeDataV2ABI.abi, PrimeDataV3);
 
 	var d =	await window.PrimeDataContract.methods.nodesStr(add).call();
-	debugger;
+	
 	var td= '';
 	td= '<td>' + add + '</td>';
 	td= td + '<td>' + d.exist + '</td>';
 	td= td + '<td>' + web3.utils.fromWei(d.bal) + '</td>';
 	td= td + '<td>' + web3.utils.fromWei(d.msgval) + '</td>';
-
+	$("#tabPrimeDataHome tr:not(:first)").remove();
 	$("#tabPrimeDataHome").append('<tr>' + td + '</tr>');
 }
 
@@ -91,7 +92,7 @@ async function onGetPrimeData() {
 	td= td + '<td>' + web3.utils.fromWei(d[1]) + '</td>';
 	td= td + '<td>' + web3.utils.fromWei(d[2]) + '</td>'
 	td= td + '<td>' + d[0] + '</td>';
-
+	$("#tabPrimeData tr").remove();
 	$("#tabPrimeData").append('<tr>' + td + '</tr>');
 }
 async function onGetPrimeDataOld() {
@@ -109,7 +110,7 @@ async function onGetPrimeDataOld() {
 	td= '<td>' + n + '</td>';
 	td= td + '<td>' +  web3.utils.fromWei(d[1])  + '</td>';
 	td= td + '<td>' +d[0]+ '</td>';
-
+	$("#tabPrimeData tr").remove();
 	$("#tabPrimeData").append('<tr>' + td + '</tr>');
 }
 
@@ -171,7 +172,7 @@ async function LoadTreePrime(){
 	if (!$("#tabTree").length) return;
 	window.nestedprimecontract = new web3.eth.Contract(NestedABIPrime.abi, nestedPrime);
 	let count = await window.nestedprimecontract.methods.getNodesCount().call();
-	
+	$("#tabTree tr:not(:first)").remove();
 	for (let i = 0; i<parseInt(count); i++) {
 		
 		var td = '';
@@ -204,7 +205,7 @@ async function LoadTreePrime(){
 		window.instancePrimecontract = new web3.eth.Contract(insABI.abi, nodeIns);
 		let mc = await window.instancePrimecontract.methods.mintCount().call();
 		td =td + '<td>' + mc+ '</td>';
-
+		
 		$("#tabTree").append('<tr>' + td + '</tr>');
 	}
 }
@@ -218,7 +219,7 @@ async function onGetDailyBusinessPrime(){
 	if (!to) { msgPrime('to is blank'); return; }
 
 	window.nestedprimecontract = new web3.eth.Contract(NestedABIPrime.abi, nestedPrime);
-	let age = await window.nestedprimecontract.methods.age().call();
+	
 	for (let i = parseInt(to); i>=parseInt(from); i--) {
 		let b = await window.nestedprimecontract.methods.getbusiness(i).call();
 		
@@ -241,7 +242,7 @@ async function onGetDailyBusinessPrime(){
 		
 
 		let royal2 = (parseFloat(b)*parseFloat(2)/100)/parseFloat(Ct2);
-		
+		$("##tabDailyBusiness tr:not(:first)").remove();
 		$("#tabDailyBusiness").append('<tr><td>'+i+'</td><td>'+b+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+royal2+'</td><td>0</td><td>0</td></tr>');
 	}	
 	
@@ -284,9 +285,9 @@ async function LoadSystemPoolClausePrime() {
 
 
 		window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-		let age = await window.nestedprimecontract.methods.systemAge().call();
+		systemAgePrime = await window.nestedprimecontract.methods.systemAge().call();
 		
-		$("#systemAgePrime").html('System Age ' + age);
+		$("#systemAgePrime").html('System Age Prime ' + systemAgePrime);
 
 }
 
@@ -380,6 +381,22 @@ async function LoadSystemORC1155Prime(o1155) {
 	
 }
 
+
+async function onLoadAddressPrime(n) {
+	
+	n = $("#txtAdd").val();
+	if (!n) { msgPrime('txtAdd is blank'); return; }
+	
+	if (!(await isPrimeUser(n))) 
+		{ msgPrime('Instance is not created.'); return; }
+
+	var header1 = $($("#tabPrime").find('tr')[0]).clone();
+	await loadStructurePrime(n, header1);
+
+	onGetPrimeDataOnHome(n);
+
+}
+
 async function isPrimeUser(u)
 {
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
@@ -387,21 +404,11 @@ async function isPrimeUser(u)
 	return (address!='0x0000000000000000000000000000000000000000') ;
 }
 
-async function loadAddressDataPrime(n) {
-	
-	if (!(await isPrimeUser(n))) 
-		{ msgPrime('Instance is not created.'); return; }
-
-	var header1 = $($("#tabPrime").find('tr')[0]).clone();
-	await loadStructurePrime(n, header1);
-}
-
-
 async function loadStructurePrime(n, header) {
 
 	
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	let age = await window.nestedprimecontract.methods.systemAge().call();
+	
 	var td = '<td>' + n + '</td>';
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
 	let instance = await window.nestedprimecontract.methods.UserToInst(n).call();
@@ -424,17 +431,21 @@ async function loadStructurePrime(n, header) {
 	td =td + '<td>' + web3.utils.fromWei(inc.toString(), 'ether') + '</td>';
 	td =td + '<td>' + (cage) + '</td>';
 	var cstyle = "";
+	$("#tabIncomePrime tr:not(:first)").remove();
 	$("#tabIncomePrime").append('<tr ' + cstyle + ' >' + td + '</tr>');
-
+	$("#tabMintPrime tr:not(:first)").remove();
 	window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);
 	
 	let dage = await window.instancePrimecontract.methods.dage().call();
 	;
 
 	loadPoolPrime(n,instance,dage);
-	;
-	loadLSBPrime(instance,dage,age);
 	
+	const checkboxLSBPrime = document.getElementById("checkboxLSBPrime");
+	
+	if (checkboxLSBPrime.checked) {
+		loadLSBPrime(instance,dage,systemAgePrime);
+	}
 	loadlevelbusinessPrime(instance);
 	
 	window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);	
@@ -480,7 +491,7 @@ async function loadStructurePrime(n, header) {
 		let cal = parseFloat(ul)-parseFloat(cl);
 		
 		td = td  + '<td><button id="btnWth" onclick="onNFTTransfer(\'' + orc + '\',1,\''+rootSponser+'\',\''+ (cal) +'\')">'+ (cal) +'</button></td>';
-
+		
 		$("#tabMintPrime").append('<tr>' + td + '</tr>');
 		
 	}
@@ -498,55 +509,49 @@ async function loadPoolPrime(n, instance, dage) {
 	$("#idPrime").text(primeid);
 	
 	window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);
-	let inc = await window.instancePrimecontract.methods.compute(200).call();
+	let inc = await window.instancePrimecontract.methods.compute(systemAgePrime).call();
 	
 	let td= '';
 	td =td + '<td>' + web3.utils.fromWei(inc.toString(), 'ether') + '</td>';
+	inc = await window.instancePrimecontract.methods.unpaidPrime().call();
+	td =td + '<td>' + web3.utils.fromWei(inc.toString(), 'ether') + '</td>';
 	td =td + '<td>' + dage + '</td>';
+	$("#tabCalIncomePrime tr:not(:first)").remove();
 	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
-	
-	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
 	
 	td = '';
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	debugger;
-	var parentid = await window.nestedprimecontract.methods.getNodeParent(instance).call();
+
+	var parentid = await window.nestedprimecontract.methods.getNodeParent(primeid).call();
 
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	debugger;
+
 	if(parseInt(parentid)>0) {
-		var parent = await window.nestedprimecontract.methods.nodes(parentid-1).call();
-
+		var parent = await window.nestedprimecontract.methods.getNodeByIndex(parentid-1).call();
+		td =td + '<td>' + parent + '</td>';
 		let parentins = await window.nestedprimecontract.methods.UserToInst(parent).call();
-
 		td =td + '<td>' + parentins + '</td>';
-
-		window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-		td =td + '<td>' + (await window.nestedprimecontract.methods.InstToUser(parentins).call()) + '</td>';
 	}
-	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	let directs =await window.nestedprimecontract.methods.getNodeDirectsCount(primeid).call();
-	td =td + '<td>' + (directs) + '</td>';
-	debugger;
+	else {
+		td =td + '<td>' + blankAddress + '</td>';
+		td =td + '<td>' + blankAddress + '</td>';
+	}
 	
+	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
+	
+	td =td + '<td>' + (await window.nestedprimecontract.methods.isNode(primeid).call()) + '</td>';
+
 	window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);
-	let mintnumber =await window.instancePrimecontract.methods.mintCount().call();
-	td =td + '<td>' + (mintnumber) + '</td>';
-	debugger;
-	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	
-	td =td + '<td>' + (await window.nestedprimecontract.methods.isNode(instance).call()) + '</td>';
-	debugger;
-	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
-	td =td + '<td>' + (await window.nestedprimecontract.methods.isStop(instance).call()) + '</td>';
+	td =td + '<td>' + (await window.instancePrimecontract.methods.isLock().call()) + '/' + (await window.instancePrimecontract.methods.isSuspend().call()) + '</td>';
+	$("#tabDetPrime tr:not(:first)").remove();
 	$("#tabDetPrime").append('<tr>' + td + '</tr>');
-	
 	
 }
 
 
 async function loadlevelbusinessPrime(instance) {
 	var tr1 = $($("#tabLevelPrime").find('tr')[0]).clone();
+	$("#tabLevelPrime tr:not(:first)").remove();
 	window.nestedprimecontract = new web3.eth.Contract(Nestedv3ABIPrime.abi, Nested741Primev3);
 	let level = (await window.nestedprimecontract.methods.getNodeLvlDepth(instance).call());
 	
@@ -563,7 +568,7 @@ async function loadlevelbusinessPrime(instance) {
 
 
 async function loadLSBPrime(instance,dage,age) {
-	;
+	$("#tabLBSPrime tr:not(:first)").remove();
 	for(let i=dage; i<=(parseInt(age)); i++) {	
 		window.instancePrimecontract = new web3.eth.Contract(insv3ABIPrime.abi, instance);
 		let lsb = await window.instancePrimecontract.methods.LSB(i).call();

@@ -38,124 +38,109 @@
         <a href="daily.html" target="_blank" >Day To Day</a> &nbsp;&nbsp; 
         <a href="orc1155.html" target="_blank" >Orc1155</a>  &nbsp;&nbsp; 
         <a href="api.html" target="_blank" >API</a>  &nbsp;&nbsp; 
-        <a href="indexprime.html" target="_blank" >PrimeDashbaord</a>  &nbsp;&nbsp; 
+        <a href="index.html" target="_blank" >StandardDashbaord</a>  &nbsp;&nbsp; 
+     
     </div>
    
         <div>
         <span id="lblmsg"></span>
         <div id="profilelist"></div>
-    <table  id="tbStandardInfo" width="100%">
+    <table  width="100%" id="tbPrimeInfo">
+        
+        <tr>
+            <td colspan="2"> <span id="lblmsgPrime"></span></td><td align="right">&nbsp;&nbsp;&nbsp; Transferred Address <span id="transferAddPrime"></span>  -  <span id="transferBalPrime"></span></td>
+        </tr>
         <tr>
             <td colspan="3" valign="top"  style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-                <table width="100%"><tr><td id="systemAge"></td><td id="oznprice"></td><td id="shutdown"></td><td id="freeIntervals"></td><td id="claimMinLimit"></td><td id="claimMaxLimit"></td><td id="mintMin"></td><td id="mintMax"></td><td id="mintDailyLimit"></td></tr></table>    
+                <table width="100%"><tr><td id="systemAgePrime"></td><td id="oznpricePrime"></td><td id="shutdownPrime"></td><td id="freeIntervalsPrime"></td><td id="claimMinLimitPrime"></td><td id="claimMaxLimitPrime"></td><td id="mintMinPrime"></td><td id="mintMaxPrime"></td><td id="mintDailyLimitPrime"></td></tr></table>    
             </td>
         
         </tr>
         <tr>
-            <td colspan="2" valign="top"  style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-                <table id="tabPool" width="100%"><tr><td>Pool</td><td>OnStake</td><td>Self</td><td>Start</td><td>Every</td><td>Till</td></tr></table>
-            </td>    
-        <td>
-            <table><tr><td colspan="2"> <input type="text" size="48" id="txtRootAdd" disabled ></input><button id="btnload" onclick="onLoadRootAddress()" value="Load">Load</button> &nbsp;&nbsp;&nbsp; Transferred Address <span id="transferAdd"></span>  -  <span id="transferBal"></span> 
-            </td> </tr>
-            <tr><td><input type="text" size="48" id="txtparent" placeholder="parent" /><button id="btndeploy" onclick="onJoin()" value="Deploy">Join</button></td><td><input id="txtAmount" type="text" size="15" placeholder="Staking Amount" /><button id="btnStake" onclick="onMint(1)" value="Stake">Mint </button></td></tr>
-            <tr><td colspan="2" ><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="onLoadAddress()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button><button id="btnSetFreeIntervals" onclick="onSetFreeIntervals()" value="btnSetFreeIntervals">FreeIntervals</button> <button id="btnSignDeligate" onclick="onSignDelegator()" value="btnSignDelegator">Sign Delegator</button> || Load LSB: <input id="checkboxLSB" type="checkbox" />
-                
-                </td>
-            </tr></table>
-        </td>
-        
+            <td colspan="1" >
+                <table>
+                   
+                <tr><td><button id="btndeployPrime" onclick="onJoinPrime()" value="DeployPrime">JoinPrime</button><button id="btndeployPrime" onclick="onDeployTest()" value="onDeployTest">onDeployTest</button></td><td><input id="txtAmount" type="text" size="15" placeholder="Staking Amount" /><button id="btnStake" onclick="onMintPrime(1)" value="Stake">Mint (Prime)</button></td></tr>
+                <tr><td colspan="2" ><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="onLoadAddress()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button> || Load LSB: <input id="checkboxLSBPrime" type="checkbox" />
+                    
+                    </td>
+                </tr></table>
+            </td>
+             <td colspan="2"> 
+                <table id="tabPrimeDataHome" style="width: 40%;">
+                      <tr style="
+                            background-color:#110550;
+                            color:white;">
+                        <th>Node</th><th>Exists</th><th>Bonus</th><th>Value</th>
+                      </tr>
+                </table>
+            </td>
+            
         </tr>
+      
         <tr>
-            <td colspan="2" valign="top"  style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-                <table id="tabPoolNFT" width="100%"><tr><td>Pool</td><td>Self</td><td>Every</td></tr></table>
-
+            <td valign="top" width="200" colspan="2" style="background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
+                <table id="tabPoolPrime" width="100%"><tr><td>Pool</td><td>OnStake</td><td>Self</td><td>Start</td><td>Every</td><td>Till</td></tr></table>
             </td>
-            <td>
-                <table id="tab" width="100%" cellpadding="10"><tr style="background-color:darksalmon;"><th width="150">Node</th><th width="150">Instance</th><th>Ins Balance</th><th>Join Age</th><th>MintCount</th><th>Bonus</th><th>Vali</th></tr></table>
-            </td>
-        </tr>
-        <tr>
-            <td valign="top" width="200" style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-                <table id="tabRank" width="100%"><tr><td>Rank</td><td>Direct</td><td>NFT</td><td>Royality</td></tr></table>
-                <hr />
-                <table id="tabTour" width="100%"></table>
-            </td>
-            <td valign="top"  style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-               
-                <table id="tabLvl"><tr><td>Level</td><td>Rank</td><td>Reward</td><td>YeildMining</td></tr></table>
-                
-            </td>
-            <td>
+            
+            <td rowspan="3">
                 <table id="outer" width="100%">
                     <tr>
                     
-                    <th width="100" valign="top"  style=" background-color:black; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
-                        <table id="tabLevel" width="100%" cellpadding="1">
+                    <th width="100" valign="top"  style="background-color:black; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
+                        <table id="tabLevelPrime" width="100%" cellpadding="1">
                             <tr><th>Level</th><th>Business</th><th>Qty</th></tr>
                         </table>
                     </th>
                     <th valign="top"  width="70"  style="
-                    background-color:#110550;
-                    color:white;
-                    font-weight:bold;
-                    font-size:large;
-                    border: burlywood thick solid;
-                    padding:0;
-                "
-            >
-                <div style="
-                    max-height:500px;
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    display:block;
-                    width:100%;
-                ">
-               
-                        <table id="tabLBS" width="100%" cellpadding="1">
+                            background-color:#110550;
+                            color:white;
+                            font-weight:bold;
+                            font-size:large;
+                            border: burlywood thick solid;
+                            padding:0;
+                        "
+                    >
+                        <div style="
+                            max-height:500px;
+                            overflow-y: auto;
+                            overflow-x: hidden;
+                            display:block;
+                            width:100%;
+                        ">
+                    
+                        <table id="tabLBSPrime" width="100%" cellpadding="1">
                             <tr><th>dage</th><th>LSB</th></tr>
                         </table>
-                </div>
-                    </th>
+                        </div>
+                </th>
                     <th valign="top">
-                        <table id="abc" width="100%" style="width: 100%; table-layout: auto;">
+                        <table id="abcPrime" width="100%" style="width: 100%; table-layout: auto;">
                             <tr>
                             
                                 <td width="100%" valign="top" style=" background-color:black; color:white; font-weight:bold; font-size:large; border: black thick solid;">
-                                    Pool id: <span id="id" style="font-size: medium;"></span>
+                                    Prime Pool id: <span id="idPrime" style="font-size: medium;"></span>
                                 </td>
                                
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" background-color:black; color:white; font-weight:bold; font-size:large; border: black thick solid;">
-                                    <table id="tabIncome" width="100%" cellpadding="10"><tr><th>reward</th><th>royality</th><th>yeild</th><th>yeildmining</th><th>Tour</th><th>Gift</th></tr></table>
-
+                                    <table id="tabIncomePrime" width="100%" cellpadding="10"><tr><th>Node</th><th>Instance</th><th>Ins Bal</th><th>bonus</th><th>Self</th><th>JoinAge</th></tr></table>
                                 </td>
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                    <table id="tabDet" width="100%" cellpadding="10"><tr style="background-color:chartreuse;"><th>Sponser Ins</th><th>Sponser</th><th>Direct</th><th>Rank</th><th>Status</th><th>Stop</th></tr></table>
+                                    <table id="tabDetPrime" width="100%" cellpadding="10"><tr style="background-color:chartreuse;"><th>Sponser Ins</th><th>Sponser</th><th>Active</th><th>Lock/Suspend</th></tr></table>
                                 </td>
-                               
-                            </tr>
-                            
-                            <tr>
-                                <td width="100%" valign="top" style=" border: black thick solid; ">
-                                    <table id="tabDelegator" width="100%" cellpadding="10"><tr style="background-color:rgb(57, 195, 219);"><th>Delegator</th><th>Total Income</th><th>Withdraw Income</th><th>Balance</th><th>Status</th></tr></table>
-                                </td>
-                               
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                    <table id="tabCalIncome" width="100%" cellpadding="10"><tr style="background-color:blueviolet;"><th>Reward</th><th>Tour</th><th>Gift</th><th>YeildLevel</th><th>Yeild</th><th>Cap</th><th>dage</th></tr></table>
-                                    <table id="tabRoyalityIncome"  width="100%" cellpadding="10"><tr style="background-color:blueviolet;"><td>Royality</td><td>Star3Age</td><td>Star3Dage</td><td>Star5Age</td><td>Star5Dage</td><td>Star7Age</td><td>Star7Dage</td></tr></table>
-            
+                                    <table id="tabCalIncomePrime" width="100%" cellpadding="10"><tr style="background-color:blueviolet;"><th>Self</th><th>Unpaid</th><th>dage</th></tr></table>
                                 </td>
-                              
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                    <table id="tabMint" width="100%" cellpadding="10">
+                                    <table id="tabMintPrime" width="100%" cellpadding="10">
                                         <tr style="background-color:rgb(250, 250, 250);"><th>MintNo</th><th>Orc1155</th><th>MAge</th><th>Amt</th><th>Qty</th><th>Transferred</th><th>Unlocked</th><th>Transfer</th></tr></table>
                                 
                                     
@@ -165,13 +150,16 @@
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                 <button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(1)">ReActivate (Free)</button><button  style=" background-color:black; color:white; font-weight:bold;" onclick="onActivate(2)">ReActivate (10USDT)</button><button style=" background-color:black; color:white; font-weight:bold;" onclick="onClaim()">Withdraw</button><button   style=" background-color:black; color:white; font-weight:bold;" id="btnValidatorIncomeClaim" onclick="onValidatorIncomeClaim()" value="btnValidatorIncomeClaim">Validator Income Claim</button>  
+                                    <button style=" background-color:black; color:white; font-weight:bold;" onclick="onPrimeClaim()">Withdraw</button>
+                                    <button style=" background-color:black; color:white; font-weight:bold;" onclick="onSync()">Sync</button>
+                                    <button style=" background-color:black; color:white; font-weight:bold;" onclick="setshutdownPrime()">ShutdownPrime</button>
+                                    
                                 </td>
                                 
                             </tr>
                             <tr>
                                 <td width="100%" valign="top" style=" border: black thick solid; ">
-                                    <table id="tabTxn" width="100%" cellpadding="10"><tr style="background-color:bisque;"><th>Txnhash</th><th>blockNumber -- blocktime</th><th>Date</th><th>Type</th><th>Amount</th><th>Stake Id</th></tr></table>
+                                    <table id="tabTxnPrime" width="100%" cellpadding="10"><tr style="background-color:bisque;"><th>Txnhash</th><th>blockNumber -- blocktime</th><th>Date</th><th>Type</th><th>Amount</th><th>Stake Id</th></tr></table>
                                 </td>
                                 
                             </tr>
@@ -182,11 +170,19 @@
                     </table>
             </td>
         </tr>
-        
         <tr>
-            <td colspan="3"> <hr/></td>
+            <td valign="top" width="200" colspan="2" style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
+                <table id="tabPoolNFTPrime" width="100%"><tr><td>Pool</td><td>Self</td><td>Every</td></tr></table>
+
+            </td>
+           
         </tr>
-       
+        <tr>
+            <td valign="top" width="200" colspan="2" style=" background-color:#110550; color:white; font-weight:bold; font-size:large; border: burlywood thick solid;">
+                
+            </td>
+           
+        </tr>
         
     </table>
 
