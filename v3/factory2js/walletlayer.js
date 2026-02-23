@@ -160,17 +160,23 @@ async function pageload() {
 		$("#txtAdd").val(accounts[0]);
 	}
 
+		
 	if ($("#txtAdd").length) {	
-		LoadSystemRankClause();
-		LoadSystemLevelClause();
-		LoadSystemPoolClause();
-
-		$("#txtRootAdd").val(rootSponser);
-		$("#transferAdd").text(transfer);
-		$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
+		var n = $("#txtAdd").val();
+		if (!n) { msg('address is blank'); return; }
 		
-		onLoadAddress();
-		
+		if ($("#tbStandardInfo").length) {
+			LoadSystemRankClause();
+			LoadSystemLevelClause();
+			LoadSystemPoolClause();
+			$("#txtRootAdd").val(rootSponser);
+			$("#transferAdd").text(transfer);
+			$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
+			loadAddressData(n);
+		}
+		if ($("#tbPrimeInfo").length) {
+			onLoadAddressPrime(n);
+		}
 	}
 	
 }
@@ -552,17 +558,17 @@ async function onLoadRootAddress() {
 	var n = $("#txtRootAdd").val();
 	if (!n) { msg('txtRootAdd is blank'); return; }
 	loadAddressData(n);
-	onGetPrimeDataOnHome(n);
-	loadAddressDataPrime(n);
+	onLoadAddressPrime(n);
 }
 
 async function onLoadAddress() {
+	
 	var n = $("#txtAdd").val();
-	if (!n) { msg('address is blank'); return; }
+	if (!n) { msg('txtAdd is blank'); return; }
 	loadAddressData(n);
-	onGetPrimeDataOnHome(n);
-	loadAddressDataPrime(n);
+	onLoadAddressPrime(n);
 }
+
 
 async function isUser(u)
 {
@@ -628,8 +634,12 @@ async function loadStructure(n, header) {
 
 	
 	loadPool(n,instance,dage);
+	const checkboxLSB = document.getElementById("checkboxLSB");
 	
-	loadLSB(instance,dage,age);
+	if (checkboxLSB.checked) {
+		loadLSB(instance,dage,age);
+	}
+	
 	loadlevelbusiness(instance);
 
 	
