@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STBots - Database Viewer</title>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 40px;
+            background: #222;
+            color: white;
+            padding: 10px;
+        }
+
+        .search-box {
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            padding: 6px;
+            width: 300px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 12px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<h1>STBots Database Viewer</h1>
+
+<div id="loading" class="loading">Loading data...</div>
+<div id="tablesContainer"></div>
+
+<script>
+
+const API_URL = "https://gateway.stbots.io/getAllData";
+
+function maskSensitiveData(obj) {
+    if (!obj || typeof obj !== "object") return obj;
+
+    const masked = { ...obj };
+
+    if (masked.apikey) masked.apikey = "********";
+    if (masked.secretkey) masked.secretkey = "********";
+    if (masked.user_password) masked.user_password = "********";
+
+    return masked;
+}
+
+function createTable(title, dataArray) {
+    if (!dataArray || dataArray.length === 0) return;
+
+    const container = document.getElementById("tablesContainer");
+
+    const heading = document.createElement("h2");
+    heading.innerText = title;
+    container.appendChild(heading);
+
+    const searchDiv = document.createElement("div");
+    searchDiv.className = "search-box";
+
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = "Search in " + title;
+
+    searchDiv.appendChild(searchInput);
+    container.appendChild(searchDiv);
+
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    const headerRow = document.createElement("tr");
+
+    Object.keys(dataArray[0]).forEach(key => {
+        const th = document.createElement("th");
+        th.innerText = key;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+
+    function renderRows(filterText = "") {
+        tbody.innerHTML = "";
+
+        dataArray.forEach(row => {
+            const rowString = JSON.stringify(row).toLowerCase();
+            if (!rowString.includes(filterText.toLowerCase())) return;
+
+            const tr = document.createElement("tr");
+
+            Object.entries(row).forEach(([key, value]) => {
+                const td = document.createElement("td");
+
+                if (typeof value === "object") {
+                    const safeValue = maskSensitiveData(value);
+                    td.innerHTML = "<pre>" + JSON.stringify(safeValue, null, 2) + "</pre>";
+                } else {
+                    if (key === "user_password") {
+                        td.innerText = "********";
+                    } else {
+                        td.innerText = value;
+                    }
+                }
+
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    renderRows();
+
+    searchInput.addEventListener("input", function () {
+        renderRows(this.value);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    container.appendChild(table);
+}
+
+function showError(message) {
+    document.getElementById("loading").innerHTML = 
+        "<div class='error'>Error: " + message + "</div>";
+}
+
+fetch(API_URL)
+    .then(res => {
+        if (!res.ok) throw new Error("Network response not OK");
+        return res.json();
+    })
+    .then(apiData => {
+        document.getElementById("loading").remove();
+
+        if (!apiData.data) {
+            throw new Error("Invalid API structure");
+        }
+
+        Object.entries(apiData.data).forEach(([tableName, tableData]) => {
+            createTable(tableName, tableData);
+        });
+    })
+    .catch(error => {
+        console.error(error);
+        showError(error.message + " (Check CORS or API server)");
+    });
+
+</script>
+
+</body>
+</html>
