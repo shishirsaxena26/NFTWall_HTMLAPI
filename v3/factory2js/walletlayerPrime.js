@@ -334,6 +334,10 @@ async function LoadRulesPrime()
 	let mintDailyLimit = await window.ruleprimeContract.methods.mintDailyLimit().call();
 	$('#mintDailyLimitPrime').text(`mintDailyLimit: `+ mintDailyLimit.toString());
 	
+	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
+	let withdrawIntervalDays = await window.ruleprimeContract.methods.withdrawIntervalDays().call();
+	$('#withdrawIntervalDays').text(`withdrawIntervalDays: `+ withdrawIntervalDays.toString());
+	
 	
 }
 async function LoadSystemORC1155Prime(o1155) {
