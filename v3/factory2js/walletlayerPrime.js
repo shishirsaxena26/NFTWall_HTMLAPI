@@ -22,7 +22,7 @@ let ORCv3ABIPrime = {};
 let Pricev3ABI = {};
 
 let systemAgePrime = 0;
-
+let withdrawIntervalDays=0;
 pageload();
 
 async function pageload() {
@@ -327,7 +327,7 @@ async function LoadRulesPrime() {
     let approvedClaimPerDayPrime = await rulePrimeV3Contract.methods.approvedClaimPerDayPrime().call();
     let mintFeePerQtyPrime = await rulePrimeV3Contract.methods.mintFeePerQtyPrime().call();
     let mintLimitPerDayPrime = await rulePrimeV3Contract.methods.mintLimitPerDayPrime().call();
-    let withdrawIntervalDays = await rulePrimeV3Contract.methods.withdrawIntervalDays().call();
+    withdrawIntervalDays = await rulePrimeV3Contract.methods.withdrawIntervalDays().call();
 
     // ------------------------
     // Create Single Row
@@ -594,6 +594,11 @@ async function loadPoolPrime(n, instance, dage) {
 	td =td + '<td>' + web3.utils.fromWei(inc.toString(), 'ether') + '</td>';
 	td =td + '<td>' + dage + '</td>';
 	$("#tabCalIncomePrime tr:not(:first)").remove();
+	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
+
+	td= '';
+	let nextwithdrawlage = (dage+withdrawIntervalDays);
+	td =td + '<td colspan="3"> Next withdrawal on age '+(nextwithdrawlage)+'</td>'
 	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
 	
 	td = '';
