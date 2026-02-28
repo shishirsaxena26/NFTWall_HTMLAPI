@@ -333,10 +333,10 @@ async function LoadRulesPrime() {
     // Create Single Row
     // ------------------------
     let row = `<tr>
-        <td>Price: ${oznPrice}</td>
+        <td>SystemAgePrime: ${systemAgePrime}</td>
+		<td>Price: ${oznPrice}</td>
         <td>Shutdown V1: ${shutdown1}</td>
         <td>Shutdown V2: ${shutdown2}</td>
-        <td>FreeIntervals: ${freeIntervals}</td>
         <td>activateInUSDT: ${web3.utils.fromWei(activateInUSDT.toString(), 'ether')}</td>
 		<td>withdrawIntervalDays: ${withdrawIntervalDays}</td>
     </tr>`;
