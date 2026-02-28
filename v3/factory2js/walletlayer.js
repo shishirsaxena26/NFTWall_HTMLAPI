@@ -148,36 +148,21 @@ async function pageload() {
 		$("#txtfrom").val(parseInt(age)-10);
 	};
 
-	const params = new URLSearchParams(window.location.search);
-	const address = params.get("address");  // will give "1" if 
+	
     let accounts = await ethereum.enable();
-	if(address!=null && address!="")    
-    {   
-    	$("#txtAdd").val(address);  
-	}
-	else
-	{
+	if(accounts)  {
 		$("#txtAdd").val(accounts[0]);
 	}
 
 		
-	if ($("#txtAdd").length) {	
-		var n = $("#txtAdd").val();
-		if (!n) { msg('address is blank'); return; }
-		
-		if ($("#tbStandardInfo").length) {
+	if ($("#tbStandardInfo").length) {
 			LoadSystemRankClause();
 			LoadSystemLevelClause();
 			LoadSystemPoolClause();
 			$("#txtRootAdd").val(rootSponser);
 			$("#transferAdd").text(transfer);
 			$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
-			loadAddressData(n);
 		}
-		if ($("#tbPrimeInfo").length) {
-			onLoadAddressPrime(n);
-		}
-	}
 	
 }
 var profilecontract;
@@ -558,7 +543,6 @@ async function onLoadRootAddress() {
 	var n = $("#txtRootAdd").val();
 	if (!n) { msg('txtRootAdd is blank'); return; }
 	loadAddressData(n);
-	onLoadAddressPrime(n);
 }
 
 async function onLoadAddress() {
@@ -566,7 +550,6 @@ async function onLoadAddress() {
 	var n = $("#txtAdd").val();
 	if (!n) { msg('txtAdd is blank'); return; }
 	loadAddressData(n);
-	onLoadAddressPrime(n);
 }
 
 
@@ -612,7 +595,8 @@ async function loadStructure(n, header) {
 	let bonus =await window.instancecontract.methods.bonus().call();
 	td =td + '<td>' + (web3.utils.fromWei(bonus.toString(), 'ether')) + '</td>';
 	let vali =await window.instancecontract.methods.validator().call();
-	td =td + '<td>' + (vali) + '</td>';
+	td =td + '<td>' + (vali) + '</td>'
+	$("#tab tr:not(:first)").remove();
 	$("#tab").append('<tr ' + cstyle + ' >' + td + '</tr>');
 	
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
@@ -626,6 +610,7 @@ async function loadStructure(n, header) {
 	td =td + '<td>' +  web3.utils.fromWei(inc[5].toString(), 'ether') + '</td>';
 	
 	var cstyle = "";
+	$("#tabIncome tr:not(:first)").remove();
 	$("#tabIncome").append('<tr ' + cstyle + ' >' + td + '</tr>');
 
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
@@ -643,7 +628,7 @@ async function loadStructure(n, header) {
 	loadlevelbusiness(instance);
 
 	
-	
+	$("#tabMint tr:not(:first)").remove();
 	for (let i = 1; i<=parseInt(mintnumber); i++) {
 		td = '<td>'+i+'</td>';	
 		let orc =await window.instancecontract.methods.mints(i).call();
@@ -703,7 +688,7 @@ async function loadPool(n, instance, dage) {
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	let inc = await window.instancecontract.methods.compute(9999).call();
 	
-	tr1 = $($("#tabCalIncome").find('tr')[0]).clone();
+	$("#tabCalIncome tr:not(:first)").remove();
 	let td= '';
 	td =td + '<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
 	td =td + '<td>' + web3.utils.fromWei(inc[4].toString(), 'ether') + '</td>';
@@ -715,7 +700,7 @@ async function loadPool(n, instance, dage) {
 	$("#tabCalIncome").append('<tr>' + td + '</tr>');
 	
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	tr1 = $($("#tabDet").find('tr')[0]).clone();
+	
 	td= '';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	var parentins = await window.nestedcontract.methods.getNodeParent(instance).call();
@@ -731,7 +716,7 @@ async function loadPool(n, instance, dage) {
 	td =td + '<td>' + (await window.nestedcontract.methods.isNode(instance).call()) + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	td =td + '<td>' + (await window.nestedcontract.methods.isStop(instance).call()) + '</td>';
-	
+	$("#tabDet tr:not(:first)").remove();
 	$("#tabDet").append('<tr>' + td + '</tr>');
 	
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
@@ -751,7 +736,7 @@ async function loadPool(n, instance, dage) {
 	td =td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 7).call())+ '</td>';
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	td =td + '<td>' + (await window.instancecontract.methods.royaldage(7).call()) + '</td>';
-
+	$("#tabRoyalityIncome tr:not(:first)").remove();
 	$("#tabRoyalityIncome").append('<tr>' + td + '</tr>');
 
 
@@ -769,16 +754,17 @@ async function loadPool(n, instance, dage) {
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
 	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.balanceOf(n).call()), 'ether')  + '</td>';
 	
+	$("#tabDelegator tr:not(:first)").remove();
 	$("#tabDelegator").append('<tr>' + td + '</tr>');
 
 	
 }
 
 async function loadlevelbusiness(instance) {
-	var tr1 = $($("#tabLevel").find('tr')[0]).clone();
+	
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let level = (await window.nestedcontract.methods.getNodeLvlDepth(instance).call());
-	
+	$("#tabLevel tr:not(:first)").remove();
 	for (let i=0; i<level; i++) {
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		var td = '<td>' + (i==0?"self":i) + '</td>';
@@ -794,7 +780,7 @@ async function loadlevelbusiness(instance) {
 
 
 async function loadLSB(instance,dage,age) {
-	
+	$("#tabLBS tr:not(:first)").remove();
 	for(let i=dage; i<=(parseInt(age)+2); i++) {	
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 		let lsb = await window.instancecontract.methods.LSB(i).call();

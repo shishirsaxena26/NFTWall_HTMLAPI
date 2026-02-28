@@ -249,13 +249,11 @@
 
         loadScript('factory2js/walletaddress.js', function () {
           loadScript('factory2js/walletlayer.js', function () {
-            loadScript('factory2js/walletlayerPrime.js', function () {
               console.log('All scripts loaded in order!');
                 const params = new URLSearchParams(window.location.search);
                 const address = params.get("address");  // will give "1" if ?forprime=1
-              
               // You can now safely use functions from all 3 scripts
-            });
+        
           });
         });
 
