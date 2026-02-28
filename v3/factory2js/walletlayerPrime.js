@@ -290,8 +290,73 @@ async function LoadSystemPoolClausePrime() {
 		$("#systemAgePrime").html('System Age Prime ' + systemAgePrime);
 
 }
+async function LoadRulesPrime() {
 
-async function LoadRulesPrime()
+    const table = $("#systemRules");
+    table.empty(); // clear old rows
+
+    // ------------------------
+    // Price Contract
+    // ------------------------
+    const priceContract = new web3.eth.Contract(Pricev3ABI.abi, Pricev3);
+    let ozn = await priceContract.methods.ozonePriceInUSDT().call();
+    let oznPrice = web3.utils.fromWei(ozn.toString(), 'ether');
+
+    // ------------------------
+    // Rule Prime V1
+    // ------------------------
+    const rulePrimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, rulePrime);
+    let shutdown1 = await rulePrimeContract.methods.shutdown().call();
+
+    // ------------------------
+    // Rule Prime V2
+    // ------------------------
+    const rulePrimeContractV2 = new web3.eth.Contract(Rulesv3ABIPrime.abi, rulePrimeV2);
+    let shutdown2 = await rulePrimeContractV2.methods.shutdown().call();
+
+    // ------------------------
+    // Rule Prime V3
+    // ------------------------
+    const rulePrimeV3Contract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+
+    let freeIntervals = await rulePrimeV3Contract.methods.freeIntervals().call();
+    let activateInUSDT = await rulePrimeV3Contract.methods.activateInUSDT().call();
+    let minMintQtyPrime = await rulePrimeV3Contract.methods.minMintQtyPrime().call();
+    let maxMintQtyPrime = await rulePrimeV3Contract.methods.maxMintQtyPrime().call();
+    let maxGlobalClaimPerDayPrime = await rulePrimeV3Contract.methods.maxGlobalClaimPerDayPrime().call();
+    let approvedClaimPerDayPrime = await rulePrimeV3Contract.methods.approvedClaimPerDayPrime().call();
+    let mintFeePerQtyPrime = await rulePrimeV3Contract.methods.mintFeePerQtyPrime().call();
+    let mintLimitPerDayPrime = await rulePrimeV3Contract.methods.mintLimitPerDayPrime().call();
+    let withdrawIntervalDays = await rulePrimeV3Contract.methods.withdrawIntervalDays().call();
+
+    // ------------------------
+    // Create Single Row
+    // ------------------------
+    let row = `<tr>
+        <td>Price: ${oznPrice}</td>
+        <td>Shutdown V1: ${shutdown1}</td>
+        <td>Shutdown V2: ${shutdown2}</td>
+        <td>FreeIntervals: ${freeIntervals}</td>
+        <td>activateInUSDT: ${web3.utils.fromWei(activateInUSDT.toString(), 'ether')}</td>
+		<td>withdrawIntervalDays: ${withdrawIntervalDays}</td>
+    </tr>`;
+
+    table.append(row);
+
+	row = `<tr>
+        <td>minMintQtyPrime: ${web3.utils.fromWei(minMintQtyPrime.toString(), 'ether')}</td>
+        <td>maxMintQtyPrime: ${web3.utils.fromWei(maxMintQtyPrime.toString(), 'ether')}</td>
+        <td>maxGlobalClaimPerDayPrime: ${web3.utils.fromWei(maxGlobalClaimPerDayPrime.toString(), 'ether')}</td>
+        <td>approvedClaimPerDayPrime: ${web3.utils.fromWei(approvedClaimPerDayPrime.toString(), 'ether')}</td>
+        <td>mintFeePerQtyPrime: ${web3.utils.fromWei(mintFeePerQtyPrime.toString(), 'ether')}</td>
+        <td>mintLimitPerDayPrime: ${mintLimitPerDayPrime}</td>
+   
+    </tr>`;
+
+    table.append(row);
+}
+
+async function LoadRulesPrime1()
 {
 	
 	window.PriceABIContract = new web3.eth.Contract(Pricev3ABI.abi, Pricev3);
@@ -299,42 +364,50 @@ async function LoadRulesPrime()
 	let ozn = await window.PriceABIContract.methods.ozonePriceInUSDT().call();
 	$('#oznpricePrime').text(`Price: `+web3.utils.fromWei(ozn.toString(), 'ether'));
 	
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, rulePrime);
 	let shutdown = await window.ruleprimeContract.methods.shutdown().call();
 	let shut = `Shutdown: `+ shutdown;
 	//$('#shutdownPrime').text(`Shutdown: `+ shutdown);
 
-	window.ruleprimeContract1 = new web3.eth.Contract(RulesABIPrime.abi, rulePrimeV2);
+	window.ruleprimeContract1 = new web3.eth.Contract(Rulesv3ABIPrime.abi, rulePrimeV2);
 	shutdown = await window.ruleprimeContract1.methods.shutdown().call();
 	shut = shut + `V2: `+ shutdown;
 	$('#shutdownPrime').text(shut);
 
-
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
+    
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
 	let freeIntervals = await window.ruleprimeContract.methods.freeIntervals().call();
 	$('#freeIntervalsPrime').text(`FreeIntervals: `+ freeIntervals);
 
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
-	let claimMinLimit = await window.ruleprimeContract.methods.claimMinLimit().call();
-	$('#claimMinLimitPrime').text(`claimMinLimit: `+web3.utils.fromWei((BigInt(claimMinLimit.toString())).toString(), 'ether'));
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let activateInUSDT = await window.ruleprimeContract.methods.activateInUSDT().call();
+	$('#activateInUSDT').text(`activateInUSDT: `+web3.utils.fromWei((BigInt(activateInUSDT.toString())).toString(), 'ether'));
 	
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
-	let claimMaxLimit = await window.ruleprimeContract.methods.claimMaxLimit().call();
-	$('#claimMaxLimitPrime').text(`claimMaxLimit: `+web3.utils.fromWei((BigInt(claimMaxLimit.toString())).toString(), 'ether'));
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let minMintQtyPrime = await window.ruleprimeContract.methods.minMintQtyPrime().call();
+	$('#minMintQtyPrime').text(`minMintQtyPrime: `+web3.utils.fromWei((BigInt(minMintQtyPrime.toString())).toString(), 'ether'));
 	
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
-	let mintMin = await window.ruleprimeContract.methods.mintMin().call();
-	$('#mintMinPrime').text(`mintMin: `+ (parseInt(mintMin)).toString());
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let maxMintQtyPrime = await window.ruleprimeContract.methods.maxMintQtyPrime().call();
+	$('#maxMintQtyPrime').text(`maxMintQtyPrime: `+web3.utils.fromWei((BigInt(maxMintQtyPrime.toString())).toString(), 'ether'));
 	
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
-	let mintMax = await window.ruleprimeContract.methods.mintMax().call();
-	$('#mintMaxPrime').text(`mintMax: `+ (parseInt(mintMax)).toString());
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let maxGlobalClaimPerDayPrime = await window.ruleprimeContract.methods.maxGlobalClaimPerDayPrime().call();
+	$('#maxGlobalClaimPerDayPrime').text(`maxGlobalClaimPerDayPrime: `+ (parseInt(maxGlobalClaimPerDayPrime)).toString());
+	
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let approvedClaimPerDayPrime = await window.ruleprimeContract.methods.approvedClaimPerDayPrime().call();
+	$('#approvedClaimPerDayPrime').text(`approvedClaimPerDayPrime: `+ (parseInt(approvedClaimPerDayPrime)).toString());
+	
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let mintFeePerQtyPrime = await window.ruleprimeContract.methods.mintFeePerQtyPrime().call();
+	$('#mintFeePerQtyPrime').text(`mintFeePerQtyPrime: `+ (parseInt(mintFeePerQtyPrime)).toString());
 
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
-	let mintDailyLimit = await window.ruleprimeContract.methods.mintDailyLimit().call();
-	$('#mintDailyLimitPrime').text(`mintDailyLimit: `+ mintDailyLimit.toString());
+	window.ruleprimeContract = new web3.eth.Contract(Rulesv3ABIPrime.abi, RulePrimev3);
+	let mintLimitPerDayPrime = await window.ruleprimeContract.methods.mintLimitPerDayPrime().call();
+	$('#mintLimitPerDayPrime').text(`mintLimitPerDayPrime: `+ mintLimitPerDayPrime.toString());
 	
-	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, rulePrime);
+	window.ruleprimeContract = new web3.eth.Contract(RulesABIPrime.abi, RulePrimev3);
 	let withdrawIntervalDays = await window.ruleprimeContract.methods.withdrawIntervalDays().call();
 	$('#withdrawIntervalDays').text(`withdrawIntervalDays: `+ withdrawIntervalDays.toString());
 	
