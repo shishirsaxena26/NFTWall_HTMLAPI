@@ -597,7 +597,7 @@ async function loadPoolPrime(n, instance, dage) {
 	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
 
 	td= '';
-	let nextwithdrawlage = (dage+withdrawIntervalDays);
+	let nextwithdrawlage = (parseInt(dage)+ parseInt(withdrawIntervalDays));
 	td =td + '<td colspan="3"> Next withdrawal on age '+(nextwithdrawlage)+'</td>'
 	$("#tabCalIncomePrime").append('<tr>' + td + '</tr>');
 	
