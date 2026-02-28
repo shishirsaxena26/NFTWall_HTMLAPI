@@ -50,14 +50,23 @@ async function pageload() {
 	ORCv3ABIPrime = await fetch('abiv3/ORC1155Prime9Oct.sol/ORC1155Prime.json?v='+version).then(res => res.json());
 	Pricev3ABI = await fetch('abiv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
 	
+	LoadSystemPoolClausePrime();
+	$("#transferAddPrime").text(TreaseryTVLMiningPrimev3);
+	$("#transferBalPrime").text(web3.utils.fromWei((await web3.eth.getBalance(TreaseryTVLMiningPrimev3)), 'ether'));
 
-	if ($("#txtAdd").length) {	
-		  
-		LoadSystemPoolClausePrime();
-		$("#transferAddPrime").text(TreaseryTVLMiningPrimev3);
-		$("#transferBalPrime").text(web3.utils.fromWei((await web3.eth.getBalance(TreaseryTVLMiningPrimev3)), 'ether'));
+	let accounts = await ethereum.enable();
+	if(accounts)    
+    {  
+		$("#txtAdd").val(accounts[0]);
 	}
 	
+}
+
+async function onLoadAddress() {
+	
+	var n = $("#txtAdd").val();
+	if (!n) { msg('txtAdd is blank'); return; }
+	onLoadAddressPrime(n);
 }
 
 async function onGetPrimeDataOnHome(add) {
@@ -242,7 +251,7 @@ async function onGetDailyBusinessPrime(){
 		
 
 		let royal2 = (parseFloat(b)*parseFloat(2)/100)/parseFloat(Ct2);
-		$("##tabDailyBusiness tr:not(:first)").remove();
+		$("#tabDailyBusiness tr:not(:first)").remove();
 		$("#tabDailyBusiness").append('<tr><td>'+i+'</td><td>'+b+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+royal2+'</td><td>0</td><td>0</td></tr>');
 	}	
 	
