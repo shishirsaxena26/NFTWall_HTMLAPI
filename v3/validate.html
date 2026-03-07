@@ -49,6 +49,11 @@
 <div id="result"></div>
 
 <script>
+function shortAddr(addr) {
+    if (!addr) return '';
+    return addr.slice(0, 6) + '...' + addr.slice(-4);
+}
+
 async function fetchData() {
     const address = document.getElementById("addressInput").value.trim();
     const statusDiv = document.getElementById("status");
@@ -107,8 +112,8 @@ async function fetchData() {
         records.forEach(item => {
             table += `
                 <tr>
-                    <td>${item.delegatoraddress0x}</td>
-                    <td>${item.validatoraddress}</td>
+                    <td>${shortAddr(item.delegatoraddress0x)}</td>
+                    <td>${shortAddr(item.validatoraddress)}</td>
                     <td>${item.totalshare}</td>
                     <td>${item.extrashare}</td>
                     <td>${item.diffShare}</td>
