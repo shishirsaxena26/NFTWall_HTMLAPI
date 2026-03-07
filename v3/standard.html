@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OzoneChain · IA Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+<style>
+:root {
+  --bg: #0b0f1a;
+  --panel-bg: rgba(20,30,50,0.8);
+  --panel-border: #2a3a5a;
+  --text: #c8d6ff;
+  --accent: #00ffff;
+  --green: #00ff90;
+  --red: #ff4d4d;
+  --yellow: #ffd700;
+  --font: "Consolas", "Courier New", monospace;
+}
+
+body {
+  margin:0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display:flex;
+  justify-content:center;
+  padding: 20px;
+}
+
+.wrapper {
+  width: 95%;
+  max-width: 1000px;
+}
+
+.console {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header h2 {
+  margin:0;
+  font-size:1.6em;
+  color: var(--accent);
+  /*text-shadow: 0 0 10px var(--accent);*/
+}
+
+.status {
+  font-size:12px;
+  color: var(--green);
+  font-weight:bold;
+}
+
+.buttons {
+  display:flex;
+  gap:10px;
+}
+
+button {
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  background: linear-gradient(135deg,#00ffff,#3fa9ff);
+  cursor:pointer;
+  font-weight:600;
+  color:#000;
+  font-size:13px;
+  /*text-shadow:0 0 2px #000;*/
+  transition:0.2s;
+}
+
+button:hover {
+  background: linear-gradient(135deg,#3fa9ff,#00ffff);
+  box-shadow: 0 0 10px #00ffff;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  gap:6px;
+}
+
+.panel h3 {
+  margin:0 0 8px 0;
+  color: var(--accent);
+  /*text-shadow:0 0 8px var(--accent);*/
+  font-size:1.1em;
+}
+
+.row {
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  padding:2px 0;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.row:last-child {
+  border-bottom:none;
+}
+
+.addr {
+  display:flex;
+  gap:6px;
+  align-items:center;
+  font-family: monospace;
+  color:#00ffff;
+}
+
+.copyBtn {
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  padding:2px 5px;
+  border-radius:4px;
+  font-size:10px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.copyBtn:hover {
+  background:#00ffff;
+  color:#000;
+}
+
+.shortAddr {
+  font-weight:bold;
+  color: var(--yellow);
+}
+
+.section-title {
+  font-weight:bold;
+  color: var(--green);
+  margin-top:8px;
+  margin-bottom:4px;
+}
+
+
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <div class="console">
+    <div class="header">
+      <h2>OzoneChain IA Console</h2>
+      <div class="status">LIVE</div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="loadSystem()">Load System</button>
+      <!-- User input for address -->
+      <input type="text" id="userAddrInput" placeholder="Enter user address 0x....."
+       style="padding:6px 10px; border-radius:6px; border:1px solid #555; 
+              width:420px; max-width: 90%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
+      <button onclick="loadUser(document.getElementById('userAddrInput').value)">Load User</button>
+
+    </div>
+
+    <div id="systemPanels">
+      <!-- Panels will be injected here -->
+    </div>
+  </div>
+</div>
+
+<script>
+var version = Date.now();
+document.addEventListener("DOMContentLoaded", () => {
+    
+    function loadScript(src, callback) {
+      var script = document.createElement('script');
+      script.src = src + '?v=' + version;
+      script.onload = callback;
+      document.head.appendChild(script);
+    }
+
+    loadScript('factory2js/appaddress.js', function () {
+      loadScript('factory2js/app.js', function () {
+          console.log('All scripts loaded');
+      });
+    });
+});
+</script>
+
+</body>
+</html>
