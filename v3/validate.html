@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,6 +38,25 @@ background:#f2f2f2;
 
 .loading{color:blue;margin-top:10px;}
 .error{color:red;margin-top:10px;}
+
+.statusbox{
+margin-top:15px;
+padding:10px;
+font-weight:bold;
+border-radius:6px;
+}
+
+.allowed{
+background:#e6ffed;
+color:#0a7a2f;
+border:1px solid #0a7a2f;
+}
+
+.notallowed{
+background:#ffe6e6;
+color:#c40000;
+border:1px solid #c40000;
+}
 
 .tab{
 display:inline-block;
@@ -82,6 +100,8 @@ font-size:14px;
 <button onclick="fetchData()">Fetch Data</button>
 
 <div id="status"></div>
+
+<div id="allowedStatus"></div>
 
 <div id="tabs" style="margin-top:20px;"></div>
 
@@ -159,17 +179,62 @@ const d2=await r2.json();
 
 statusDiv.innerHTML="";
 
+/* ---------- Allowed Status ---------- */
+
+let allowedFlag=false;
+
+if(d1.data[1] && d1.data[1][0]){
+allowedFlag=d1.data[1][0].allowed;
+}
+
+document.getElementById("allowedStatus").innerHTML=
+allowedFlag
+? `<div class="statusbox allowed">Validator Status: ALLOWED</div>`
+: `<div class="statusbox notallowed">Validator Status: NOT ALLOWED</div>`;
+
+
+/* ---------- Tabs (SWAPPED) ---------- */
+
 document.getElementById("tabs").innerHTML=`
-<div class="tab active" id="btn_tab1" onclick="showTab('tab1')">Delegator Details</div>
-<div class="tab" id="btn_tab2" onclick="showTab('tab2')">Daily Validator Income</div>
+<div class="tab active" id="btn_tab1" onclick="showTab('tab1')">Daily Income</div>
+<div class="tab" id="btn_tab2" onclick="showTab('tab2')">Income Details</div>
 <div class="tab" id="btn_tab3" onclick="showTab('tab3')">Income Transactions</div>
 `;
 
-/* TAB 1 */
+
+/* ---------- TAB 1 (Daily Income) ---------- */
+
+let set1=d2.data[0];
+
+let table1=`<table>
+<tr>
+<th>Node</th>
+<th>Income</th>
+<th>Date</th>
+<th>Record Age</th>
+</tr>`;
+
+set1.forEach(item=>{
+table1+=`
+<tr>
+<td>${addrCell(item.node)}</td>
+<td>${item.income}</td>
+<td>${item.age}</td>
+<td>${item.recordAge}</td>
+</tr>
+`;
+});
+
+table1+="</table>";
+
+document.getElementById("tab1").innerHTML=table1;
+
+
+/* ---------- TAB 2 (Income Details) ---------- */
 
 let records=d1.data[0];
 
-let table1=`<table>
+let table2=`<table>
 <tr>
 <th>Delegator</th>
 <th>Validator</th>
@@ -188,7 +253,7 @@ let table1=`<table>
 </tr>`;
 
 records.forEach(item=>{
-table1+=`
+table2+=`
 <tr>
 <td>${addrCell(item.delegatoraddress0x)}</td>
 <td>${addrCell(item.validatoraddress)}</td>
@@ -208,40 +273,12 @@ table1+=`
 `;
 });
 
-table1+="</table>";
-
-document.getElementById("tab1").innerHTML=table1;
-
-
-/* TAB 2 */
-
-let set1=d2.data[0];
-
-let table2=`<table>
-<tr>
-<th>Node</th>
-<th>Income</th>
-<th>Date</th>
-<th>Record Age</th>
-</tr>`;
-
-set1.forEach(item=>{
-table2+=`
-<tr>
-<td>${addrCell(item.node)}</td>
-<td>${item.income}</td>
-<td>${item.age}</td>
-<td>${item.recordAge}</td>
-</tr>
-`;
-});
-
 table2+="</table>";
 
 document.getElementById("tab2").innerHTML=table2;
 
 
-/* TAB 3 */
+/* ---------- TAB 3 ---------- */
 
 let set2=d2.data[1];
 
@@ -290,4 +327,3 @@ console.error(e);
 
 </body>
 </html>
-
