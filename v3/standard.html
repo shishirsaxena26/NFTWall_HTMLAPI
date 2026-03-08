@@ -185,7 +185,21 @@ button:hover {
   <div class="console">
     <div class="header">
       <h2>OzoneChain IA Console</h2>
-      <div class="status">LIVE</div>
+      <div id="walletLine" style="margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center;">
+
+          <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+
+          <span id="walletInfoLine" style="display:none;gap:10px;align-items:center;">
+              <span id="walletAddr" class="shortAddr"></span>
+              <button class="copyBtn" onclick="copyWallet()">📋</button>
+              <span id="walletId"></span> | 
+              <span id="walletInst" class="shortAddr"></span> | 
+              <span id="walletStor" class="shortAddr"></span>
+
+              <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d;">disconnect</a>
+          </span>
+
+      </div>
     </div>
 
     <div class="buttons">
@@ -195,17 +209,8 @@ button:hover {
       <input type="text" id="userAddrInput" placeholder="Enter user address 0x....."
        style="padding:6px 10px; border-radius:6px; border:1px solid #555; 
               width:320px; max-width: 80%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
-      <button onclick="showLoader(); loadUser(document.getElementById('userAddrInput').value);">Load User</button>
-      <div id="walletArea" style="margin-left:auto; display:flex; align-items:center; gap:8px;">
-        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
-        <div id="walletInfo" style="display:none; align-items:center; gap:6px;">
-            <span class="shortAddr" id="walletAddr"></span>
-            <button class="copyBtn" onclick="copyWallet()">copy</button>
-            <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d; font-size:12px;">
-              disconnect
-            </a>
-        </div>
-      </div>
+      <button onclick="showLoader(); loadUser();">Load User</button>
+      <button onclick="showLoader(); joinUser();">Join User</button>
     </div>
 
     <div id="systemPanels">
