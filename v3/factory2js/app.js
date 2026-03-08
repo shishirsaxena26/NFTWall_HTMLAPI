@@ -272,7 +272,7 @@ async function loadUser() {
 
     const instAddr = node[3];
     const storAddr = node[4];
-
+    addRow(panel, "InstAddr", node[3]);
     if (instAddr != "0x0000000000000000000000000000000000000000") {
         const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
         const instId = await inst.methods.id().call();
@@ -282,7 +282,7 @@ async function loadUser() {
         addRow(panel, "Instance Parent", instParent);
         addRow(panel, "Instance Stor", instStor);
     }
-
+    addRow(panel, "StorAddr", node[4]);
     const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
     const dage = await stor.methods.dage().call();
     const rank = await stor.methods.rank().call();
