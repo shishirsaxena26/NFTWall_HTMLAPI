@@ -190,10 +190,11 @@ button:hover {
 
     <div class="buttons">
       <button onclick="showLoader(); loadSystem();">Load System</button>
+      <button onclick="showLoader(); loadMarket();">Load Market</button>
       <!-- User input for address -->
       <input type="text" id="userAddrInput" placeholder="Enter user address 0x....."
        style="padding:6px 10px; border-radius:6px; border:1px solid #555; 
-              width:420px; max-width: 90%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
+              width:320px; max-width: 80%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
       <button onclick="showLoader(); loadUser(document.getElementById('userAddrInput').value);">Load User</button>
       <div id="walletArea" style="margin-left:auto; display:flex; align-items:center; gap:8px;">
         <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
