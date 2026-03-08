@@ -272,6 +272,7 @@ async function loadUser() {
 
     const instAddr = node[3];
     const storAddr = node[4];
+    addRow(panel, "INST---", "");
     addRow(panel, "InstAddr", node[3]);
     if (instAddr != "0x0000000000000000000000000000000000000000") {
         const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
@@ -282,6 +283,7 @@ async function loadUser() {
         addRow(panel, "Instance Parent", instParent);
         addRow(panel, "Instance Stor", instStor);
     } 
+    addRow(panel, "STOR---", "");
     addRow(panel, "StorAddr", node[4]);
     const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
     const dage = await stor.methods.dage().call();
@@ -292,12 +294,14 @@ async function loadUser() {
     addRow(panel, "Stor Rank", rank);
     addRow(panel, "Stor Cage", cage);
 
+    /*
     // Fetch LSB 1,3,30,93,95,603,695,696
     const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
     for (const i of lsbIndexes) {
         const val = await stor.methods.LSB(i).call();
         addRow(panel, `Stor LSB(${i})`, val);
     }
+    */
 
     // Drawn, Flushed, Unpaid, Compute
     const drawn = await stor.methods.drawn().call();
