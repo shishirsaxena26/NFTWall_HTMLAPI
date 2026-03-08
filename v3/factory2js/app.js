@@ -67,7 +67,16 @@ async function init(){
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-    debugger;
+   
+    if(window.ethereum){
+        window.ethereum.request({method:'eth_accounts'}).then(accounts=>{
+            if(accounts.length){
+                currentAccount = accounts[0];
+                showWallet(currentAccount);
+            }
+        });
+    }
+
     hideLoader();
 }
 
@@ -261,7 +270,7 @@ async function loadUser() {
         alert("Enter a valid Ethereum address");
         return;
     }
-
+    
     clearPanels();
     const panel = addPanel("User Data");
 
@@ -289,55 +298,115 @@ async function loadUser() {
     } 
     addRow(panel, "STOR---", "");
     addRow(panel, "StorAddr", node[4]);
-    const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
-    const dage = await stor.methods.dage().call();
-    const rank = await stor.methods.rank().call();
-    const cage = await stor.methods.cage().call();
+    if (storAddr != "0x0000000000000000000000000000000000000000") { 
+        const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
+        const dage = await stor.methods.dage().call();
+        const rank = await stor.methods.rank().call();
+        const cage = await stor.methods.cage().call();
 
-    addRow(panel, "Stor Dage", dage);
-    addRow(panel, "Stor Rank", rank);
-    addRow(panel, "Stor Cage", cage);
+        addRow(panel, "Stor Dage", dage);
+        addRow(panel, "Stor Rank", rank);
+        addRow(panel, "Stor Cage", cage);
+    
+        /*
+        // Fetch LSB 1,3,30,93,95,603,695,696
+        const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
+        for (const i of lsbIndexes) {
+            const val = await stor.methods.LSB(i).call();
+            addRow(panel, `Stor LSB(${i})`, val);
+        }
+        */
 
-    /*
-    // Fetch LSB 1,3,30,93,95,603,695,696
-    const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
-    for (const i of lsbIndexes) {
-        const val = await stor.methods.LSB(i).call();
-        addRow(panel, `Stor LSB(${i})`, val);
+        // Drawn, Flushed, Unpaid, Compute
+        const drawn = await stor.methods.drawn().call();
+        const flushed = await stor.methods.flushed().call();
+        const unpaid = await stor.methods.unpaid().call();
+        const compute = await stor.methods.compute(700).call();
+
+        const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
+
+        // Helper: format wei → OZN with 3 decimals
+        function formatOZN(value) {
+            return Number(web3.utils.fromWei(value, "ether")).toFixed(3);
+        }
+
+        // Add a header row
+        addRow(panel, "Income Type", "Compute | Drawn | Flushed | Unpaid");
+
+        for (let i = 0; i < 7; i++) {
+            const comp = formatOZN(compute[i]);
+            const drwn = formatOZN(drawn[i]);
+            const flsh = formatOZN(flushed[i]);
+            const unpaidVal = formatOZN(unpaid[i]);
+
+            addRow(panel, incomeTypes[i], `${comp} | ${drwn} | ${flsh} | ${unpaidVal}`);
+        }
+
+        // Burned & Self Proposed
+        const burned = await stor.methods.burned().call();
+        const selfProposed = await stor.methods.selfProposed().call();
+        addRow(panel, "Burned", formatOZN(burned));
+        addRow(panel, "Self Proposed", formatOZN(selfProposed));
     }
-    */
-
-    // Drawn, Flushed, Unpaid, Compute
-    const drawn = await stor.methods.drawn().call();
-    const flushed = await stor.methods.flushed().call();
-    const unpaid = await stor.methods.unpaid().call();
-    const compute = await stor.methods.compute(700).call();
-
-    const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
-
-    // Helper: format wei → OZN with 3 decimals
-    function formatOZN(value) {
-        return Number(web3.utils.fromWei(value, "ether")).toFixed(3);
-    }
-
-    // Add a header row
-    addRow(panel, "Income Type", "Compute | Drawn | Flushed | Unpaid");
-
-    for (let i = 0; i < 7; i++) {
-        const comp = formatOZN(compute[i]);
-        const drwn = formatOZN(drawn[i]);
-        const flsh = formatOZN(flushed[i]);
-        const unpaidVal = formatOZN(unpaid[i]);
-
-        addRow(panel, incomeTypes[i], `${comp} | ${drwn} | ${flsh} | ${unpaidVal}`);
-    }
-
-    // Burned & Self Proposed
-    const burned = await stor.methods.burned().call();
-    const selfProposed = await stor.methods.selfProposed().call();
-    addRow(panel, "Burned", formatOZN(burned));
-    addRow(panel, "Self Proposed", formatOZN(selfProposed));
     hideLoader();
 }
+
+
+let currentAccount = null;
+
+async function connectWallet() {
+
+  if (!window.ethereum) {
+      alert("MetaMask not installed");
+      return;
+  }
+
+  try {
+
+      const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+      });
+
+      currentAccount = accounts[0];
+
+      showWallet(currentAccount);
+
+  } catch (err) {
+      console.error(err);
+  }
+
+}
+
+function showWallet(addr){
+
+    const short = addr.slice(0,6) + "..." + addr.slice(-4);
+
+    document.getElementById("walletAddr").innerText = short;
+
+    document.getElementById("connectBtn").style.display = "none";
+
+    document.getElementById("walletInfo").style.display = "flex";
+
+}
+
+function disconnectWallet(){
+
+    currentAccount = null;
+
+    document.getElementById("walletInfo").style.display = "none";
+
+    document.getElementById("connectBtn").style.display = "inline-block";
+
+}
+
+function copyWallet(){
+
+    if(!currentAccount) return;
+
+    navigator.clipboard.writeText(currentAccount);
+
+}
+
+
 
 window.onload = init;
