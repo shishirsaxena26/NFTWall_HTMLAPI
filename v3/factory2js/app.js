@@ -351,6 +351,11 @@ async function loadUser() {
     hideLoader();
 }
 
+async function loadMarket(){
+    clearPanels(); 
+    const panelSys = addPanel("Marketplace");
+    hideLoader();
+}
 
 let currentAccount = null;
 
