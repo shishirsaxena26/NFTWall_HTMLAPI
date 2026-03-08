@@ -281,7 +281,7 @@ async function loadUser() {
         addRow(panel, "Instance ID", instId);
         addRow(panel, "Instance Parent", instParent);
         addRow(panel, "Instance Stor", instStor);
-    }
+    } 
     addRow(panel, "StorAddr", node[4]);
     const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
     const dage = await stor.methods.dage().call();
