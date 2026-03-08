@@ -68,7 +68,10 @@ async function init(){
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
     debugger;
+    hideLoader();
 }
+
+
 
 // -------------------- PANEL FUNCTIONS --------------------
 function clearPanels() {
@@ -159,6 +162,7 @@ async function loadSystem(){
     addRow(panelSys,"Form Count",forms);
 
     await loadSystemTreasuriesNSecurebase();
+    hideLoader();
 }
 
 // -------------------- SYSTEM TREASURY + SECUREBASE --------------------
@@ -333,6 +337,7 @@ async function loadUser() {
     const selfProposed = await stor.methods.selfProposed().call();
     addRow(panel, "Burned", formatOZN(burned));
     addRow(panel, "Self Proposed", formatOZN(selfProposed));
+    hideLoader();
 }
 
 window.onload = init;
