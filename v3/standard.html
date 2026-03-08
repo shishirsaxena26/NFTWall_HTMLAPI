@@ -195,7 +195,16 @@ button:hover {
        style="padding:6px 10px; border-radius:6px; border:1px solid #555; 
               width:420px; max-width: 90%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
       <button onclick="showLoader(); loadUser(document.getElementById('userAddrInput').value);">Load User</button>
-
+      <div id="walletArea" style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+        <div id="walletInfo" style="display:none; align-items:center; gap:6px;">
+            <span class="shortAddr" id="walletAddr"></span>
+            <button class="copyBtn" onclick="copyWallet()">copy</button>
+            <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d; font-size:12px;">
+              disconnect
+            </a>
+        </div>
+      </div>
     </div>
 
     <div id="systemPanels">
