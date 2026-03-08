@@ -34,6 +34,11 @@ let daocore;
 let daoassembly;
 let transferRequests;
 
+
+let currentAccount = null;
+let currentInstance = null;
+let currentStor = null;
+
 async function init(){
     IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
     ISafeguardABI = await fetch('abistandardv3/libSafeguard.sol/libSafeguard.json?v='+version).then(res => res.json());
@@ -67,12 +72,17 @@ async function init(){
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-   
+    
+    currentAccount = null;
+    currentInstance = null;
+    currentStor = null;
+
     if(window.ethereum){
-        window.ethereum.request({method:'eth_accounts'}).then(accounts=>{
+        window.ethereum.request({method:'eth_accounts'}).then(async (accounts)=>{
             if(accounts.length){
                 currentAccount = accounts[0];
-                showWallet(currentAccount);
+                showWallet();
+                await addConnectedUserPanel();
             }
         });
     }
@@ -146,7 +156,7 @@ function pad3(v){
 
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
-    return Number(web3.utils.fromWei(value, "ether")).toFixed(3);
+    return Number(web3.utils.fromWei(value, "ether")).toFixed(3) + " OZN";
 }
 
 async function printRow(addr){
@@ -161,7 +171,7 @@ async function printRow(addr){
 async function loadSystem(){
     clearPanels();
     const panelSys = addPanel("System Data");
-
+    try{
     const nodes = await nested.methods.getNodesCount().call();
     const sysAge = await nested.methods.systemAge().call();
     const forms = await transferRequests.methods.getFormsCount().call();
@@ -171,6 +181,14 @@ async function loadSystem(){
     addRow(panelSys,"Form Count",forms);
 
     await loadSystemTreasuriesNSecurebase();
+
+    }catch(err){
+
+        console.error(err);
+        addRow(panelMarket,"Error","Unable to load marketplace");
+
+    }
+
     hideLoader();
 }
 
@@ -261,6 +279,49 @@ async function loadUserPanel(user){
     addRow(userPanel,"Stor Rank",rank);
     addRow(userPanel,"Stor Cage",cage);
 }
+async function addConnectedUserPanel(){
+
+    if (!currentAccount || !web3.utils.isAddress(currentAccount)) return;
+
+    try{
+        const id = await nested.methods.UserToId(currentAccount).call();
+        const node = await nested.methods.getNode(id).call();
+
+        document.getElementById("walletId").innerText =
+            "ID " + node[0];
+
+        currentInstance = node[3];
+        document.getElementById("walletInst").innerText =
+            "Inst " + shortAddr(node[3]);
+
+        currentStor = node[4];
+        document.getElementById("walletStor").innerText =
+            "Stor " + shortAddr(node[4]);
+
+    }catch(e){
+        console.log(e);
+        document.getElementById("walletNode").innerText = "User not registered";
+    }
+}
+
+async function joinUser() {
+    const input = document.getElementById("userAddrInput");
+    const parent = input.value.trim();
+    if (!parent || !web3.utils.isAddress(parent)) {
+        alert("Enter a valid parent");
+        return;
+    }
+
+    if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
+        alert("Connect to wallet");
+        return;
+    }
+
+	window.web3T = new Web3(window.ethereum);
+   
+
+    hideLoader();
+}
 
 // -------------------- LOAD USER FULL --------------------
 async function loadUser() {
@@ -273,93 +334,272 @@ async function loadUser() {
     
     clearPanels();
     const panel = addPanel("User Data");
+    try{
+        const id = await nested.methods.UserToId(user).call();
+        const node = await nested.methods.getNode(id).call();
 
-    const id = await nested.methods.UserToId(user).call();
-    const node = await nested.methods.getNode(id).call();
+        addRow(panel, "ID", node[0]);
+        addRow(panel, "Node", node[1]);
+        addRow(panel, "Parent", node[2]);
+        addRow(panel, "Active", node[5]);
+        addRow(panel, "Direct Count", node[6]);
 
-    addRow(panel, "ID", node[0]);
-    addRow(panel, "Node", node[1]);
-    addRow(panel, "Parent", node[2]);
-    addRow(panel, "Active", node[5]);
-    addRow(panel, "Direct Count", node[6]);
+        const instAddr = node[3];
+        const storAddr = node[4];
+        addRow(panel, "INST---", "");
+        addRow(panel, "InstAddr", node[3]);
+        if (instAddr != "0x0000000000000000000000000000000000000000") {
+            const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
+            const instId = await inst.methods.id().call();
+            const instParent = await inst.methods.parent().call();
+            const instStor = await inst.methods.stor().call();
+            addRow(panel, "Instance ID", instId);
+            addRow(panel, "Instance Parent", instParent);
+            addRow(panel, "Instance Stor", instStor);
+        } 
+        addRow(panel, "STOR---", "");
+        addRow(panel, "StorAddr", node[4]);
+        if (storAddr != "0x0000000000000000000000000000000000000000") { 
+            const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
+            const dage = await stor.methods.dage().call();
+            const rank = await stor.methods.rank().call();
+            const cage = await stor.methods.cage().call();
 
-    const instAddr = node[3];
-    const storAddr = node[4];
-    addRow(panel, "INST---", "");
-    addRow(panel, "InstAddr", node[3]);
-    if (instAddr != "0x0000000000000000000000000000000000000000") {
-        const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
-        const instId = await inst.methods.id().call();
-        const instParent = await inst.methods.parent().call();
-        const instStor = await inst.methods.stor().call();
-        addRow(panel, "Instance ID", instId);
-        addRow(panel, "Instance Parent", instParent);
-        addRow(panel, "Instance Stor", instStor);
-    } 
-    addRow(panel, "STOR---", "");
-    addRow(panel, "StorAddr", node[4]);
-    if (storAddr != "0x0000000000000000000000000000000000000000") { 
-        const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
-        const dage = await stor.methods.dage().call();
-        const rank = await stor.methods.rank().call();
-        const cage = await stor.methods.cage().call();
+            addRow(panel, "Stor Dage", dage);
+            addRow(panel, "Stor Rank", rank);
+            addRow(panel, "Stor Cage", cage);
+        
+            /*
+            // Fetch LSB 1,3,30,93,95,603,695,696
+            const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
+            for (const i of lsbIndexes) {
+                const val = await stor.methods.LSB(i).call();
+                addRow(panel, `Stor LSB(${i})`, val);
+            }
+            */
 
-        addRow(panel, "Stor Dage", dage);
-        addRow(panel, "Stor Rank", rank);
-        addRow(panel, "Stor Cage", cage);
-    
-        /*
-        // Fetch LSB 1,3,30,93,95,603,695,696
-        const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
-        for (const i of lsbIndexes) {
-            const val = await stor.methods.LSB(i).call();
-            addRow(panel, `Stor LSB(${i})`, val);
+            // Drawn, Flushed, Unpaid, Compute
+            const drawn = await stor.methods.drawn().call();
+            const flushed = await stor.methods.flushed().call();
+            const unpaid = await stor.methods.unpaid().call();
+            const compute = await stor.methods.compute(700).call();
+
+            const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
+
+            // Add a header row
+            addRow(panel, "Income Type", "Compute | Drawn | Flushed | Unpaid");
+
+            for (let i = 0; i < 7; i++) {
+                const comp = formatOZN(compute[i]);
+                const drwn = formatOZN(drawn[i]);
+                const flsh = formatOZN(flushed[i]);
+                const unpaidVal = formatOZN(unpaid[i]);
+
+                addRow(panel, incomeTypes[i], `${comp} | ${drwn} | ${flsh} | ${unpaidVal}`);
+            }
+
+            // Burned & Self Proposed
+            const burned = await stor.methods.burned().call();
+            const selfProposed = await stor.methods.selfProposed().call();
+            addRow(panel, "Burned", formatOZN(burned));
+            addRow(panel, "Self Proposed", formatOZN(selfProposed));
         }
-        */
+    }catch(err){
 
-        // Drawn, Flushed, Unpaid, Compute
-        const drawn = await stor.methods.drawn().call();
-        const flushed = await stor.methods.flushed().call();
-        const unpaid = await stor.methods.unpaid().call();
-        const compute = await stor.methods.compute(700).call();
+        console.error(err);
+        addRow(panelMarket,"Error","Unable to load marketplace");
 
-        const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
-
-        // Helper: format wei → OZN with 3 decimals
-        function formatOZN(value) {
-            return Number(web3.utils.fromWei(value, "ether")).toFixed(3);
-        }
-
-        // Add a header row
-        addRow(panel, "Income Type", "Compute | Drawn | Flushed | Unpaid");
-
-        for (let i = 0; i < 7; i++) {
-            const comp = formatOZN(compute[i]);
-            const drwn = formatOZN(drawn[i]);
-            const flsh = formatOZN(flushed[i]);
-            const unpaidVal = formatOZN(unpaid[i]);
-
-            addRow(panel, incomeTypes[i], `${comp} | ${drwn} | ${flsh} | ${unpaidVal}`);
-        }
-
-        // Burned & Self Proposed
-        const burned = await stor.methods.burned().call();
-        const selfProposed = await stor.methods.selfProposed().call();
-        addRow(panel, "Burned", formatOZN(burned));
-        addRow(panel, "Self Proposed", formatOZN(selfProposed));
     }
+
     hideLoader();
 }
 
 async function loadMarket(){
-    clearPanels(); 
-    const panelSys = addPanel("Marketplace");
+
+    clearPanels();
+    const panelMarket = addPanel("Marketplace");
+
+    try{
+
+        const o1155 = await hexBase.methods.inOrc1155(0).call();
+        const orc1155 = new web3.eth.Contract(IORC1155ABI.abi,o1155);
+
+        addRow(panelMarket,"Contract",o1155);
+
+        const name = await orc1155.methods.name().call();
+        const curSupply = await orc1155.methods.curSupply().call();
+        const totSupply = await orc1155.methods.totSupply().call();
+        const price = await rule.methods.computeMintValue(1).call();
+
+        addRow(panelMarket,"Collection",name);
+        addRow(panelMarket,"Total Supply",totSupply);
+        addRow(panelMarket,"Minted",curSupply);
+        addRow(panelMarket,"Price", formatOZN(price) +" / unit");
+
+        const panelNFT = addPanel("NFT Marketplace");
+
+        let i=1;
+        let flag=true;
+
+        while(flag){
+
+            try{
+
+                const tokenName = await orc1155.methods.idToName(i).call();
+
+                if(!tokenName){
+                    flag=false;
+                    break;
+                }
+
+                const metadataURI = await orc1155.methods.uri(i).call();
+                const meta = await fetch(metadataURI).then(r=>r.json());
+
+                const row = document.createElement("div");
+                row.className="row";
+
+                const left = document.createElement("div");
+                left.innerHTML =
+                    '<div style="display:flex;align-items:center;gap:8px;">'
+                    + '<img src="'+meta.image+'" width="40" height="40">'
+                    + '<span>#'+i+' '+tokenName+'</span>'
+                    + '</div>';
+
+                const right = document.createElement("div");
+
+                if(currentAccount){
+
+                    const btn=document.createElement("button");
+                    btn.innerText="Buy";
+                    btn.style.padding="4px 8px";
+
+                    const tokenId = i;   // capture correct id
+                    btn.onclick = () => buyNFT(o1155, tokenId);
+
+                    right.appendChild(btn);
+
+                }else{
+
+                    right.innerText="Connect wallet";
+
+                }
+
+                row.appendChild(left);
+                row.appendChild(right);
+
+                panelNFT.appendChild(row);
+
+                i++;
+
+            }catch(e){
+                flag=false;
+            }
+
+        }
+
+        // MY NFT PANEL
+        if(currentAccount){
+
+            const panelMine = addPanel("My NFTs");
+
+            for(let id=1; id<=i; id++){
+
+                try{
+
+                    const bal = await orc1155.methods.balanceOf(currentAccount,id).call();
+
+                    if(bal>0){
+
+                        const tokenName = await orc1155.methods.idToName(id).call();
+
+                        addRow(panelMine,"#"+id+" "+tokenName,"x"+bal);
+
+                    }
+
+                }catch(e){}
+
+            }
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+        addRow(panelMarket,"Error","Unable to load marketplace");
+
+    }
+
     hideLoader();
 }
 
-let currentAccount = null;
+
+async function buyNFT(o1155, tokenId){
+
+
+                    try{
+
+                        if(!currentAccount){
+                            alert("Connect wallet first");
+                            return;
+                        }
+
+                        if(currentInstance==null || currentInstance =='0x0000000000000000000000000000000000000000'){
+                            alert("invalid instance");
+                            return;
+                        }
+
+                        if(currentStor==null || currentStor == '0x0000000000000000000000000000000000000000'){
+                            alert("invalid stor");
+                            return;
+                        } 
+                        debugger;
+                        let accounts = await ethereum.enable();
+		                window.web3T = new Web3(window.ethereum);
+                        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
+                        const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
+                       
+                        // qty = 1 (market purchase)
+                        const qty = 2;
+                        //const tokenid = i;
+
+                        // get mint value
+                        let value = BigInt(
+                            await rule.methods
+                            .computeMintValue(qty)
+                            .call()
+                        );
+
+                        // check bonus
+                        let bonus = BigInt(
+                            await storcontract.methods
+                            .bonus()
+                            .call()
+                        );
+
+                        // reduce bonus
+                        value = bonus >= value ? 0n : (value - bonus);
+                        debugger;
+                        // execute transaction
+                        await instancecontract.methods
+                            .Txn(o1155,tokenId,qty,1)
+                            .send({
+                                from: currentAccount,
+                                value: value.toString()
+                            });
+
+                        alert("NFT Purchased");
+
+                    }catch(e){
+                        console.error(e);
+                        alert("Transaction failed");
+                    }
+
+}
 
 async function connectWallet() {
+    currentAccount = null;
+    currentInstance = null;
+    currentStor = null;
 
   if (!window.ethereum) {
       alert("MetaMask not installed");
@@ -374,31 +614,32 @@ async function connectWallet() {
 
       currentAccount = accounts[0];
 
-      showWallet(currentAccount);
-
+      showWallet();
+      await addConnectedUserPanel();
   } catch (err) {
       console.error(err);
   }
 
 }
+function showWallet(){
 
-function showWallet(addr){
-
-    const short = addr.slice(0,6) + "..." + addr.slice(-4);
+    const short = currentAccount.slice(0,6) + "..." + currentAccount.slice(-4);
 
     document.getElementById("walletAddr").innerText = short;
 
     document.getElementById("connectBtn").style.display = "none";
-
-    document.getElementById("walletInfo").style.display = "flex";
+    document.getElementById("walletInfoLine").style.display = "flex";
+    
 
 }
 
 function disconnectWallet(){
 
     currentAccount = null;
+    currentInstance = null;
+    currentStor = null;
 
-    document.getElementById("walletInfo").style.display = "none";
+    document.getElementById("walletInfoLine").style.display = "none";
 
     document.getElementById("connectBtn").style.display = "inline-block";
 
