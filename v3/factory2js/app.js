@@ -73,6 +73,11 @@ async function init(){
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
     
+    inPrice  = await hexBase.methods.inPrice().call();
+    const priceContract = new web3.eth.Contract(IPriceABI.abi, inPrice);
+    console.log("💰 Ozone Price in USDT:", 
+        await priceContract.methods.ozonePriceInUSDT().call()
+    );
     currentAccount = null;
     currentInstance = null;
     currentStor = null;
@@ -88,6 +93,67 @@ async function init(){
     }
 
     hideLoader();
+    debugTransaction();
+    //scanBlocks(100); // scan last 20 blocks
+}
+
+async function scanBlocks(limit = 10) {
+
+
+  const latestBlock = await web3.eth.getBlockNumber();
+  //console.log("Latest Block:", latestBlock);
+
+  for (let i = latestBlock; i > 0; i--) {
+
+    const block = await web3.eth.getBlock(i, true); // true = include tx objects
+    if( block.transactions.length==0) continue;
+    console.log("------------------------------------------------");
+   
+   
+    console.log("Block Number:", block.number);
+    console.log("Block Hash:", block.hash);
+    console.log("Timestamp:", block.timestamp);
+    console.log("Miner:", block.miner);
+    console.log("Gas Used:", block.gasUsed);
+    console.log("Transaction Count:", block.transactions.length);
+
+    block.transactions.forEach((tx, index) => {
+      console.log("   TX#", index + 1);
+      console.log("   Hash:", tx.hash);
+      console.log("   From:", tx.from);
+      console.log("   To:", tx.to);
+      console.log("   Value:", web3.utils.fromWei(tx.value, "ether"), "ETH");
+      console.log("   Gas:", tx.gas);
+      console.log("   GasPrice:", tx.gasPrice);
+      console.log("   Nonce:", tx.nonce);
+      console.log("   Input:", tx.input);
+      console.log("   ---------------------------");
+    });
+
+  }
+}
+
+async function debugTransaction() {
+    const txHash = "0xbfb6ba9e7ce5a4ba4d5919878f8a8a9732615ed408abff03380bb1b4d92b4465";
+    web3.currentProvider.send(
+    {
+        jsonrpc: "2.0",
+        method: "debug_traceTransaction",
+        params: [
+            txHash,
+            { tracer: "callTracer" }
+        ],
+        id: 1
+    },
+    function (err, result) {
+      if (err) {
+        console.error("Debug error:", err);
+        return;
+      }
+
+      console.log("Trace result:", result);
+    }
+  );
 }
 
 
@@ -281,6 +347,15 @@ async function loadUserPanel(user){
 }
 async function addConnectedUserPanel(){
 
+    
+    const btnJoin = document.getElementById("btnJoin");
+    const btnInit = document.getElementById("btnInit");
+    const btnImport = document.getElementById("btnImport");
+
+    btnJoin.style.display = "none";
+    btnInit.style.display = "none";
+    btnImport.style.display = "none";
+
     if (!currentAccount || !web3.utils.isAddress(currentAccount)) return;
 
     try{
@@ -291,12 +366,39 @@ async function addConnectedUserPanel(){
             "ID " + node[0];
 
         currentInstance = node[3];
-        document.getElementById("walletInst").innerText =
-            "Inst " + shortAddr(node[3]);
-
         currentStor = node[4];
-        document.getElementById("walletStor").innerText =
-            "Stor " + shortAddr(node[4]);
+
+       /*
+        STEP 1
+        No instance yet
+        */
+
+        if(node[3] == ZERO){
+            btnJoin.style.display = "block";
+            return;
+        }
+
+        /*
+        STEP 2
+        Import instance
+        */
+        if(node[3] != ZERO && node[4] != ZERO){
+            currentInstance = node[3];
+            currentStor = node[4];
+            document.getElementById("walletInst").innerText =
+                "Inst " + shortAddr(currentInstance);
+            const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
+            const postInit = await stor.methods.postInit().call();
+            if(!postInit){
+                btnImport.style.display = "block";
+                return;
+            } else {
+                
+                document.getElementById("walletStor").innerText =
+                "Stor " + shortAddr(currentStor);
+            }
+           
+        }
 
     }catch(e){
         console.log(e);
@@ -304,23 +406,197 @@ async function addConnectedUserPanel(){
     }
 }
 
+function updatePanelWithInstance(instance){
+
+    document.getElementById("walletInst").innerText =
+        "Inst " + shortAddr(instance);
+
+    document.getElementById("btnJoin").style.display = "none";
+    document.getElementById("btnInit").style.display = "block";
+}
+
 async function joinUser() {
-    const input = document.getElementById("userAddrInput");
-    const parent = input.value.trim();
-    if (!parent || !web3.utils.isAddress(parent)) {
-        alert("Enter a valid parent");
-        return;
-    }
+        try {
+            const input = document.getElementById("userAddrInput");
+            const parent = input.value.trim();
+            if (!parent || !web3.utils.isAddress(parent)) {
+                alert("Enter a valid parent");
+                return;
+            }
 
-    if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
-        alert("Connect to wallet");
-        return;
-    }
+            if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
+                alert("Connect to wallet");
+                return;
+            }
+            
+            let accounts = await ethereum.enable();
+            if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+            window.web3T = new Web3(window.ethereum);
+            // encode constructor args
+            const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
+            const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
+            
+            // append args to bytecode
+            const deployBytecode = byteCodeStandard + encodedArgs.slice(2);
+            
+            // deploy transaction
+            const tx = await web3T.eth.sendTransaction({
+                from: currentAccount,
+                data: deployBytecode,
+                value: "0"
+            });
+            
+            console.log("Deploy TX:", tx);
+          
+            // contract address from receipt
+            currentInstance = tx.contractAddress;
+            alert("User Joined: "+currentInstance);
+            // update UI
+            document.getElementById("walletInst").innerText =
+                "Inst " + shortAddr(currentInstance);
 
-	window.web3T = new Web3(window.ethereum);
-   
+            document.getElementById("btnJoin").style.display = "none";
+            document.getElementById("btnInit").style.display = "block";
+        
+        }catch(e){
+            console.error(e);
+            alert("Transaction failed");
+        }  
 
     hideLoader();
+}
+
+async function initUser(){
+
+    if(!currentInstance){
+        alert("Instance not found");
+        return;
+    }
+
+    try{
+
+        let accounts = await ethereum.enable();
+        window.web3T = new Web3(window.ethereum);
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        debugger;
+        const instancecontract = new web3T.eth.Contract(
+            IInstanceMeABI.abi,
+            currentInstance
+        );
+
+        await instancecontract.methods
+            .initialize()
+            .send({
+                from: currentAccount,
+                value: "0" // change if initialization requires ETH
+            });
+
+        console.log("Instance initialized");
+
+        // reload panel so stor address appears
+        await addConnectedUserPanel();
+
+    }catch(e){
+        console.log(e);
+        alert("Transaction failed");
+    }
+     hideLoader();
+}
+
+async function importUser() {
+
+    try{
+
+        let accounts = await ethereum.enable();
+        window.web3T = new Web3(window.ethereum);
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        const userId = await nested.methods.UserToId(currentAccount).call();
+        if(userId==0) { alert("Invalid user"); return;}
+        const limit = 5; // change according to your import batch size
+        debugger;
+        const nestedcontract = new web3T.eth.Contract(
+            INested741ABI.abi,
+            inNested741
+        );
+        await nestedcontract.methods
+            .importOld(userId, limit)
+            .send({
+                from: currentAccount,
+                value: "0"
+            });
+
+        console.log("Import completed");
+
+        await addConnectedUserPanel();
+
+    }catch(e){
+        console.log(e);
+        alert("Transaction failed");
+    }
+    hideLoader();
+}
+
+async function buyNFT(o1155, tokenId){
+  showLoader();
+                    try{
+
+                        if(!currentAccount){
+                            alert("Connect wallet first");
+                            return;
+                        }
+
+                        if(currentInstance==null || currentInstance =='0x0000000000000000000000000000000000000000'){
+                            alert("invalid instance");
+                            return;
+                        }
+
+                        if(currentStor==null || currentStor == '0x0000000000000000000000000000000000000000'){
+                            alert("invalid stor");
+                            return;
+                        } 
+                       
+                        let accounts = await ethereum.enable();
+                        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+		                window.web3T = new Web3(window.ethereum);
+                        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
+                        const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
+                       
+                        // qty = 1 (market purchase)
+                        const qty = 2;
+                        //const tokenid = i;
+
+                        // get mint value
+                        let value = BigInt(
+                            await rule.methods
+                            .computeMintValue(qty)
+                            .call()
+                        );
+                              debugger;
+                        // check bonus
+                        let bonus = BigInt(
+                            await storcontract.methods
+                            .bonus()
+                            .call()
+                        );
+
+                        // reduce bonus
+                        value = bonus >= value ? 0n : (value - bonus);
+                        debugger;
+                        // execute transaction
+                        await instancecontract.methods
+                            .Txn(o1155,tokenId,qty,1)
+                            .send({
+                                from: currentAccount,
+                                value: value.toString()
+                            });
+
+                        alert("NFT Purchased");
+
+                    }catch(e){
+                        console.error(e);
+                        alert("Transaction failed");
+                    }
+ hideLoader();
 }
 
 // -------------------- LOAD USER FULL --------------------
@@ -435,9 +711,8 @@ async function loadMarket(){
         addRow(panelMarket,"Total Supply",totSupply);
         addRow(panelMarket,"Minted",curSupply);
         addRow(panelMarket,"Price", formatOZN(price) +" / unit");
-
-        const panelNFT = addPanel("NFT Marketplace");
-
+        const nftRows = [];
+        
         let i=1;
         let flag=true;
 
@@ -486,8 +761,8 @@ async function loadMarket(){
 
                 row.appendChild(left);
                 row.appendChild(right);
-
-                panelNFT.appendChild(row);
+                nftRows.push(row);
+                //panelNFT.appendChild(row);
 
                 i++;
 
@@ -497,30 +772,11 @@ async function loadMarket(){
 
         }
 
-        // MY NFT PANEL
-        if(currentAccount){
+        addRow(panelMarket,"Total NFT Tokens", i);
+        const panelNFT = addPanel("NFT Marketplace");
+        nftRows.slice(0,3).forEach(r => panelNFT.appendChild(r));
 
-            const panelMine = addPanel("My NFTs");
-
-            for(let id=1; id<=i; id++){
-
-                try{
-
-                    const bal = await orc1155.methods.balanceOf(currentAccount,id).call();
-
-                    if(bal>0){
-
-                        const tokenName = await orc1155.methods.idToName(id).call();
-
-                        addRow(panelMine,"#"+id+" "+tokenName,"x"+bal);
-
-                    }
-
-                }catch(e){}
-
-            }
-
-        }
+        
 
     }catch(err){
 
@@ -532,68 +788,213 @@ async function loadMarket(){
     hideLoader();
 }
 
+async function loadMyNFT(){
 
-async function buyNFT(o1155, tokenId){
+    clearPanels();
+    const input = document.getElementById("userAddrInput");
+    const user = input.value.trim();
+  
+    if (!user || !web3.utils.isAddress(user)) {
+        alert("Enter a valid address");
+        return;
+    }
+
+    const id = await nested.methods.UserToId(user).call();
+    const node = await nested.methods.getNode(id).call();
+    const instance = node[3];
+    const stor = node[4];
+
+    const panel = addPanel("My Minted NFTs");
+ 
+    if(!instance || instance==ZERO || !stor || stor==ZERO){
+        addRow(panel,"User","Instance/Stor not found");
+        return;
+    }
+
+    const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
+    const mintCount = await storeContract.methods.mintCount().call();
+
+    for(let i=1; i<=mintCount; i++){
+
+        const mint = await storeContract.methods.mints(i).call();
+        const nftAddr = mint.nft;
+
+        const nft = new web3.eth.Contract(IORC1155ABI.abi, nftAddr);
+
+        const mintedUser = await nft.methods.mintedUser().call();
+
+        if(mintedUser.toLowerCase() !== user.toLowerCase()){
+            continue;
+        }
+
+        const tokenId = await nft.methods.ids(0).call();
+        const tokenName = await nft.methods.idToName(tokenId).call();
+
+        const mintedqty = await nft.methods.mintedqty().call();
+        const mintedfee = await nft.methods.mintedfee().call();
+        const mintedAge = await nft.methods.mintedAge().call();
+
+        const uri = await nft.methods.uri(tokenId).call();
+        const meta = await fetch(uri).then(r=>r.json());
+
+        const row=document.createElement("div");
+        row.className="row";
+
+        const left=document.createElement("div");
+        left.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px;">'
+        + '<img src="'+meta.image+'" width="40" height="40">'
+        + '<span>'+tokenName+'</span>'
+        + '</div>';
+
+        const right=document.createElement("div");
+
+        right.innerHTML =
+        "Qty: "+mintedqty+
+        " | Fee: "+web3.utils.fromWei(mintedfee,"ether")+
+        " | Age: "+mintedAge+" ";
+
+        /* TRANSFER BUTTON */
+
+        const btnTransfer=document.createElement("button");
+        btnTransfer.innerText="Transfer";
+        btnTransfer.style.marginLeft="10px";
+
+        btnTransfer.onclick = () => onNFTTransfer(user, nftAddr, tokenId);
+
+        /* BURN BUTTON */
+
+        const btnBurn=document.createElement("button");
+        btnBurn.innerText="Burn";
+        btnBurn.style.marginLeft="5px";
+        btnBurn.onclick = () => burnNFT(user, nftAddr, tokenId);
+
+        right.appendChild(btnTransfer);
+        right.appendChild(btnBurn);
+
+        row.appendChild(left);
+        row.appendChild(right);
+
+        panel.appendChild(row);
+
+    }
+
+    hideLoader();
+}
+
+async function onNFTTransfer(user,orc1155, tokenId) {
+    showLoader();
+
+    try {
+        // Prompt for recipient
+        const to = prompt("Enter receiver address:");
+        if (!to) {
+            throw 'Receiver address required';
+        }
+
+        // Prompt for amount
+        const amountStr = prompt("Enter amount to transfer:");
+        if (!amountStr) {
+            throw 'Amount required';
+        }
+        const amount = parseInt(amountStr);
+        if (isNaN(amount) || amount <= 0) {
+            throw 'Invalid amount';
+        }
+
+        // Enable wallet
+        const accounts = await ethereum.enable();
+        if(user!=accounts[0]) { 
+            throw "Incorrect account selected";
+        }
+		window.web3T = new Web3(window.ethereum);
+        // Initialize contract
+        const orc1155contract = new web3T.eth.Contract(IORC1155ABI.abi, orc1155);
+
+        // Check balance
+        const balance = await orc1155contract.methods.balanceOf(user, tokenId).call();
+        if (amount > parseInt(balance)) {
+            throw 'Insufficient NFT balance';
+        }
+
+        // Send transfer
+        const tx = await orc1155contract.methods
+            .safeTransferFrom(user, to, tokenId, amount, "0x")
+            .send({ from: user });
+
+        console.log(tx);
+
+        if (tx.status) {
+            alert("Transfer succeeded");
+        } else {
+            alert("Transfer failed");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Transfer failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+    
+}
 
 
-                    try{
+async function burnNFT(user,orc1155, tokenId) {
+    showLoader();
 
-                        if(!currentAccount){
-                            alert("Connect wallet first");
-                            return;
-                        }
+    try {
+        // Prompt for recipient
+        const to = prompt("Enter receiver address:");
+        if (!to) 
+            throw 'Receiver address required';
+        
 
-                        if(currentInstance==null || currentInstance =='0x0000000000000000000000000000000000000000'){
-                            alert("invalid instance");
-                            return;
-                        }
+        // Prompt for amount
+        const amountStr = prompt("Enter amount to transfer:");
+        if (!amountStr) 
+            throw 'Amount required';
+        
+        const amount = parseInt(amountStr);
+        if (isNaN(amount) || amount <= 0) 
+            throw 'Invalid amount';
+        
 
-                        if(currentStor==null || currentStor == '0x0000000000000000000000000000000000000000'){
-                            alert("invalid stor");
-                            return;
-                        } 
-                        debugger;
-                        let accounts = await ethereum.enable();
-		                window.web3T = new Web3(window.ethereum);
-                        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
-                        const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
-                       
-                        // qty = 1 (market purchase)
-                        const qty = 2;
-                        //const tokenid = i;
+        // Enable wallet
+        const accounts = await ethereum.enable();
+        if(user!=accounts[0]) 
+            throw "Incorrect account selected";
+        
+		window.web3T = new Web3(window.ethereum);
+        // Initialize contract
+        const orc1155contract = new web3T.eth.Contract(IORC1155ABI.abi, orc1155);
 
-                        // get mint value
-                        let value = BigInt(
-                            await rule.methods
-                            .computeMintValue(qty)
-                            .call()
-                        );
+        // Check balance
+        const balance = await orc1155contract.methods.balanceOf(user, tokenId).call();
+        if (amount > parseInt(balance)) 
+            throw 'Insufficient NFT balance';
+        
 
-                        // check bonus
-                        let bonus = BigInt(
-                            await storcontract.methods
-                            .bonus()
-                            .call()
-                        );
+        // Send transfer
+        const tx = await orc1155contract.methods
+            .onTokenBurn(tokenId, amount)
+            .send({ from: user });
 
-                        // reduce bonus
-                        value = bonus >= value ? 0n : (value - bonus);
-                        debugger;
-                        // execute transaction
-                        await instancecontract.methods
-                            .Txn(o1155,tokenId,qty,1)
-                            .send({
-                                from: currentAccount,
-                                value: value.toString()
-                            });
+        console.log(tx);
 
-                        alert("NFT Purchased");
+        if (tx.status) 
+            alert("Transfer succeeded");
+        else 
+            throw "Transfer failed"; 
+    
 
-                    }catch(e){
-                        console.error(e);
-                        alert("Transaction failed");
-                    }
-
+    } catch (err) {
+        console.error(err);
+        alert("Transfer failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+    
 }
 
 async function connectWallet() {

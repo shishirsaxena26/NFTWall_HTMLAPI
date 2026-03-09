@@ -5,7 +5,7 @@
 <title>OzoneChain · IA Console</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <style>
 :root {
   --bg: #0b0f1a;
@@ -185,32 +185,40 @@ button:hover {
   <div class="console">
     <div class="header">
       <h2>OzoneChain IA Console</h2>
-      <div id="walletLine" style="margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center;">
+     <div id="walletLine" style="margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center;">
 
-          <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
 
-          <span id="walletInfoLine" style="display:none;gap:10px;align-items:center;">
-              <span id="walletAddr" class="shortAddr"></span>
-              <button class="copyBtn" onclick="copyWallet()">📋</button>
-              <span id="walletId"></span> | 
-              <span id="walletInst" class="shortAddr"></span> | 
-              <span id="walletStor" class="shortAddr"></span>
+        <span id="walletInfoLine" style="display:none;gap:10px;align-items:center;">
+            <span id="walletAddr" class="shortAddr"></span>
+            <button class="copyBtn" onclick="copyWallet()">📋</button>
 
-              <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d;">disconnect</a>
-          </span>
+            <span id="walletId"></span> |
 
-      </div>
+            <span id="walletInst" class="shortAddr"></span>
+            <button id="btnJoin" onclick="showLoader(); joinUser();">Join</button>
+            <button id="btnInit" onclick="showLoader(); initUser();">Initialize</button>
+
+            |
+
+            <span id="walletStor" class="shortAddr"></span>
+            <button id="btnImport" onclick="showLoader(); importUser();">Import</button>
+
+            <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d;">disconnect</a>
+        </span>
+
+    </div>
     </div>
 
     <div class="buttons">
       <button onclick="showLoader(); loadSystem();">Load System</button>
-      <button onclick="showLoader(); loadMarket();">Load Market</button>
+      <button onclick="showLoader(); loadMarket();">Marketplace</button>
       <!-- User input for address -->
       <input type="text" id="userAddrInput" placeholder="Enter user address 0x....."
        style="padding:6px 10px; border-radius:6px; border:1px solid #555; 
               width:320px; max-width: 80%; font-family:monospace; color:#0b0f1a;" value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
       <button onclick="showLoader(); loadUser();">Load User</button>
-      <button onclick="showLoader(); joinUser();">Join User</button>
+      <button onclick="showLoader(); loadMyNFT();">My NFT</button>
     </div>
 
     <div id="systemPanels">
