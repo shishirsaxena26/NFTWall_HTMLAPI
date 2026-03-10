@@ -134,7 +134,7 @@ async function scanBlocks(limit = 10) {
 }
 
 async function debugTransaction() {
-    const txHash = "0xbfb6ba9e7ce5a4ba4d5919878f8a8a9732615ed408abff03380bb1b4d92b4465";
+    const txHash = "0x8eec05089ab54940d38cfbbf543a345f3a6f6267657a0741902307d763b0f5a1";
     web3.currentProvider.send(
     {
         jsonrpc: "2.0",
@@ -161,6 +161,36 @@ async function debugTransaction() {
 // -------------------- PANEL FUNCTIONS --------------------
 function clearPanels() {
   document.getElementById("systemPanels").innerHTML = "";
+}
+
+function renderAddress(value){
+  const v = document.createElement("div");
+
+  if(typeof value === "string" && value.startsWith("0x")){
+    v.className = "addr";
+
+    const short = document.createElement("span");
+    short.className = "shortAddr";
+    short.innerText = value.slice(0,6) + "..." + value.slice(-4);
+
+    const btn = document.createElement("button");
+    btn.className = "copyBtn";
+    btn.innerText = "📋";
+
+    btn.onclick = ()=>{
+      navigator.clipboard.writeText(value);
+      btn.innerText="✓";
+      setTimeout(()=>{ btn.innerText="📋"; },1000);
+    };
+
+    v.appendChild(short);
+    v.appendChild(btn);
+  } 
+  else{
+    v.innerText = value;
+  }
+
+  return v;
 }
 
 function addPanel(title) {
@@ -828,11 +858,12 @@ async function loadMyNFT(){
         }
 
         const tokenId = await nft.methods.ids(0).call();
-        const tokenName = await nft.methods.idToName(tokenId).call();
-
+        const tokenName = await nft.methods.idToName(0).call();
+debugger;
         const mintedqty = await nft.methods.mintedqty().call();
         const mintedfee = await nft.methods.mintedfee().call();
         const mintedAge = await nft.methods.mintedAge().call();
+        const clonnedOf = await nft.methods.clonnedOf().call();
 
         const uri = await nft.methods.uri(tokenId).call();
         const meta = await fetch(uri).then(r=>r.json());
@@ -840,12 +871,30 @@ async function loadMyNFT(){
         const row=document.createElement("div");
         row.className="row";
 
-        const left=document.createElement("div");
-        left.innerHTML =
-        '<div style="display:flex;align-items:center;gap:8px;">'
-        + '<img src="'+meta.image+'" width="40" height="40">'
-        + '<span>'+tokenName+'</span>'
-        + '</div>';
+        const left = document.createElement("div");
+
+        const rowTop = document.createElement("div");
+        rowTop.style.display = "flex";
+        rowTop.style.alignItems = "center";
+        rowTop.style.gap = "8px";
+
+        const idSpan = document.createElement("span");
+        idSpan.innerText = tokenId;
+
+        const img = document.createElement("img");
+        img.src = meta.image;
+        img.width = 40;
+        img.height = 40;
+
+        const idText = document.createElement("span");
+        idText.innerText = ' CLONNED OF ';
+
+        rowTop.appendChild(idSpan);
+        rowTop.appendChild(img);
+        rowTop.appendChild(renderAddress(nftAddr));
+        rowTop.appendChild(idText);
+        rowTop.appendChild(renderAddress(clonnedOf));
+        left.appendChild(rowTop);
 
         const right=document.createElement("div");
 
@@ -882,7 +931,7 @@ async function loadMyNFT(){
     hideLoader();
 }
 
-async function onNFTTransfer(user,orc1155, tokenId) {
+async function onNFTTransfer(user,orc1155, tokenId,byforce) {
     showLoader();
 
     try {
