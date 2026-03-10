@@ -15,6 +15,7 @@ let IInstanceStorABI = {};
 let IDAOCoreABI = {};
 let IDAOAssemblyABI = {};
 let ITransferRequestsABI = {};
+let INFTArchiveABI = {};
 
 let inprice = {};
 let insafeguard = {};
@@ -26,6 +27,7 @@ let inORC1155 = {};
 let indaocore = {};
 let indaoassembly = {};
 let inproposals = [];
+let inNftArchive = {};
 
 let nested;
 let rule;
@@ -33,7 +35,7 @@ let safeguard;
 let daocore;
 let daoassembly;
 let transferRequests;
-
+let nftArchive;
 
 let currentAccount = null;
 let currentInstance = null;
@@ -51,7 +53,8 @@ async function init(){
     IDAOCoreABI = await fetch('abistandardv3/DAOCore.sol/DAOCore.json?v='+version).then(res => res.json());
     IDAOAssemblyABI = await fetch('abistandardv3/DAOAssembly.sol/DAOAssembly.json?v='+version).then(res => res.json());
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v='+version).then(res => res.json());
-
+    INFTArchiveABI = await fetch('abistandardv3/NFTArchive.sol/NFTArchive.json?v='+version).then(res => res.json());
+     
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
 
@@ -78,6 +81,10 @@ async function init(){
     console.log("💰 Ozone Price in USDT:", 
         await priceContract.methods.ozonePriceInUSDT().call()
     );
+
+    inNftArchive = await hexBase.methods.inNftArchive().call();
+    nftArchive = new web3.eth.Contract(INFTArchiveABI.abi, inNftArchive);
+    
     currentAccount = null;
     currentInstance = null;
     currentStor = null;
@@ -134,7 +141,7 @@ async function scanBlocks(limit = 10) {
 }
 
 async function debugTransaction() {
-    const txHash = "0x8eec05089ab54940d38cfbbf543a345f3a6f6267657a0741902307d763b0f5a1";
+    const txHash = "0xf2f31bb35e2e5a288666ed0901d6d2fa230ba16a33ebb805184347e9a1dae525";
     web3.currentProvider.send(
     {
         jsonrpc: "2.0",
@@ -152,6 +159,31 @@ async function debugTransaction() {
       }
 
       console.log("Trace result:", result);
+
+      /* OPTIONAL: Also fetch receipt */
+
+      web3.eth.getTransactionReceipt(txHash)
+        .then(function(receipt){
+
+            console.log("Transaction Receipt:", receipt);
+
+            if(receipt && receipt.logs){
+
+                console.log("Event Logs:");
+
+                receipt.logs.forEach(function(log,i){
+
+                    console.log("Log #"+i, log);
+
+                });
+
+            }
+
+        })
+        .catch(function(err){
+            console.error("Error fetching receipt:", err);
+        });
+
     }
   );
 }
@@ -172,6 +204,36 @@ function renderAddress(value){
     const short = document.createElement("span");
     short.className = "shortAddr";
     short.innerText = value.slice(0,6) + "..." + value.slice(-4);
+
+    const btn = document.createElement("button");
+    btn.className = "copyBtn";
+    btn.innerText = "📋";
+
+    btn.onclick = ()=>{
+      navigator.clipboard.writeText(value);
+      btn.innerText="✓";
+      setTimeout(()=>{ btn.innerText="📋"; },1000);
+    };
+
+    v.appendChild(short);
+    v.appendChild(btn);
+  } 
+  else{
+    v.innerText = value;
+  }
+
+  return v;
+}
+
+function renderAddressLongX(value){
+  const v = document.createElement("div");
+
+  if(typeof value === "string" && value.startsWith("0x")){
+    v.className = "addr";
+
+    const short = document.createElement("span");
+    short.className = "shortAddr";
+    short.innerText = value.slice(0,10) + "..." + value.slice(-10);
 
     const btn = document.createElement("button");
     btn.className = "copyBtn";
@@ -864,6 +926,7 @@ debugger;
         const mintedfee = await nft.methods.mintedfee().call();
         const mintedAge = await nft.methods.mintedAge().call();
         const clonnedOf = await nft.methods.clonnedOf().call();
+        const balance = await nft.methods.balanceOf(user, tokenId).call();
 
         const uri = await nft.methods.uri(tokenId).call();
         const meta = await fetch(uri).then(r=>r.json());
@@ -887,7 +950,7 @@ debugger;
         img.height = 40;
 
         const idText = document.createElement("span");
-        idText.innerText = ' CLONNED OF ';
+        idText.innerText = ' CLONNED_OF ';
 
         rowTop.appendChild(idSpan);
         rowTop.appendChild(img);
@@ -899,9 +962,15 @@ debugger;
         const right=document.createElement("div");
 
         right.innerHTML =
-        "Qty: "+mintedqty+
+        "Balance: "+balance+
+        " | Minted : "+mintedqty+
         " | Fee: "+web3.utils.fromWei(mintedfee,"ether")+
         " | Age: "+mintedAge+" ";
+        /* CHECKBOX */
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.style.marginRight="10px";
 
         /* TRANSFER BUTTON */
 
@@ -909,15 +978,37 @@ debugger;
         btnTransfer.innerText="Transfer";
         btnTransfer.style.marginLeft="10px";
 
-        btnTransfer.onclick = () => onNFTTransfer(user, nftAddr, tokenId);
+       
+        btnTransfer.onclick = () => {
+            const isforce = checkbox.checked;
+            if(isforce) {
+                alert('checked');
+            } else {
+                alert('not hecked');
+            } 
+
+            onNFTTransfer(user, nftAddr, tokenId, isforce);
+
+        };
 
         /* BURN BUTTON */
 
         const btnBurn=document.createElement("button");
         btnBurn.innerText="Burn";
         btnBurn.style.marginLeft="5px";
-        btnBurn.onclick = () => burnNFT(user, nftAddr, tokenId);
 
+        btnBurn.onclick = () => {
+            const isforce = checkbox.checked;
+            if(isforce) {
+                alert('checked');
+            } else {
+                alert('not hecked');
+            } 
+
+            burnNFT(user, nftAddr, tokenId, isforce);
+        };
+        
+        right.appendChild(checkbox);
         right.appendChild(btnTransfer);
         right.appendChild(btnBurn);
 
@@ -931,7 +1022,7 @@ debugger;
     hideLoader();
 }
 
-async function onNFTTransfer(user,orc1155, tokenId,byforce) {
+async function onNFTTransfer(user,orc1155, tokenId, isforce) {
     showLoader();
 
     try {
@@ -952,8 +1043,8 @@ async function onNFTTransfer(user,orc1155, tokenId,byforce) {
         }
 
         // Enable wallet
-        const accounts = await ethereum.enable();
-        if(user!=accounts[0]) { 
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
             throw "Incorrect account selected";
         }
 		window.web3T = new Web3(window.ethereum);
@@ -989,18 +1080,13 @@ async function onNFTTransfer(user,orc1155, tokenId,byforce) {
 }
 
 
-async function burnNFT(user,orc1155, tokenId) {
+async function burnNFT(user,orc1155, tokenId, isforce) {
     showLoader();
 
     try {
-        // Prompt for recipient
-        const to = prompt("Enter receiver address:");
-        if (!to) 
-            throw 'Receiver address required';
-        
 
         // Prompt for amount
-        const amountStr = prompt("Enter amount to transfer:");
+        const amountStr = prompt("Enter amount to Burn:");
         if (!amountStr) 
             throw 'Amount required';
         
@@ -1010,8 +1096,9 @@ async function burnNFT(user,orc1155, tokenId) {
         
 
         // Enable wallet
-        const accounts = await ethereum.enable();
-        if(user!=accounts[0]) 
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        
+        if(user.trim().toLowerCase() !== accounts[0].toLowerCase())
             throw "Incorrect account selected";
         
 		window.web3T = new Web3(window.ethereum);
@@ -1023,27 +1110,141 @@ async function burnNFT(user,orc1155, tokenId) {
         if (amount > parseInt(balance)) 
             throw 'Insufficient NFT balance';
         
+        if(isforce) { 
+            // Send transfer
+            const tx = await orc1155contract.methods
+                .onTokenBurnByForce(tokenId, amount)
+                .send({ from: user });
 
-        // Send transfer
-        const tx = await orc1155contract.methods
-            .onTokenBurn(tokenId, amount)
-            .send({ from: user });
+            console.log(tx);
 
-        console.log(tx);
+            if (tx.status) 
+                alert("Burning succeeded");
+            else 
+                throw "Burning failed"; 
+        }
+        else { 
+            // Send transfer
+            const tx = await orc1155contract.methods
+                .onTokenBurn(tokenId, amount)
+                .send({ from: user });
 
-        if (tx.status) 
-            alert("Transfer succeeded");
-        else 
-            throw "Transfer failed"; 
+            console.log(tx);
+
+            if (tx.status) 
+                alert("Burning succeeded");
+            else 
+                throw "Burning failed"; 
+        }
     
 
     } catch (err) {
         console.error(err);
-        alert("Transfer failed: " + (err.message || err));
+        alert("Burning failed: " + (err.message || err));
     } 
         
     hideLoader();
     
+}
+
+async function loadNFTArchive(){
+
+    clearPanels();
+    const panel = addPanel("NFT Archive Events");
+
+    try{
+
+        const latestBlock = await web3.eth.getBlockNumber();
+
+        const minBlock = 3540411;
+        const step = 10000;
+
+        let allEvents = [];
+
+        for(let end = latestBlock; end >= minBlock; end -= step){
+
+            let start = end - step;
+
+            if(start < minBlock){
+                start = minBlock;
+            }
+
+            const events = await nftArchive.getPastEvents("NFTTransfer",{
+                fromBlock: start,
+                toBlock: end
+            });
+
+            allEvents = allEvents.concat(events);
+
+        }
+
+        if(allEvents.length === 0){
+            addRow(panel,"Result","No events found");
+            return;
+        }
+
+        /* sort latest first */
+
+        allEvents.sort((a,b)=> b.blockNumber - a.blockNumber);
+
+        for(const ev of allEvents){
+
+            const e = ev.returnValues;
+
+            const row = document.createElement("div");
+            row.className = "row";
+            row.style.display = "flex";
+            row.style.justifyContent = "space-between";
+            row.style.alignItems = "center";
+
+            const left = document.createElement("div");
+            left.style.display = "flex";
+            left.style.alignItems = "center";
+            left.style.gap = "6px";
+
+            const right = document.createElement("div");
+            right.style.display = "flex";
+            right.style.alignItems = "center";
+            right.style.gap = "6px";
+
+            const arrow = document.createElement("span");
+            arrow.innerText = "➜";
+
+            /* FROM → TO */
+
+            left.appendChild(renderAddressLongX(e.from));
+            left.appendChild(arrow);
+            left.appendChild(renderAddressLongX(e.to));
+
+            /* RIGHT SIDE INFO */
+
+            const info = document.createElement("span");
+
+            info.innerText =
+                "Block: "+ev.blockNumber+
+                " | TokenId: "+e.tokenId+
+                " | Amount: "+e.amount+
+                " | Sender:";
+
+            right.appendChild(info);
+
+            if(e.sender){
+                right.appendChild(renderAddress(e.sender));
+            }
+
+            row.appendChild(left);
+            row.appendChild(right);
+
+            panel.appendChild(row);
+        }
+
+    }
+    catch(err){
+        console.error(err);
+        addRow(panel,"Error","Failed to load events");
+    }
+
+    hideLoader();
 }
 
 async function connectWallet() {
