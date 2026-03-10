@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+<title>User Network Report</title>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+background:#fafafa;
+}
+
+h2{
+margin-bottom:10px;
+}
+
+input{
+width:420px;
+padding:8px;
+}
+
+button{
+padding:8px 15px;
+cursor:pointer;
+}
+
+table{
+border-collapse:collapse;
+margin-top:20px;
+width:100%;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#2c3e50;
+color:white;
+}
+
+.loading{color:blue;margin-top:10px;}
+.error{color:red;margin-top:10px;}
+
+.copybtn{
+margin-left:5px;
+cursor:pointer;
+border:none;
+background:none;
+font-size:14px;
+}
+
+.summary{
+margin-top:15px;
+padding:10px;
+background:#fff;
+border:1px solid #ddd;
+border-radius:6px;
+font-weight:bold;
+}
+
+/* Row colors */
+
+.rowUpline{
+background:#ffeaea;
+}
+
+.rowDownline{
+background:#e9ffe9;
+}
+
+/* Level badges */
+
+.levelUp{
+color:white;
+background:#d00000;
+padding:3px 8px;
+border-radius:4px;
+font-weight:bold;
+}
+
+.levelDown{
+color:white;
+background:#008000;
+padding:3px 8px;
+border-radius:4px;
+font-weight:bold;
+}
+
+/* Rank badge */
+
+.rankBadge{
+background:#4285f4;
+color:white;
+padding:3px 8px;
+border-radius:4px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>User Network Report</h2>
+
+<input type="text" id="nodeInput" placeholder="Enter Node Address (0x...)" />
+<button onclick="fetchData()">Fetch Data</button>
+
+<div id="status"></div>
+
+<div id="summary"></div>
+
+<div id="tableArea"></div>
+
+<script>
+
+/* ---------- Address Helpers ---------- */
+
+function shortAddr(addr){
+if(!addr) return '';
+return addr.slice(0,6)+'...'+addr.slice(-4);
+}
+
+function copyAddr(addr,btn){
+navigator.clipboard.writeText(addr);
+btn.innerText="✓";
+setTimeout(()=>{btn.innerText="📋";},1000);
+}
+
+function addrCell(addr){
+return `
+<span title="${addr}">
+${shortAddr(addr)}
+<button class="copybtn" onclick="copyAddr('${addr}',this)" title="Copy Address">📋</button>
+</span>
+`;
+}
+
+/* ---------- Level Badge ---------- */
+
+function levelBadge(level){
+
+if(level < 0){
+return `<span class="levelUp">${level}</span>`;
+}
+
+if(level > 0){
+return `<span class="levelDown">${level}</span>`;
+}
+
+return level;
+
+}
+
+/* ---------- Row Color ---------- */
+
+function rowClass(relation){
+
+if(relation==="UPLINE") return "rowUpline";
+if(relation==="DOWNLINE") return "rowDownline";
+
+return "";
+
+}
+
+/* ---------- API Fetch ---------- */
+
+async function fetchData(){
+
+const node=document.getElementById("nodeInput").value.trim();
+const statusDiv=document.getElementById("status");
+
+if(!node){
+statusDiv.innerHTML="<div class='error'>Enter node address</div>";
+return;
+}
+
+statusDiv.innerHTML="<div class='loading'>Loading...</div>";
+
+try{
+
+const api=`https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_user_downline&forprime=0&node=${node}`;
+
+const r=await fetch(api);
+const d=await r.json();
+
+statusDiv.innerHTML="";
+
+if(!d.success){
+statusDiv.innerHTML="<div class='error'>API returned error</div>";
+return;
+}
+
+/* ---------- Summary ---------- */
+
+let pageInfo=d.data[0][0];
+
+document.getElementById("summary").innerHTML=`
+<div class="summary">
+Page : ${pageInfo.page} |
+Page Size : ${pageInfo.pageSize} |
+Total Records : ${pageInfo.totalcount}
+</div>
+`;
+
+/* ---------- Table ---------- */
+
+let records=d.data[1];
+
+let table=`<table>
+<tr>
+<th>Relation</th>
+<th>Node</th>
+<th>Level</th>
+<th>Rank</th>
+<th>Business</th>
+<th>Qty</th>
+<th>Directs</th>
+</tr>`;
+
+records.forEach(item=>{
+
+table+=`
+<tr class="${rowClass(item.relation)}">
+<td>${item.relation}</td>
+<td>${addrCell(item.childNode)}</td>
+<td>${levelBadge(item.level)}</td>
+<td><span class="rankBadge">${item.rank}</span></td>
+<td>${item.userbusiness}</td>
+<td>${item.myQty}</td>
+<td>${item.directs}</td>
+</tr>
+`;
+
+});
+
+table+="</table>";
+
+document.getElementById("tableArea").innerHTML=table;
+
+}
+catch(e){
+
+statusDiv.innerHTML="<div class='error'>Error loading API</div>";
+console.error(e);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
