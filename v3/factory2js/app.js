@@ -100,8 +100,8 @@ async function init(){
     }
 
     hideLoader();
-    debugTransaction();
-    //scanBlocks(100); // scan last 20 blocks
+    //debugTransaction();
+    //scanBlocks(500); // scan last 20 blocks
 }
 
 async function scanBlocks(limit = 10) {
@@ -1186,14 +1186,14 @@ async function loadNFTArchive(){
         const latestBlock = await web3.eth.getBlockNumber();
 
         const minBlock = 3540411;
-        const step = 10000;
+        const step = 500;
 
         let allEvents = [];
 
         for(let end = latestBlock; end >= minBlock; end -= step){
 
             let start = end - step;
-
+             debugger;
             if(start < minBlock){
                 start = minBlock;
             }
@@ -1217,7 +1217,7 @@ async function loadNFTArchive(){
         allEvents.sort((a,b)=> b.blockNumber - a.blockNumber);
 
         for(const ev of allEvents){
-
+           
             const e = ev.returnValues;
 
             const row = document.createElement("div");
