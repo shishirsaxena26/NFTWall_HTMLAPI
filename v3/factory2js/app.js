@@ -771,6 +771,8 @@ async function loadUser() {
             const selfProposed = await stor.methods.selfProposed().call();
             addRow(panel, "Burned", formatOZN(burned));
             addRow(panel, "Self Proposed", formatOZN(selfProposed));
+
+            loadMyNFT();
         }
     }catch(err){
 
@@ -882,7 +884,7 @@ async function loadMarket(){
 
 async function loadMyNFT(){
 
-    clearPanels();
+    //clearPanels();
     const input = document.getElementById("userAddrInput");
     const user = input.value.trim();
   
@@ -905,7 +907,22 @@ async function loadMyNFT(){
 
     const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
     const mintCount = await storeContract.methods.mintCount().call();
+   
+    const lsbpanel = addPanel("LSB Amount");
 
+    let lsbindex = await storeContract.methods.dage().call();
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage LSB[${lsbindex}]: ${web3.utils.fromWei(lsbindex,"ether")}`
+    }));
+
+    lsbindex = await storeContract.methods.withdrawlDage().call();
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `WithdrawlDage LSB[${lsbindex}]: ${web3.utils.fromWei(lsbindex,"ether")}`
+    }));
+
+  
     for(let i=1; i<=mintCount; i++){
 
         const mint = await storeContract.methods.mints(i).call();
@@ -921,7 +938,7 @@ async function loadMyNFT(){
 
         const tokenId = await nft.methods.ids(0).call();
         const tokenName = await nft.methods.idToName(0).call();
-debugger;
+
         const mintedqty = await nft.methods.mintedqty().call();
         const mintedfee = await nft.methods.mintedfee().call();
         const mintedAge = await nft.methods.mintedAge().call();
@@ -964,7 +981,7 @@ debugger;
         right.innerHTML =
         "Balance: "+balance+
         " | Minted : "+mintedqty+
-        " | Fee: "+web3.utils.fromWei(mintedfee,"ether")+
+        " | Fee: "+Number(web3.utils.fromWei(mintedfee,"ether")).toFixed(3)+
         " | Age: "+mintedAge+" ";
         /* CHECKBOX */
 
@@ -1017,7 +1034,19 @@ debugger;
 
         panel.appendChild(row);
 
+        lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+            className: "row",
+            innerHTML: `Mint LSB[${parseInt(mintedAge)+2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(mintedAge)+2).call(),"ether")}`
+        }));
+        lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+            className: "row",
+            innerHTML: `Mint LSB[${parseInt(mintedAge)+2+600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(mintedAge)+2+600).call(),"ether")}`
+        }));
     }
+
+    
+    panel.appendChild(lsbpanel);
+     
 
     hideLoader();
 }
