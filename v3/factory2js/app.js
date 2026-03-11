@@ -41,7 +41,11 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
+const minBlock = 3560318;
+const step = 5000;
+
 async function init(){
+    //scanBlocks(50); // scan last 20 blocks
     IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
     ISafeguardABI = await fetch('abistandardv3/libSafeguard.sol/libSafeguard.json?v='+version).then(res => res.json());
     IHexBaseABI = await fetch('abistandardv3/hexBase.sol/hexBase.json?v='+version).then(res => res.json());
@@ -101,7 +105,7 @@ async function init(){
 
     hideLoader();
     //debugTransaction();
-    //scanBlocks(500); // scan last 20 blocks
+    //scanBlocks(50); // scan last 20 blocks
 }
 
 async function scanBlocks(limit = 10) {
@@ -931,7 +935,7 @@ async function loadMyNFT(){
         const nft = new web3.eth.Contract(IORC1155ABI.abi, nftAddr);
 
         const mintedUser = await nft.methods.mintedUser().call();
-
+        debugger;
         if(mintedUser.toLowerCase() !== user.toLowerCase()){
             continue;
         }
@@ -942,7 +946,7 @@ async function loadMyNFT(){
         const mintedqty = await nft.methods.mintedqty().call();
         const mintedfee = await nft.methods.mintedfee().call();
         const mintedAge = await nft.methods.mintedAge().call();
-        const clonnedOf = await nft.methods.clonnedOf().call();
+        const clonedOf = await nft.methods.clonedOf().call();
         const balance = await nft.methods.balanceOf(user, tokenId).call();
 
         const uri = await nft.methods.uri(tokenId).call();
@@ -973,7 +977,7 @@ async function loadMyNFT(){
         rowTop.appendChild(img);
         rowTop.appendChild(renderAddress(nftAddr));
         rowTop.appendChild(idText);
-        rowTop.appendChild(renderAddress(clonnedOf));
+        rowTop.appendChild(renderAddress(clonedOf));
         left.appendChild(rowTop);
 
         const right=document.createElement("div");
@@ -1185,15 +1189,13 @@ async function loadNFTArchive(){
 
         const latestBlock = await web3.eth.getBlockNumber();
 
-        const minBlock = 3540411;
-        const step = 500;
-
+        
         let allEvents = [];
 
         for(let end = latestBlock; end >= minBlock; end -= step){
 
             let start = end - step;
-             debugger;
+            
             if(start < minBlock){
                 start = minBlock;
             }
@@ -1207,10 +1209,8 @@ async function loadNFTArchive(){
 
         }
 
-        if(allEvents.length === 0){
-            addRow(panel,"Result","No events found");
-            return;
-        }
+        if(allEvents.length === 0)
+            throw new Error("No events found");
 
         /* sort latest first */
 
@@ -1270,6 +1270,7 @@ async function loadNFTArchive(){
     }
     catch(err){
         console.error(err);
+        addRow(panel,"Error", err.message);
         addRow(panel,"Error","Failed to load events");
     }
 
