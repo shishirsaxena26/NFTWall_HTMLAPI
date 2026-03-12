@@ -513,8 +513,8 @@ function updatePanelWithInstance(instance){
 
 async function joinUser() {
         try {
-            const input = document.getElementById("userAddrInput");
-            const parent = input.value.trim();
+            const _p = prompt("Enter parent address:");
+            const parent = _p.trim();
             if (!parent || !web3.utils.isAddress(parent)) {
                 alert("Enter a valid parent");
                 return;
