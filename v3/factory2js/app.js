@@ -1281,8 +1281,21 @@ async function loadValidatorPage() {
     clearPanels();
     const panel = addPanel("Validator Module");
     try {
-    
-    }
+        
+        const btnGetValidator=document.createElement("button");
+        btnGetValidator.innerText="GetValidatorInfo";
+        btnGetValidator.style.marginLeft="10px";
+       
+        btnGetValidator.onclick = () => {
+            const _v = prompt("Enter validator address:");
+            const validatorAdd = _v.trim();
+            if (!validatorAdd || !web3.utils.isAddress(validatorAdd)) {
+                alert("Enter a valid validator");
+                return;
+            }
+        };
+
+    }   
     catch(err){
         console.error(err);
         addRow(panel,"Error", err.message);
