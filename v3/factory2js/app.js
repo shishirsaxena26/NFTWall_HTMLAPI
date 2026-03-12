@@ -1281,7 +1281,11 @@ async function loadValidatorPage() {
     clearPanels();
     const panel = addPanel("Validator Module");
     try {
-        
+        const row=document.createElement("div");
+        row.className="row";
+
+        const left = document.createElement("div");
+
         const btnGetValidator=document.createElement("button");
         btnGetValidator.innerText="GetValidatorInfo";
         btnGetValidator.style.marginLeft="10px";
@@ -1294,6 +1298,10 @@ async function loadValidatorPage() {
                 return;
             }
         };
+
+        left.appendChild(btnGetValidator);
+        row.appendChild(left);
+        panel.appendChild(row);
 
     }   
     catch(err){
