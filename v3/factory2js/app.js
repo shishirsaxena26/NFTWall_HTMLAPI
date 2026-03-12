@@ -1277,6 +1277,23 @@ async function loadNFTArchive(){
     hideLoader();
 }
 
+async function loadValidatorPage() {
+    clearPanels();
+    const panel = addPanel("Validator Module");
+    try {
+    
+    }
+    catch(err){
+        console.error(err);
+        addRow(panel,"Error", err.message);
+        addRow(panel,"Error","Failed to Validator Module");
+    }
+
+    hideLoader();
+}
+
+
+
 async function connectWallet() {
     currentAccount = null;
     currentInstance = null;
