@@ -142,27 +142,51 @@
 
 <p><strong>Description:</strong> Fetches the income summary for a validator node.</p>
 
+<h2>10. Validator Delegator Details</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_validator_deligator&delegator=0x91c4f43ddfc18af09e807fb761e6a791b4b0bf0c</pre>
+
+<p><strong>Description:</strong> GET All associated Validator of Delegator.</p>
+
+<h2>11. Validator Delegator Mapping (POST)</h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/dacct-proc?procedureName=mapDelegatorValidator&validator=0x6C4c76A13666d227fB605f49D898f800c09eb9d8&deligator=0x6C4c76A13666d227fB605f49D898f800c09eb9d8&node=0x6C4c76A13666d227fB605f49D898f800c09eb9d8&status=1</pre>
+
+<p><strong>Description:</strong> Map Validator Delegator and Node mapping.</p>
+
 <script>
-  document.querySelectorAll('pre').forEach(pre => {
-    const button = document.createElement('button');
-    button.className = 'copy-btn';
-    button.textContent = 'Copy';
+document.querySelectorAll('pre').forEach(pre => {
 
-    const tooltip = document.createElement('span');
-    tooltip.className = 'tooltip';
-    tooltip.textContent = 'COPIED';
+  // store original text before adding button
+  const textToCopy = pre.textContent.trim();
 
-    pre.appendChild(button);
-    pre.appendChild(tooltip);
+  const button = document.createElement('button');
+  button.className = 'copy-btn';
+  button.textContent = 'Copy';
 
-    button.addEventListener('click', () => {
-      navigator.clipboard.writeText(pre.innerText.replace('Copy', '').trim())
-        .then(() => {
-          tooltip.classList.add('show');
-          setTimeout(() => tooltip.classList.remove('show'), 1500);
-        });
-    });
+  const tooltip = document.createElement('span');
+  tooltip.className = 'tooltip';
+  tooltip.textContent = 'Copied!';
+
+  pre.appendChild(button);
+  pre.appendChild(tooltip);
+
+  button.addEventListener('click', async () => {
+
+    await navigator.clipboard.writeText(textToCopy);
+
+    // animation
+    tooltip.classList.add('show');
+    button.textContent = "✓";
+
+    setTimeout(() => {
+      tooltip.classList.remove('show');
+      button.textContent = "Copy";
+    },1500);
+
   });
+
+});
 </script>
 
 </body>
