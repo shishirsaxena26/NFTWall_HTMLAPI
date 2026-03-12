@@ -1,6 +1,9 @@
 let web3;
 web3 = new Web3(provider);
 
+let web3Main;
+web3Main = new Web3(providerMain);
+
 var BN = web3.utils.BN;
 var bs1 = new web3.utils.BN("0");
 
@@ -36,7 +39,7 @@ let daocore;
 let daoassembly;
 let transferRequests;
 let nftArchive;
-
+let validator;
 let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
@@ -86,6 +89,8 @@ async function init(){
         await priceContract.methods.ozonePriceInUSDT().call()
     );
 
+    validator = new web3Main.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
+   
     inNftArchive = await hexBase.methods.inNftArchive().call();
     nftArchive = new web3.eth.Contract(INFTArchiveABI.abi, inNftArchive);
     
@@ -1286,20 +1291,92 @@ async function loadValidatorPage() {
 
         const left = document.createElement("div");
 
-        const btnGetValidator=document.createElement("button");
-        btnGetValidator.innerText="GetValidatorInfo";
-        btnGetValidator.style.marginLeft="10px";
+        const btnGetDeligator=document.createElement("button");
+        btnGetDeligator.innerText="Get Deligator Info";
+        btnGetDeligator.style.marginLeft="10px";
        
-        btnGetValidator.onclick = () => {
-            const _v = prompt("Enter validator address:");
-            const validatorAdd = _v.trim();
-            if (!validatorAdd || !web3.utils.isAddress(validatorAdd)) {
-                alert("Enter a valid validator");
-                return;
+        btnGetDeligator.onclick = async () => {
+            try {
+                const _v = prompt("Enter deligator address:");
+                const deligatorAdd = _v.trim();
+                if (!deligatorAdd || !web3.utils.isAddress(deligatorAdd)) {
+                    alert("Enter a valid deligatorAdd");
+                    return;
+                }
+                debugger;
+                // Enable wallet
+                //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                
+                //if(currentAccount.trim().toLowerCase() !== accounts[0].toLowerCase())
+                //    throw "Incorrect account selected";
+                
+                // Initialize contract
+                //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
+                
+                const isDelegator = await validator.methods.isDelegator(deligatorAdd).call();
+                const deluser = await validator.methods.getUser(deligatorAdd).call();
+                const subrow=document.createElement("div");
+                subrow.className="row";
+
+                const right=document.createElement("div");
+                right.innerHTML =
+                "Deligator: "+deligatorAdd+" | isDelegator: "+isDelegator+" | "+ "User: "+deluser+" ";
+                
+                subrow.appendChild(right);
+                panel.appendChild(subrow);
+            }
+            catch(err){
+                console.error(err);
+                addRow(panel,"Error", err.message);
+                addRow(panel,"Error","Failed to Deligator Module");
             }
         };
 
-        left.appendChild(btnGetValidator);
+        left.appendChild(btnGetDeligator);
+        
+        const btnGetUserDeligator=document.createElement("button");
+        btnGetUserDeligator.innerText="Get User's Deligator";
+        btnGetUserDeligator.style.marginLeft="10px";
+
+        btnGetUserDeligator.onclick = async () => {
+            try {
+                const _u = prompt("Enter User address:");
+                const userAdd = _u.trim();
+                if (!userAdd || !web3.utils.isAddress(userAdd)) {
+                    alert("Enter a valid userAdd");
+                    return;
+                }
+                debugger;
+                // Enable wallet
+                //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                
+                //if(currentAccount.trim().toLowerCase() !== accounts[0].toLowerCase())
+                //    throw "Incorrect account selected";
+                
+                // Initialize contract
+                //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
+                
+                
+                const delegatorAdd = await validator.methods.getDelegator(userAdd).call();
+                const subrow=document.createElement("div");
+                subrow.className="row";
+
+                const right=document.createElement("div");
+                right.innerHTML =
+                "User: "+userAdd+" | Delegator: "+delegatorAdd +" ";
+                
+                subrow.appendChild(right);
+                panel.appendChild(subrow);
+            }
+            catch(err){
+                console.error(err);
+                addRow(panel,"Error", err.message);
+                addRow(panel,"Error","Failed to Deligator Module");
+            }
+        };
+
+        left.appendChild(btnGetUserDeligator);
+
         row.appendChild(left);
         panel.appendChild(row);
 
