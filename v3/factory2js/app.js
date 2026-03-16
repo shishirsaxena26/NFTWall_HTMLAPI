@@ -1208,7 +1208,7 @@ async function burnNFT(user,orc1155, tokenId, isforce) {
 
         console.log(payload);
 
-        debugger
+        
         if(isforce) { 
             // Send transfer
             const tx = await orc1155contract.methods
