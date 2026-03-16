@@ -18,7 +18,7 @@ let IInstanceStorABI = {};
 let IDAOCoreABI = {};
 let IDAOAssemblyABI = {};
 let ITransferRequestsABI = {};
-let INFTArchiveABI = {};
+let INFTProxyABI = {};
 
 let inprice = {};
 let insafeguard = {};
@@ -30,7 +30,7 @@ let inORC1155 = {};
 let indaocore = {};
 let indaoassembly = {};
 let inproposals = [];
-let inNftArchive = {};
+let inNftProxy = {};
 
 let nested;
 let rule;
@@ -38,14 +38,15 @@ let safeguard;
 let daocore;
 let daoassembly;
 let transferRequests;
-let nftArchive;
+let nftProxy;
 let validator;
 let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const minBlock = 3560318;
+const minBlock = 3643181;
 const step = 5000;
+
 
 async function init(){
     //scanBlocks(50); // scan last 20 blocks
@@ -60,11 +61,11 @@ async function init(){
     IDAOCoreABI = await fetch('abistandardv3/DAOCore.sol/DAOCore.json?v='+version).then(res => res.json());
     IDAOAssemblyABI = await fetch('abistandardv3/DAOAssembly.sol/DAOAssembly.json?v='+version).then(res => res.json());
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v='+version).then(res => res.json());
-    INFTArchiveABI = await fetch('abistandardv3/NFTArchive.sol/NFTArchive.json?v='+version).then(res => res.json());
+    INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v='+version).then(res => res.json());
      
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
-
+    
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
 
@@ -91,8 +92,8 @@ async function init(){
 
     validator = new web3Main.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
    
-    inNftArchive = await hexBase.methods.inNftArchive().call();
-    nftArchive = new web3.eth.Contract(INFTArchiveABI.abi, inNftArchive);
+    inNftProxy = await hexBase.methods.inNftProxy().call();
+    nftProxy = new web3.eth.Contract(INFTProxyABI.abi, inNftProxy);
     
     currentAccount = null;
     currentInstance = null;
@@ -104,13 +105,48 @@ async function init(){
                 currentAccount = accounts[0];
                 showWallet();
                 await addConnectedUserPanel();
+              
             }
         });
     }
-
+   
     hideLoader();
-    //debugTransaction();
+     
+    debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
+}
+
+
+
+async function _callpayload(){
+    const data = web3.eth.abi.encodeFunctionCall({
+            name: "subscribed",
+            type: "function",
+            inputs: [
+                {type: "address", name: "_user"}
+            ]
+            }, ["0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8"]);
+
+        const payload = web3.eth.abi.encodeParameters(
+            ["address", "bytes"],
+            ["0xFcb3B3914e3E93040884696De45fb99b1a8Cbb90", data]
+        );
+        
+            window.web3T = new Web3(window.ethereum);
+        // Initialize contract
+        const hexcontract = new web3T.eth.Contract(IHexBaseABI.abi, inhexBase);
+            // Send transfer
+            const tx = await hexcontract.methods
+                .onTokenTransfer(payload)
+                .send({ from: currentAccount });
+
+            console.log(tx);
+
+            if (tx.status) 
+                alert("Burning succeeded");
+            else 
+                throw "Burning failed"; 
+      
 }
 
 async function scanBlocks(limit = 10) {
@@ -150,7 +186,7 @@ async function scanBlocks(limit = 10) {
 }
 
 async function debugTransaction() {
-    const txHash = "0xf2f31bb35e2e5a288666ed0901d6d2fa230ba16a33ebb805184347e9a1dae525";
+    const txHash = "0xa4de0d0d4355b21d9158ead76af831b1505de7d99b10ac543eb7293f66592501";
     web3.currentProvider.send(
     {
         jsonrpc: "2.0",
@@ -381,7 +417,8 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelBase,"proposal(0)",prop0);
     const inst = await hexBase.methods.inInstance().call();
     addRow(panelBase,"instance",inst);
-
+    const nftproxy = await hexBase.methods.inNftProxy().call();
+    addRow(panelBase,"NFTProxy",nftproxy);
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
     addRow(panelTreasury,"Factory",factory);
@@ -579,7 +616,7 @@ async function initUser(){
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
         if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
-        debugger;
+        
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
@@ -614,7 +651,7 @@ async function importUser() {
         const userId = await nested.methods.UserToId(currentAccount).call();
         if(userId==0) { alert("Invalid user"); return;}
         const limit = 5; // change according to your import batch size
-        debugger;
+        
         const nestedcontract = new web3T.eth.Contract(
             INested741ABI.abi,
             inNested741
@@ -672,7 +709,7 @@ async function buyNFT(o1155, tokenId){
                             .computeMintValue(qty)
                             .call()
                         );
-                              debugger;
+                              
                         // check bonus
                         let bonus = BigInt(
                             await storcontract.methods
@@ -682,7 +719,7 @@ async function buyNFT(o1155, tokenId){
 
                         // reduce bonus
                         value = bonus >= value ? 0n : (value - bonus);
-                        debugger;
+                        
                         // execute transaction
                         await instancecontract.methods
                             .Txn(o1155,tokenId,qty,1)
@@ -823,7 +860,7 @@ async function loadMarket(){
 
             try{
 
-                const tokenName = await orc1155.methods.idToName(i).call();
+                const tokenName = await orc1155.methods.names(i-1).call();
 
                 if(!tokenName){
                     flag=false;
@@ -940,13 +977,13 @@ async function loadMyNFT(){
         const nft = new web3.eth.Contract(IORC1155ABI.abi, nftAddr);
 
         const mintedUser = await nft.methods.mintedUser().call();
-        debugger;
+        
         if(mintedUser.toLowerCase() !== user.toLowerCase()){
             continue;
         }
 
         const tokenId = await nft.methods.ids(0).call();
-        const tokenName = await nft.methods.idToName(0).call();
+        const tokenName = await nft.methods.names(0).call();
 
         const mintedqty = await nft.methods.mintedqty().call();
         const mintedfee = await nft.methods.mintedfee().call();
@@ -1148,10 +1185,34 @@ async function burnNFT(user,orc1155, tokenId, isforce) {
         if (amount > parseInt(balance)) 
             throw 'Insufficient NFT balance';
         
+        //function subscribed(address _user) 
+        const target = "0x9c00f73eE2751610F1590202C53A0543Aa374dd8";
+
+        // encode function call
+        const data = web3.eth.abi.encodeFunctionCall(
+        {
+            name: "subscribed",
+            type: "function",
+            inputs: [
+                { type: "address", name: "_user" }
+            ]
+        },
+        [user]
+        );
+
+        // build payload = target + calldata
+        const payload =
+            "0x" +
+            target.slice(2) +
+            data.slice(2);
+
+        console.log(payload);
+
+        debugger
         if(isforce) { 
             // Send transfer
             const tx = await orc1155contract.methods
-                .onTokenBurnByForce(tokenId, amount)
+                .onTokenBurnByForce(tokenId, amount, payload)
                 .send({ from: user });
 
             console.log(tx);
@@ -1197,20 +1258,59 @@ async function loadNFTArchive(){
         
         let allEvents = [];
 
-        for(let end = latestBlock; end >= minBlock; end -= step){
+        const transferSingleTopic = web3.utils.sha3(
+            "TransferSingle(address,address,address,uint256,uint256)"
+        );
+
+        for (let end = latestBlock; end >= minBlock; end -= step) {
 
             let start = end - step;
-            
-            if(start < minBlock){
-                start = minBlock;
+            if (start < minBlock) start = minBlock;
+
+            for (let block = start; block <= end; block++) {
+                
+                const blockData = await web3.eth.getBlock(block, true);
+                if (!blockData || !blockData.transactions) continue;
+
+                for (const tx of blockData.transactions) {
+
+                    const receipt = await web3.eth.getTransactionReceipt(tx.hash);
+                    if (!receipt || !receipt.logs) continue;
+
+                    for (const log of receipt.logs) {
+                        
+                        if (log.topics[0] === transferSingleTopic) {
+                            
+                            const operator = "0x" + log.topics[1].slice(26);
+                            const from = "0x" + log.topics[2].slice(26);
+                            const to = "0x" + log.topics[3].slice(26);
+
+                            const decoded = web3.eth.abi.decodeParameters(
+                                ["uint256", "uint256"],
+                                log.data
+                            );
+
+                            const id = decoded[0];
+                            const value = decoded[1];
+
+                            allEvents.push({
+                                contract: log.address,
+                                operator,
+                                from,
+                                to,
+                                id,
+                                value,
+                                blockNumber: receipt.blockNumber,
+                                txHash: receipt.transactionHash
+                            });
+
+                        }
+
+                    }
+
+                }
+
             }
-
-            const events = await nftArchive.getPastEvents("NFTTransfer",{
-                fromBlock: start,
-                toBlock: end
-            });
-
-            allEvents = allEvents.concat(events);
 
         }
 
@@ -1246,9 +1346,9 @@ async function loadNFTArchive(){
 
             /* FROM → TO */
 
-            left.appendChild(renderAddressLongX(e.from));
+            left.appendChild(renderAddressLongX(ev.from));
             left.appendChild(arrow);
-            left.appendChild(renderAddressLongX(e.to));
+            left.appendChild(renderAddressLongX(ev.to));
 
             /* RIGHT SIDE INFO */
 
@@ -1256,15 +1356,15 @@ async function loadNFTArchive(){
 
             info.innerText =
                 "Block: "+ev.blockNumber+
-                " | TokenId: "+e.tokenId+
-                " | Amount: "+e.amount+
+                " | TokenId: "+ev.id+
+                " | Amount: "+ev.value+
                 " | Sender:";
 
             right.appendChild(info);
 
-            if(e.sender){
+            /*if(e.sender){
                 right.appendChild(renderAddress(e.sender));
-            }
+            }*/
 
             row.appendChild(left);
             row.appendChild(right);
@@ -1303,7 +1403,7 @@ async function loadValidatorPage() {
                     alert("Enter a valid deligatorAdd");
                     return;
                 }
-                debugger;
+                
                 // Enable wallet
                 //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
                 
@@ -1346,7 +1446,7 @@ async function loadValidatorPage() {
                     alert("Enter a valid userAdd");
                     return;
                 }
-                debugger;
+                
                 // Enable wallet
                 //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
                 
