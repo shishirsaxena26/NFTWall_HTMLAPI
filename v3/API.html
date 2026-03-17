@@ -156,9 +156,15 @@
 
 <h2>12. NFT Events </h2>
 <p><strong>Endpoint:</strong></p>
-<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_NFT_events&from=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8&to=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8</pre>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_NFT_events&from=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8&to=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8&block=3643324&orc1155=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8&tokenId=1</pre>
 
-<p><strong>Description:</strong> GET NFT Events. {from} - optional,  {to} - optional</p>
+<p><strong>Description:</strong> GET NFT Events. {from} - optional,  {to} - optional, {block} - optional, {orc1155} - optional, {tokenId} - optional </p>
+
+<h2>13. NFT Balance </h2>
+<p><strong>Endpoint:</strong></p>
+<pre>https://api.nftwall.io:2096/api/call-proc?procedureName=get_NFT_balance&node=0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8&</pre>
+
+<p><strong>Description:</strong> GET NFT balance. {node} - user address </p>
 
 <script>
 document.querySelectorAll('pre').forEach(pre => {

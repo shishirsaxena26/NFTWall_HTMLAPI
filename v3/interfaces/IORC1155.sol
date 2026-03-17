@@ -50,6 +50,7 @@ interface IORC1155 {
     function getUnlockedNFT() external view returns (uint256 _NFT);
     function ids(uint256) external view returns (uint256);
     function isApprovedForAll(address account, address operator) external view returns (bool);
+    function isSecuredNFT(address orc1155) external view returns (bool);
     function lastTransferDay() external view returns (uint256);
     function mintedAge() external view returns (uint256);
     function mintedUser() external view returns (address);
@@ -59,8 +60,9 @@ interface IORC1155 {
     function names(uint256) external view returns (string memory);
     function onTokenBurn(uint256 _id, uint256 _qty, bytes memory payload) external;
     function onTokenBurnByForce(uint256 _id, uint256 _qty, bytes memory payload) external;
-    function onTokenTransfer(address from, address to, uint256 _id, uint256 _qty, bytes memory payload) external;
-    function onTokenTransferByForce(address to, uint256 _id, uint256 _qty, bytes memory payload) external;
+    function onTokenTransfer(address _from, address _to, uint256 _id, uint256 _qty, bytes memory payload) external;
+    function onTokenTransferByForce(address _from, address _to, uint256 _id, uint256 _qty, bytes memory payload)
+        external;
     function owner() external view returns (address);
     function postinit(
         string memory _contractName,

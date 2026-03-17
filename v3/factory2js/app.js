@@ -112,7 +112,7 @@ async function init(){
    
     hideLoader();
      
-    debugTransaction();
+    //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 }
 
@@ -1208,11 +1208,12 @@ async function burnNFT(user,orc1155, tokenId, isforce) {
 
         console.log(payload);
 
+        const payload1 ='0x';
         
         if(isforce) { 
             // Send transfer
             const tx = await orc1155contract.methods
-                .onTokenBurnByForce(tokenId, amount, payload)
+                .onTokenBurnByForce(tokenId, amount, payload1)
                 .send({ from: user });
 
             console.log(tx);
