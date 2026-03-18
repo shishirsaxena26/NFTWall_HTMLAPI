@@ -44,7 +44,7 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const minBlock = 3643181;
+const minBlock = 3653181;
 const step = 5000;
 
 
@@ -111,12 +111,20 @@ async function init(){
     }
    
     hideLoader();
-     
+    name(); 
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 }
 
-
+async function name() {
+ 
+    const orc1155contract = new web3.eth.Contract(IORC1155ABI.abi,"0xC9627f194Cb4Ed859132F3f9D0E0577ee9c9f443");
+    const events = await orc1155contract.getPastEvents("TransferSingle", {
+    fromBlock: minBlock,
+    toBlock: parseInt(minBlock)+10000
+    });
+    console.log(events);
+}
 
 async function _callpayload(){
     const data = web3.eth.abi.encodeFunctionCall({
