@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
 <html>
+<meta charset="UTF-8">
 <head>
   <title>Above Rank 5 Users Report</title>
 
@@ -72,9 +74,12 @@
 <div id="tabContents"></div>
 
 <script>
-const apiUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_5Star_user";
+const baseUrl = "https://api.nftwall.io:2096/api/call-proc?procedureName=get_rpt_5Star_user";
 
-fetch(apiUrl)
+let mainData = [];
+
+/* ---------------- LOAD MAIN DATA ---------------- */
+fetch(baseUrl)
   .then(res => res.json())
   .then(apiResponse => {
     document.getElementById("loading").style.display = "none";
@@ -84,81 +89,205 @@ fetch(apiUrl)
       return;
     }
 
-    const tabsDiv = document.getElementById("tabs");
-    const contentsDiv = document.getElementById("tabContents");
+    mainData = apiResponse.data[0] || [];
 
-    tabsDiv.style.display = "block";
-
-    apiResponse.data.forEach((dataset, index) => {
-      if (!dataset.length) return;
-
-      /* ---------- TAB NAME ---------- */
-      const tabName = index === 0 ? "Main" : "Set " + index;
-
-      /* ---------- TAB BUTTON ---------- */
-      const tabBtn = document.createElement("button");
-      tabBtn.className = "tab-btn";
-      tabBtn.textContent = tabName;
-      tabBtn.onclick = () => activateTab(index);
-      tabsDiv.appendChild(tabBtn);
-
-      /* ---------- TAB CONTENT ---------- */
-      const tabContent = document.createElement("div");
-      tabContent.className = "tab-content";
-      tabContent.id = "tab-" + index;
-
-      const table = document.createElement("table");
-      const thead = document.createElement("thead");
-      const tbody = document.createElement("tbody");
-
-      /* ---------- HEADER ---------- */
-      const keys = Object.keys(dataset[0]);
-      const headerRow = document.createElement("tr");
-      keys.forEach(k => {
-        const th = document.createElement("th");
-        th.textContent = k;
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
-
-      /* ---------- BODY ---------- */
-      dataset.forEach(row => {
-        const tr = document.createElement("tr");
-
-        if (row.childNode === "DOWNLINE_TOTAL") {
-          tr.classList.add("total");
-        }
-
-        keys.forEach(k => {
-          const td = document.createElement("td");
-          td.textContent = row[k] ?? "";
-          tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-      });
-
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      tabContent.appendChild(table);
-      contentsDiv.appendChild(tabContent);
-    });
-
-    activateTab(0); // open Main tab by default
+    renderMainTab(mainData);
+    createNodeTabs(mainData);
   })
   .catch(err => {
     document.getElementById("loading").textContent = "Failed to load data.";
-    console.error("API error:", err);
+    console.error(err);
   });
 
-function activateTab(index) {
-  document.querySelectorAll(".tab-btn").forEach((btn, i) => {
-    btn.classList.toggle("active", i === index);
+/* ---------------- RENDER MAIN TAB ---------------- */
+function renderMainTab(data) {
+  const tabsDiv = document.getElementById("tabs");
+  const contentsDiv = document.getElementById("tabContents");
+
+  tabsDiv.style.display = "block";
+
+  const btn = document.createElement("button");
+  btn.className = "tab-btn active";
+  btn.textContent = "Main";
+  btn.onclick = () => activateTab("tab-main");
+  tabsDiv.appendChild(btn);
+
+  const content = document.createElement("div");
+  content.className = "tab-content active";
+  content.id = "tab-main";
+
+  content.appendChild(createTable(data));
+  contentsDiv.appendChild(content);
+}
+
+/* ---------------- CREATE NODE TABS ---------------- */
+function createNodeTabs(data) {
+  const tabsDiv = document.getElementById("tabs");
+
+  const nodes = [...new Set(data.map(x => x.node))];
+
+  nodes.forEach(node => {
+    const short = node.slice(0, 6) + "..." + node.slice(-4);
+
+    const btn = document.createElement("button");
+    btn.className = "tab-btn";
+    btn.textContent = short;
+
+    btn.onclick = () => loadNodeHistory(node, short);
+
+    tabsDiv.appendChild(btn);
+  });
+}
+
+/* ---------------- LOAD NODE HISTORY ---------------- */
+function loadNodeHistory(node, label) {
+  const tabId = "tab-" + label;
+
+  activateTab(tabId);
+
+  if (document.getElementById(tabId)) return;
+
+  const contentsDiv = document.getElementById("tabContents");
+
+  const content = document.createElement("div");
+  content.className = "tab-content";
+  content.id = tabId;
+  content.innerHTML = "<div class='loading'>Loading history...</div>";
+
+  contentsDiv.appendChild(content);
+
+  const url = baseUrl + `&node=${node}&days=5`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(apiResponse => {
+      if (!apiResponse.success) {
+        content.innerHTML = "Failed to load data";
+        return;
+      }
+
+      const data = apiResponse.data[0] || [];
+      content.innerHTML = "";
+      content.appendChild(createTable(data));
+    })
+    .catch(err => {
+      content.innerHTML = "Error loading data";
+      console.error(err);
+    });
+}
+
+/* ---------------- TABLE ---------------- */
+function createTable(dataset) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
+  if (!dataset.length) return table;
+
+  const headers = [
+    "nodeId",
+    "node",
+    "My Business",
+    "Team Business",
+    "MyQty",
+    "TeamQty",
+    "Directs",
+    "TeamCount",
+    "Date"
+  ];
+
+  const headerRow = document.createElement("tr");
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
   });
 
-  document.querySelectorAll(".tab-content").forEach((div, i) => {
-    div.classList.toggle("active", i === index);
+  thead.appendChild(headerRow);
+
+  dataset.forEach(row => {
+    const tr = document.createElement("tr");
+
+    addCell(tr, row.nodeId);
+    addCell(tr, shortAddr(row.node));
+
+    tr.appendChild(createTrendCell(row.mybusiness, row.mybusiness_diff));
+    tr.appendChild(createTrendCell(row.teambusiness, row.teambusiness_diff));
+
+    tr.appendChild(createTrendCell(row.myQty, row.myQty_diff));
+    tr.appendChild(createTrendCell(row.teamQty, row.teamQty_diff));
+
+    tr.appendChild(createTrendCell(row.directs, row.directs_diff));
+    tr.appendChild(createTrendCell(row.teamcount, row.teamcount_diff));
+
+    addCell(tr, row.date);
+
+    tbody.appendChild(tr);
   });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  return table;
+}
+
+/* ---------------- CELL HELPERS ---------------- */
+function addCell(tr, value) {
+  const td = document.createElement("td");
+  td.textContent = value ?? "";
+  tr.appendChild(td);
+}
+
+function shortAddr(addr) {
+  if (!addr) return "";
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
+
+/* ---------------- TREND CELL ---------------- */
+function createTrendCell(value, diff) {
+  const td = document.createElement("td");
+
+  diff = Number(diff ?? 0);
+
+  const main = document.createElement("div");
+  main.textContent = Number(value || 0).toLocaleString();
+  main.style.fontWeight = "600";
+
+  const trend = document.createElement("div");
+
+  if (diff > 0) {
+    trend.innerHTML = `▲ +${diff}`;
+    trend.style.color = "#16a34a";
+  } else if (diff < 0) {
+    trend.innerHTML = `▼ ${diff}`;
+    trend.style.color = "#dc2626";
+  } else {
+    trend.innerHTML = `– 0`;
+    trend.style.color = "#6b7280";
+  }
+
+  trend.style.fontSize = "11px";
+
+  td.appendChild(main);
+  td.appendChild(trend);
+
+  return td;
+}
+
+/* ---------------- TAB SWITCH ---------------- */
+function activateTab(id) {
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    if (id === "tab-main" && btn.textContent === "Main") {
+      btn.classList.add("active");
+    } else if (btn.textContent.includes(id.replace("tab-", ""))) {
+      btn.classList.add("active");
+    }
+  });
+
+  const tab = document.getElementById(id);
+  if (tab) tab.classList.add("active");
 }
 </script>
 
