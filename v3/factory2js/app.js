@@ -440,7 +440,9 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelTreasury,"TVL Tour",tour);
     const val = await hexBase.methods.inTreaseryTVLValidator().call();
     addRow(panelTreasury,"TVL Validator",val);
-
+    const panelByteCode = addPanel("BYTECODE");
+    addRow(panelByteCode,"Bytecode", byteCodeStandard);
+    
     const panelSecure = addPanel("SECUREBASE");
     const safe = await safeguard.methods.isSecureBase(insafeguard).call();
     addRow(panelSecure,"safeguard",safe);
@@ -1099,8 +1101,11 @@ async function loadMyNFT(){
     }
 
     
-    panel.appendChild(lsbpanel);
-     
+  
+     const levelpanel = addPanel("Level Business");
+
+
+
 
     hideLoader();
 }

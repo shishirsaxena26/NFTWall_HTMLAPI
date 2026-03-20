@@ -163,21 +163,27 @@ pre#output {
   const ws = new WebSocket(`wss://${WS_HOST}/ws/?userid=${USER_ID}`);
 
   ws.onopen = () => {
-      appendLog(`✅ WebSocket connected for ${USER_ID}`);
+      appendLog(`✅ WebSocket host connected for ${USER_ID}`);
+      appendLog(`⚠️ Waiting for response...(5s..)`);
   };
 
   ws.onmessage = (event) => {
       // Filter logs for this user (simpler check)
+     
+     
       let data;
         try {
             data = JSON.parse(event.data);
+            data = JSON.parse(data.data);
+             debugger;
         } catch {
+           debugger;
             return; // ignore non-JSON messages
         }
 
         if (data.userId !== USER_ID) return;
 
-        data.logs.forEach(line => appendLog(line));
+        data.logs.forEach(line => appendLog(JSON.parse(line)));
   };
 
   ws.onerror = (err) => {

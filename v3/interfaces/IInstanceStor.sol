@@ -71,6 +71,7 @@ interface IInstanceStor {
         returns (uint256 p1, uint256 p2, uint256 p3, uint256 p4, uint256 p5, uint256 p6, uint256 p7);
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
+    function getNodeLB(uint256 _level) external view returns (uint256, uint256);
     function id() external view returns (uint256);
     function inc(uint256) external view returns (uint256);
     function isCap() external view returns (bool);
