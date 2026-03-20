@@ -442,9 +442,13 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelTreasury,"TVL Validator",val);
     const panelByteCode = addPanel("BYTECODE");
     addRow(panelByteCode,"Bytecode", byteCodeStandard);
+    addRow(panelByteCode,"Download ABI", "https://drive.google.com/drive/folders/1O4J0hFtdSdbBcDyA5SxrLUOM8NqtQl0-");
     
+
     const panelSecure = addPanel("SECUREBASE");
     const safe = await safeguard.methods.isSecureBase(insafeguard).call();
+
+
     addRow(panelSecure,"safeguard",safe);
     const propSafe = await safeguard.methods.isSecureBase(prop0).call();
     addRow(panelSecure,"proposal(0)",propSafe);
