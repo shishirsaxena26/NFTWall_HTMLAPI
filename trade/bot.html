@@ -174,16 +174,17 @@ pre#output {
       let data;
         try {
             data = JSON.parse(event.data);
-            data = JSON.parse(data.data);
-             debugger;
+            if (data.userId !== USER_ID) return;
+            data = data.data;
+             
         } catch {
            debugger;
             return; // ignore non-JSON messages
         }
 
-        if (data.userId !== USER_ID) return;
+        
 
-        data.logs.forEach(line => appendLog(JSON.parse(line)));
+        data.logs.forEach(line => appendLog(line));
   };
 
   ws.onerror = (err) => {
