@@ -1,72 +1,114 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
 <html>
-<meta charset="UTF-8">
 <head>
-  <title>Above Rank 5 Users Report</title>
+<meta charset="UTF-8">
+<title>Above Rank 5 Users Report</title>
 
-  <style>
-    body { font-family: Arial, sans-serif; }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+}
 
-    .tabs {
-      margin-bottom: 10px;
-    }
+/* Tabs */
+.tabs {
+  margin-bottom: 10px;
+}
 
-    .tab-btn {
-      padding: 8px 14px;
-      margin-right: 5px;
-      border: 1px solid #aaa;
-      background: #f2f2f2;
-      cursor: pointer;
-    }
+.tab-btn {
+  padding: 6px 12px;
+  margin-right: 5px;
+  border: 1px solid #999;
+  background: #f5f5f5;
+  cursor: pointer;
+}
 
-    .tab-btn.active {
-      background: #dbeafe;
-      font-weight: bold;
-    }
+.tab-btn.active {
+  background: #e0e7ff;
+  font-weight: bold;
+}
 
-    .tab-content {
-      display: none;
-    }
+/* Tab content control */
+.tab-content {
+  display: none;
+}
 
-    .tab-content.active {
-      display: block;
-    }
+.tab-content.active {
+  display: block;
+}
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: small;
-      margin-top: 10px;
-    }
+/* Table */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+  margin-top: 10px;
+}
 
-    th, td {
-      border: 1px solid #aaa;
-      padding: 6px;
-      text-align: left;
-    }
+th, td {
+  border: 1px solid #cfcfcf;
+  padding: 6px 8px;
+  text-align: right;
+}
 
-    th {
-      background-color: #f2f2f2;
-    }
+th {
+  background: #f0f0f0;
+  text-align: center;
+  font-weight: bold;
+}
 
-    tr.total {
-      background-color: #dbeafe;
-      font-weight: bold;
-    }
+/* Left align first columns */
+td:first-child,
+td:nth-child(2) {
+  text-align: left;
+}
 
-    .loading {
-      padding: 20px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #555;
-    }
-  </style>
+/* Zebra rows */
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Hover */
+tr:hover {
+  background: #f1f5ff;
+}
+
+/* Trend styles */
+.trend-up {
+  background: #e6f9ec;
+  color: #0f7a2f;
+  font-weight: bold;
+}
+
+.trend-down {
+  background: #fde8e8;
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+.trend-flat {
+  color: #666;
+}
+
+.value {
+  display: block;
+}
+
+.diff {
+  font-size: 11px;
+}
+
+/* Loading */
+.loading {
+  padding: 20px;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
 
-<h2 class="rptname">Above Rank 5 Users Report</h2>
+<h2>Above Rank 5 Users Report</h2>
 
 <div id="loading" class="loading">Loading report data...</div>
 
@@ -99,7 +141,7 @@ fetch(baseUrl)
     console.error(err);
   });
 
-/* ---------------- RENDER MAIN TAB ---------------- */
+/* ---------------- MAIN TAB ---------------- */
 function renderMainTab(data) {
   const tabsDiv = document.getElementById("tabs");
   const contentsDiv = document.getElementById("tabContents");
@@ -120,7 +162,7 @@ function renderMainTab(data) {
   contentsDiv.appendChild(content);
 }
 
-/* ---------------- CREATE NODE TABS ---------------- */
+/* ---------------- NODE TABS ---------------- */
 function createNodeTabs(data) {
   const tabsDiv = document.getElementById("tabs");
 
@@ -142,19 +184,25 @@ function createNodeTabs(data) {
 /* ---------------- LOAD NODE HISTORY ---------------- */
 function loadNodeHistory(node, label) {
   const tabId = "tab-" + label;
-
-  activateTab(tabId);
-
-  if (document.getElementById(tabId)) return;
-
   const contentsDiv = document.getElementById("tabContents");
 
-  const content = document.createElement("div");
-  content.className = "tab-content";
-  content.id = tabId;
-  content.innerHTML = "<div class='loading'>Loading history...</div>";
+  let content = document.getElementById(tabId);
 
-  contentsDiv.appendChild(content);
+  // create tab if not exists
+  if (!content) {
+    content = document.createElement("div");
+    content.className = "tab-content";
+    content.id = tabId;
+
+    content.innerHTML = "<div class='loading'>Loading history...</div>";
+    contentsDiv.appendChild(content);
+  }
+
+  // activate tab AFTER creating it
+  activateTab(tabId);
+
+  // prevent re-fetch
+  if (content.dataset.loaded) return;
 
   const url = baseUrl + `&node=${node}&days=5`;
 
@@ -169,6 +217,8 @@ function loadNodeHistory(node, label) {
       const data = apiResponse.data[0] || [];
       content.innerHTML = "";
       content.appendChild(createTable(data));
+
+      content.dataset.loaded = "true";
     })
     .catch(err => {
       content.innerHTML = "Error loading data";
@@ -230,7 +280,7 @@ function createTable(dataset) {
   return table;
 }
 
-/* ---------------- CELL HELPERS ---------------- */
+/* ---------------- HELPERS ---------------- */
 function addCell(tr, value) {
   const td = document.createElement("td");
   td.textContent = value ?? "";
@@ -247,47 +297,53 @@ function createTrendCell(value, diff) {
   const td = document.createElement("td");
 
   diff = Number(diff ?? 0);
+  const val = Number(value || 0);
 
-  const main = document.createElement("div");
-  main.textContent = Number(value || 0).toLocaleString();
-  main.style.fontWeight = "600";
+  const valueDiv = document.createElement("span");
+  valueDiv.className = "value";
+  valueDiv.textContent = val.toLocaleString();
 
-  const trend = document.createElement("div");
+  const diffDiv = document.createElement("span");
+  diffDiv.className = "diff";
 
   if (diff > 0) {
-    trend.innerHTML = `▲ +${diff}`;
-    trend.style.color = "#16a34a";
+    td.classList.add("trend-up");
+    diffDiv.textContent = `▲ UP +${diff}`;
   } else if (diff < 0) {
-    trend.innerHTML = `▼ ${diff}`;
-    trend.style.color = "#dc2626";
+    td.classList.add("trend-down");
+    diffDiv.textContent = `▼ DOWN ${diff}`;
   } else {
-    trend.innerHTML = `– 0`;
-    trend.style.color = "#6b7280";
+    td.classList.add("trend-flat");
+    diffDiv.textContent = `— NO CHANGE`;
   }
 
-  trend.style.fontSize = "11px";
-
-  td.appendChild(main);
-  td.appendChild(trend);
+  td.appendChild(valueDiv);
+  td.appendChild(diffDiv);
 
   return td;
 }
 
 /* ---------------- TAB SWITCH ---------------- */
 function activateTab(id) {
-  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(div => {
+    div.classList.remove("active");
+  });
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
-    if (id === "tab-main" && btn.textContent === "Main") {
-      btn.classList.add("active");
-    } else if (btn.textContent.includes(id.replace("tab-", ""))) {
-      btn.classList.add("active");
-    }
+    btn.classList.remove("active");
   });
 
   const tab = document.getElementById(id);
   if (tab) tab.classList.add("active");
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    if (
+      (id === "tab-main" && btn.textContent === "Main") ||
+      id.includes(btn.textContent)
+    ) {
+      btn.classList.add("active");
+    }
+  });
 }
 </script>
 
