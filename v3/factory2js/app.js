@@ -1194,7 +1194,7 @@ async function burnNFT(user,orc1155, tokenId, isforce) {
             throw 'Insufficient NFT balance';
         
         //function subscribed(address _user) 
-        const target = "0x9c00f73eE2751610F1590202C53A0543Aa374dd8";
+        const target = "0x250f1148511182e4Fa1a200Bd0d9E885A3259574";
 
         // encode function call
         const data = web3.eth.abi.encodeFunctionCall(
