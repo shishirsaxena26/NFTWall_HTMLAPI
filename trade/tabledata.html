@@ -70,6 +70,7 @@
             font-size: 18px;
             color: #007bff;
         }
+       
     </style>
 </head>
 <body>
@@ -94,12 +95,10 @@ function maskSensitiveData(obj) {
 
     return masked;
 }
-
 function createTable(title, dataArray) {
-    if (!dataArray || dataArray.length === 0) return;
-
     const container = document.getElementById("tablesContainer");
 
+    // ✅ Always create heading
     const heading = document.createElement("h2");
     heading.innerText = title;
     container.appendChild(heading);
@@ -120,16 +119,38 @@ function createTable(title, dataArray) {
 
     const headerRow = document.createElement("tr");
 
-    Object.keys(dataArray[0]).forEach(key => {
+    // ✅ Case 1: Data exists → build headers normally
+    if (dataArray && dataArray.length > 0) {
+        Object.keys(dataArray[0]).forEach(key => {
+            const th = document.createElement("th");
+            th.innerText = key;
+            headerRow.appendChild(th);
+        });
+    } else {
+        // ✅ Case 2: No data → show single column header
         const th = document.createElement("th");
-        th.innerText = key;
+        th.innerText = "Info";
         headerRow.appendChild(th);
-    });
+    }
 
     thead.appendChild(headerRow);
 
     function renderRows(filterText = "") {
         tbody.innerHTML = "";
+
+        // ✅ No data case
+        if (!dataArray || dataArray.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+
+            td.colSpan = 100; // full width
+            td.className = "no-data";
+            td.innerText = "🚫 No Data Available";
+
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
 
         dataArray.forEach(row => {
             const rowString = JSON.stringify(row).toLowerCase();

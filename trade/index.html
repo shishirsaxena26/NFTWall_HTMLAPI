@@ -186,6 +186,49 @@ pre {
   opacity: .6;
   margin-top: 10px;
 }
+
+
+
+#botList {
+  min-height: 220px; /* 👈 prevents collapse */
+}
+
+/* Card UI */
+.bot-card {
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Status */
+.status-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-left: 8px;
+}
+
+.status-active {
+  background: rgba(0,255,144,0.15);
+  color: #00ff90;
+}
+
+.status-stop {
+  background: rgba(255,95,95,0.15);
+  color: #ff5f5f;
+}
+
+/* No data highlight */
+.no-data {
+  text-align: center;
+  padding: 40px 10px;
+  border-radius: 14px;
+  border: 1px dashed rgba(255,255,255,0.2);
+  color: #00ffd5;
+  font-weight: 500;
+}
 </style>
 </head>
 
@@ -228,7 +271,7 @@ pre {
       <button onclick="getKeys()">Get Keys</button>
       
       <button onclick="apiBind()">API Bind</button>
-      <button onclick="toggleContainer(2)">Create BOT</button>
+      <button onclick="toggleContainer(2)">TRADE BOT</button>
       <button onclick="showtablehtml()">Tables</button>
     </div>
   </div>
@@ -236,9 +279,10 @@ pre {
   <div class="container" id="botContainer" style="display: none;">
 
   <div class="header">
-    <h2>Create / Update BOT</h2>
+    <h2>TRADE BOT</h2>
     <button onclick="toggleContainer(1)">Back</button>
-    <button onclick="showbothtml()">Status</button>
+    <button onclick="toggleContainer(3)">Your BOT</button>
+    <button onclick="showbothtml()">Live</button>
   </div>
 
   <div class="section">
@@ -289,9 +333,20 @@ pre {
 
   <div class="buttons">
     <button onclick="saveSettings()">Save Settings</button>
+    <button onclick="activateBOT()">Activate</button>
   </div>
 
-  <div class="footer">SecureTrade · Crypto Trading Terminal</div>
+  </div>
+
+  <div class="container" id="botDetailsContainer" style="display: none;">
+
+  <div class="header">
+    <h2>Your Running BOT</h2>
+    <button onclick="toggleContainer(2)">Back</button>
+    <button onclick="showbothtml()">Live</button>
+  </div>
+
+  <div class="section" id="botList"></div>
 
   </div>
 
@@ -307,12 +362,34 @@ let TOKEN = "";
 
 // Safe response handler
 async function handleResponse(res) {
-  const text = await res.text();
+  const cloned = res.clone(); // 👈 IMPORTANT
+
+  const text = await cloned.text();
+
+  let data;
   try {
-    return JSON.parse(text);
+    data = JSON.parse(text);
   } catch {
-    return { error: text, status: res.status };
+    return {
+      success: false,
+      error: text || "Invalid JSON",
+      status: res.status
+    };
   }
+
+  if (!res.ok) {
+    return {
+      success: false,
+      error: data?.message || data?.error || "Request failed",
+      status: res.status
+    };
+  }
+
+  return {
+    success: true,
+    data: data?.data ?? data,
+    status: res.status
+  };
 }
 
 function show(data) {
@@ -354,14 +431,14 @@ async function login() {
   });
 
   const data = await handleResponse(res);
-
-  if (data.token) {
+debugger;
+  if (data.data && data.data.token) {
     document.getElementById("btnLogin").style.display = "none";
     document.getElementById("btnLogout").style.display = "block";
-    TOKEN = data.token;
+    TOKEN = data.data.token;
   }
 
-  show(data);
+  show(await handleResponse(res));
 }
 
 // ================= DASHBOARD =================
@@ -405,6 +482,7 @@ async function apiBind() {
   show(await handleResponse(res));
 }
 
+
 // ================= GET KEYS =================
 async function getKeys() {
   if (!TOKEN) return show({ error: "Login required" });
@@ -434,17 +512,16 @@ async function logout() {
 }
 
 
-
 async function toggleContainer(type) {
-  if(type==1) {
-    document.getElementById("apiContainer").style.display = "block";
-    document.getElementById("botContainer").style.display = "none";
-  }
+  document.getElementById("apiContainer").style.display = "none";
+  document.getElementById("botContainer").style.display = "none";
+  document.getElementById("botDetailsContainer").style.display = "none";
 
-  if(type==2) {
-    document.getElementById("apiContainer").style.display = "none";
-    document.getElementById("botContainer").style.display = "block";
-  }
+  if (type == 1) document.getElementById("apiContainer").style.display = "block";
+  if (type == 2) document.getElementById("botContainer").style.display = "block";
+  if (type == 3) document.getElementById("botDetailsContainer").style.display = "block";
+
+  if(type == 3) loadBots(); 
 }
 
 // ================= BOT STATUS =================
@@ -460,6 +537,24 @@ function showtablehtml() {
 }
 </script>
 
+
+<script>
+// ================= ACTIVATE BOT =================
+async function activateBOT() {
+   if (!TOKEN) return show({ error: "Login required" });
+  const payload = {
+    pair: document.getElementById("symbols").value
+};
+
+  const res = await fetch(BASE_URL + "/activateBot", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload)
+  });
+
+  show(await handleResponse(res));// reuse existing function to show response
+}
+</script>
 
 <script>
 async function saveSettings() {
@@ -501,9 +596,94 @@ async function saveSettings() {
     body: JSON.stringify(payload)
   });
 
-  const data = await handleResponse(res);
-  show(data); // reuse existing function to show response
+  show(await handleResponse(res));// reuse existing function to show response
+
 }
+</script>
+
+<script>
+    async function loadBots() {
+      if (!TOKEN) return show({ error: "Login required" });
+
+      const res = await fetch(BASE_URL + "/getRunningBots", {
+        method: "POST",
+        headers: authHeaders()
+      });
+
+      const data = await handleResponse(res);
+      show(data);// reuse existing function to show response
+
+      const container = document.getElementById("botList");
+
+      // ✅ ALWAYS keep height
+      container.style.minHeight = "220px";
+
+      // ❌ No data case
+      if (!data.data || data.data.length === 0) {
+        container.innerHTML = `
+          <div class="no-data">
+            🚫 No running bots found
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = "";
+
+      data.data.forEach(bot => {
+
+        const isActive = bot.is_active ? "🟢 Running" : "🔴 Stopped";
+
+        const payload = bot.payload || {};
+        const live = bot.payloadlive || {};
+
+        const card = document.createElement("div");
+        card.style.marginBottom = "12px";
+        card.style.padding = "12px";
+        card.style.borderRadius = "12px";
+        card.style.background = "rgba(255,255,255,0.05)";
+        card.style.border = "1px solid rgba(255,255,255,0.1)";
+
+        card.innerHTML = `
+          <b>${bot.symbol || 'N/A'}</b><br>
+          Status: ${isActive}<br>
+          Docker: ${bot.docker_id}<br><br>
+
+          <small>Mode: ${payload.mode || '-'}</small><br>
+          <small>TP: ${payload?.spotConfig?.takeProfitPercent || '-'}</small><br>
+          <small>DCA Count: ${payload?.spotConfig?.maxDcaCount || '-'}</small><br>
+
+          <div style="margin-top:8px;">
+            <button onclick="startBot('${bot.symbol}')">Start</button>
+            <button class="danger" onclick="stopBot('${bot.symbol}')">Stop</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function startBot(symbol) {
+      const res = await fetch(BASE_URL + "/startBot", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ pair: symbol })
+      });
+
+      show(await handleResponse(res));
+      //loadBots(); // refresh
+    }
+
+    async function stopBot(symbol) {
+      const res = await fetch(BASE_URL + "/stopBot", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ pair: symbol })
+      });
+
+      show(await handleResponse(res));
+      //loadBots(); // refresh
+    }
 </script>
 
 </body>
