@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>STBots API Documentation</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f8f9fb;
+      padding: 20px;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      vertical-align: top;
+      font-size: 13px;
+    }
+    th {
+      background: #222;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background: #f4f6f9;
+    }
+    .token {
+      color: green;
+      font-weight: bold;
+    }
+    .no-token {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🚀 STBots API Documentation</h1>
+
+<table>
+<tr>
+<th>API Name</th>
+<th>Headers</th>
+<th>Request Data</th>
+<th>Response JSON</th>
+<th>Description</th>
+</tr>
+
+<!-- SIGNUP -->
+<tr>
+<td>/signup</td>
+<td class="no-token">No Token</td>
+<td>
+{  
+  "username": "test",  
+  "useremail": "test@gmail.com",  
+  "password": "123456"  
+}
+</td>
+<td>
+{ "message": "User registered successfully" }
+</td>
+<td>Register new user</td>
+</tr>
+
+<!-- LOGIN -->
+<tr>
+<td>/login</td>
+<td class="no-token">No Token</td>
+<td>
+{  
+  "username": "test",  
+  "password": "123456"  
+}
+</td>
+<td>
+{ "message": "Login successful", "token": "JWT_TOKEN" }
+</td>
+<td>Authenticate & get JWT token</td>
+</tr>
+
+<!-- DASHBOARD -->
+<tr>
+<td>/dashboard</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>
+{
+  "username": "test",
+  "stats": {...}
+}
+</td>
+<td>User dashboard data</td>
+</tr>
+
+<!-- SEND OTP -->
+<tr>
+<td>/sendotp</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>{ "message": "OTP sent" }</td>
+<td>Send OTP to registered email</td>
+</tr>
+
+<!-- API BIND -->
+<tr>
+<td>/apibind</td>
+<td class="token">Bearer + OTP</td>
+<td>
+{
+  "apikey": "xxx",
+  "secretkey": "yyy",
+  "keyotp": "1234"
+}
+</td>
+<td>{ "message": "Keys saved successfully" }</td>
+<td>Bind Binance API keys (OTP required)</td>
+</tr>
+
+<!-- GET KEYS -->
+<tr>
+<td>/getapikeys</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>
+{
+  "apikey": "xx*******",
+  "secretkey": "yy*******"
+}
+</td>
+<td>Get masked Binance keys</td>
+</tr>
+
+<!-- GET SMART -->
+<tr>
+<td>/getSmartSettings</td>
+<td class="token">Bearer Token</td>
+<td>{ "pair": "BTCUSDT" }</td>
+<td>{ "data": {...} }</td>
+<td>Get default smart strategy</td>
+</tr>
+
+<!-- GET MANUAL -->
+<tr>
+<td>/getManualSettings</td>
+<td class="token">Bearer Token</td>
+<td>{ "pair": "BTCUSDT" }</td>
+<td>{ "data": {...} }</td>
+<td>Get user manual settings</td>
+</tr>
+
+<!-- SAVE SETTINGS -->
+<tr>
+<td>/SaveSettings</td>
+<td class="token">Bearer Token</td>
+<td>
+{
+  "pair": "BTCUSDT",
+  "setting": {
+    "mode": "HYBRID",
+    "spotConfig": {...},
+    "futuresConfig": {...}
+  }
+}
+</td>
+<td>{ "message": "Settings Saved" }</td>
+<td>Save/update trading settings</td>
+</tr>
+
+<!-- ACTIVATE BOT -->
+<tr>
+<td>/activateBot</td>
+<td class="token">Bearer Token</td>
+<td>{ "pair": "BTCUSDT" }</td>
+<td>{ "message": "ActivateBot Saved" }</td>
+<td>Activate bot with settings</td>
+</tr>
+
+<!-- GET RUNNING -->
+<tr>
+<td>/getRunningBots</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>{ "data": [...] }</td>
+<td>List all bots with status</td>
+</tr>
+
+<!-- START BOT -->
+<tr>
+<td>/startBot</td>
+<td class="token">Bearer Token</td>
+<td>{ "pair": "BTCUSDT" }</td>
+<td>{ "message": "Bot started successfully" }</td>
+<td>Start bot</td>
+</tr>
+
+<!-- STOP BOT -->
+<tr>
+<td>/stopBot</td>
+<td class="token">Bearer Token</td>
+<td>{ "pair": "BTCUSDT" }</td>
+<td>{ "message": "Bot stopped successfully" }</td>
+<td>Stop bot</td>
+</tr>
+
+<!-- NOTIFICATIONS -->
+<tr>
+<td>/getNotifications</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>{ "data": [...] }</td>
+<td>Get notifications</td>
+</tr>
+
+<tr>
+<td>/readNotification</td>
+<td class="token">Bearer Token</td>
+<td>{ "notificationId": 1 }</td>
+<td>{ "message": "Notification marked as read" }</td>
+<td>Mark notification read</td>
+</tr>
+
+<tr>
+<td>/deleteNotification</td>
+<td class="token">Bearer Token</td>
+<td>{ "notificationId": 1 }</td>
+<td>{ "message": "Notification deleted successfully" }</td>
+<td>Delete notification</td>
+</tr>
+
+<!-- LOGOUT -->
+<tr>
+<td>/logout</td>
+<td class="token">Bearer Token</td>
+<td>None</td>
+<td>{ "message": "Logout successful" }</td>
+<td>Invalidate token</td>
+</tr>
+
+</table>
+
+<h2>🔐 Authentication Rules</h2>
+<ul>
+<li><b>Signup/Login:</b> No token required</li>
+<li><b>All other APIs:</b> Require <b>Authorization: Bearer TOKEN</b></li>
+<li><b>API Bind:</b> Requires OTP + Token</li>
+<li><b>Token expires in:</b> 1 hour</li>
+</ul>
+
+<h2>⚠️ Important Notes</h2>
+<ul>
+<li>Headers must include: <b>Content-Type: application/json</b></li>
+<li>Case-sensitive APIs: <b>/SaveSettings (NOT /savesettings)</b></li>
+<li>Token is stored server-side and revoked on logout</li>
+<li>OTP is single-use</li>
+</ul>
+
+</body>
+</html>
