@@ -246,7 +246,7 @@ function createTable(dataset) {
 
   const headers = [
     "nodeId","node","My Business","Team Business",
-    "MyQty","TeamQty","Directs","TeamCount","Date"
+    "MyQty","TeamQty","Directs","TeamCount","Myclaim","Teamclaim","Date"
   ];
 
   const trHead = document.createElement("tr");
@@ -272,6 +272,9 @@ function createTable(dataset) {
 
     tr.appendChild(createTrendCell(row.directs, row.directs_diff));
     tr.appendChild(createTrendCell(row.teamcount, row.teamcount_diff));
+
+    tr.appendChild(createTrendCell(row.myclaim, row.myclaim_diff));
+    tr.appendChild(createTrendCell(row.teamclaim, row.teamclaim_diff));
 
     addCell(tr, row.date);
 
