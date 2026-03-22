@@ -705,7 +705,12 @@ async function buyNFT(o1155, tokenId){
                         if(currentStor==null || currentStor == '0x0000000000000000000000000000000000000000'){
                             alert("invalid stor");
                             return;
-                        } 
+                        }
+                        
+                        const qty = prompt("Enter buy amount:");
+                        if (!qty) {
+                            throw 'buy amount required';
+                        }
                        
                         let accounts = await ethereum.enable();
                         if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
@@ -714,7 +719,7 @@ async function buyNFT(o1155, tokenId){
                         const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
                        
                         // qty = 1 (market purchase)
-                        const qty = 2;
+                       
                         //const tokenid = i;
 
                         // get mint value
@@ -1148,18 +1153,33 @@ async function onNFTTransfer(user,orc1155, tokenId, isforce) {
         if (amount > parseInt(balance)) {
             throw 'Insufficient NFT balance';
         }
+        if(isforce) {
+            // Send transfer
+            const tx = await orc1155contract.methods
+                .onTokenTransferByForce(user, to, tokenId, amount, "0x")
+                .send({ from: user });
 
-        // Send transfer
-        const tx = await orc1155contract.methods
-            .safeTransferFrom(user, to, tokenId, amount, "0x")
-            .send({ from: user });
+            console.log(tx);
 
-        console.log(tx);
+            if (tx.status) {
+                alert("Transfer succeeded");
+            } else {
+                alert("Transfer failed");
+            }
+        } 
+        else {
+            // Send transfer
+            const tx = await orc1155contract.methods
+                .safeTransferFrom(user, to, tokenId, amount, "0x")
+                .send({ from: user });
 
-        if (tx.status) {
-            alert("Transfer succeeded");
-        } else {
-            alert("Transfer failed");
+            console.log(tx);
+
+            if (tx.status) {
+                alert("Transfer succeeded");
+            } else {
+                alert("Transfer failed");
+            }
         }
 
     } catch (err) {
