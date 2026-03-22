@@ -816,7 +816,7 @@ async function loadUser() {
             const flushed = await stor.methods.flushed().call();
             const unpaid = await stor.methods.unpaid().call();
             const compute = await stor.methods.compute(700).call();
-
+            debugger;
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
 
             // Add a header row
@@ -1111,8 +1111,14 @@ async function loadMyNFT(){
 
     
   
-     const levelpanel = addPanel("Level Business");
+    const levelpanel = addPanel("Level Business");
+    for(let i=0; i<=15; i++){
 
+        const lvl = await storeContract.methods.getNodeLB(i).call();
+        debugger;
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} `);
+    }
+    
 
 
 
