@@ -1049,13 +1049,13 @@ async function loadMyNFT(){
     let lsbindex = await storeContract.methods.dage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
-        innerHTML: `Dage LSB[${lsbindex}]: ${web3.utils.fromWei(lsbindex,"ether")}`
+        innerHTML: `Dage: ${lsbindex}`
     }));
 
     lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
-        innerHTML: `WithdrawlDage LSB[${lsbindex}]: ${web3.utils.fromWei(lsbindex,"ether")}`
+        innerHTML: `WithdrawlDage: ${lsbindex}`
     }));
 
   
