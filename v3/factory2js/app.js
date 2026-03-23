@@ -1036,7 +1036,7 @@ async function loadMyNFT(){
 
     const panel = addPanel("My Minted NFTs");
  
-    if(!instance || instance==ZERO || !stor || stor==ZERO){
+    if(!stor || stor==ZERO){
         addRow(panel,"User","Instance/Stor not found");
         return;
     }
