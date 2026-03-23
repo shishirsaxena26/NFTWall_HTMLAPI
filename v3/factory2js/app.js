@@ -756,6 +756,22 @@ async function buyNFT(o1155, tokenId){
  hideLoader();
 }
 
+async function loadID() {
+    try {
+        const uid = prompt("Enter ID:");
+        if (!uid && parseInt(uid)>0) 
+            throw 'valid ID required';
+        const user = await nested.methods.nodes(uid).call();
+        if(user==ZERO) alert ("No user found");
+        else document.getElementById("userAddrInput").value = user;
+
+    } catch(err) {
+        console.error(err);
+        alert("Failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+ }
 // -------------------- LOAD USER FULL --------------------
 async function loadUser() {
     const input = document.getElementById("userAddrInput");
