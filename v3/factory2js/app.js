@@ -630,12 +630,12 @@ async function initUser(){
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
         if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
-        
+        debugger;
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
         );
-
+        debugger;
         await instancecontract.methods
             .initialize()
             .send({
