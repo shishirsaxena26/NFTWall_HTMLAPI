@@ -797,11 +797,12 @@ async function loadUser() {
             const dage = await stor.methods.dage().call();
             const rank = await stor.methods.rank().call();
             const cage = await stor.methods.cage().call();
+            const isCap = await stor.methods.isCap().call();
 
             addRow(panel, "Stor Dage", dage);
             addRow(panel, "Stor Rank", rank);
             addRow(panel, "Stor Cage", cage);
-        
+            addRow(panel, "Stor isCap", isCap);
             /*
             // Fetch LSB 1,3,30,93,95,603,695,696
             const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
