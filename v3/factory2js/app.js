@@ -808,6 +808,24 @@ async function loadUser() {
         } 
         addRow(panel, "STOR---", "");
         addRow(panel, "StorAddr", node[4]);
+        loadMyStor(id, panel);
+
+        loadMyNFT();
+    }catch(err){
+
+        console.error(err);
+        addRow(panelMarket,"Error","Unable to load marketplace");
+
+    }
+
+    hideLoader();
+}
+
+async function loadMyStor(id, panel){
+    try{
+
+        const node = await nested.methods.getNode(id).call();
+        const storAddr = node[4];
         if (storAddr != "0x0000000000000000000000000000000000000000") { 
             const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
             const dage = await stor.methods.dage().call();
@@ -853,18 +871,54 @@ async function loadUser() {
             const selfProposed = await stor.methods.selfProposed().call();
             addRow(panel, "Burned", formatOZN(burned));
             addRow(panel, "Self Proposed", formatOZN(selfProposed));
-
-            loadMyNFT();
         }
-    }catch(err){
+    } catch(err){
 
         console.error(err);
-        addRow(panelMarket,"Error","Unable to load marketplace");
+        addRow(panel,"Error","Unable to load store");
 
     }
-
-    hideLoader();
 }
+
+async function loadUpline(){
+
+    const input = document.getElementById("userAddrInput");
+    const user = input.value.trim();
+    if (!user || !web3.utils.isAddress(user)) {
+        alert("Enter a valid Ethereum address");
+        return;
+    }
+    clearPanels();
+    
+    try{
+
+        const id = await nested.methods.UserToId(user).call();
+        _loadUpline(id);
+
+    } catch (err) {
+        console.error(err);
+        alert("Burning failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+
+}
+
+
+async function _loadUpline(id){
+    try{
+        
+        const node = await nested.methods.getNode(id).call();
+        const panel = addPanel(`${node[0]} | ${node[1]} | ${node[2]}`);
+        await loadMyStor(id, panel);
+        if(parseInt(node[2])>0) await _loadUpline(parseInt(node[2]));
+
+    } catch (err) {
+        console.error(err);
+        alert("Burning failed: " + (err.message || err));
+    } 
+}
+
 
 async function loadMarket(){
 
