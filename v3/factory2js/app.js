@@ -44,7 +44,7 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const minBlock = 3653181;
+
 const step = 5000;
 
 
@@ -1252,7 +1252,7 @@ async function onClaim() {
             currentInstance
         );
       
-        await instancecontract.methods
+        const tx = await instancecontract.methods
             .Txn(ZERO,90,0,7)
             .send({
                 from: currentAccount,
