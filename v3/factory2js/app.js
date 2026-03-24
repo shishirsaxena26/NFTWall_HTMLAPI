@@ -326,7 +326,11 @@ function addRow(panel, field, value) {
   f.innerText = field;
 
   const v = document.createElement("div");
-  if(typeof value === "string" && value.startsWith("0x")){
+  if (value instanceof HTMLElement) {
+    // ⬅️ If value is HTML object → append it
+    v.appendChild(value);
+
+  } else if(typeof value === "string" && value.startsWith("0x")){
     v.className = "addr";
     const short = document.createElement("span");
     short.className = "shortAddr";
@@ -341,7 +345,12 @@ function addRow(panel, field, value) {
       setTimeout(()=>{ btn.innerText="📋"; },1000);
     };
 
+    const balpanel = document.createElement("span");
+    balpanel.className = "shortAddr";
+    printRow(value,balpanel);
+
     v.appendChild(short);
+    v.append(balpanel);
     v.appendChild(btn);
   } else {
     v.innerText = value;
@@ -367,15 +376,17 @@ function pad3(v){
 
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
-    return Number(web3.utils.fromWei(value, "ether")).toFixed(3) + " OZN";
+    return Number(web3.utils.fromWei(value, "ether")).toFixed(8) + " OZN";
 }
 
-async function printRow(addr){
+async function printRow(addr, balpanel){
     const bal = await web3.eth.getBalance(addr);
     let eth3 = new web3.utils.BN(bal).div(new web3.utils.BN("1000000000000000"));
     let major = eth3.div(new web3.utils.BN("1000")).toString();
     let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString());
-    return addr + " | " + major + "." + minor + " OZN";
+    let res = " | " + major + "." + minor + " OZN";
+    balpanel.innerText = res;
+    return res;
 }
 
 // -------------------- LOAD SYSTEM --------------------
@@ -630,12 +641,12 @@ async function initUser(){
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
         if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
-        debugger;
+       
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
         );
-        debugger;
+      
         await instancecontract.methods
             .initialize()
             .send({
@@ -850,8 +861,8 @@ async function loadMyStor(id, panel){
             const drawn = await stor.methods.drawn().call();
             const flushed = await stor.methods.flushed().call();
             const unpaid = await stor.methods.unpaid().call();
-            const compute = await stor.methods.compute(700).call();
-            debugger;
+            const compute = await stor.methods.compute(90).call();
+          
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
 
             // Add a header row
@@ -871,6 +882,18 @@ async function loadMyStor(id, panel){
             const selfProposed = await stor.methods.selfProposed().call();
             addRow(panel, "Burned", formatOZN(burned));
             addRow(panel, "Self Proposed", formatOZN(selfProposed));
+            const right=document.createElement("div");
+            const btnClaim=document.createElement("button");
+            btnClaim.innerText="Claim";
+            btnClaim.style.marginLeft="10px";
+
+        
+            btnClaim.onclick = () => {
+              onClaim();
+            };
+            right.appendChild(btnClaim);
+            
+            addRow(panel, "Claim", right);
         }
     } catch(err){
 
@@ -1045,18 +1068,22 @@ async function loadMyNFT(){
     const mintCount = await storeContract.methods.mintCount().call();
    
     const lsbpanel = addPanel("LSB Amount");
-
-    let lsbindex = await storeContract.methods.dage().call();
-    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
-        className: "row",
-        innerHTML: `Dage: ${lsbindex}`
-    }));
-
-    lsbindex = await storeContract.methods.withdrawlDage().call();
+    let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
         innerHTML: `WithdrawlDage: ${lsbindex}`
     }));
+
+    lsbindex = await storeContract.methods.dage().call();
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage: ${lsbindex}`
+    }));
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+            className: "row",
+            innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(lsbindex)).call(),"ether")}`
+    }));
+    
 
   
     for(let i=1; i<=mintCount; i++){
@@ -1170,6 +1197,7 @@ async function loadMyNFT(){
 
         panel.appendChild(row);
 
+       
         lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
             innerHTML: `Mint LSB[${parseInt(mintedAge)+2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(mintedAge)+2).call(),"ether")}`
@@ -1186,7 +1214,7 @@ async function loadMyNFT(){
     for(let i=0; i<=15; i++){
 
         const lvl = await storeContract.methods.getNodeLB(i).call();
-        debugger;
+      
         addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} `);
     }
     
@@ -1194,6 +1222,57 @@ async function loadMyNFT(){
 
 
     hideLoader();
+}
+
+
+async function onClaim() {
+    showLoader();
+
+    try {
+        // Prompt for recipient
+        const input = document.getElementById("userAddrInput");
+        const user = input.value.trim();
+    
+        if (!user || !web3.utils.isAddress(user)) {
+            alert("Enter a valid address");
+            return;
+        }
+
+        const id = await nested.methods.UserToId(user).call();
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
+            throw "Incorrect account selected";
+        }
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+        const instancecontract = new web3T.eth.Contract(
+            IInstanceMeABI.abi,
+            currentInstance
+        );
+      
+        await instancecontract.methods
+            .Txn(ZERO,90,0,7)
+            .send({
+                from: currentAccount,
+                value: "0" // change if initialization requires ETH
+            });
+
+        if (tx.status) {
+            alert("Claimed succeeded");
+        } else {
+            alert("Claimed failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("Claimed failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+    
 }
 
 async function onNFTTransfer(user,orc1155, tokenId, isforce) {
