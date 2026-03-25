@@ -376,6 +376,7 @@ function pad3(v){
 
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
+    if(!value) return "NULL";
     return Number(web3.utils.fromWei(value, "ether")).toFixed(8) + " OZN";
 }
 
@@ -861,7 +862,17 @@ async function loadMyStor(id, panel){
             const drawn = await stor.methods.drawn().call();
             const flushed = await stor.methods.flushed().call();
             const unpaid = await stor.methods.unpaid().call();
-            const compute = await stor.methods.compute(90).call();
+            
+            let compute;
+
+            try {
+                compute = await stor.methods.compute(1).call();
+            } catch (err) {
+                console.error("❌ compute() failed:", err.message);
+
+                // Fallback → prevent UI break
+                compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+            }
           
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
 
@@ -882,6 +893,12 @@ async function loadMyStor(id, panel){
             const selfProposed = await stor.methods.selfProposed().call();
             addRow(panel, "Burned", formatOZN(burned));
             addRow(panel, "Self Proposed", formatOZN(selfProposed));
+            const _OLD_RWRD_IX_   = 101;
+            const _OLD_YEILD_IX_  = 104;
+            const _OLD_RWRD = await stor.methods.inc(_OLD_RWRD_IX_).call();
+             const _OLD_YEILD = await stor.methods.inc(_OLD_YEILD_IX_).call();
+            addRow(panel, "OLD_RWRD", formatOZN(_OLD_RWRD));
+            addRow(panel, "OLD_YEILD", formatOZN(_OLD_YEILD));
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
             btnClaim.innerText="Claim";
@@ -1211,11 +1228,12 @@ async function loadMyNFT(){
     
   
     const levelpanel = addPanel("Level Business");
+    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
     for(let i=0; i<=15; i++){
 
         const lvl = await storeContract.methods.getNodeLB(i).call();
       
-        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} `);
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }
     
 
