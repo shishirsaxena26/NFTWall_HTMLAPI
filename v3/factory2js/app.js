@@ -866,7 +866,7 @@ async function loadMyStor(id, panel){
             
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(4,20).call();
+                compute = await stor.methods.getAllIncome(4,10).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -876,7 +876,7 @@ async function loadMyStor(id, panel){
 
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(5,20).call();
+                computeFlush = await stor.methods.getAllIncome(5,10).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -896,7 +896,11 @@ async function loadMyStor(id, panel){
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
                 const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
-
+                stor.methods.getToggleAgeCount(200).call().then(console.log);
+                if(susCount>1){
+                    stor.methods.getToggleAgeValue(i+1,0).call().then(console.log);
+                    stor.methods.getToggleAgeValue(i+1,1).call().then(console.log);
+                }
                 addRow(panel, incomeTypes[i], `${comp} | ${compFlush} | ${drwn} | ${flsh} | ${unpaidVal}| ${parseInt(susCount)%2==1}`);
             }
             
