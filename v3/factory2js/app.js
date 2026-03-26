@@ -439,6 +439,9 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelBase,"instance",inst);
     const nftproxy = await hexBase.methods.inNftProxy().call();
     addRow(panelBase,"NFTProxy",nftproxy);
+    const validator = await hexBase.methods.invalidator().call();
+    addRow(panelTreasury,"Validator",validator);
+
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
     addRow(panelTreasury,"Factory",factory);
@@ -843,12 +846,10 @@ async function loadMyStor(id, panel){
             const dage = await stor.methods.dage().call();
             const rank = await stor.methods.rank().call();
             const cage = await stor.methods.cage().call();
-            const isCap = await stor.methods.isCap().call();
 
             addRow(panel, "Stor Dage", dage);
             addRow(panel, "Stor Rank", rank);
             addRow(panel, "Stor Cage", cage);
-            addRow(panel, "Stor isCap", isCap);
             /*
             // Fetch LSB 1,3,30,93,95,603,695,696
             const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
@@ -859,46 +860,58 @@ async function loadMyStor(id, panel){
             */
 
             // Drawn, Flushed, Unpaid, Compute
-            const drawn = await stor.methods.drawn().call();
-            const flushed = await stor.methods.flushed().call();
-            const unpaid = await stor.methods.unpaid().call();
+            const drawn = await stor.methods.getAllIncome(0,0).call();
+            const flushed = await stor.methods.getAllIncome(1,0).call();
+            const unpaid = await stor.methods.getAllIncome(2,0).call();
+            const misc = await stor.methods.getAllIncome(3,0).call();
             
             let compute;
-
             try {
-                compute = await stor.methods.compute(1).call();
+                compute = await stor.methods.getAllIncome(4,20).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
                 // Fallback → prevent UI break
                 compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
+
+            let computeFlush;
+            try {
+                computeFlush = await stor.methods.getAllIncome(5,20).call();
+            } catch (err) {
+                console.error("❌ computeFlush() failed:", err.message);
+
+                // Fallback → prevent UI break
+                computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+            }
           
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
 
             // Add a header row
-            addRow(panel, "Income Type", "Compute | Drawn | Flushed | Unpaid");
+            addRow(panel, "Income Type", "Compute | ComputeFlush | Drawn | Flushed | Unpaid | Suspend");
 
             for (let i = 0; i < 7; i++) {
                 const comp = formatOZN(compute[i]);
+                const compFlush = formatOZN(computeFlush[i]);
                 const drwn = formatOZN(drawn[i]);
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
+                const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
 
-                addRow(panel, incomeTypes[i], `${comp} | ${drwn} | ${flsh} | ${unpaidVal}`);
+                addRow(panel, incomeTypes[i], `${comp} | ${compFlush} | ${drwn} | ${flsh} | ${unpaidVal}| ${parseInt(susCount)%2==1}`);
             }
+            
+            const capCount =  await stor.methods.getToggleAgeCount(200).call();
+            debugger;
+            addRow(panel, "Stor isCapping", `${parseInt(capCount)%2==1}`);
 
             // Burned & Self Proposed
-            const burned = await stor.methods.burned().call();
-            const selfProposed = await stor.methods.selfProposed().call();
-            addRow(panel, "Burned", formatOZN(burned));
-            addRow(panel, "Self Proposed", formatOZN(selfProposed));
-            const _OLD_RWRD_IX_   = 101;
-            const _OLD_YEILD_IX_  = 104;
-            const _OLD_RWRD = await stor.methods.inc(_OLD_RWRD_IX_).call();
-             const _OLD_YEILD = await stor.methods.inc(_OLD_YEILD_IX_).call();
-            addRow(panel, "OLD_RWRD", formatOZN(_OLD_RWRD));
-            addRow(panel, "OLD_YEILD", formatOZN(_OLD_YEILD));
+
+            addRow(panel, "Burned", formatOZN(misc[0]));
+            addRow(panel, "Self Proposed", formatOZN(misc[1]));
+            addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
+            addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
+
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
             btnClaim.innerText="Claim";
@@ -1271,7 +1284,7 @@ async function onClaim() {
         );
       
         const tx = await instancecontract.methods
-            .Txn(ZERO,90,0,7)
+            .Txn(ZERO,50,0,7)
             .send({
                 from: currentAccount,
                 value: "0" // change if initialization requires ETH

@@ -31,13 +31,11 @@ interface I741Rules {
     function _isSigner(address sender) external view returns (bool);
     function allowForceTransfer() external view returns (bool);
     function capOnRank(uint256) external view returns (uint256 maxClaim, uint256 cycleDays);
-    function capping()
-        external
-        view
-        returns (uint256 multiple, bool rw, bool ry, bool self, bool yei, bool tour, bool val);
+    function capping() external view returns (uint256 multiple, bool rw, bool ry, bool self, bool yei, bool val);
     function computeMintValue(uint256 _qty) external view returns (uint256);
     function delegateamtprivate() external view returns (uint256);
     function delegateamtpublic() external view returns (uint256);
+    function eachclaimCycle() external view returns (uint256);
     function freeIntervals() external view returns (uint256);
     function getBalance() external view returns (uint256);
     function getBatchRoyaltyClauses() external view returns (lib741Rules.RoyalityStr[7] memory clauses);
@@ -46,10 +44,12 @@ interface I741Rules {
         external
         view
         returns (uint256 rank, uint256 rwNum, uint256 rwrDen, uint256 yeiNum, uint256 yeiDen);
+    function maxClaimPerDay() external view returns (uint256);
     function maxGlobalClaimPerDay() external view returns (uint256);
     function maxMintQty() external view returns (uint256);
     function maxMintsPerCycle() external view returns (uint256);
     function maxNFTSend() external view returns (uint256);
+    function minClaimPerDay() external view returns (uint256);
     function minMintQty() external view returns (uint256);
     function mintCycleDays() external view returns (uint256);
     function mintFeePerQty() external view returns (uint256);
@@ -96,7 +96,7 @@ interface I741Rules {
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
     function setAllowForceTransfer(bool _f) external;
-    function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei, bool _tour, bool _val) external;
+    function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei, bool _val) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setCoinPool(
         uint256 _type,
@@ -117,8 +117,7 @@ interface I741Rules {
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
-    function setTourClause(uint256 _rank, uint256 _tw) external;
-    function setWithdrawIntervalDays(uint256 _d) external;
+    function setclaimCycle(uint256 _d) external;
     function setlevelClause(
         uint256 lvl,
         uint256 _rank,
@@ -133,5 +132,4 @@ interface I741Rules {
     function setvalidatorPrice(uint256 _pri, uint256 _pub) external;
     function shutdown() external view returns (bool);
     function systemAge() external view returns (uint256);
-    function tourClause(uint256) external view returns (uint256);
 }

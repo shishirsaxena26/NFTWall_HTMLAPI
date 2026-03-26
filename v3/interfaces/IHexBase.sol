@@ -2,9 +2,6 @@
 pragma solidity ^0.8.4;
 
 interface IHexBase {
-    error FailedDeployment();
-    error InsufficientBalance(uint256 balance, uint256 needed);
-
     fallback() external payable;
 
     receive() external payable;

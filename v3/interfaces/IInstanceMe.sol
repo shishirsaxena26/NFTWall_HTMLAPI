@@ -9,7 +9,7 @@ interface IInstanceMe {
     event EthTransferred(address indexed to, uint256 amount);
     event HexBaseUpdated(address indexed previousHexBase, address indexed newHexBase);
     event OwnerUpdated(address indexed previousOwner, address indexed newOwner);
-    event TVLClaimTxnLog(uint256 _value, uint256 _time);
+    event TVLClaimTxnLog(address to, uint256 _value, uint256 _time);
 
     fallback() external payable;
 

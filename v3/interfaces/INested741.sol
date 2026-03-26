@@ -32,7 +32,7 @@ interface INested741 {
         uint256 _msgValue,
         uint256 _type
     ) external;
-    function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256);
+    function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256, uint256);
     function compileRoyality() external;
     function getBalance() external view returns (uint256);
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
