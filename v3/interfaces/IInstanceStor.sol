@@ -67,7 +67,7 @@ interface IInstanceStor {
     ) external returns (uint256 lastrnk, uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
-    function capStatus() external view returns (uint256 threshold, bool _cap, uint256 currentValue);
+    function capStatus() external view returns (uint256 totalIncome, uint256 threshold, bool _cap, uint256 currentValue);
     function dage() external view returns (uint256);
     function direct() external view returns (uint256);
     function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[5] memory values);
