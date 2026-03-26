@@ -451,8 +451,6 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelTreasury,"TVL Reward",reward);
     const roy = await hexBase.methods.inTreaseryTVLRoyality().call();
     addRow(panelTreasury,"TVL Royality",roy);
-    const tour = await hexBase.methods.inTreaseryTVLTour().call();
-    addRow(panelTreasury,"TVL Tour",tour);
     const val = await hexBase.methods.inTreaseryTVLValidator().call();
     addRow(panelTreasury,"TVL Validator",val);
     const panelByteCode = addPanel("BYTECODE");
@@ -846,7 +844,8 @@ async function loadMyStor(id, panel){
             const dage = await stor.methods.dage().call();
             const rank = await stor.methods.rank().call();
             const cage = await stor.methods.cage().call();
-
+            const isLock = await stor.methods.isLock().call();
+ 
             addRow(panel, "Stor Dage", dage);
             addRow(panel, "Stor Rank", rank);
             addRow(panel, "Stor Cage", cage);
@@ -885,12 +884,12 @@ async function loadMyStor(id, panel){
                 computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
           
-            const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Tour", "Gift", "Valida"];
+            const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator"];
 
             // Add a header row
             addRow(panel, "Income Type", "Compute | ComputeFlush | Drawn | Flushed | Unpaid | Suspend");
 
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 5; i++) {
                 const comp = formatOZN(compute[i]);
                 const compFlush = formatOZN(computeFlush[i]);
                 const drwn = formatOZN(drawn[i]);
@@ -911,7 +910,8 @@ async function loadMyStor(id, panel){
             addRow(panel, "Self Proposed", formatOZN(misc[1]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
             addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
-
+            addRow(panel, "LOCKED", isLock);
+            
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
             btnClaim.innerText="Claim";
