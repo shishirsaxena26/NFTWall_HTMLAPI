@@ -440,7 +440,7 @@ async function loadSystemTreasuriesNSecurebase(){
     const nftproxy = await hexBase.methods.inNftProxy().call();
     addRow(panelBase,"NFTProxy",nftproxy);
     const validator = await hexBase.methods.invalidator().call();
-    addRow(panelTreasury,"Validator",validator);
+    addRow(panelBase,"Validator",validator);
 
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
@@ -883,7 +883,9 @@ async function loadMyStor(id, panel){
                 // Fallback → prevent UI break
                 computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-          
+            
+            stor.methods.getAllIncome(6,10).call().then(console.log);
+
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator"];
 
             // Add a header row
@@ -904,10 +906,6 @@ async function loadMyStor(id, panel){
                 addRow(panel, incomeTypes[i], `${comp} | ${compFlush} | ${drwn} | ${flsh} | ${unpaidVal}| ${parseInt(susCount)%2==1}`);
             }
             
-            const capCount =  await stor.methods.getToggleAgeCount(200).call();
-            debugger;
-            addRow(panel, "Stor isCapping", `${parseInt(capCount)%2==1}`);
-
             // Burned & Self Proposed
 
             addRow(panel, "Burned", formatOZN(misc[0]));
@@ -916,16 +914,30 @@ async function loadMyStor(id, panel){
             addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
             addRow(panel, "LOCKED", isLock);
             
+            const capCount =  await stor.methods.getToggleAgeCount(200).call();
+            //debugger;
+            addRow(panel, "ToggleAgeCount(_CAP_IX)->", `${parseInt(capCount)%2==1}`);
+            const capStatus =  await stor.methods.capStatus().call();
+            addRow(panel, "CAP Status", "TotalInc | Threshold | IsCap | CurrentValue");
+            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
+
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
             btnClaim.innerText="Claim";
             btnClaim.style.marginLeft="10px";
-
-        
             btnClaim.onclick = () => {
               onClaim();
             };
+
+            const btnCapBurn=document.createElement("button");
+            btnCapBurn.innerText="CapBurn";
+            btnCapBurn.style.marginLeft="10px";
+
+            btnCapBurn.onclick = () => {
+              onCapBurn();
+            };
             right.appendChild(btnClaim);
+            right.appendChild(btnCapBurn);
             
             addRow(panel, "Claim", right);
         }
@@ -1259,6 +1271,67 @@ async function loadMyNFT(){
     hideLoader();
 }
 
+async function onCapBurn() {
+    showLoader();
+
+    try {
+        // Prompt for recipient
+        const input = document.getElementById("userAddrInput");
+        const user = input.value.trim();
+    
+        if (!user || !web3.utils.isAddress(user)) {
+            alert("Enter a valid address");
+            return;
+        }
+
+        const id = await nested.methods.UserToId(user).call();
+        const node = await nested.methods.getNode(id).call();
+        const stor = node[4];
+        if(!stor || stor==ZERO){
+            alert("Instance/Stor not found");
+            return;
+        }
+
+        const amountStr = prompt("Enter amount to burn:");
+        if (!amountStr) {
+            throw 'Amount required';
+        }
+        const amount = parseFloat(amountStr);
+        if (isNaN(amount)) {
+            throw 'Invalid amount';
+        }
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
+            throw "Incorrect account selected";
+        }
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+        const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
+    
+        const tx = await storeContract.methods
+            .BurnCoin()
+            .send({
+                from: currentAccount,
+                value: web3.utils.toWei(amount.toString(), 'ether') // change if initialization requires ETH
+            });
+
+        if (tx.status) {
+            alert("Burn succeeded");
+        } else {
+            alert("Burn failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("Burn failed: " + (err.message || err));
+    } 
+        
+    hideLoader();
+}
 
 async function onClaim() {
     showLoader();
@@ -1286,9 +1359,9 @@ async function onClaim() {
             IInstanceMeABI.abi,
             currentInstance
         );
-      
+      debugger;
         const tx = await instancecontract.methods
-            .Txn(ZERO,50,0,7)
+            .Txn(ZERO,49,0,7)
             .send({
                 from: currentAccount,
                 value: "0" // change if initialization requires ETH
