@@ -158,6 +158,11 @@ document.getElementById("btn_"+tabId).classList.add('active');
 }
 async function fetchDelStatus() {
     const deladdress=document.getElementById("deladdressInput").value.trim();
+    if(!deladdress){
+        allowedStatus.innerHTML = "🚫 Not Found";
+        return;
+    }
+    allowedStatus.innerHTML = "⏳ fetching...";
     let web3;
     web3 = new Web3("https://chain.ozonescan.com");
     var validatorcontract = new web3.eth.Contract([{'type':'function','name':'isDelegatorActive','inputs':[{'name':'del','type':'address','internalType':'address'}],'outputs':[{'name':'','type':'bool','internalType':'bool'}],'stateMutability':'view'}], "0x68dB6c84eFdC641E7dff1421fbBaEa19D98e81d4");
