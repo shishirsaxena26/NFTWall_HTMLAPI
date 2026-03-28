@@ -108,6 +108,16 @@ button:hover {
   border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
+.row > div:only-child {
+  width: 100%;
+  flex: 1;
+}
+
+.row table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .row:last-child {
   border-bottom:none;
 }
@@ -222,6 +232,7 @@ button:hover {
       <button onclick="showLoader(); loadNFTArchive();">NFT Logs</button>
       <button onclick="showLoader(); loadValidatorPage();">Validator</button>
       <button onclick="showLoader(); loadUpline();">Upline</button>
+      <button onclick="showLoader(); loadDAO();">DAO</button>
     </div>
 
     <div id="systemPanels">

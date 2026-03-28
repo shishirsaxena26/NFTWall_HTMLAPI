@@ -323,13 +323,20 @@ function addRow(panel, field, value) {
   row.className = "row";
 
   const f = document.createElement("div");
-  f.innerText = field;
+
+  if (field instanceof HTMLElement) {
+    f.appendChild(field); row.appendChild(f); 
+  }
+  else {
+    if(field!="") { f.innerText = field;  row.appendChild(f); }
+  }
 
   const v = document.createElement("div");
   if (value instanceof HTMLElement) {
     // ⬅️ If value is HTML object → append it
+    v.width = "100%";
     v.appendChild(value);
-
+    
   } else if(typeof value === "string" && value.startsWith("0x")){
     v.className = "addr";
     const short = document.createElement("span");
@@ -356,7 +363,7 @@ function addRow(panel, field, value) {
     v.innerText = value;
   }
 
-  row.appendChild(f);
+ 
   row.appendChild(v);
   panel.appendChild(row);
 }
@@ -398,10 +405,12 @@ async function loadSystem(){
     const nodes = await nested.methods.getNodesCount().call();
     const sysAge = await nested.methods.systemAge().call();
     const forms = await transferRequests.methods.getFormsCount().call();
+    const isSafe = await safeguard.methods.isSafe().call();
 
     addRow(panelSys,"Nodes Count",nodes);
     addRow(panelSys,"System Age",sysAge);
     addRow(panelSys,"Form Count",forms);
+    addRow(panelSys,"Is Safe",isSafe);
 
     await loadSystemTreasuriesNSecurebase();
 
@@ -480,9 +489,11 @@ async function loadUserPanel(user){
     //const user = "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8";
     const id = await nested.methods.UserToId(user).call();
     const node = await nested.methods.getNode(id).call();
+    const isdelegator = await nested.methods._isDelegatorNode(user).call();
 
     addRow(userPanel,"ID",node[0]);
     addRow(userPanel,"Node",node[1]);
+    addRow(userPanel,"Are you Delegator ", isdelegator);
     addRow(userPanel,"Parent",node[2]);
     addRow(userPanel,"Active",node[5]);
     addRow(userPanel,"Direct Count",node[6]);
@@ -648,6 +659,9 @@ async function initUser(){
             IInstanceMeABI.abi,
             currentInstance
         );
+
+        instancecontract.methods.owner().call(console.log);
+        instancecontract.methods.getHexbase().call(console.log);
       
         await instancecontract.methods
             .initialize()
@@ -799,13 +813,16 @@ async function loadUser() {
     try{
         const id = await nested.methods.UserToId(user).call();
         const node = await nested.methods.getNode(id).call();
+        const isdelegator = await nested.methods._isDelegatorNode(user).call();
+        const isdelegatorNode = await daoassembly.methods.isdelegatorNode(user).call();
 
         addRow(panel, "ID", node[0]);
         addRow(panel, "Node", node[1]);
         addRow(panel, "Parent", node[2]);
         addRow(panel, "Active", node[5]);
         addRow(panel, "Direct Count", node[6]);
-
+        addRow(panel,"Are you Delegator ", isdelegator);
+        addRow(panel,"Are you delegatorNode ", isdelegatorNode);
         const instAddr = node[3];
         const storAddr = node[4];
         addRow(panel, "INST---", "");
@@ -860,6 +877,7 @@ async function loadMyStor(id, panel){
 
             // Drawn, Flushed, Unpaid, Compute
             const drawn = await stor.methods.getAllIncome(0,0).call();
+           
             const flushed = await stor.methods.getAllIncome(1,0).call();
             const unpaid = await stor.methods.getAllIncome(2,0).call();
             const misc = await stor.methods.getAllIncome(3,0).call();
@@ -989,6 +1007,319 @@ async function _loadUpline(id){
 }
 
 
+async function loadDAO() {
+     clearPanels();
+     const panel = addPanel("DAO Admin");
+     try{
+        
+      
+        addRow(panel,"DAO Core",indaocore);
+        addRow(panel,"DAO Assembly",indaoassembly);
+
+        const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
+        const rankforDAO = await rule.methods.rankforDAO().call();
+      
+        // const blacklistedCount = await daoassembly.methods.blacklistedCount().call();
+        const proposalsCount = await daocore.methods.getProposalsCount().call();
+        const left = document.createElement("div");
+        
+        left.innerHTML =
+                    '<div style="display:flex;align-items:center;gap:8px;">'
+                    + ' DelegatorCount: ' + delegatorCount            
+                    + ' | RankForDAO: ' + rankforDAO         
+                    + ' | BlacklistedCount: ' + 0    
+                    + ' | ProposalsCount: ' + proposalsCount    
+                    + '</div>';
+
+        const right=document.createElement("div");
+        const btnTransferForms=document.createElement("button");
+        btnTransferForms.innerText="TransferForms";
+        btnTransferForms.style.marginLeft="10px";
+        btnTransferForms.onclick = () => {
+              loadTransferForms();
+        };
+
+        const btnProposals=document.createElement("button");
+        btnProposals.innerText="Proposals";
+        btnProposals.style.marginLeft="10px";
+        btnProposals.onclick = () => {
+              loadProposals();
+        };
+         
+        const btnSubmitTrasfer=document.createElement("button");
+        btnSubmitTrasfer.innerText="SubmitTrasfer";
+        btnSubmitTrasfer.style.marginLeft="10px";
+        btnSubmitTrasfer.onclick = () => {
+              onSubmitTrasfer();
+        };
+        right.appendChild(btnTransferForms);
+        right.appendChild(btnSubmitTrasfer);
+        right.appendChild(btnProposals);
+        addRow(panel, left, right);
+
+    } catch (err) {
+        console.error(err);
+        addRow(panel, "", err.message);
+    } 
+    hideLoader();
+}
+//send "$PKKEY" "$TransferRequest" "0" "submitTransferForm(address,address[] memory)" "$ADDRESS" "$mandatedvoters_arr"
+
+async function onSubmitTrasfer() {
+
+    try {
+        
+        const fromAddress = prompt("Enter ADDRESS to be transferred:");
+        if (!fromAddress) {
+            throw 'Enter from Address';
+        }
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+        const trContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
+    
+        const tx = await trContract.methods
+            .submitTransferForm(fromAddress)
+            .send({
+                from: currentAccount,
+                value: 0 // change if initialization requires ETH
+            });
+
+        if (tx.status) {
+            alert("SubmitTrasfer succeeded");
+        } else {
+            alert("SubmitTrasfer failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("SubmitTrasfer failed: " + (err.message || err));
+    } 
+
+}
+
+async function loadProposals() {
+     const panel = addPanel("Proposals");
+    try{
+        const count = await daocore.methods.getProposalsCount().call();
+        
+        let limit = 3;
+        /* for (let i = count; i >= 1 && limit>0; i--) {
+                const p = await contract.methods.getProposal(i).call();
+                const r = await contract.methods.getResult(i).call();
+                let sgn =r[5];
+                if(r[4]==4) sgn = "RESOLVE";
+                else if(r[4]==3) sgn = "REJECT";
+                else if(r[4]==2) sgn = "SIGN-APPROVED2";
+                else if(r[4]==1) sgn = "SIGN-APPROVED1";
+                else sgn = "PENDING";
+
+                '<div style="display:flex;align-items:center;gap:8px;">'
+                + ' | ' + p[0] 
+                + ' | ' + r[0] 
+                + ' | ' + r[1]        
+                + ' | ' + r[3]        
+                + ' | DelegatorCount: ' + p[1]            
+                + ' | RankForDAO: ' + p[3]         
+                + ' | BlacklistedCount: ' + sgn    
+                + ' | ' + p[5]       
+                        + '</div>';
+            } */
+      
+        const table = document.createElement("table");
+        table.border = "1";
+        table.cellPadding = "5";
+        table.style.width = "100%";
+        // ✅ THEAD (Header)
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+        <tr>
+            <th>#</th>
+            <th>Desc</th>
+            <th>Target</th>
+            <th>Up</th>
+            <th>Dn</th>
+            <th>Win</th>
+            <th>Approved</th>
+            <th>Resolved</th>
+            <th>Creator</th>
+            <th>Vote</th>
+            <th>Sign</th>
+        </tr>
+        `;
+        table.appendChild(thead);
+       const tbody = document.createElement("tbody");
+      for (let i = count; i >= 1 && limit>0; i--) {
+      
+        const p = await daocore.methods.getProposal(i).call();
+        const r = await daocore.methods.getResult(i).call();
+        let approve = "PENDING"
+        if(r[5]) approve = "RESOLVE";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i}</td>
+          <td title="${p[0]}">${p[0]}</td>
+          <td class="shortAddr" title="${p[1]}">${shortAddr(p[1])}</td>
+          
+          <td>${r[0]}</td>
+          <td>${r[1]}</td>
+          <td>${r[3]}</td>
+          <td>${r[4]}</td>
+          <td>${approve}</td>
+          <td class="shortAddr" title="${p[5]}">${shortAddr(p[3])}</td>
+          <td>
+            <button class="vote-btn upvote" onclick="vote(${i}, true)">Vote(Y)</button>
+            <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
+          </td>
+          <td>
+            <button class="vote-btn upvote" onclick="execute(${i}, true)">Sign(Y)</button>
+            <button class="vote-btn downvote" onclick="execute(${i}, false)">Sign(N)</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+        limit--;
+      }
+
+        // ✅ Attach tbody
+        table.appendChild(tbody);
+
+       
+
+      addRow(panel, "", table);
+    } catch (err) {
+        console.error(err);
+        addRow(panel, "", err.message);
+    } 
+}
+
+async function loadTransferForms() {
+
+      const panel = addPanel("TransferForms");
+    try{
+        const count = await transferRequests.methods.getFormsCount().call();
+        
+        let limit = 10;
+        const table = document.createElement("table");
+        table.border = "1";
+        table.cellPadding = "5";
+        table.style.width = "100%";
+        // ✅ THEAD (Header)
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+        <tr>
+            <th>#</th>
+            <th>from</th>
+            <th>to</th>
+            <th>resolved</th>
+            <th>closed</th>
+            <th>status</th>
+            <th>proposalId</th>
+            <td>Close Action</td>
+        </tr>
+        `;
+        table.appendChild(thead);
+       const tbody = document.createElement("tbody");
+      for (let i = count; i >= 1 && limit>0; i--) {
+        
+        const p = await transferRequests.methods.getForm(i).call();
+      
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i}</td>
+          <td class="shortAddr" title="${p[p.from]}">${shortAddr(p.from)}</td>
+          <td class="shortAddr" title="${p[p.to]}">${shortAddr(p.to)}</td>
+          <td>${p.resolved}</td>
+          <td>${p.closed}</td>
+          <td>${p.status}</td>
+          <td>${p.proposalId}</td>
+          <td>
+            <button class="vote-btn upvote" onclick="closeTransferTarget('${p.to}')">Close</button>
+          </td>
+
+        `;
+        tbody.appendChild(row);
+        limit--;
+      }
+
+        // ✅ Attach tbody
+        table.appendChild(tbody);
+
+       
+
+      addRow(panel, "", table);
+    } catch (err) {
+        console.error(err);
+        addRow(panel, "", err.message);
+    } 
+} 
+async function closeTransferTarget(to) {
+    try {
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        
+        const transferContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
+        
+        const tx = await transferContract.methods.closeTransferTarget(to).send({ from: accounts[0] });
+        if (tx.status) {
+                alert("Transfer Closed succeeded");
+            } 
+        else {
+                alert("Transfer Closed failed");
+            }
+    } catch (err) {
+        console.error(err);
+        alert("❌ Transfer Closed failed: " + (err.message || err));
+    }
+}
+
+async function vote(proposalId, support) {
+	try {
+	window.web3T = new Web3(window.ethereum);
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+    const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+	  
+	const tx = await daoContract.methods.vote(proposalId, support).send({ from: accounts[0] });
+    if (tx.status) {
+            alert("vote succeeded");
+        } 
+    else {
+            alert("vote failed");
+        }
+	} catch (err) {
+	  console.error(err);
+	  alert("❌ Vote failed: " + (err.message || err));
+	}
+  }
+
+  async function execute(proposalId, isapproved) {
+    try {
+	window.web3T = new Web3(window.ethereum);
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+    const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+	  
+	const tx = await daoContract.methods.execute(proposalId, isapproved).send({ from: accounts[0] });
+    if (tx.status) {
+            alert("execute succeeded");
+        } 
+    else {
+            alert("execute failed");
+        }
+	} catch (err) {
+	  console.error(err);
+	  alert("❌ execute failed: " + (err.message || err));
+	}
+  }
+
+
 async function loadMarket(){
 
     clearPanels();
@@ -1112,7 +1443,7 @@ async function loadMyNFT(){
 
     const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
     const mintCount = await storeContract.methods.mintCount().call();
-   
+   debugger;
     const lsbpanel = addPanel("LSB Amount");
     let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
@@ -1132,7 +1463,7 @@ async function loadMyNFT(){
     
 
   
-    for(let i=1; i<=mintCount; i++){
+    for(let i=1; i<=parseInt(mintCount); i++){
 
         const mint = await storeContract.methods.mints(i).call();
         const nftAddr = mint.nft;
@@ -1206,37 +1537,11 @@ async function loadMyNFT(){
 
        
         btnTransfer.onclick = () => {
-            const isforce = checkbox.checked;
-            if(isforce) {
-                alert('checked');
-            } else {
-                alert('not hecked');
-            } 
-
-            onNFTTransfer(user, nftAddr, tokenId, isforce);
-
+            onNFTTransfer(user, nftAddr, tokenId, checkbox.checked);
         };
 
-        /* BURN BUTTON */
-
-        const btnBurn=document.createElement("button");
-        btnBurn.innerText="Burn";
-        btnBurn.style.marginLeft="5px";
-
-        btnBurn.onclick = () => {
-            const isforce = checkbox.checked;
-            if(isforce) {
-                alert('checked');
-            } else {
-                alert('not hecked');
-            } 
-
-            burnNFT(user, nftAddr, tokenId, isforce);
-        };
-        
         right.appendChild(checkbox);
         right.appendChild(btnTransfer);
-        right.appendChild(btnBurn);
 
         row.appendChild(left);
         row.appendChild(right);
@@ -1359,7 +1664,7 @@ async function onClaim() {
             IInstanceMeABI.abi,
             currentInstance
         );
-      debugger;
+      
         const tx = await instancecontract.methods
             .Txn(ZERO,49,0,7)
             .send({
@@ -1402,146 +1707,44 @@ async function onNFTTransfer(user,orc1155, tokenId, isforce) {
         if (isNaN(amount) || amount <= 0) {
             throw 'Invalid amount';
         }
-
+        
         // Enable wallet
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
-            throw "Incorrect account selected";
-        }
-		window.web3T = new Web3(window.ethereum);
+
+
+        window.web3T = new Web3(window.ethereum);
         // Initialize contract
         const orc1155contract = new web3T.eth.Contract(IORC1155ABI.abi, orc1155);
-
         // Check balance
         const balance = await orc1155contract.methods.balanceOf(user, tokenId).call();
         if (amount > parseInt(balance)) {
             throw 'Insufficient NFT balance';
         }
-        if(isforce) {
-            // Send transfer
-            const tx = await orc1155contract.methods
-                .onTokenTransferByForce(user, to, tokenId, amount, "0x")
+
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
+            const tx1 = await orc1155contract.methods
+                .setApprovalForAll(accounts[0], true)
                 .send({ from: user });
-
-            console.log(tx);
-
-            if (tx.status) {
-                alert("Transfer succeeded");
-            } else {
-                alert("Transfer failed");
-            }
-        } 
-        else {
-            // Send transfer
-            const tx = await orc1155contract.methods
-                .safeTransferFrom(user, to, tokenId, amount, "0x")
-                .send({ from: user });
-
-            console.log(tx);
-
-            if (tx.status) {
-                alert("Transfer succeeded");
-            } else {
-                alert("Transfer failed");
-            }
+            if (!tx1.status) throw "Incorrect account selected";
         }
+        
+        // Send transfer
+        const tx1 = await orc1155contract.methods
+            .onTokenTransfer(user, to, tokenId, amount, isforce, "0x")
+            .send({ from: accounts[0] });
+
+        console.log(tx1);
+
+        if (tx1.status) {
+            alert("Transfer succeeded");
+        } else {
+            alert("Transfer failed");
+        }
+       
 
     } catch (err) {
         console.error(err);
         alert("Transfer failed: " + (err.message || err));
-    } 
-        
-    hideLoader();
-    
-}
-
-
-async function burnNFT(user,orc1155, tokenId, isforce) {
-    showLoader();
-
-    try {
-
-        // Prompt for amount
-        const amountStr = prompt("Enter amount to Burn:");
-        if (!amountStr) 
-            throw 'Amount required';
-        
-        const amount = parseInt(amountStr);
-        if (isNaN(amount) || amount <= 0) 
-            throw 'Invalid amount';
-        
-
-        // Enable wallet
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        
-        if(user.trim().toLowerCase() !== accounts[0].toLowerCase())
-            throw "Incorrect account selected";
-        
-		window.web3T = new Web3(window.ethereum);
-        // Initialize contract
-        const orc1155contract = new web3T.eth.Contract(IORC1155ABI.abi, orc1155);
-
-        // Check balance
-        const balance = await orc1155contract.methods.balanceOf(user, tokenId).call();
-        if (amount > parseInt(balance)) 
-            throw 'Insufficient NFT balance';
-        
-        //function subscribed(address _user) 
-        const target = "0x250f1148511182e4Fa1a200Bd0d9E885A3259574";
-
-        // encode function call
-        const data = web3.eth.abi.encodeFunctionCall(
-        {
-            name: "subscribed",
-            type: "function",
-            inputs: [
-                { type: "address", name: "_user" }
-            ]
-        },
-        [user]
-        );
-
-        // build payload = target + calldata
-        const payload =
-            "0x" +
-            target.slice(2) +
-            data.slice(2);
-
-        console.log(payload);
-
-        const payload1 ='0x';
-        
-        if(isforce) { 
-            // Send transfer
-            const tx = await orc1155contract.methods
-                .onTokenBurnByForce(tokenId, amount, payload1)
-                .send({ from: user });
-
-            console.log(tx);
-
-            if (tx.status) 
-                alert("Burning succeeded");
-            else 
-                throw "Burning failed"; 
-        }
-        else { 
-            // Send transfer
-            const tx = await orc1155contract.methods
-                .onTokenBurn(tokenId, amount)
-                .send({ from: user });
-
-            console.log(tx);
-
-            if (tx.status) 
-                alert("Burning succeeded");
-            else 
-                throw "Burning failed"; 
-        }
-    
-
-    } catch (err) {
-        console.error(err);
-        alert("Burning failed: " + (err.message || err));
     } 
         
     hideLoader();
