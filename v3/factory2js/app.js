@@ -393,7 +393,7 @@ async function printRow(addr, balpanel){
     let major = eth3.div(new web3.utils.BN("1000")).toString();
     let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString()); */
     
-    let res = " | " + Number(web3.utils.fromWei(bal, "ether")).toFixed(8) + " OZN";
+    let res = " | " + Number(web3.utils.fromWei(bal, "ether")).toFixed(12) + " OZN";
     balpanel.innerText = res;
     return res;
 }
