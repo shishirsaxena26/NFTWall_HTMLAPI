@@ -60,6 +60,7 @@ interface IHexBase {
     function insafeguardPrime() external view returns (address);
     function insafeguardPrimeOld() external view returns (address);
     function invalidator() external view returns (address);
+    function invalidatorOld() external view returns (address);
     function mapOldORC1155(address) external view returns (address);
     function mapOldORC1155Prime(address) external view returns (address);
     function proposals(uint256) external view returns (address);
