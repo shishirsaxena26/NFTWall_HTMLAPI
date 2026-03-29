@@ -389,10 +389,11 @@ function formatOZN(value) {
 
 async function printRow(addr, balpanel){
     const bal = await web3.eth.getBalance(addr);
-    let eth3 = new web3.utils.BN(bal).div(new web3.utils.BN("1000000000000000"));
+   /* let eth3 = new web3.utils.BN(bal).div(new web3.utils.BN("1000000000"));
     let major = eth3.div(new web3.utils.BN("1000")).toString();
-    let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString());
-    let res = " | " + major + "." + minor + " OZN";
+    let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString()); */
+    
+    let res = " | " + Number(web3.utils.fromWei(bal, "ether")).toFixed(8) + " OZN";
     balpanel.innerText = res;
     return res;
 }
