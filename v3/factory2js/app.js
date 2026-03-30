@@ -105,7 +105,6 @@ async function init(){
                 currentAccount = accounts[0];
                 showWallet();
                 await addConnectedUserPanel();
-              
             }
         });
     }
@@ -475,7 +474,142 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelSecure,"safeguard",safe);
     const propSafe = await safeguard.methods.isSecureBase(prop0).call();
     addRow(panelSecure,"proposal(0)",propSafe);
+
+    
+    const panelBusiness= addPanel("Business");
+      
+    const rBusiness=document.createElement("div");
+
+    const btnExecuteRoyality=document.createElement("button");
+            btnExecuteRoyality.innerText="ExecuteRoyality";
+            btnExecuteRoyality.style.marginLeft="10px";
+            btnExecuteRoyality.onclick = () => {
+              onExecuteRoyality();
+    };
+
+    const btnBusiness=document.createElement("button");
+            btnBusiness.innerText="GetBusiness";
+            btnBusiness.style.marginLeft="10px";
+            btnBusiness.onclick = () => {
+              onGetDailyBusiness();
+    };
+
+    rBusiness.appendChild(btnExecuteRoyality);
+    rBusiness.appendChild(btnBusiness);
+
+    addRow(panelBusiness,"Click to get business",rBusiness);
+    // Create table
+    const table1 = document.createElement("table");
+    table1.id = "tabDailyBusiness";
+    table1.border = "1";
+    table1.style.width = "100%";
+
+    // Add header
+    table1.innerHTML = `
+    <thead>
+    <tr>
+    <th>Day</th><th>Business</th><th>Withdrawn</th><th>Joining</th>
+    <th>Ct0</th><th>Ct1</th><th>Ct2</th><th>Ct3</th>
+    <th>Ct4</th><th>Ct5</th><th>Ct6</th><th>Ct7</th>
+    <th>Royal3-2</th><th>Royal5-4</th><th>Royal7</th>
+    </tr>
+    </thead>
+    <tbody id="tabDBBody"></tbody>
+    `;
+  
+    
+    const idSpan = document.createElement("span");
+    
+
+    addRow(panelBusiness, "", table1);
 }
+
+async function onExecuteRoyality() {
+
+    // Enable wallet
+    window.web3T = new Web3(window.ethereum);
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
+    
+    const tx = await nestedContractV1.methods
+        .compileRoyality()
+        .send({
+            from: accounts[0]
+    });
+
+    if (tx.status) {
+        alert("ExecuteRoyality succeeded");
+    } else {
+        alert("ExecuteRoyality failed");
+    }
+       
+
+}
+async function onGetDailyBusiness(){
+	
+	var r3 = new BN("0");
+	var r5 = new BN("0");
+	var r7 = new BN("0");
+	
+	
+	let age = await nested.methods.systemAge().call();
+	for (let i = age; i>=parseInt(age-10); i--) {
+		let b = await nested.methods.getbusiness(i).call();
+		let w = await nested.methods.getwithdrawn(i).call();
+        let j = await nested.methods.getjoining(i).call();
+
+		
+		let Ct0 = await nested.methods.getrankCount(i,0).call();
+		let Ct1 = await nested.methods.getrankCount(i,1).call();
+		let Ct2 = await nested.methods.getrankCount(i,2).call();
+		let Ct3 = await nested.methods.getrankCount(i,3).call();
+		let Ct4 = await nested.methods.getrankCount(i,4).call();
+		let Ct5 = await nested.methods.getrankCount(i,5).call();
+		let Ct6 = await nested.methods.getrankCount(i,6).call();
+		let Ct7 = await nested.methods.getrankCount(i,7).call();
+		var royal3 = new BN('0');
+		var royal5 = new BN('0');
+		var royal7 = new BN('0');
+		
+		if(parseInt(Ct3)>0)
+		{	royal3=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct3.toString()));
+		}
+		if(parseInt(Ct5)>0)
+		{
+			royal5=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct5.toString()));
+		}
+		if(parseInt(Ct7)>0)
+		{
+			royal7=(new BN(((new BN(b)).mul(new BN("9")).div(new BN("1000"))).toString())).div(new BN(Ct7.toString()));
+		}
+		
+		r3=r3.add(new BN(royal3.toString()));
+		r5=r5.add(new BN(royal5.toString()));
+		r7=r7.add(new BN(royal7.toString()));
+		
+		console.log(r3.toString());
+		console.log(r5.toString());
+		console.log(r7.toString());
+// 1. Check addresses
+console.log("nested:", nested.options.address);
+
+let in741Addr = await hexBase.methods.in741().call();
+console.log("in741:", in741Addr);
+        let constRoyal = await nested.methods.getRoyalityAmountBatch(i).call();
+
+		
+		document.getElementById("tabDBBody")
+        .insertAdjacentHTML("beforeend",
+            '<tr><td>'+i+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
+        );
+	}	
+
+	
+
+	
+	
+}
+
 
 // -------------------- LOAD USER --------------------
 async function loadUserPanel(user){
@@ -858,6 +992,9 @@ async function loadMyStor(id, panel){
         const node = await nested.methods.getNode(id).call();
         const storAddr = node[4];
         if (storAddr != "0x0000000000000000000000000000000000000000") { 
+
+          
+            
             const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
             const dage = await stor.methods.dage().call();
             const rank = await stor.methods.rank().call();
@@ -867,7 +1004,19 @@ async function loadMyStor(id, panel){
             addRow(panel, "Stor Dage", dage);
             addRow(panel, "Stor Rank", rank);
             addRow(panel, "Stor Cage", cage);
-            /*
+            
+             /*
+            let aj1 = await stor.methods.comp(15,2).call();
+            let aj2 = await stor.methods.comp(15,1).call();
+            
+            let aj3 = await stor.methods.comp(14,2).call();
+            let aj4 = await stor.methods.comp(14,1).call();
+           
+          
+            stor.methods.rankage(0).call(console.log);
+            stor.methods.rankage(1).call(console.log);
+            stor.methods.rankage(2).call(console.log);
+            
             // Fetch LSB 1,3,30,93,95,603,695,696
             const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
             for (const i of lsbIndexes) {
@@ -885,7 +1034,7 @@ async function loadMyStor(id, panel){
             
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(4,10).call();
+                compute = await stor.methods.getAllIncome(4,20).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -895,7 +1044,7 @@ async function loadMyStor(id, panel){
 
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(5,10).call();
+                computeFlush = await stor.methods.getAllIncome(5,20).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -934,7 +1083,7 @@ async function loadMyStor(id, panel){
             addRow(panel, "LOCKED", isLock);
             
             const capCount =  await stor.methods.getToggleAgeCount(200).call();
-            //debugger;
+            
             addRow(panel, "ToggleAgeCount(_CAP_IX)->", `${parseInt(capCount)%2==1}`);
             const capStatus =  await stor.methods.capStatus().call();
             addRow(panel, "CAP Status", "TotalInc | Threshold | IsCap | CurrentValue");
@@ -1444,7 +1593,7 @@ async function loadMyNFT(){
 
     const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
     const mintCount = await storeContract.methods.mintCount().call();
-   debugger;
+
     const lsbpanel = addPanel("LSB Amount");
     let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
@@ -1563,12 +1712,12 @@ async function loadMyNFT(){
     
   
     const levelpanel = addPanel("Level Business");
-    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
+    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild | RankAge`);
     for(let i=0; i<=15; i++){
 
         const lvl = await storeContract.methods.getNodeLB(i).call();
-      
-        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
+        const rankage = await storeContract.methods.rankage(i).call();
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} | ${rankage}`);
     }
     
 
