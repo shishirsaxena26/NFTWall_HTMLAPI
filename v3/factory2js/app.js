@@ -44,6 +44,20 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
+const demoTree = {
+  id: 1,
+  children: [
+    {
+      id: 2,
+      children: [
+        { id: 6, children: [{ id: 15 }, { id: 16 }, { id: 17 }] },
+        { id: 7 }
+      ]
+    },
+    { id: 3 },
+    { id: 4 }
+  ]
+};
 
 const step = 5000;
 
@@ -110,9 +124,11 @@ async function init(){
     }
    
     hideLoader();
-    name(); 
+    //name(); 
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
+
+    renderTreeGraphPanel(demoTree);
 }
 
 async function name() {
@@ -487,13 +503,22 @@ async function loadSystemTreasuriesNSecurebase(){
               onExecuteRoyality();
     };
 
+    const btnDefaultRankCount=document.createElement("button");
+            btnDefaultRankCount.innerText="DefaultRankCount";
+            btnDefaultRankCount.style.marginLeft="10px";
+            btnDefaultRankCount.onclick = () => {
+              onSetDefaultRankCount();
+    };
+    
+
     const btnBusiness=document.createElement("button");
             btnBusiness.innerText="GetBusiness";
             btnBusiness.style.marginLeft="10px";
             btnBusiness.onclick = () => {
               onGetDailyBusiness();
     };
-
+    
+    rBusiness.appendChild(btnDefaultRankCount);
     rBusiness.appendChild(btnExecuteRoyality);
     rBusiness.appendChild(btnBusiness);
 
@@ -532,7 +557,29 @@ async function onExecuteRoyality() {
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
     
     const tx = await nestedContractV1.methods
-        .compileRoyality()
+        .compileRoyality(systemAge)
+        .send({
+            from: accounts[0]
+    });
+
+    if (tx.status) {
+        alert("ExecuteRoyality succeeded");
+    } else {
+        alert("ExecuteRoyality failed");
+    }
+       
+
+}
+
+async function onSetDefaultRankCount() {
+
+    // Enable wallet
+    window.web3T = new Web3(window.ethereum);
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
+    
+    const tx = await nestedContractV1.methods
+        .setDefaultRankCount(10)
         .send({
             from: accounts[0]
     });
@@ -1202,6 +1249,15 @@ async function loadDAO() {
         btnSubmitTrasfer.onclick = () => {
               onSubmitTrasfer();
         };
+
+        const btnNewProposer=document.createElement("button");
+        btnNewProposer.innerText="NewProposer";
+        btnNewProposer.style.marginLeft="10px";
+        btnNewProposer.onclick = () => {
+              onNewProposer();
+        };
+
+        right.appendChild(btnNewProposer);
         right.appendChild(btnTransferForms);
         right.appendChild(btnSubmitTrasfer);
         right.appendChild(btnProposals);
@@ -1213,6 +1269,55 @@ async function loadDAO() {
     } 
     hideLoader();
 }
+
+/*
+DATA_SUCCESS=$(cast calldata "safeSecureBaseCallback(address,bool)" $SECUREBASE true)
+TARGET="$safeguardPrime"
+VALUE_SUCCESS="0"
+echo "Encoded success calldata: $DATA_SUCCESS"
+SUBJECT="Trigger.securebase.proposal.UpdateBonusRequestsPrime"
+echo "$SUBJECT"
+#send "$PKKEY" "$DAOAssemblyCore" "0" "newProposal(string,address,uint256,bytes,uint256)" "$SUBJECT" "$TARGET" "$VALUE_SUCCESS" "$DATA_SUCCESS" "7" 
+*/
+async function onNewProposer() {
+     try {
+        
+        const ok = confirm("Are you sure you want to execute this transaction?");
+
+        if(!ok) return;
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+       
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        const SUBJECT = "Trigger.rule.proposal.UpdateMintQty";
+        const TARGET = in741Rule;
+        const VALUE_SUCCESS = 0;
+        const DATA_SUCCESS = rule.methods.setMintQty(2, 50000).encodeABI();
+        const EXPIRE = 7
+debugger;
+        const tx = await daoContract.methods
+            .newProposal(SUBJECT,TARGET,VALUE_SUCCESS,DATA_SUCCESS,EXPIRE)
+            .send({
+                from: currentAccount
+            });
+
+        if (tx.status) {
+            alert("NewProposer succeeded");
+        } else {
+            alert("NewProposer failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("NewProposer failed: " + (err.message || err));
+    } 
+} 
+
 //send "$PKKEY" "$TransferRequest" "0" "submitTransferForm(address,address[] memory)" "$ADDRESS" "$mandatedvoters_arr"
 
 async function onSubmitTrasfer() {
@@ -2145,6 +2250,111 @@ async function loadValidatorPage() {
     hideLoader();
 }
 
+
+function renderTreeGraphPanel(treeData) {
+
+  // ✅ Use your existing panel system
+  const panel = addPanel("🌳 Tree Graph");
+
+  // Container (acts like a row but full width)
+  const graphContainer = document.createElement("div");
+  graphContainer.style.width = "100%";
+  graphContainer.style.overflow = "auto";
+  graphContainer.style.paddingTop = "10px";
+
+  panel.appendChild(graphContainer);
+
+  // ---------- BUILD LEVELS ----------
+  function buildLevels(root) {
+    const levels = [];
+    function walk(node, depth = 0) {
+      if (!levels[depth]) levels[depth] = [];
+      levels[depth].push(node);
+      if (node.children) {
+        node.children.forEach(c => walk(c, depth + 1));
+      }
+    }
+    walk(root);
+    return levels;
+  }
+
+  const levels = buildLevels(treeData);
+
+  // ---------- CONFIG ----------
+  const nodeW = 70;
+  const nodeH = 28;
+  const hGap = 25;
+  const vGap = 70;
+
+  const svgW = 1200;
+  const svgH = levels.length * vGap + 100;
+
+  let svg = `<svg width="${svgW}" height="${svgH}">`;
+
+  const pos = new Map();
+
+  // ---------- DRAW NODES ----------
+  levels.forEach((level, depth) => {
+
+    const totalWidth = level.length * (nodeW + hGap);
+    let startX = (svgW - totalWidth) / 2;
+
+    level.forEach((node, i) => {
+
+      const x = startX + i * (nodeW + hGap);
+      const y = depth * vGap + 40;
+
+      pos.set(node.id, { x, y });
+
+      svg += `
+        <g onclick="onTreeNodeClick('${node.id}')">
+          <rect x="${x}" y="${y}" width="${nodeW}" height="${nodeH}"
+            rx="6"
+            fill="#0b0f1a"
+            stroke="#00ffff"
+            style="cursor:pointer" />
+          
+          <text x="${x + nodeW/2}" y="${y + 18}"
+            text-anchor="middle"
+            fill="#00ffff"
+            font-size="11">
+            ${node.id}
+          </text>
+        </g>
+      `;
+    });
+  });
+
+  // ---------- DRAW EDGES ----------
+  function drawEdges(node) {
+    if (!node.children) return;
+
+    const p = pos.get(node.id);
+
+    node.children.forEach(child => {
+      const c = pos.get(child.id);
+
+      svg += `
+        <line 
+          x1="${p.x + nodeW/2}" 
+          y1="${p.y + nodeH}" 
+          x2="${c.x + nodeW/2}" 
+          y2="${c.y}" 
+          stroke="#00ffff55"
+          stroke-width="1"
+        />
+      `;
+
+      drawEdges(child);
+    });
+  }
+
+  drawEdges(treeData);
+
+  svg += `</svg>`;
+
+  graphContainer.innerHTML = svg;
+}
 
 
 async function connectWallet() {
