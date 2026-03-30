@@ -128,7 +128,7 @@ async function init(){
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 
-    renderTreeGraphPanel(demoTree);
+    renderRadialTreePanel(demoTree);
 }
 
 async function name() {
@@ -2250,7 +2250,101 @@ async function loadValidatorPage() {
     hideLoader();
 }
 
+function renderRadialTreePanel(treeData) {
 
+  const panel = addPanel("🌳 Radial Tree View");
+
+  const container = document.createElement("div");
+  container.style.width = "100%";
+  container.style.overflow = "auto";
+  panel.appendChild(container);
+
+  const size = 800;
+  const center = size / 2;
+
+  let svg = `<svg width="${size}" height="${size}">`;
+
+  const pos = new Map();
+
+  // --------- BUILD LEVELS ----------
+  function buildLevels(root) {
+    const levels = [];
+    function walk(node, depth = 0) {
+      if (!levels[depth]) levels[depth] = [];
+      levels[depth].push(node);
+      if (node.children) {
+        node.children.forEach(c => walk(c, depth + 1));
+      }
+    }
+    walk(root);
+    return levels;
+  }
+
+  const levels = buildLevels(treeData);
+
+  const radiusStep = 40;
+
+  // --------- POSITION NODES ----------
+  levels.forEach((level, depth) => {
+
+    const radius = depth * radiusStep;
+
+    level.forEach((node, i) => {
+
+      const angle = (2 * Math.PI * i) / level.length;
+
+      const x = center + radius * Math.cos(angle);
+      const y = center + radius * Math.sin(angle);
+
+      pos.set(node.id, { x, y });
+
+      svg += `
+        <circle cx="${x}" cy="${y}" r="10"
+          fill="#0b0f1a"
+          stroke="#00ffff"
+          stroke-width="1.5"
+          onclick="onTreeNodeClick('${node.id}')"
+          style="cursor:pointer"
+        />
+        <text x="${x}" y="${y - 14}" 
+          fill="#00ffff"
+          font-size="9"
+          text-anchor="middle">
+          ${node.id}
+        </text>
+      `;
+    });
+  });
+
+  // --------- DRAW EDGES ----------
+  function drawEdges(node) {
+    if (!node.children) return;
+
+    const p = pos.get(node.id);
+
+    node.children.forEach(child => {
+      const c = pos.get(child.id);
+
+      svg += `
+        <line 
+          x1="${p.x}" 
+          y1="${p.y}" 
+          x2="${c.x}" 
+          y2="${c.y}" 
+          stroke="#00ffff33"
+        />
+      `;
+
+      drawEdges(child);
+    });
+  }
+
+  drawEdges(treeData);
+
+  svg += `</svg>`;
+
+  container.innerHTML = svg;
+}
 function renderTreeGraphPanel(treeData) {
 
   // ✅ Use your existing panel system
