@@ -547,6 +547,7 @@ async function loadSystemTreasuriesNSecurebase(){
     
 
     addRow(panelBusiness, "", table1);
+    
 }
 
 async function onExecuteRoyality() {
@@ -597,10 +598,10 @@ async function onGetDailyBusiness(){
 	var r3 = new BN("0");
 	var r5 = new BN("0");
 	var r7 = new BN("0");
-	
+	document.getElementById("tabDBBody").replaceChildren();
 	
 	let age = await nested.methods.systemAge().call();
-	for (let i = age; i>=parseInt(age-10); i--) {
+	for (let i = age; i>=parseInt(age)-25; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
@@ -634,24 +635,27 @@ async function onGetDailyBusiness(){
 		r5=r5.add(new BN(royal5.toString()));
 		r7=r7.add(new BN(royal7.toString()));
 		
-		console.log(r3.toString());
-		console.log(r5.toString());
-		console.log(r7.toString());
-// 1. Check addresses
-console.log("nested:", nested.options.address);
+		//console.log(r3.toString());
+		//console.log(r5.toString());
+		//console.log(r7.toString());
+        // 1. Check addresses
+        //console.log("nested:", nested.options.address);
 
-let in741Addr = await hexBase.methods.in741().call();
-console.log("in741:", in741Addr);
+        //let in741Addr = await hexBase.methods.in741().call();
+        //console.log("in741:", in741Addr);
         let constRoyal = await nested.methods.getRoyalityAmountBatch(i).call();
 
-		
+		console.log(i);
+        console.log(constRoyal);
 		document.getElementById("tabDBBody")
         .insertAdjacentHTML("beforeend",
             '<tr><td>'+i+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
         );
 	}	
 
-	
+	setTimeout(() => {
+        onGetDailyBusiness();
+    }, 20000);
 
 	
 	
@@ -1081,7 +1085,7 @@ async function loadMyStor(id, panel){
             
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(4,20).call();
+                compute = await stor.methods.getAllIncome(4,1).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -1091,7 +1095,7 @@ async function loadMyStor(id, panel){
 
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(5,20).call();
+                computeFlush = await stor.methods.getAllIncome(5,1).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -1819,9 +1823,11 @@ async function loadMyNFT(){
     const levelpanel = addPanel("Level Business");
     addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild | RankAge`);
     for(let i=0; i<=15; i++){
-
+        debugger;
         const lvl = await storeContract.methods.getNodeLB(i).call();
-        const rankage = await storeContract.methods.rankage(i).call();
+        let rankage = 0;
+        if(i<8)
+            rankage = await storeContract.methods.rankage(i).call();
         addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} | ${rankage}`);
     }
     
