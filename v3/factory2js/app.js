@@ -1002,12 +1002,15 @@ async function loadUser() {
         const node = await nested.methods.getNode(id).call();
         const isdelegator = await nested.methods._isDelegatorNode(user).call();
         const isdelegatorNode = await daoassembly.methods.isdelegatorNode(user).call();
+        const totalTeamSize = await nested.methods.getTeamSize(id).call();
 
         addRow(panel, "ID", node[0]);
         addRow(panel, "Node", node[1]);
         addRow(panel, "Parent", node[2]);
         addRow(panel, "Active", node[5]);
         addRow(panel, "Direct Count", node[6]);
+        addRow(panel, "TotalTeamSize",totalTeamSize);
+        
         addRow(panel,"Are you Delegator ", isdelegator);
         addRow(panel,"Are you delegatorNode ", isdelegatorNode);
         const instAddr = node[3];
@@ -1103,15 +1106,15 @@ async function loadMyStor(id, panel) {
                 // Fallback → prevent UI break
                 computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-            
+            console.log(`computeFlush: `  + computeFlush);
             stor.methods.getAllIncome(6,10).call().then(console.log);
 
-            const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator"];
+            const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
             addRow(panel, "Income Type", "Compute | ComputeFlush | Drawn | Flushed | Unpaid | Suspend");
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 7; i++) {
                 const comp = formatOZN(compute[i]);
                 const compFlush = formatOZN(computeFlush[i]);
                 const drwn = formatOZN(drawn[i]);
@@ -1355,22 +1358,15 @@ async function onMovedownlineProposer() {
         const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
        
         
-    /*
-        //Raise  DAO request
 
-        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({
-                from: currentAccount
-        });
-        
+        //Raise  DAO request
+    /*
+
+        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
    */
 
         //if approved by DAO
-        const tx = await nestedContractT.methods
-            .moveDownline(uid)
-            .send({
-                from: currentAccount
-            });
-
+        const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
 
         if (tx.status) {
             alert("Movedownline succeeded");
