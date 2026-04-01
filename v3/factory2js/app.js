@@ -129,6 +129,8 @@ async function init(){
     //scanBlocks(50); // scan last 20 blocks
 
     renderRadialTreePanel(demoTree);
+    
+    
 }
 
 async function name() {
@@ -414,7 +416,7 @@ async function printRow(addr, balpanel){
 }
 
 // -------------------- LOAD SYSTEM --------------------
-async function loadSystem(){
+async function loadSystem() {
     clearPanels();
     const panelSys = addPanel("System Data");
     try{
@@ -430,14 +432,14 @@ async function loadSystem(){
 
     await loadSystemTreasuriesNSecurebase();
 
-    }catch(err){
-
+    } catch(err){
         console.error(err);
         addRow(panelMarket,"Error","Unable to load marketplace");
-
     }
 
     hideLoader();
+    setTimeout(() => loadSystem(), 15000);
+   
 }
 
 // -------------------- SYSTEM TREASURY + SECUREBASE --------------------
@@ -593,7 +595,7 @@ async function onSetDefaultRankCount() {
        
     
 }
-async function onGetDailyBusiness(){
+async function onGetDailyBusiness() {
 	
 	var r3 = new BN("0");
 	var r5 = new BN("0");
@@ -660,8 +662,8 @@ async function onGetDailyBusiness(){
 	
 }
 
-
-// -------------------- LOAD USER --------------------
+//NOT IN USED
+// -------------------- LOAD USER (NOT IN USED) --------------------
 async function loadUserPanel(user){
     if(!user || !web3.utils.isAddress(user)){
         alert("Please enter a valid address");
@@ -1032,6 +1034,8 @@ async function loadUser() {
     }
 
     hideLoader();
+
+    
 }
 
 async function loadMyStor(id, panel) {
