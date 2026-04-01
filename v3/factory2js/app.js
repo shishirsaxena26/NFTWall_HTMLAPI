@@ -1229,7 +1229,7 @@ async function loadDAO() {
                     + ' DelegatorCount: ' + delegatorCount            
                     + ' | RankForDAO: ' + rankforDAO         
                     + ' | BlacklistedCount: ' + 0    
-                    + ' | ProposalsCount: ' + proposalsCount    
+                    //+ ' | ProposalsCount: ' + proposalsCount    
                     + '</div>';
 
         const right=document.createElement("div");
@@ -1248,7 +1248,7 @@ async function loadDAO() {
         };
          
         const btnSubmitTrasfer=document.createElement("button");
-        btnSubmitTrasfer.innerText="SubmitTrasfer";
+        btnSubmitTrasfer.innerText="SubmitTransfer";
         btnSubmitTrasfer.style.marginLeft="10px";
         btnSubmitTrasfer.onclick = () => {
               onSubmitTrasfer();
@@ -1261,11 +1261,19 @@ async function loadDAO() {
               onNewProposer();
         };
 
+        const btnMovedownlineProposer=document.createElement("button");
+        btnMovedownlineProposer.innerText="Movedownline";
+        btnMovedownlineProposer.style.marginLeft="10px";
+        btnMovedownlineProposer.onclick = () => {
+              onMovedownlineProposer();
+        };
+
         right.appendChild(btnNewProposer);
         right.appendChild(btnTransferForms);
         right.appendChild(btnSubmitTrasfer);
         right.appendChild(btnProposals);
         addRow(panel, left, right);
+        addRow(panel, 'ProposalsCount: ' + proposalsCount, btnMovedownlineProposer);
 
     } catch (err) {
         console.error(err);
@@ -1283,6 +1291,7 @@ SUBJECT="Trigger.securebase.proposal.UpdateBonusRequestsPrime"
 echo "$SUBJECT"
 #send "$PKKEY" "$DAOAssemblyCore" "0" "newProposal(string,address,uint256,bytes,uint256)" "$SUBJECT" "$TARGET" "$VALUE_SUCCESS" "$DATA_SUCCESS" "7" 
 */
+//function setMoveDownlineApproval(uint256 _id, address parent, bool approval)
 async function onNewProposer() {
      try {
         
@@ -1299,10 +1308,10 @@ async function onNewProposer() {
 
         const SUBJECT = "Trigger.rule.proposal.UpdateMintQty";
         const TARGET = in741Rule;
-        const VALUE_SUCCESS = 0;
         const DATA_SUCCESS = rule.methods.setMintQty(2, 50000).encodeABI();
+        const VALUE_SUCCESS = 0;
         const EXPIRE = 7
-debugger;
+        debugger;
         const tx = await daoContract.methods
             .newProposal(SUBJECT,TARGET,VALUE_SUCCESS,DATA_SUCCESS,EXPIRE)
             .send({
@@ -1322,6 +1331,58 @@ debugger;
     } 
 } 
 
+
+async function onMovedownlineProposer() {
+    try {
+        
+        const uid = prompt("Enter ID:");
+        if (!uid && parseInt(uid)>0) 
+            throw 'valid ID required';
+
+        const newpid = prompt("Enter new parent ID:");
+        if (!newpid && parseInt(newpid)>0) 
+            throw 'valid ID required';
+
+        const ok = confirm("Are you sure you want to execute this transaction?");
+        if(!ok) return;
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+    
+        const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
+       
+        
+    /*
+        //Raise  DAO request
+
+        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({
+                from: currentAccount
+        });
+        
+   */
+
+        //if approved by DAO
+        const tx = await nestedContractT.methods
+            .moveDownline(uid)
+            .send({
+                from: currentAccount
+            });
+
+
+        if (tx.status) {
+            alert("Movedownline succeeded");
+        } else {
+            alert("Movedownline failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("Movedownline failed: " + (err.message || err));
+    } 
+} 
 //send "$PKKEY" "$TransferRequest" "0" "submitTransferForm(address,address[] memory)" "$ADDRESS" "$mandatedvoters_arr"
 
 async function onSubmitTrasfer() {
