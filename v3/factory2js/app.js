@@ -547,7 +547,7 @@ async function loadSystemTreasuriesNSecurebase(){
     
 
     addRow(panelBusiness, "", table1);
-    
+    onGetDailyBusiness();
 }
 
 async function onExecuteRoyality() {
@@ -591,7 +591,7 @@ async function onSetDefaultRankCount() {
         alert("ExecuteRoyality failed");
     }
        
-
+    
 }
 async function onGetDailyBusiness(){
 	
@@ -599,9 +599,10 @@ async function onGetDailyBusiness(){
 	var r5 = new BN("0");
 	var r7 = new BN("0");
 	document.getElementById("tabDBBody").replaceChildren();
+    document.getElementById("tabDBBody").innerHTML = "";
 	
 	let age = await nested.methods.systemAge().call();
-	for (let i = age; i>=parseInt(age)-25; i--) {
+	for (let i = age; i>=parseInt(age)-8; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
@@ -645,17 +646,15 @@ async function onGetDailyBusiness(){
         //console.log("in741:", in741Addr);
         let constRoyal = await nested.methods.getRoyalityAmountBatch(i).call();
 
-		console.log(i);
-        console.log(constRoyal);
+		console.log(`i: ${i}`);
+        console.log(`constRoyal: ${constRoyal}`);
 		document.getElementById("tabDBBody")
         .insertAdjacentHTML("beforeend",
             '<tr><td>'+i+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
         );
 	}	
 
-	setTimeout(() => {
-        onGetDailyBusiness();
-    }, 20000);
+	
 
 	
 	
@@ -1027,17 +1026,15 @@ async function loadUser() {
         loadMyStor(id, panel);
 
         loadMyNFT();
-    }catch(err){
-
+    } catch(err){
         console.error(err);
         addRow(panelMarket,"Error","Unable to load marketplace");
-
     }
 
     hideLoader();
 }
 
-async function loadMyStor(id, panel){
+async function loadMyStor(id, panel) {
     try{
 
         const node = await nested.methods.getNode(id).call();
@@ -1085,17 +1082,17 @@ async function loadMyStor(id, panel){
             
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(4,1).call();
+                compute = await stor.methods.getAllIncome(4,50).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
                 // Fallback → prevent UI break
                 compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-
+            console.log(`compute: `  + compute);
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(5,1).call();
+                computeFlush = await stor.methods.getAllIncome(5,50).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -1311,7 +1308,7 @@ async function onNewProposer() {
         const DATA_SUCCESS = rule.methods.setMintQty(2, 50000).encodeABI();
         const VALUE_SUCCESS = 0;
         const EXPIRE = 7
-        debugger;
+        ;
         const tx = await daoContract.methods
             .newProposal(SUBJECT,TARGET,VALUE_SUCCESS,DATA_SUCCESS,EXPIRE)
             .send({
@@ -1884,7 +1881,7 @@ async function loadMyNFT(){
     const levelpanel = addPanel("Level Business");
     addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild | RankAge`);
     for(let i=0; i<=15; i++){
-        debugger;
+        ;
         const lvl = await storeContract.methods.getNodeLB(i).call();
         let rankage = 0;
         if(i<8)
