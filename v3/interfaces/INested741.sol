@@ -33,7 +33,8 @@ interface INested741 {
         uint256 _type
     ) external;
     function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256, uint256);
-    function compileRoyality() external;
+    function compileRoyality(uint256 prevAge) external;
+    function createmdrequest(uint256 uid, uint256 newpid) external;
     function getBalance() external view returns (uint256);
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
     function getDownlineCountByLevel(uint256 uid, uint256 lvl) external view returns (uint256);
@@ -55,7 +56,7 @@ interface INested741 {
     function getNodeParent(address _user) external view returns (uint256, address);
     function getNodeParentId(uint256 _id) external view returns (uint256);
     function getNodesCount() external view returns (uint256 nodesCount);
-    function getRoyalityAmountBatch(uint256 ag) external view returns (uint256[] memory royal);
+    function getRoyalityAmountBatch(uint256 ag) external view returns (uint256[7] memory royal);
     function getTeamSize(uint256 uid) external view returns (uint256);
     function getTotalTeamSizeWithLevel(address _user, uint256 lvl) external view returns (uint256, uint256);
     function getUserIdToInst(uint256 _id) external view returns (address);
@@ -69,16 +70,17 @@ interface INested741 {
     function importBusiness(uint256 _amt, uint256 _ag) external;
     function importJoining(uint256 _cnt, uint256 _ag) external;
     function importOld(uint256 _id, uint256 _limit) external payable;
-    function importRankNBusiness(uint256[] memory _ag) external;
+    function importRankNBusiness(uint256 from, uint256 to) external;
     function importWithdrawal(uint256 _amt, uint256 _ag) external;
     function isNode(uint256 _id) external view returns (bool);
     function isUserExists(address node) external view returns (bool);
     function join(address _parent, address _user) external returns (uint256 _id, address _stor);
     function joinImport(address _parent, address _user) external returns (uint256 _id, address _stor);
-    function moveDownline(uint256 _id, address parent, bool _op) external;
+    function moveDownline(uint256 uid) external;
     function nodes(uint256) external view returns (address);
     function owner() external view returns (address);
     function setDefaultRankCount(uint256 _limit) external;
+    function setMoveDownlineApproval(uint256 uid, uint256 newpid) external;
     function systemAge() external view returns (uint256);
     function updateUsers(address from, address to) external returns (uint256 _id, address _stor, address _parent);
 }

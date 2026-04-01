@@ -29,9 +29,9 @@ interface IInstanceMe {
     function getHexbase() external view returns (address);
     function id() external view returns (uint256);
     function initialize() external payable;
-    function moveDownline(bool _op, address newparent) external;
     function owner() external view returns (address);
     function parent() external view returns (address);
+    function setParent(address newparent) external;
     function stor() external view returns (address);
     function systemAge() external view returns (uint256);
 }
