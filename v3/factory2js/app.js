@@ -1002,14 +1002,15 @@ async function loadUser() {
         const node = await nested.methods.getNode(id).call();
         const isdelegator = await nested.methods._isDelegatorNode(user).call();
         const isdelegatorNode = await daoassembly.methods.isdelegatorNode(user).call();
-        const totalTeamSize = await nested.methods.getTeamSize(id).call();
+        const teamSizeAndZeroDownlevelCount = await nested.methods.getTotalTeamSizeWithLevel(user,1).call();
 
         addRow(panel, "ID", node[0]);
         addRow(panel, "Node", node[1]);
         addRow(panel, "Parent", node[2]);
         addRow(panel, "Active", node[5]);
         addRow(panel, "Direct Count", node[6]);
-        addRow(panel, "TotalTeamSize",totalTeamSize);
+        addRow(panel, "Downline Size (1 level)",teamSizeAndZeroDownlevelCount[1]);
+        addRow(panel, "TotalTeamSize",teamSizeAndZeroDownlevelCount[0]);
         
         addRow(panel,"Are you Delegator ", isdelegator);
         addRow(panel,"Are you delegatorNode ", isdelegatorNode);
@@ -1363,11 +1364,11 @@ async function onMovedownlineProposer() {
     /*
 
         const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
-   */
 
+   */
         //if approved by DAO
         const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
-
+   
         if (tx.status) {
             alert("Movedownline succeeded");
         } else {
