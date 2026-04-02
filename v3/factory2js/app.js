@@ -182,7 +182,7 @@ async function init(){
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 
-    //renderULTreePanel();
+    renderULTreePanel();
     
     
 }
@@ -2366,434 +2366,175 @@ async function loadValidatorPage() {
     hideLoader();
 }
 
-function renderRadialTreePanel(treeData) {
+async function renderULTreePanel() {
 
-  const panel = addPanel("🌳 Radial Tree View");
-
-  const container = document.createElement("div");
-  container.style.width = "100%";
-  container.style.overflow = "auto";
-  panel.appendChild(container);
-
-  const size = 800;
-  const center = size / 2;
-
-  let svg = `<svg width="${size}" height="${size}">`;
-
-  const pos = new Map();
-
-  // --------- BUILD LEVELS ----------
-  function buildLevels(root) {
-    const levels = [];
-    function walk(node, depth = 0) {
-      if (!levels[depth]) levels[depth] = [];
-      levels[depth].push(node);
-      if (node.children) {
-        node.children.forEach(c => walk(c, depth + 1));
-      }
-    }
-    walk(root);
-    return levels;
-  }
-
-  const levels = buildLevels(treeData);
-
-  const radiusStep = 40;
-
-  // --------- POSITION NODES ----------
-  levels.forEach((level, depth) => {
-
-    const radius = depth * radiusStep;
-
-    level.forEach((node, i) => {
-
-      const angle = (2 * Math.PI * i) / level.length;
-
-      const x = center + radius * Math.cos(angle);
-      const y = center + radius * Math.sin(angle);
-
-      pos.set(node.id, { x, y });
-
-      svg += `
-        <circle cx="${x}" cy="${y}" r="10"
-          fill="#0b0f1a"
-          stroke="#00ffff"
-          stroke-width="1.5"
-          onclick="onTreeNodeClick('${node.id}')"
-          style="cursor:pointer"
-        />
-        <text x="${x}" y="${y - 14}" 
-          fill="#00ffff"
-          font-size="9"
-          text-anchor="middle">
-          ${node.id}
-        </text>
-      `;
-    });
-  });
-
-  // --------- DRAW EDGES ----------
-  function drawEdges(node) {
-    if (!node.children) return;
-
-    const p = pos.get(node.id);
-
-    node.children.forEach(child => {
-      const c = pos.get(child.id);
-
-      svg += `
-        <line 
-          x1="${p.x}" 
-          y1="${p.y}" 
-          x2="${c.x}" 
-          y2="${c.y}" 
-          stroke="#00ffff33"
-        />
-      `;
-
-      drawEdges(child);
-    });
-  }
-
-  drawEdges(treeData);
-
-  svg += `</svg>`;
-
-  container.innerHTML = svg;
-}
-function renderTreeGraphPanel(treeData) {
-
-  // ✅ Use your existing panel system
-  const panel = addPanel("🌳 Tree Graph");
-
-  // Container (acts like a row but full width)
-  const graphContainer = document.createElement("div");
-  graphContainer.style.width = "100%";
-  graphContainer.style.overflow = "auto";
-  graphContainer.style.paddingTop = "10px";
-
-  panel.appendChild(graphContainer);
-
-  // ---------- BUILD LEVELS ----------
-  function buildLevels(root) {
-    const levels = [];
-    function walk(node, depth = 0) {
-      if (!levels[depth]) levels[depth] = [];
-      levels[depth].push(node);
-      if (node.children) {
-        node.children.forEach(c => walk(c, depth + 1));
-      }
-    }
-    walk(root);
-    return levels;
-  }
-
-  const levels = buildLevels(treeData);
-
-  // ---------- CONFIG ----------
-  const nodeW = 70;
-  const nodeH = 28;
-  const hGap = 25;
-  const vGap = 70;
-
-  const svgW = 1200;
-  const svgH = levels.length * vGap + 100;
-
-  let svg = `<svg width="${svgW}" height="${svgH}">`;
-
-  const pos = new Map();
-
-  // ---------- DRAW NODES ----------
-  levels.forEach((level, depth) => {
-
-    const totalWidth = level.length * (nodeW + hGap);
-    let startX = (svgW - totalWidth) / 2;
-
-    level.forEach((node, i) => {
-
-      const x = startX + i * (nodeW + hGap);
-      const y = depth * vGap + 40;
-
-      pos.set(node.id, { x, y });
-
-      svg += `
-        <g onclick="onTreeNodeClick('${node.id}')">
-          <rect x="${x}" y="${y}" width="${nodeW}" height="${nodeH}"
-            rx="6"
-            fill="#0b0f1a"
-            stroke="#00ffff"
-            style="cursor:pointer" />
-          
-          <text x="${x + nodeW/2}" y="${y + 18}"
-            text-anchor="middle"
-            fill="#00ffff"
-            font-size="11">
-            ${node.id}
-          </text>
-        </g>
-      `;
-    });
-  });
-
-  // ---------- DRAW EDGES ----------
-  function drawEdges(node) {
-    if (!node.children) return;
-
-    const p = pos.get(node.id);
-
-    node.children.forEach(child => {
-      const c = pos.get(child.id);
-
-      svg += `
-        <line 
-          x1="${p.x + nodeW/2}" 
-          y1="${p.y + nodeH}" 
-          x2="${c.x + nodeW/2}" 
-          y2="${c.y}" 
-          stroke="#00ffff55"
-          stroke-width="1"
-        />
-      `;
-
-      drawEdges(child);
-    });
-  }
-
-  drawEdges(treeData);
-
-  svg += `</svg>`;
-
-  graphContainer.innerHTML = svg;
-}
-
-function renderULTreePanel() {
-
-  const panel = addPanel("🌳 UL Tree View");
+  const panel = addPanel("🌳 Upline + Downline View");
 
   // ---------- INPUT UI ----------
   const inputWrap = document.createElement("div");
   inputWrap.style.display = "flex";
-  inputWrap.style.gap = "8px";
-  inputWrap.style.marginBottom = "10px";
+  inputWrap.style.alignItems = "center";
+  inputWrap.style.gap = "10px";
+  inputWrap.style.marginBottom = "12px";
 
   const input = document.createElement("input");
   input.placeholder = "Enter wallet address...";
   input.style.flex = "1";
-  input.style.padding = "6px";
-  input.style.borderRadius = "6px";
-  input.style.border = "1px solid #333";
+  input.style.padding = "8px 10px";
+  input.style.borderRadius = "8px";
+  input.style.border = "1px solid #2a3a5a";
   input.style.background = "#0b0f1a";
   input.style.color = "#00ffff";
-  input.style.fontSize = "12px";
 
   const btn = document.createElement("button");
-  btn.textContent = "Load Tree";
+  btn.textContent = "Load";
+  btn.style.padding = "8px 14px";
+  btn.style.borderRadius = "8px";
+  btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+  btn.style.border = "none";
 
   inputWrap.appendChild(input);
   inputWrap.appendChild(btn);
   panel.appendChild(inputWrap);
 
-  // ---------- TREE CONTAINER ----------
+  // ---------- CONTAINER ----------
   const container = document.createElement("div");
   container.className = "ulTreeWrap";
-  container.style.width = "100%";
-  container.style.overflow = "auto";
-  container.style.padding = "10px";
-
   panel.appendChild(container);
 
   // ---------- STYLE ----------
   const style = document.createElement("style");
   style.innerHTML = `
-    .ulTreeWrap ul { list-style:none; padding-left:18px; position:relative; }
-    .ulTreeWrap li { position:relative; margin:4px 0; color:#00ffff; font-size:12px; }
-    .ulTreeWrap li::before {
-      content:""; position:absolute; top:10px; left:-12px;
-      width:10px; height:2px; background:#00ffff55;
-    }
-    .ulTreeWrap ul::before {
-      content:""; position:absolute; left:6px; top:10px;
-      bottom:0; width:2px; background:#00ffff22;
-    }
-    .node {
-      cursor:pointer;
-      padding:3px 6px;
-      border-radius:4px;
-      display:inline-block;
-      background:#0b0f1a;
-    }
-    .node:hover { background:#ffffff22; }
-    .active {
-      background:#00ffff33;
-      box-shadow:0 0 6px #00ffff;
-    }
-    .toggle {
-      margin-right:6px;
-      color:#ffd700;
-      cursor:pointer;
-    }
+    .ulTreeWrap ul { list-style:none; padding-left:15px; }
+    .ulTreeWrap li { margin:3px 0; color:#00ffff; font-size:12px; }
   `;
   document.head.appendChild(style);
 
-  // ---------- CACHE ----------
-  const nodeCache = {};
-
   // ---------- HELPERS ----------
   function shortAddr(addr) {
-    return addr ? addr.slice(-4) : "----";
+    return addr ? "0x.."+addr.slice(-4) : "----";
   }
 
   async function getNode(id) {
-
-    if (nodeCache[id]) return nodeCache[id];
-
-    const n = await nested.methods.nodes(id).call();
-
-    const node = {
-      id: id.toString(),
-      address: n.user || n[0],
-      loaded: false,
-      loading: false,
-      children: []
-    };
-
-    nodeCache[id] = node;
-    return node;
+    const addr = await nested.methods.nodes(id).call();
+    return { id: id.toString(), address: addr };
   }
 
-  async function getChildren(node) {
-
-    const n = await nested.methods.nodes(node.id).call();
-    const directs = n.direc || n[2] || [];
-
-    const MAX_CHILD = 10; // 🔥 IMPORTANT LIMIT
-
-    const slice = directs.slice(0, MAX_CHILD);
-
-    // ⚡ PARALLEL CALLS
-    const promises = slice.map(async (addr) => {
-      const info = await nested.methods.getNodeParent(addr).call();
-      return getNode(info[0]);
-    });
-
-    return await Promise.all(promises);
+async function getChildren(id) {
+    
+    const getNodeDirectsCount = await nested.methods.getNodeDirectsCount(id).call()
+    const arr = [];
+    
+    for(let i=0;i<getNodeDirectsCount && i<10;i++) {
+        arr.push(await getNode(await nested.methods.getNodeChild(id, i).call()));
+    }
+    return arr;
   }
-
-  // ---------- MAIN LOAD FUNCTION ----------
-  async function loadTree(userAddress) {
+  
+  // ---------- LOAD ----------
+  async function loadTree(addr) {
 
     container.innerHTML = "⏳ Loading...";
 
     try {
-
-      const info = await nested.methods.getNodeParent(userAddress).call();
+        
+      const info = await nested.methods.getNodeParent(addr).call();
       let uid = info[0];
 
-      let current = await getNode(uid);
-      let root = current;
+      const chain = [];
 
-      // 🔼 BUILD UPLINE
-      while (true) {
-        const pid = await nested.methods.getNodeParentId(current.id).call();
-        if (pid == 0) break;
+      // 🔥 SELF NODE
+      const selfNode = { id: "You", address: addr };
+      chain.push(selfNode);
 
-        const parent = await getNode(pid);
-        parent.children = [current];
-
-        current = parent;
-        root = parent;
+      // 🔼 UPLINE
+      while (uid != 0) {
+        const node = await getNode(uid);
+        chain.push(node);
+        uid = await nested.methods.getNodeParentId(uid).call();
       }
 
-      // ---------- RENDER ----------
-      function createNode(node) {
+      chain.reverse();
+
+      // ---------- BUILD TREE ----------
+      const ul = document.createElement("ul");
+      let currentUL = ul;
+      let lastLI = null;
+
+      for (let i = 0; i < chain.length; i++) {
+
+        const n = chain[i];
 
         const li = document.createElement("li");
+        li.textContent = `${n.id} (${shortAddr(n.address)})`;
 
-        const toggle = document.createElement("span");
-        toggle.textContent = "▶";
-        toggle.className = "toggle";
+        const nextUL = document.createElement("ul");
 
-        const label = document.createElement("span");
-        label.className = "node";
-        label.textContent = `${node.id} (${shortAddr(node.address)})`;
+        li.appendChild(nextUL);
+        currentUL.appendChild(li);
 
-        // 🔽 EXPAND / COLLAPSE + LAZY LOAD
-        toggle.onclick = async () => {
+        currentUL = nextUL;
+        lastLI = li;
+      }
 
-          if (node.loading) return;
-          node.loading = true;
+      // 🔽 ADD DOWNLINE (ONLY FOR SELF NODE)
+      const selfId = chain[chain.length - 1].id === "You"
+        ? (await nested.methods.getNodeParent(addr).call())[0]
+        : null;
 
-          toggle.textContent = "⏳";
+      if (selfId) {
 
-          try {
+        const children = await getChildren(selfId);
+        
+        const downUL = document.createElement("ul");
 
-            if (!node.loaded) {
+        for (let c of children) {
 
-              const children = await getChildren(node);
+          const cli = document.createElement("li");
+          cli.textContent = `${c.id} (${shortAddr(c.address)})`;
 
-              node.children = children;
-              node.loaded = true;
+          // 🔽 LEVEL 2
+          const subChildren = await getChildren(c.id);
 
-              const ul = document.createElement("ul");
-              children.forEach(c => ul.appendChild(createNode(c)));
-              li.appendChild(ul);
+          if (subChildren.length) {
+            const subUL = document.createElement("ul");
 
-            } else {
+            subChildren.forEach(sc => {
+              const scli = document.createElement("li");
+              scli.textContent = `${sc.id} (${shortAddr(sc.address)})`;
+              subUL.appendChild(scli);
+            });
 
-              const ul = li.querySelector("ul");
-              if (ul) {
-                ul.style.display = ul.style.display === "none" ? "block" : "none";
-              }
-            }
-
-          } catch (e) {
-            console.error(e);
+            cli.appendChild(subUL);
           }
 
-          node.loading = false;
-          toggle.textContent = toggle.textContent === "▶" ? "▼" : "▶";
-        };
+          downUL.appendChild(cli);
+        }
 
-        // 🎯 HIGHLIGHT PATH
-        label.onclick = () => {
-          container.querySelectorAll(".node").forEach(n => n.classList.remove("active"));
-
-          let el = label;
-          while (el) {
-            if (el.classList?.contains("node")) el.classList.add("active");
-            el = el.parentElement?.closest("li")?.querySelector(".node");
-          }
-        };
-
-        li.appendChild(toggle);
-        li.appendChild(label);
-
-        return li;
+        lastLI.appendChild(downUL);
       }
 
       container.innerHTML = "";
-
-      const ul = document.createElement("ul");
-      ul.appendChild(createNode(root));
-
       container.appendChild(ul);
 
-    } catch (err) {
-      container.innerHTML = "❌ Error loading tree";
-      console.error(err);
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = "❌ Error";
     }
   }
 
-  // ---------- BUTTON CLICK ----------
+  // ---------- CLICK ----------
   btn.onclick = () => {
     const addr = input.value.trim();
-    if (!addr) {
-      alert("Enter address");
-      return;
-    }
+    if (!addr) return alert("Enter address");
     loadTree(addr);
   };
+
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btn.click();
+  });
 }
+
 
 async function connectWallet() {
     currentAccount = null;
