@@ -33,6 +33,7 @@ interface INested741 {
         uint256 _type
     ) external;
     function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256, uint256);
+    function closemdrequest(uint256 uid) external;
     function compileRoyality(uint256 prevAge) external;
     function createmdrequest(uint256 uid, uint256 newpid) external;
     function getBalance() external view returns (uint256);

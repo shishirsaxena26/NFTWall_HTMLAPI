@@ -44,18 +44,72 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const demoTree = {
-  id: 1,
+const treeData = {
+  id: "1",
+  address: "0x0089188449F0d4119715c9A10eA8955FB26EE308",
   children: [
     {
-      id: 2,
+      id: "2",
+      address: "0x2242C969aaFD0D61Dd83e9a9c5E5dB046eeC922C",
       children: [
-        { id: 6, children: [{ id: 15 }, { id: 16 }, { id: 17 }] },
-        { id: 7 }
+        {
+          id: "4",
+          address: "0x65595A6F3F2c71D2Daf9e816FbA3bfF80C8388c2",
+          children: [
+            {
+              id: "6",
+              address: "0x3700Ec1c787B382363f8CEF7c6605f6D8d8CBbBB",
+              children: [
+                {
+                  id: "8",
+                  address: "0x35312d50cf3c4ea8e997f2cB55c89b674E769161",
+                  children: [
+                    {
+                      id: "9",
+                      address: "0xBC422C995f416C44FDCD2f755622F74E76c1782f",
+                      children: [
+                        {
+                          id: "10",
+                          address: "0x38d8980013588181A3ee358F4aFcF573c1454A21",
+                          children: [
+                            {
+                              id: "11",
+                              address: "0x7017313e77417D9F66EFc6c4E38623Ec28E50266",
+                              children: []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: "7",
+              address: "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8",
+              children: []
+            }
+          ]
+        },
+        {
+          id: "5",
+          address: "0x8fBD8b80F831735B1d0f21c67600e2b29a43A143",
+          children: [
+            {
+              id: "12",
+              address: "0xd2e355C594775d9cE44959C05879085c4fD94229",
+              children: []
+            }
+          ]
+        }
       ]
     },
-    { id: 3 },
-    { id: 4 }
+    {
+      id: "3",
+      address: "0x9653e22e7De603e3f4F80d6e6964Da487a4440bD",
+      children: []
+    }
   ]
 };
 
@@ -128,7 +182,7 @@ async function init(){
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 
-    renderRadialTreePanel(demoTree);
+    renderULTreePanel(treeData);
     
     
 }
@@ -2512,6 +2566,126 @@ function renderTreeGraphPanel(treeData) {
   graphContainer.innerHTML = svg;
 }
 
+function renderULTreePanel(treeData) {
+
+  const panel = addPanel("🌳 UL Tree View");
+
+  const container = document.createElement("div");
+  container.className = "ulTreeWrap"; // ✅ scope root
+  container.style.width = "100%";
+  container.style.overflow = "auto";
+  container.style.padding = "10px";
+
+  panel.appendChild(container);
+
+  // --------- SCOPED STYLE ----------
+  const style = document.createElement("style");
+style.innerHTML = `
+  .ulTreeWrap ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  /* 🌈 Alternate vertical line colors by depth */
+  .ulTreeWrap ul:nth-child(odd)::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #00ffff55;  /* cyan */
+  }
+
+  .ulTreeWrap ul:nth-child(even)::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #ff00ff55;  /* magenta */
+  }
+
+  .ulTreeWrap li {
+    position: relative;
+    margin: 4px 0;
+    color: #00ffff;
+    font-size: 12px;
+    font-family: Consolas, monospace;
+  }
+
+  /* 🌈 Horizontal connectors alternate too */
+  .ulTreeWrap li:nth-child(odd)::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: -12px;
+    width: 10px;
+    height: 1px;
+    background: #00ffff;
+  }
+
+  .ulTreeWrap li:nth-child(even)::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: -12px;
+    width: 10px;
+    height: 1px;
+    background: #ff00ff;
+  }
+
+  .ulTreeWrap span {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .ulTreeWrap span:hover {
+    background: #00ffff22;
+    color: #ffffff;
+  }
+`;
+document.head.appendChild(style);
+
+  // --------- HELPER ----------
+  function shortAddr(addr) {
+    return addr ? addr.slice(-4) : "----";
+  }
+
+  // --------- BUILD TREE ----------
+  function createNode(node) {
+    const li = document.createElement("li");
+
+    const span = document.createElement("span");
+    span.textContent = `${node.id} (${shortAddr(node.address)})`;
+
+    span.onclick = () => onTreeNodeClick(node.id);
+
+    li.appendChild(span);
+
+    if (node.children && node.children.length > 0) {
+      const ul = document.createElement("ul");
+
+      node.children.forEach(child => {
+        ul.appendChild(createNode(child));
+      });
+
+      li.appendChild(ul);
+    }
+
+    return li;
+  }
+
+  const rootUL = document.createElement("ul");
+  rootUL.appendChild(createNode(treeData));
+
+  container.appendChild(rootUL);
+}
 
 async function connectWallet() {
     currentAccount = null;
