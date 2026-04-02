@@ -1362,13 +1362,13 @@ async function onMovedownlineProposer() {
 
         //Raise  DAO request
     
-/*
+/* 
         const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
- */
+  */
    
-        //if approved by DAO
+       //if approved by DAO
         const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
-  
+ 
         if (tx.status) {
             alert("Movedownline succeeded");
         } else {
