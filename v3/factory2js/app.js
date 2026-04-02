@@ -182,7 +182,7 @@ async function init(){
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
 
-    renderULTreePanel(treeData);
+    //renderULTreePanel();
     
     
 }
@@ -2566,125 +2566,233 @@ function renderTreeGraphPanel(treeData) {
   graphContainer.innerHTML = svg;
 }
 
-function renderULTreePanel(treeData) {
+function renderULTreePanel() {
 
   const panel = addPanel("🌳 UL Tree View");
 
+  // ---------- INPUT UI ----------
+  const inputWrap = document.createElement("div");
+  inputWrap.style.display = "flex";
+  inputWrap.style.gap = "8px";
+  inputWrap.style.marginBottom = "10px";
+
+  const input = document.createElement("input");
+  input.placeholder = "Enter wallet address...";
+  input.style.flex = "1";
+  input.style.padding = "6px";
+  input.style.borderRadius = "6px";
+  input.style.border = "1px solid #333";
+  input.style.background = "#0b0f1a";
+  input.style.color = "#00ffff";
+  input.style.fontSize = "12px";
+
+  const btn = document.createElement("button");
+  btn.textContent = "Load Tree";
+
+  inputWrap.appendChild(input);
+  inputWrap.appendChild(btn);
+  panel.appendChild(inputWrap);
+
+  // ---------- TREE CONTAINER ----------
   const container = document.createElement("div");
-  container.className = "ulTreeWrap"; // ✅ scope root
+  container.className = "ulTreeWrap";
   container.style.width = "100%";
   container.style.overflow = "auto";
   container.style.padding = "10px";
 
   panel.appendChild(container);
 
-  // --------- SCOPED STYLE ----------
+  // ---------- STYLE ----------
   const style = document.createElement("style");
-style.innerHTML = `
-  .ulTreeWrap ul {
-    list-style: none;
-    margin: 0;
-    padding-left: 18px;
-    position: relative;
-  }
+  style.innerHTML = `
+    .ulTreeWrap ul { list-style:none; padding-left:18px; position:relative; }
+    .ulTreeWrap li { position:relative; margin:4px 0; color:#00ffff; font-size:12px; }
+    .ulTreeWrap li::before {
+      content:""; position:absolute; top:10px; left:-12px;
+      width:10px; height:2px; background:#00ffff55;
+    }
+    .ulTreeWrap ul::before {
+      content:""; position:absolute; left:6px; top:10px;
+      bottom:0; width:2px; background:#00ffff22;
+    }
+    .node {
+      cursor:pointer;
+      padding:3px 6px;
+      border-radius:4px;
+      display:inline-block;
+      background:#0b0f1a;
+    }
+    .node:hover { background:#ffffff22; }
+    .active {
+      background:#00ffff33;
+      box-shadow:0 0 6px #00ffff;
+    }
+    .toggle {
+      margin-right:6px;
+      color:#ffd700;
+      cursor:pointer;
+    }
+  `;
+  document.head.appendChild(style);
 
-  /* 🌈 Alternate vertical line colors by depth */
-  .ulTreeWrap ul:nth-child(odd)::before {
-    content: "";
-    position: absolute;
-    left: 6px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: #00ffff55;  /* cyan */
-  }
+  // ---------- CACHE ----------
+  const nodeCache = {};
 
-  .ulTreeWrap ul:nth-child(even)::before {
-    content: "";
-    position: absolute;
-    left: 6px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: #ff00ff55;  /* magenta */
-  }
-
-  .ulTreeWrap li {
-    position: relative;
-    margin: 4px 0;
-    color: #00ffff;
-    font-size: 12px;
-    font-family: Consolas, monospace;
-  }
-
-  /* 🌈 Horizontal connectors alternate too */
-  .ulTreeWrap li:nth-child(odd)::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: -12px;
-    width: 10px;
-    height: 1px;
-    background: #00ffff;
-  }
-
-  .ulTreeWrap li:nth-child(even)::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: -12px;
-    width: 10px;
-    height: 1px;
-    background: #ff00ff;
-  }
-
-  .ulTreeWrap span {
-    cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 4px;
-    display: inline-block;
-  }
-
-  .ulTreeWrap span:hover {
-    background: #00ffff22;
-    color: #ffffff;
-  }
-`;
-document.head.appendChild(style);
-
-  // --------- HELPER ----------
+  // ---------- HELPERS ----------
   function shortAddr(addr) {
     return addr ? addr.slice(-4) : "----";
   }
 
-  // --------- BUILD TREE ----------
-  function createNode(node) {
-    const li = document.createElement("li");
+  async function getNode(id) {
 
-    const span = document.createElement("span");
-    span.textContent = `${node.id} (${shortAddr(node.address)})`;
+    if (nodeCache[id]) return nodeCache[id];
 
-    span.onclick = () => onTreeNodeClick(node.id);
+    const n = await nested.methods.nodes(id).call();
 
-    li.appendChild(span);
+    const node = {
+      id: id.toString(),
+      address: n.user || n[0],
+      loaded: false,
+      loading: false,
+      children: []
+    };
 
-    if (node.children && node.children.length > 0) {
-      const ul = document.createElement("ul");
-
-      node.children.forEach(child => {
-        ul.appendChild(createNode(child));
-      });
-
-      li.appendChild(ul);
-    }
-
-    return li;
+    nodeCache[id] = node;
+    return node;
   }
 
-  const rootUL = document.createElement("ul");
-  rootUL.appendChild(createNode(treeData));
+  async function getChildren(node) {
 
-  container.appendChild(rootUL);
+    const n = await nested.methods.nodes(node.id).call();
+    const directs = n.direc || n[2] || [];
+
+    const MAX_CHILD = 10; // 🔥 IMPORTANT LIMIT
+
+    const slice = directs.slice(0, MAX_CHILD);
+
+    // ⚡ PARALLEL CALLS
+    const promises = slice.map(async (addr) => {
+      const info = await nested.methods.getNodeParent(addr).call();
+      return getNode(info[0]);
+    });
+
+    return await Promise.all(promises);
+  }
+
+  // ---------- MAIN LOAD FUNCTION ----------
+  async function loadTree(userAddress) {
+
+    container.innerHTML = "⏳ Loading...";
+
+    try {
+
+      const info = await nested.methods.getNodeParent(userAddress).call();
+      let uid = info[0];
+
+      let current = await getNode(uid);
+      let root = current;
+
+      // 🔼 BUILD UPLINE
+      while (true) {
+        const pid = await nested.methods.getNodeParentId(current.id).call();
+        if (pid == 0) break;
+
+        const parent = await getNode(pid);
+        parent.children = [current];
+
+        current = parent;
+        root = parent;
+      }
+
+      // ---------- RENDER ----------
+      function createNode(node) {
+
+        const li = document.createElement("li");
+
+        const toggle = document.createElement("span");
+        toggle.textContent = "▶";
+        toggle.className = "toggle";
+
+        const label = document.createElement("span");
+        label.className = "node";
+        label.textContent = `${node.id} (${shortAddr(node.address)})`;
+
+        // 🔽 EXPAND / COLLAPSE + LAZY LOAD
+        toggle.onclick = async () => {
+
+          if (node.loading) return;
+          node.loading = true;
+
+          toggle.textContent = "⏳";
+
+          try {
+
+            if (!node.loaded) {
+
+              const children = await getChildren(node);
+
+              node.children = children;
+              node.loaded = true;
+
+              const ul = document.createElement("ul");
+              children.forEach(c => ul.appendChild(createNode(c)));
+              li.appendChild(ul);
+
+            } else {
+
+              const ul = li.querySelector("ul");
+              if (ul) {
+                ul.style.display = ul.style.display === "none" ? "block" : "none";
+              }
+            }
+
+          } catch (e) {
+            console.error(e);
+          }
+
+          node.loading = false;
+          toggle.textContent = toggle.textContent === "▶" ? "▼" : "▶";
+        };
+
+        // 🎯 HIGHLIGHT PATH
+        label.onclick = () => {
+          container.querySelectorAll(".node").forEach(n => n.classList.remove("active"));
+
+          let el = label;
+          while (el) {
+            if (el.classList?.contains("node")) el.classList.add("active");
+            el = el.parentElement?.closest("li")?.querySelector(".node");
+          }
+        };
+
+        li.appendChild(toggle);
+        li.appendChild(label);
+
+        return li;
+      }
+
+      container.innerHTML = "";
+
+      const ul = document.createElement("ul");
+      ul.appendChild(createNode(root));
+
+      container.appendChild(ul);
+
+    } catch (err) {
+      container.innerHTML = "❌ Error loading tree";
+      console.error(err);
+    }
+  }
+
+  // ---------- BUTTON CLICK ----------
+  btn.onclick = () => {
+    const addr = input.value.trim();
+    if (!addr) {
+      alert("Enter address");
+      return;
+    }
+    loadTree(addr);
+  };
 }
 
 async function connectWallet() {
