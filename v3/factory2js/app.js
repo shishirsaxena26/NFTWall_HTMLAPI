@@ -1357,17 +1357,14 @@ async function onMovedownlineProposer() {
         if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
     
         const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
-       
-        
 
         //Raise  DAO request
     
-/* 
-        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
-  */
+      //  const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
    
        //if approved by DAO
-        const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
+
+         const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
  
         if (tx.status) {
             alert("Movedownline succeeded");
