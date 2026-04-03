@@ -73,46 +73,12 @@ interface I741Rules {
         );
     function poolNFT1() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
     function poolNFT2() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
-    function poolValprivate()
-        external
-        view
-        returns (
-            uint256 startafter,
-            uint256 stakeN,
-            uint256 stakeD,
-            uint256 roiN,
-            uint256 roiD,
-            uint256 roiInt,
-            uint256 roiEnd
-        );
-    function poolValpublic()
-        external
-        view
-        returns (
-            uint256 startafter,
-            uint256 stakeN,
-            uint256 stakeD,
-            uint256 roiN,
-            uint256 roiD,
-            uint256 roiInt,
-            uint256 roiEnd
-        );
     function rankClause(uint256) external view returns (uint256 direct, uint256 nftAmount);
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
     function setAllowForceTransfer(bool _f) external;
     function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei, bool _val, bool _tour) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
-    function setCoinPool(
-        uint256 _type,
-        uint256 _start,
-        uint256 _stakeN,
-        uint256 _stakeD,
-        uint256 _roiN,
-        uint256 _roiD,
-        uint256 _roiInt,
-        uint256 _roiEnd
-    ) external;
     function setFreeIntervals(uint256 _d) external;
     function setGlobalClaimPerDay(uint256 _ac) external;
     function setLevelIncomeOnRank(uint256 _min, uint256 _max) external;
@@ -123,9 +89,9 @@ interface I741Rules {
     function setMintQty(uint256 _min, uint256 _max) external;
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
-    function setNftPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
+    function setValidatorPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setclaimCycle(uint256 _d) external;
     function setlevelClause(
         uint256 lvl,

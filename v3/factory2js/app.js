@@ -2888,9 +2888,7 @@ async function loadRule() {
                 if (parseInt(t) === 0) continue;
 
                 // convert wei → ether (3 decimal)
-                const ethVal = parseFloat(web3.utils.fromWei(t.toString(), "ether")).toFixed(0);
-
-                addRow(panelTour, `Tour ${i}`, `${ethVal}$`);
+                addRow(panelTour, `Tour ${i}`, `${t.toString()}$`);
 
             } catch (e) {
                 console.log("Tour error:", i);
