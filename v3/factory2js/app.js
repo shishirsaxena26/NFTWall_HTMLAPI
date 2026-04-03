@@ -2781,49 +2781,76 @@ async function loadRule() {
 
         panelNFTPool.appendChild(tableNFT);
         
-        // ---------------- BASIC SETTINGS ----------------
-        const panelBasic = addPanel("Rule - Basic");
-
-        addRow(panelBasic, "Owner", await rule.methods.owner().call());
-        addRow(panelBasic, "System Age", await rule.methods.systemAge().call());
-        addRow(panelBasic, "Shutdown", await rule.methods.shutdown().call());
-        addRow(panelBasic, "Is Safe", await rule.methods._isSafe().call());
-        addRow(panelBasic, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
-
         // ---------------- MINT SETTINGS ----------------
         const panelMint = addPanel("Mint Config");
 
-        addRow(panelMint, "Min Mint Qty", await rule.methods.minMintQty().call());
-        addRow(panelMint, "Max Mint Qty", await rule.methods.maxMintQty().call());
-        addRow(panelMint, "Mint Fee", await rule.methods.mintFeePerQty().call());
-        addRow(panelMint, "Mint Cycle Days", await rule.methods.mintCycleDays().call());
-        addRow(panelMint, "Max Mints/Cycle", await rule.methods.maxMintsPerCycle().call());
+        const minQty = await rule.methods.minMintQty().call();
+        const maxQty = await rule.methods.maxMintQty().call();
+        const fee = await rule.methods.mintFeePerQty().call();
+        const cycleDays = await rule.methods.mintCycleDays().call();
+        const maxPerCycle = await rule.methods.maxMintsPerCycle().call();
+
+        // min + max qty
+        addRow(panelMint, "Mint Quantity Range", `${minQty} - ${maxQty}`);
+
+        // cycle info
+        addRow(panelMint, "Mint Limit", `${maxPerCycle} mints allowed in ${cycleDays} days`);
+
+        // fee per qty
+        addRow(panelMint, "Mint Price", `${(parseFloat(fee) / 1e18).toFixed(3)} ETH per NFT`);
 
         // ---------------- CLAIM SETTINGS ----------------
         const panelClaim = addPanel("Claim Config");
 
-        addRow(panelClaim, "Min Claim/Day", await rule.methods.minClaimPerDay().call());
-        addRow(panelClaim, "Max Claim/Day", await rule.methods.maxClaimPerDay().call());
-        addRow(panelClaim, "Global Claim/Day", await rule.methods.maxGlobalClaimPerDay().call());
-        addRow(panelClaim, "Claim Cycle", await rule.methods.eachclaimCycle().call());
+        const minClaim = await rule.methods.minClaimPerDay().call();
+        const maxClaim = await rule.methods.maxClaimPerDay().call();
+        const globalClaim = await rule.methods.maxGlobalClaimPerDay().call();
+        const cycle = await rule.methods.eachclaimCycle().call();
+
+        // min + max in single row
+        addRow(panelClaim, "Daily Claim Range", `${minClaim} - ${maxClaim}`);
+
+        // claim cycle meaning
+        addRow(panelClaim, "Claim Frequency", `1 claim allowed every ${cycle} days`);
+
+        // global claim meaning
+        addRow(panelClaim, "Daily Limit", `Max ${globalClaim} claimable per day`);
 
         // ---------------- NFT SETTINGS ----------------
         const panelNFT = addPanel("NFT Config");
 
-        addRow(panelNFT, "Max NFT Send", await rule.methods.maxNFTSend().call());
-        addRow(panelNFT, "NFT Send/Cycle", await rule.methods.NFTSendPerCycle().call());
+        const maxSend = await rule.methods.maxNFTSend().call();
+        const perCycle = await rule.methods.NFTSendPerCycle().call();
 
-        // ---------------- DAO ----------------
-        const panelDAO = addPanel("DAO");
-
-        addRow(panelDAO, "Rank For DAO", await rule.methods.rankforDAO().call());
+        addRow(panelNFT, "NFT Send", `${maxSend} NFTs in ${perCycle} days`);
 
         // ---------------- DELEGATION ----------------
         const panelDelegation = addPanel("Delegation");
 
+        // add DAO rank here
+        addRow(panelDelegation, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
+
+        // delegator count
         addRow(panelDelegation, "Delegator Count", await rule.methods._delegatorCount().call());
-        addRow(panelDelegation, "Delegate Private", await rule.methods.delegateamtprivate().call());
-        addRow(panelDelegation, "Delegate Public", await rule.methods.delegateamtpublic().call());
+
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
+
+        // validator configs
+        const valInternal = await rule.methods.valInternal().call();
+        const valExternal = await rule.methods.valExternal().call();
+
+        // grouped view
+        addRow(panelDelegation, "Internal",
+            `Qty:${valInternal.qty} | ROI:${toPercent(valInternal.roiN, valInternal.roiD)} (${valInternal.roiN}/${valInternal.roiD}) | Int:${valInternal.roiInt}`
+        );
+
+        addRow(panelDelegation, "External",
+            `Qty:${valExternal.qty} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
+        );
 
         
         // ---------------- CAPPING ----------------
@@ -2859,6 +2886,16 @@ async function loadRule() {
                 console.log("Tour error:", i);
             }
         }
+
+
+        // ---------------- OTHER SETTINGS ----------------
+        const panelOthers = addPanel("OTHER SETTINGS");
+
+        addRow(panelOthers, "Owner", await rule.methods.owner().call());
+        addRow(panelOthers, "System Age", await rule.methods.systemAge().call());
+        addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());
+        addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
+        addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
 
     } catch (err) {
         console.error(err);
