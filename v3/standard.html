@@ -187,6 +187,21 @@ button:hover {
   100% { transform:rotate(360deg); }
 }
 
+#btnloadRule {
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #111;
+    color: #fff;
+    transition: 0.2s ease;
+}
+
+#btnloadRule:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
 </style>
 </head>
 
@@ -194,7 +209,7 @@ button:hover {
 <div class="wrapper">
   <div class="console">
     <div class="header">
-      <h2>OzoneChain IA Console</h2>
+      <a id="btnloadRule" onclick="showLoader(); loadRule();"><h2>OzoneChain IA Console</h2></a>
      <div id="walletLine" style="margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center;">
 
         <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
@@ -231,7 +246,7 @@ button:hover {
       <button onclick="showLoader(); loadID();">Load ID</button>
       <button onclick="showLoader(); loadNFTArchive();">NFT Logs</button>
       <button onclick="showLoader(); loadValidatorPage();">Validator</button>
-      <button onclick="showLoader(); loadUpline();">Upline</button>
+      <button onclick="showLoader(); loadUpline();">UplineBusiness</button>
       <button onclick="showLoader(); loadDAO();">DAO</button>
     </div>
 

@@ -181,9 +181,9 @@ async function init(){
     //name(); 
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
-
-    renderULTreePanel();
     
+   
+    loadRule();
     
 }
 
@@ -492,7 +492,7 @@ async function loadSystem() {
     }
 
     hideLoader();
-    setTimeout(() => loadSystem(), 15000);
+    //setTimeout(() => loadSystem(), 15000);
    
 }
 
@@ -2534,6 +2534,346 @@ async function getChildren(id) {
     if (e.key === "Enter") btn.click();
   });
 }
+
+
+// -------------------- LOAD RULE --------------------
+async function loadRule() {
+    clearPanels();
+
+    try {
+        
+        // ---------------- LEVEL CLAUSES (TABLE) ----------------
+        const panelLevel = addPanel("Level Clauses");
+
+        // create table
+        const table = document.createElement("table");
+        table.border = "1";
+        table.style.width = "100%";
+
+        // header
+        table.innerHTML = `
+        <thead>
+        <tr>
+        <th>Level</th>
+        <th>Rank required</th>
+        <th>RW %</th>
+        <th>YEI %</th>
+        </tr>
+        </thead>
+        <tbody id="levelClauseBody"></tbody>
+        `;
+
+        panelLevel.appendChild(table);
+
+        // helper for percentage
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return (parseFloat(num) / parseFloat(den)) + "%";
+        }
+
+        // load data
+        for (let i = 1; i <= 10; i++) {
+            try {
+                const lvl = await rule.methods.levelClause(i).call();
+
+                const rwPercent = toPercent(lvl.rwNum, lvl.rwrDen);
+                const yeiPercent = toPercent(lvl.yeiNum, lvl.yeiDen);
+
+                document.getElementById("levelClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
+                            <td>${i}</td>
+                            <td>${lvl.rank}</td>
+                            <td>${rwPercent}</td>
+                            <td>${yeiPercent}</td>
+                        </tr>`
+                    );
+
+            } catch (e) {
+                console.log("Level error:", i);
+            }
+        }
+
+       
+        // ---------------- RANK CLAUSES (TABLE) ----------------
+        const panelRank = addPanel("Rank Clauses");
+
+        // create table
+        const tableRank = document.createElement("table");
+        tableRank.border = "1";
+        tableRank.style.width = "100%";
+
+        // header
+        tableRank.innerHTML = `
+        <thead>
+        <tr>
+        <th>Rank</th>
+        <th>Direct Required</th>
+        <th>NFT Amount</th>
+        </tr>
+        </thead>
+        <tbody id="rankClauseBody"></tbody>
+        `;
+
+        panelRank.appendChild(tableRank);
+
+        // load data
+        for (let i = 1; i <= 10; i++) {
+            try {
+                const r = await rule.methods.rankClause(i).call();
+
+                document.getElementById("rankClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
+                            <td>${i}</td>
+                            <td>${r.direct}</td>
+                            <td>${r.nftAmount}</td>
+                        </tr>`
+                    );
+
+            } catch (e) {
+                console.log("Rank error:", i);
+            }
+        }
+       // ---------------- ROYALTY CLAUSES (TABLE) ----------------
+        const panelRoyal = addPanel("Royalty");
+
+        // create table
+        const tableRoyal = document.createElement("table");
+        tableRoyal.border = "1";
+        tableRoyal.style.width = "100%";
+
+        // header
+        tableRoyal.innerHTML = `
+        <thead>
+        <tr>
+        <th>Royal #</th>
+        <th>Percentage</th>
+        <th>End (days)</th>
+        </tr>
+        </thead>
+        <tbody id="royalClauseBody"></tbody>
+        `;
+
+        panelRoyal.appendChild(tableRoyal);
+
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            let val = parseFloat(num) / parseFloat(den);
+            return parseFloat(val.toFixed(2)) + "%"; // removes trailing zeros
+        }
+
+        // load data
+        for (let i = 1; i <= 7; i++) {
+            try {
+                const rw = await rule.methods.royalityClause(i).call();
+
+                const percent = toPercent(rw.rwNum, rw.rwDen);
+
+                document.getElementById("royalClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
+                            <td>${i}</td>
+                            <td>${percent}</td>
+                            <td>${rw.rwEnd}</td>
+                        </tr>`
+                    );
+
+            } catch (e) {
+                console.log("Royal error:", i);
+            }
+        }
+
+        // ---------------- POOL (TABLE - CLEAN) ----------------
+        const panelPool = addPanel("Pool");
+
+        const pool = await rule.methods.pool().call();
+
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
+
+        // create table
+        const tablePool = document.createElement("table");
+        tablePool.border = "1";
+        tablePool.style.width = "100%";
+
+        tablePool.innerHTML = `
+        <thead>
+        <tr>
+        <th>Parameter</th>
+        <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Start After</td>
+            <td>${pool.startafter}</td>
+        </tr>
+        <tr>
+            <td>Stake</td>
+            <td>${pool.stakeN}/${pool.stakeD}</td>
+        </tr>
+        <tr>
+            <td>ROI</td>
+            <td>${toPercent(pool.roiN, pool.roiD)} 
+                <small>(${pool.roiN}/${pool.roiD})</small>
+            </td>
+        </tr>
+        <tr>
+            <td>ROI Interval</td>
+            <td>${pool.roiInt}</td>
+        </tr>
+        <tr>
+            <td>ROI End</td>
+            <td>${pool.roiEnd}</td>
+        </tr>
+        </tbody>
+        `;
+
+        panelPool.appendChild(tablePool);
+
+        // ---------------- NFT POOLS (TABLE) ----------------
+        const panelNFTPool = addPanel("NFT Pools (StartFrom: 270 days for 2025, 180 days for 2026))");
+
+        const nft1 = await rule.methods.poolNFT1().call();
+        const nft2 = await rule.methods.poolNFT2().call();
+
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
+
+        // create table
+        const tableNFT = document.createElement("table");
+        tableNFT.border = "1";
+        tableNFT.style.width = "100%";
+
+        tableNFT.innerHTML = `
+        <thead>
+        <tr>
+        <th>Pool</th>
+        <th>ROI</th>
+        <th>Interval</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>NFT1</td>
+            <td>${toPercent(nft1.roiN, nft1.roiD)} 
+                <small>(${nft1.roiN}/${nft1.roiD})</small>
+            </td>
+            <td>${nft1.roiInt}</td>
+        </tr>
+        <tr>
+            <td>NFT2</td>
+            <td>${toPercent(nft2.roiN, nft2.roiD)} 
+                <small>(${nft2.roiN}/${nft2.roiD})</small>
+            </td>
+            <td>${nft2.roiInt}</td>
+        </tr>
+        </tbody>
+        `;
+
+        panelNFTPool.appendChild(tableNFT);
+        
+        // ---------------- BASIC SETTINGS ----------------
+        const panelBasic = addPanel("Rule - Basic");
+
+        addRow(panelBasic, "Owner", await rule.methods.owner().call());
+        addRow(panelBasic, "System Age", await rule.methods.systemAge().call());
+        addRow(panelBasic, "Shutdown", await rule.methods.shutdown().call());
+        addRow(panelBasic, "Is Safe", await rule.methods._isSafe().call());
+        addRow(panelBasic, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
+
+        // ---------------- MINT SETTINGS ----------------
+        const panelMint = addPanel("Mint Config");
+
+        addRow(panelMint, "Min Mint Qty", await rule.methods.minMintQty().call());
+        addRow(panelMint, "Max Mint Qty", await rule.methods.maxMintQty().call());
+        addRow(panelMint, "Mint Fee", await rule.methods.mintFeePerQty().call());
+        addRow(panelMint, "Mint Cycle Days", await rule.methods.mintCycleDays().call());
+        addRow(panelMint, "Max Mints/Cycle", await rule.methods.maxMintsPerCycle().call());
+
+        // ---------------- CLAIM SETTINGS ----------------
+        const panelClaim = addPanel("Claim Config");
+
+        addRow(panelClaim, "Min Claim/Day", await rule.methods.minClaimPerDay().call());
+        addRow(panelClaim, "Max Claim/Day", await rule.methods.maxClaimPerDay().call());
+        addRow(panelClaim, "Global Claim/Day", await rule.methods.maxGlobalClaimPerDay().call());
+        addRow(panelClaim, "Claim Cycle", await rule.methods.eachclaimCycle().call());
+
+        // ---------------- NFT SETTINGS ----------------
+        const panelNFT = addPanel("NFT Config");
+
+        addRow(panelNFT, "Max NFT Send", await rule.methods.maxNFTSend().call());
+        addRow(panelNFT, "NFT Send/Cycle", await rule.methods.NFTSendPerCycle().call());
+
+        // ---------------- DAO ----------------
+        const panelDAO = addPanel("DAO");
+
+        addRow(panelDAO, "Rank For DAO", await rule.methods.rankforDAO().call());
+
+        // ---------------- DELEGATION ----------------
+        const panelDelegation = addPanel("Delegation");
+
+        addRow(panelDelegation, "Delegator Count", await rule.methods._delegatorCount().call());
+        addRow(panelDelegation, "Delegate Private", await rule.methods.delegateamtprivate().call());
+        addRow(panelDelegation, "Delegate Public", await rule.methods.delegateamtpublic().call());
+
+        
+        // ---------------- CAPPING ----------------
+        const panelCap = addPanel("Capping");
+
+        const cap = await rule.methods.capping().call();
+        addRow(panelCap, "Multiple", cap.multiple);
+        addRow(panelCap, "RW", cap.rw);
+        addRow(panelCap, "RY", cap.ry);
+        addRow(panelCap, "SELF", cap.self);
+        addRow(panelCap, "YEI", cap.yei);
+        addRow(panelCap, "VAL", cap.val);
+        addRow(panelCap, "TOUR", cap.tour);
+
+        
+
+        // ---------------- TOUR ----------------
+        const panelTour = addPanel("Tour");
+
+        for (let i = 1; i <= 10; i++) {
+            try {
+                const t = await rule.methods.tourClause(i).call();
+
+                // skip if 0
+                if (parseInt(t) === 0) continue;
+
+                // convert wei → ether (3 decimal)
+                const ethVal = parseFloat(web3.utils.fromWei(t.toString(), "ether")).toFixed(3);
+
+                addRow(panelTour, `Tour ${i}`, `${ethVal} ETH`);
+
+            } catch (e) {
+                console.log("Tour error:", i);
+            }
+        }
+
+    } catch (err) {
+        console.error(err);
+        const panelErr = addPanel("Error");
+        addRow(panelErr, "Error", "Failed to load rule data");
+    }
+    renderULTreePanel();
+    hideLoader();
+
+   
+}
+
+
+
+
 
 
 async function connectWallet() {

@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
 <title>Validator Income Dashboard</title>
 <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
-   
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>   
 <style>
 
 body{
@@ -91,6 +92,10 @@ background:none;
 font-size:14px;
 }
 
+.bgcolor {
+    background-color: bisque;
+}
+
 </style>
 </head>
 
@@ -111,8 +116,10 @@ font-size:14px;
 <div id="tab1" class="tabcontent"></div>
 <div id="tab2" class="tabcontent"></div>
 <div id="tab3" class="tabcontent"></div>
-
+<div id="tab4" class="tabcontent"></div>
 <script>
+    
+const web3 = new Web3(window.ethereum);
 
 function shortAddr(addr){
 if(!addr) return '';
@@ -213,8 +220,9 @@ allowedFlag
 
 document.getElementById("tabs").innerHTML=`
 <div class="tab active" id="btn_tab1" onclick="showTab('tab1')">Daily Income</div>
-<div class="tab" id="btn_tab2" onclick="showTab('tab2')">Income Details</div>
-<div class="tab" id="btn_tab3" onclick="showTab('tab3')">Income Transactions</div>
+<div class="tab" id="btn_tab2" onclick="showTab('tab2')">Income Details(Archive)</div>
+<div class="tab" id="btn_tab3" onclick="showTab('tab3')">Stake Transactions</div>
+<div class="tab" id="btn_tab4" onclick="showTab('tab4')">Delegate Transactions</div>
 `;
 
 
@@ -274,11 +282,13 @@ table2+=`
 <td>${addrCell(item.delegatoraddress0x)}</td>
 <td>${addrCell(item.validatoraddress)}</td>
 <td>${item.totalshare}</td>
-<td>${item.extrashare}</td>
-<td>${item.diffShare}</td>
+<td>${parseFloat(
+        web3.utils.fromWei(item.extrashare.toString(), "ether")
+    ).toFixed(3)}</td>
+<td class="bgcolor">${item.diffShare}</td>
 <td>${item.value}</td>
 <td>${item.amt}</td>
-<td>${item.StakePer25}</td>
+<td class="bgcolor">${item.StakePer25}</td>
 <td>${item.income}</td>
 <td>${item.jailed}</td>
 <td>${item.active}</td>
@@ -326,6 +336,40 @@ table3+=`
 table3+="</table>";
 
 document.getElementById("tab3").innerHTML=table3;
+
+/* ---------- TAB 4 ---------- */
+
+let set = d1.data[2]; // your API array
+
+let table4 = `<table>
+<tr>
+<th>Delegator</th>
+<th>Validator</th>
+<th>Amount (ETH)</th>
+<th>Created</th>
+</tr>`;
+
+set.forEach(item => {
+
+    let amountEth = parseFloat(
+        web3.utils.fromWei(item.amount.toString(), "ether")
+    ).toFixed(3);
+
+    let created = new Date(item.timestamp).toLocaleString();
+
+    table4 += `
+<tr>
+<td>${addrCell(item.delegatoraddress0x)}</td>
+<td>${addrCell(item.validatoraddress0x)}</td>
+<td>${amountEth}</td>
+<td>${created}</td>
+</tr>
+`;
+});
+
+table4 += `</table>`;
+
+document.getElementById("tab4").innerHTML = table4;
 
 showTab('tab1');
 
