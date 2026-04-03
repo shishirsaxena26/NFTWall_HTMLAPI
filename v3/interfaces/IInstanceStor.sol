@@ -64,11 +64,11 @@ interface IInstanceStor {
         uint256 _direct,
         uint256 _amount,
         uint256 _qty,
-        uint256 _lvlincrank,
         uint256 _level,
         uint256 _epochAge,
         uint256 _free,
-        uint256 _irank
+        uint256 _irankMin,
+        uint256 _irankMax
     ) external returns (uint256 lastrnk, uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
@@ -82,7 +82,6 @@ interface IInstanceStor {
     function getToggleAgeValue(uint256 key, uint256 index) external view returns (uint256);
     function id() external view returns (uint256);
     function isLock() external view returns (bool);
-    function levelRestrictionAge() external view returns (uint256);
     function mintCount() external view returns (uint256);
     function mints(uint256) external view returns (uint256 amt, uint256 qty, uint256 mage, address nft);
     function moveLvlIncome(uint256 _direct, uint256 _amount, uint256 _qty, uint256 _level, uint256 _epochAge, bool _op)
