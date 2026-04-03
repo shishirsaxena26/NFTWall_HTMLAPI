@@ -2780,7 +2780,15 @@ async function loadRule() {
         `;
 
         panelNFTPool.appendChild(tableNFT);
-        
+
+        // ---------------- LEVEL INCOME RANGE ----------------
+        const panelLvlRange = addPanel("LEVEL INCOME RANGE");
+        const lvlIncome = await rule.methods.getLevelIncomeOnRank().call();
+
+        addRow(panelLvlRange, "Level Income allowed from: ",
+            `${lvlIncome[0]} rank - ${lvlIncome[1]} rank`
+        );
+
         // ---------------- MINT SETTINGS ----------------
         const panelMint = addPanel("Mint Config");
 
@@ -2824,11 +2832,13 @@ async function loadRule() {
 
         addRow(panelNFT, "NFT Send", `${maxSend} NFTs allowed to send in ${perCycle} days`);
 
+         // ---------------- DAO ----------------
+        const panelDAO = addPanel("DAO");
+
+        addRow(panelDAO, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
+
         // ---------------- DELEGATION Config----------------
         const panelDelegation = addPanel("Delegation Config");
-
-        // add DAO rank here
-        addRow(panelDelegation, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
 
         // delegator count
         addRow(panelDelegation, "Delegator Count", await rule.methods._delegatorCount().call());
