@@ -37,8 +37,6 @@ interface I741Rules {
         returns (uint256 multiple, bool rw, bool ry, bool self, bool yei, bool val, bool tour);
     function computeMintValue(uint256 _qty) external view returns (uint256);
     function computeTour(uint256 _r) external view returns (uint256);
-    function delegateamtprivate() external view returns (uint256);
-    function delegateamtpublic() external view returns (uint256);
     function eachclaimCycle() external view returns (uint256);
     function freeIntervals() external view returns (uint256);
     function getBalance() external view returns (uint256);
@@ -125,6 +123,7 @@ interface I741Rules {
     function setMintQty(uint256 _min, uint256 _max) external;
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
+    function setNftPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
     function setclaimCycle(uint256 _d) external;
@@ -139,8 +138,9 @@ interface I741Rules {
     function setrankClause(uint256 rank, uint256 direct, uint256 nftAmount) external;
     function setrankforDAO(uint256 _r) external;
     function setshutdown(bool _shutdown) external;
-    function setvalidatorPrice(uint256 _pri, uint256 _pub) external;
     function shutdown() external view returns (bool);
     function systemAge() external view returns (uint256);
     function tourClause(uint256) external view returns (uint256);
+    function valExternal() external view returns (uint256 qty, uint256 roiN, uint256 roiD, uint256 roiInt);
+    function valInternal() external view returns (uint256 qty, uint256 roiN, uint256 roiD, uint256 roiInt);
 }

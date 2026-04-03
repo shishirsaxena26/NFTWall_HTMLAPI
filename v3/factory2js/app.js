@@ -2556,8 +2556,8 @@ async function loadRule() {
         <tr>
         <th>Level</th>
         <th>Rank required</th>
-        <th>RW %</th>
-        <th>YEI %</th>
+        <th>REWARD %</th>
+        <th>LEVEL %</th>
         </tr>
         </thead>
         <tbody id="levelClauseBody"></tbody>
@@ -2724,7 +2724,7 @@ async function loadRule() {
             </td>
         </tr>
         <tr>
-            <td>ROI Interval</td>
+            <td>ROI Interval (days)</td>
             <td>${pool.roiInt}</td>
         </tr>
         <tr>
@@ -2758,7 +2758,7 @@ async function loadRule() {
         <tr>
         <th>Pool</th>
         <th>ROI</th>
-        <th>Interval</th>
+        <th>Interval (days)</th>
         </tr>
         </thead>
         <tbody>
@@ -2797,24 +2797,24 @@ async function loadRule() {
         addRow(panelMint, "Mint Limit", `${maxPerCycle} mints allowed in ${cycleDays} days`);
 
         // fee per qty
-        addRow(panelMint, "Mint Price", `${(parseFloat(fee) / 1e18).toFixed(3)} ETH per NFT`);
+        addRow(panelMint, "Mint Price", `${fee}$ per NFT`);
 
         // ---------------- CLAIM SETTINGS ----------------
         const panelClaim = addPanel("Claim Config");
 
-        const minClaim = await rule.methods.minClaimPerDay().call();
-        const maxClaim = await rule.methods.maxClaimPerDay().call();
-        const globalClaim = await rule.methods.maxGlobalClaimPerDay().call();
-        const cycle = await rule.methods.eachclaimCycle().call();
+        const minClaim = parseFloat(web3.utils.fromWei((await rule.methods.minClaimPerDay().call()).toString(), "ether")).toFixed(3);
+        const maxClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxClaimPerDay().call()).toString(), "ether")).toFixed(3);
+        const globalClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxGlobalClaimPerDay().call()).toString(), "ether")).toFixed(3)
+                const cycle = await rule.methods.eachclaimCycle().call();
 
         // min + max in single row
-        addRow(panelClaim, "Daily Claim Range", `${minClaim} - ${maxClaim}`);
+        addRow(panelClaim, "Claim Limit", `${minClaim} OZN - ${maxClaim} OZN`);
 
         // claim cycle meaning
         addRow(panelClaim, "Claim Frequency", `1 claim allowed every ${cycle} days`);
 
         // global claim meaning
-        addRow(panelClaim, "Daily Limit", `Max ${globalClaim} claimable per day`);
+        addRow(panelClaim, "Daily Claim qouta- Global", `Max ${globalClaim} OZN claimable per day`);
 
         // ---------------- NFT SETTINGS ----------------
         const panelNFT = addPanel("NFT Config");
@@ -2822,10 +2822,10 @@ async function loadRule() {
         const maxSend = await rule.methods.maxNFTSend().call();
         const perCycle = await rule.methods.NFTSendPerCycle().call();
 
-        addRow(panelNFT, "NFT Send", `${maxSend} NFTs in ${perCycle} days`);
+        addRow(panelNFT, "NFT Send", `${maxSend} NFTs allowed to send in ${perCycle} days`);
 
-        // ---------------- DELEGATION ----------------
-        const panelDelegation = addPanel("Delegation");
+        // ---------------- DELEGATION Config----------------
+        const panelDelegation = addPanel("Delegation Config");
 
         // add DAO rank here
         addRow(panelDelegation, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
@@ -2878,9 +2878,9 @@ async function loadRule() {
                 if (parseInt(t) === 0) continue;
 
                 // convert wei → ether (3 decimal)
-                const ethVal = parseFloat(web3.utils.fromWei(t.toString(), "ether")).toFixed(3);
+                const ethVal = parseFloat(web3.utils.fromWei(t.toString(), "ether")).toFixed(0);
 
-                addRow(panelTour, `Tour ${i}`, `${ethVal} ETH`);
+                addRow(panelTour, `Tour ${i}`, `${ethVal}$`);
 
             } catch (e) {
                 console.log("Tour error:", i);
