@@ -53,6 +53,7 @@ interface IHexBase {
     function inTreaseryTVLTour() external view returns (address);
     function inTreaseryTVLValidator() external view returns (address);
     function inblank() external view returns (address);
+    function incointransfer() external view returns (address);
     function infactoryold() external view returns (address);
     function infactoryprimeold() external view returns (address);
     function insafeguard() external view returns (address);
@@ -83,6 +84,7 @@ interface IHexBase {
     function update741RuleOld(address addr) external;
     function update741RulePrime(address addr) external;
     function update741RulePrimeOld(address addr) external;
+    function updateCoinTransfer(address addr) external;
     function updateDAOAssembly(address _dao) external;
     function updateDAOCore(address _dao) external;
     function updateDEAD(address addr) external;

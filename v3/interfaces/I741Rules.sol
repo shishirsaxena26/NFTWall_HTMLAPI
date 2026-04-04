@@ -30,7 +30,6 @@ interface I741Rules {
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
     function allowForceTransfer() external view returns (bool);
-    function capOnRank(uint256) external view returns (uint256 maxClaim, uint256 cycleDays);
     function capping()
         external
         view
