@@ -2572,7 +2572,7 @@ async function loadRule() {
         }
 
         // load data
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 15; i++) {
             try {
                 const lvl = await rule.methods.levelClause(i).call();
 
@@ -2618,7 +2618,7 @@ async function loadRule() {
         panelRank.appendChild(tableRank);
 
         // load data
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 7; i++) {
             try {
                 const r = await rule.methods.rankClause(i).call();
 
@@ -2715,7 +2715,9 @@ async function loadRule() {
         </tr>
         <tr>
             <td>Stake</td>
-            <td>${pool.stakeN}/${pool.stakeD}</td>
+            <td>${toPercent(pool.stakeN, pool.stakeD)}
+                <small>(${pool.stakeN}/${pool.stakeD})</small> 
+            </td>
         </tr>
         <tr>
             <td>ROI</td>
@@ -2728,7 +2730,7 @@ async function loadRule() {
             <td>${pool.roiInt}</td>
         </tr>
         <tr>
-            <td>ROI End</td>
+            <td>ROI End (days)</td>
             <td>${pool.roiEnd}</td>
         </tr>
         </tbody>
@@ -2904,6 +2906,8 @@ async function loadRule() {
         addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());
         addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
         addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
+        // ✅ NEW
+        addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
 
     } catch (err) {
         console.error(err);
