@@ -2668,7 +2668,7 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const rw = await rule.methods.royalityClause(i).call();
-
+                if (parseInt(rw.rwNum) === 0) continue;
                 const percent = toPercent(rw.rwNum, rw.rwDen);
 
                 document.getElementById("royalClauseBody")
