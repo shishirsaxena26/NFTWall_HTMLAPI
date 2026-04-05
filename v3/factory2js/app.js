@@ -502,7 +502,25 @@ async function loadSystemTreasuriesNSecurebase(){
     const container = document.getElementById("systemPanels");
 
     const panelBase = addPanel("BASE");
-    addRow(panelBase,"HexBase",hexBaseAddress);
+    const link = document.createElement("a");
+
+    link.innerText = "HexBase";
+    link.href = "#"; // prevent navigation
+    // apply color
+    link.style.color = "var(--text)";
+    link.addEventListener("click", function (e) {
+        e.preventDefault(); // stop page jump
+        const _p = prompt("Enter hexbase address:");
+        const _hex = _p.trim();
+        if (!_hex || !web3.utils.isAddress(_hex)) {
+            alert("Enter a valid hexbase address");
+            return;
+        }
+        hexBaseAddress = _hex;
+    });
+    addRow(panelBase,link,hexBaseAddress);
+   
+
     const deployer = await hexBase.methods.inDeployerAsRoot().call();
     addRow(panelBase,"DeployerAsRoot",deployer);
 
