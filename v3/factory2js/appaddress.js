@@ -2,7 +2,7 @@ const provider = "https://rpc-testnet.ozonescan.com";
 const providerMain = "https://chain.ozonescan.com";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
-let hexBaseAddress = "0x6ce458e30828ca4Ba5724E72fA0811aAa166C198";
+let hexBaseAddress = "0x076F02C82488b4401CD35bE263460CB626b09C75";
 const minBlock = 3884916;
 
 const DEAD = "0x000000000000000000000000000000000000dEaD"
