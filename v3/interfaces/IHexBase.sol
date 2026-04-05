@@ -12,7 +12,7 @@ interface IHexBase {
     function daoassembly() external view returns (address);
     function daocore() external view returns (address);
     function getProposalsCount() external view returns (uint256);
-    function importBusiness(uint256 limit) external;
+    function importRankBusiness(uint256 frmage, uint256 toage) external;
     function importuser(uint256 limit) external;
     function in741() external view returns (address);
     function in741Old() external view returns (address);
@@ -75,6 +75,7 @@ interface IHexBase {
         address _hexUserEngine,
         address _hexInstanceEngine
     ) external;
+    function testTxnSys() external;
     function update741(address addr) external;
     function update741Old(address addr) external;
     function update741Prime(address addr) external;

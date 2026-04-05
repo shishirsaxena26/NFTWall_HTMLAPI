@@ -67,8 +67,7 @@ interface IInstanceStor {
         uint256 _level,
         uint256 _epochAge,
         uint256 _free,
-        uint256 _irankMin,
-        uint256 _irankMax
+        uint256 _irankMin
     ) external returns (uint256 lastrnk, uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
