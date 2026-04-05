@@ -157,7 +157,7 @@ async function init(){
     daoassembly = new web3.eth.Contract(IDAOAssemblyABI.abi, indaoassembly);
     
     inInstanceMe = await hexBase.methods.inInstance().call();
-    instanceme = new web3.eth.Contract(IInstanceMeABI.abi,instAddr);
+    instanceme = new web3.eth.Contract(IInstanceMeABI.abi,inInstanceMe);
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
