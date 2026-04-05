@@ -155,6 +155,9 @@ async function init(){
 
     indaoassembly = await hexBase.methods.daoassembly().call();
     daoassembly = new web3.eth.Contract(IDAOAssemblyABI.abi, indaoassembly);
+    
+    inInstanceMe = await hexBase.methods.inInstance().call();
+    instanceme = new web3.eth.Contract(IInstanceMeABI.abi,instAddr);
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
@@ -872,6 +875,8 @@ async function joinUser() {
                 return;
             }
             
+            
+
             let accounts = await ethereum.enable();
             if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
             window.web3T = new Web3(window.ethereum);
