@@ -116,6 +116,13 @@ const treeData = {
 const step = 5000;
 
 
+
+async function load(){
+    await init();
+    loadRule();
+    
+}
+
 async function init(){
     //scanBlocks(50); // scan last 20 blocks
     IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
@@ -181,9 +188,7 @@ async function init(){
     //name(); 
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
-    
-   
-    loadRule();
+    //loadRule();
     
 }
 
@@ -517,6 +522,7 @@ async function loadSystemTreasuriesNSecurebase(){
             return;
         }
         hexBaseAddress = _hex;
+        init();
     });
     addRow(panelBase,link,hexBaseAddress);
    
@@ -3004,4 +3010,4 @@ function copyWallet(){
 
 
 
-window.onload = init;
+window.onload = load;
