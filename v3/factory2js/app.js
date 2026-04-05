@@ -463,7 +463,7 @@ function pad3(v){
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
     if(!value) return "NULL";
-    return Number(web3.utils.fromWei(value, "ether")).toFixed(8) + " OZN";
+    return Number(web3.utils.fromWei(value, "ether")).toFixed(12) + " OZN";
 }
 
 async function printRow(addr, balpanel){
