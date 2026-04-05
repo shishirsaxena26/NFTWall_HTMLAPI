@@ -491,6 +491,7 @@ async function loadSystem() {
         addRow(panelMarket,"Error","Unable to load marketplace");
     }
 
+    await onGetDailyBusiness();
     hideLoader();
     //setTimeout(() => loadSystem(), 15000);
    
@@ -604,6 +605,7 @@ async function loadSystemTreasuriesNSecurebase(){
 
     addRow(panelBusiness, "", table1);
     onGetDailyBusiness();
+    
 }
 
 async function onExecuteRoyality() {
@@ -650,7 +652,7 @@ async function onSetDefaultRankCount() {
     
 }
 async function onGetDailyBusiness() {
-	
+	showLoader();
 	var r3 = new BN("0");
 	var r5 = new BN("0");
 	var r7 = new BN("0");
@@ -712,7 +714,7 @@ async function onGetDailyBusiness() {
 
 	
 
-	
+	hideLoader();
 	
 }
 
@@ -1083,9 +1085,9 @@ async function loadUser() {
         } 
         addRow(panel, "STOR---", "");
         addRow(panel, "StorAddr", node[4]);
-        loadMyStor(id, panel);
+        await loadMyStor(id, panel);
 
-        loadMyNFT();
+        await loadMyNFT();
     } catch(err){
         console.error(err);
         addRow(panelMarket,"Error","Unable to load marketplace");
@@ -1228,7 +1230,7 @@ async function loadMyStor(id, panel) {
 }
 
 async function loadUpline(){
-
+    showLoader();
     const input = document.getElementById("userAddrInput");
     const user = input.value.trim();
     if (!user || !web3.utils.isAddress(user)) {
@@ -2539,7 +2541,7 @@ async function getChildren(id) {
 // -------------------- LOAD RULE --------------------
 async function loadRule() {
     clearPanels();
-
+    showLoader();
     try {
         
         // ---------------- LEVEL CLAUSES (TABLE) ----------------
