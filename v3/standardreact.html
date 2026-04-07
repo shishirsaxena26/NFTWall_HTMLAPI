@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OzoneChain · IA Console</title>
+
+<!-- ✅ Mobile optimized viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://unpkg.com/@walletconnect/ethereum-provider/dist/index.umd.js"></script>
+<style>
+:root {
+  --bg: #0b0f1a;
+  --panel-bg: rgba(20,30,50,0.8);
+  --panel-border: #2a3a5a;
+  --text: #c8d6ff;
+  --accent: #00ffff;
+  --green: #00ff90;
+  --red: #ff4d4d;
+  --yellow: #ffd700;
+  --font: "Consolas", "Courier New", monospace;
+}
+
+body {
+  margin:0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display:flex;
+  justify-content:center;
+  padding: 20px;
+}
+
+.wrapper {
+  width: 95%;
+  max-width: 1000px;
+}
+
+.console {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* HEADER */
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header h2 {
+  margin:0;
+  font-size:1.6em;
+  color: var(--accent);
+}
+
+.status {
+  font-size:12px;
+  color: var(--green);
+  font-weight:bold;
+}
+
+/* BUTTONS */
+.buttons {
+  display:flex;
+  flex-wrap: wrap;
+  gap:8px;
+}
+
+.buttons button {
+  flex: 1 1 calc(50% - 8px);
+}
+
+/* BUTTON */
+button {
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background: linear-gradient(135deg,#00ffff,#3fa9ff);
+  cursor:pointer;
+  font-weight:600;
+  color:#000;
+  font-size:12px;
+  transition:0.2s;
+  min-height:40px;
+}
+
+button:hover {
+  background: linear-gradient(135deg,#3fa9ff,#00ffff);
+  box-shadow: 0 0 10px #00ffff;
+}
+
+/* PANEL */
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  gap:6px;
+}
+
+.panel h3 {
+  margin:0 0 8px 0;
+  color: var(--accent);
+  font-size:1.1em;
+}
+
+/* ROW */
+.row {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  padding:4px 0;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  flex-wrap: wrap;
+  gap:4px;
+}
+
+.row:last-child {
+  border-bottom:none;
+}
+
+.row table {
+  width:100%;
+}
+
+/* ADDRESS */
+.addr {
+  display:flex;
+  gap:6px;
+  align-items:center;
+  color:#00ffff;
+}
+
+.copyBtn {
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  padding:2px 5px;
+  border-radius:4px;
+  font-size:10px;
+  cursor:pointer;
+}
+
+.copyBtn:hover {
+  background:#00ffff;
+  color:#000;
+}
+
+.shortAddr {
+  font-weight:bold;
+  color: var(--yellow);
+}
+
+.section-title {
+  font-weight:bold;
+  color: var(--green);
+  margin-top:8px;
+  margin-bottom:4px;
+}
+
+/* WALLET */
+#walletLine {
+  display:flex;
+  gap:8px;
+  flex-wrap: wrap;
+  align-items:center;
+}
+
+#walletInfoLine {
+  display:none;
+  flex-wrap: wrap;
+  gap:6px;
+}
+
+/* INPUT */
+#userAddrInput {
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #555;
+  font-family:monospace;
+  color:#0b0f1a;
+}
+
+/* LOADER */
+.loaderOverlay {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(10,15,25,0.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  backdrop-filter: blur(4px);
+}
+
+.spinner {
+  width:60px;
+  height:60px;
+  border:6px solid rgba(255,255,255,0.1);
+  border-top:6px solid #00ffff;
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  body { padding:10px; }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .buttons button {
+    flex: 1 1 100%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="console">
+
+    <!-- HEADER -->
+    <div class="header">
+      <a id="btnloadRule" onclick="showLoader(); loadRule();">
+        <h2>OzoneChain IA Console</h2>
+      </a>
+
+      <div id="walletLine">
+        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+
+        <span id="walletInfoLine">
+          <span id="walletAddr" class="shortAddr"></span>
+          <button class="copyBtn" onclick="copyWallet()">📋</button>
+
+          <span id="walletId"></span> |
+
+          <span id="walletInst" class="shortAddr"></span>
+          <button id="btnJoin" onclick="showLoader(); joinUser();">Join</button>
+          <button id="btnInit" onclick="showLoader(); initUser();">Initialize</button>
+
+          |
+
+          <span id="walletStor" class="shortAddr"></span>
+          <button id="btnImport" onclick="showLoader(); importUser();">Import</button>
+
+          <a href="#" onclick="disconnectWallet()" style="color:#ff4d4d;">disconnect</a>
+        </span>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="buttons">
+      <button onclick="showLoader(); loadSystem();">Load System</button>
+      <button onclick="showLoader(); loadMarket();">Marketplace</button>
+
+      <input type="text" id="userAddrInput"
+             placeholder="Enter user address 0x....."
+             value="0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8" />
+
+      <button onclick="showLoader(); loadUser();">Load User</button>
+      <button onclick="showLoader(); loadID();">Get ID</button>
+      <button onclick="showLoader(); loadNFTArchive();">NFT Logs</button>
+      <button onclick="showLoader(); loadValidatorPage();">Validator</button>
+      <button onclick="showLoader(); loadUpline();">UplineBusiness</button>
+      <button onclick="showLoader(); loadDAO();">DAO</button>
+    </div>
+
+    <!-- PANELS -->
+    <div id="systemPanels"></div>
+
+  </div>
+</div>
+
+<!-- LOADER -->
+<div class="loaderOverlay" id="loader">
+  <div class="spinner"></div>
+</div>
+
+<script>
+
+// Loader
+function showLoader(){
+  document.getElementById("loader").style.display = "flex";
+}
+function hideLoader(){
+  document.getElementById("loader").style.display = "none";
+}
+
+// WebView Bridge (for mobile app)
+function sendToApp(type, data) {
+  if (window.ReactNativeWebView) {
+    window.ReactNativeWebView.postMessage(JSON.stringify({ type, data }));
+  }
+}
+
+window.addEventListener("message", function(event) {
+  try {
+    const msg = JSON.parse(event.data);
+    console.log("Message from app:", msg);
+  } catch(e) {}
+});
+
+// Dynamic script loader
+var version = Date.now();
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  function loadScript(src, callback) {
+    var script = document.createElement('script');
+    script.src = src + '?v=' + version;
+    script.onload = callback;
+    document.head.appendChild(script);
+  }
+
+  loadScript('factory2js/appaddress.js', function () {
+    loadScript('factory2js/app.js', function () {
+      console.log('All scripts loaded');
+    });
+  });
+
+});
+
+</script>
+
+</body>
+</html>
