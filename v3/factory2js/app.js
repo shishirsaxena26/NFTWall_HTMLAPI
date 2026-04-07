@@ -119,7 +119,7 @@ const step = 5000;
 
 async function load(){
     await init();
-    loadRule();
+    //loadRule();
     
 }
 
