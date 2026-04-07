@@ -2913,15 +2913,17 @@ async function loadRule() {
         // ---------------- TOUR ----------------
         const panelTour = addPanel("Tour");
 
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 7; i++) {
             try {
                 const t = await rule.methods.tourClause(i).call();
-
+                debugger;
+                const ct = await rule.methods.computeTour(i).call();
+                debugger;
                 // skip if 0
                 if (parseInt(t) === 0) continue;
 
                 // convert wei → ether (3 decimal)
-                addRow(panelTour, `Tour ${i}`, `${t.toString()}$`);
+                addRow(panelTour, `Tour ${i}`, `${t.toString()}$ ~ ${formatOZN(ct)}`);
 
             } catch (e) {
                 console.log("Tour error:", i);
