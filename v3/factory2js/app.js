@@ -488,7 +488,7 @@ async function loadSystem() {
     const isSafe = await safeguard.methods.isSafe().call();
 
     addRow(panelSys,"Nodes Count",nodes);
-    addRow(panelSys,"System Age",sysAge);
+    addRow(panelSys,"System Age",`${getAgeDateRange(sysAge).start} {${sysAge}}`);
     addRow(panelSys,"Form Count",forms);
     addRow(panelSys,"Is Safe",isSafe);
 
@@ -731,11 +731,11 @@ async function onGetDailyBusiness() {
         //console.log("in741:", in741Addr);
         let constRoyal = await nested.methods.getRoyalityAmountBatch(i).call();
 
-		console.log(`i: ${i}`);
+		console.log(`i: ${getAgeDateRange(i).start} {${i}}`);
         console.log(`constRoyal: ${constRoyal}`);
 		document.getElementById("tabDBBody")
         .insertAdjacentHTML("beforeend",
-            '<tr><td>'+i+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
+            '<tr><td>'+`${getAgeDateRange(i).start} {${i}}`+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
         );
 	}	
 
@@ -784,11 +784,11 @@ async function loadUserPanel(user){
 
     const stor = new web3.eth.Contract(IInstanceStorABI.abi,storAddr);
     const dage = await stor.methods.dage().call();
-    const rank = await stor.methods.rank().call();
+    const rankWithAge= await stor.methods.getRankWithAgeValue().call();
     const cage = await stor.methods.cage().call();
 
-    addRow(userPanel,"Stor Dage",dage);
-    addRow(userPanel,"Stor Rank",rank);
+    addRow(userPanel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
+    addRow(userPanel,"Stor Rank",`Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
     addRow(userPanel,"Stor Cage",cage);
 }
 async function addConnectedUserPanel(){
@@ -1138,13 +1138,13 @@ async function loadMyStor(id, panel) {
             
             const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
             const dage = await stor.methods.dage().call();
-            const rank = await stor.methods.rank().call();
+            const rankWithAge= await stor.methods.getRankWithAgeValue().call();
             const cage = await stor.methods.cage().call();
             const isLock = await stor.methods.isLock().call();
  
-            addRow(panel, "Stor Dage", dage);
-            addRow(panel, "Stor Rank", rank);
-            addRow(panel, "Stor Cage", cage);
+            addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
+            addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
+            addRow(panel,"Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
             
              /*
             let aj1 = await stor.methods.comp(15,2).call();
@@ -1848,13 +1848,13 @@ async function loadMyNFT(){
     let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
-        innerHTML: `WithdrawlDage: ${lsbindex}`
+        innerHTML: `WithdrawlDage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
     }));
 
     lsbindex = await storeContract.methods.dage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
-        innerHTML: `Dage: ${lsbindex}`
+        innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
     }));
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
@@ -1922,7 +1922,7 @@ async function loadMyNFT(){
         "Balance: "+balance+
         " | Minted : "+mintedqty+
         " | Fee: "+Number(web3.utils.fromWei(mintedfee,"ether")).toFixed(3)+
-        " | Age: "+mintedAge+" ";
+        " | Age: "+ `${getAgeDateRange(mintedAge).start} {${mintedAge}}`+" ";
         /* CHECKBOX */
 
         const checkbox = document.createElement("input");
@@ -1969,7 +1969,7 @@ async function loadMyNFT(){
         let rankage = 0;
         if(i<8)
             rankage = await storeContract.methods.rankage(i).call();
-        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} | ${rankage}`);
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} | ${getAgeDateRange(rankage).start} {${rankage}}`);
     }
     
 
@@ -2933,9 +2933,9 @@ async function loadRule() {
 
         // ---------------- OTHER SETTINGS ----------------
         const panelOthers = addPanel("OTHER SETTINGS");
-
+        const sysAge = await rule.methods.systemAge().call();
         addRow(panelOthers, "Owner", await rule.methods.owner().call());
-        addRow(panelOthers, "System Age", await rule.methods.systemAge().call());
+        addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
         addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());
         addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
         addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
@@ -3015,6 +3015,28 @@ function copyWallet(){
 
 }
 
+function formatDate(date) {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+}
 
+function getAgeDateRange(age) {
+    const baseDate = new Date("2025-07-17T22:00:00"); // 10:00 PM
+
+    // Start date = base + (age - 1) days
+    const start = new Date(baseDate);
+    start.setDate(start.getDate() + (age - 1));
+
+    // End date = start + 1 day
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return {
+        start: formatDate(start),
+        end: formatDate(end)
+    };
+}
 
 window.onload = load;

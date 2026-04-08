@@ -55,7 +55,7 @@ interface IInstanceStor {
     function _isSafe() external view returns (bool);
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
-    function _txnType7(uint256 _maxint, uint256 _ag) external payable returns (uint256[10] memory CALC_INC);
+    function _txnType7(uint256 _maxint, uint256 _ag) external payable returns (uint256[9] memory CALC_INC);
     function _txnType_1_0(address paramAdd, uint256 _id_maxint, uint256 _qty, uint256 _msgValue, uint256 _type)
         external
         payable
@@ -67,8 +67,8 @@ interface IInstanceStor {
         uint256 _level,
         uint256 _epochAge,
         uint256 _free,
-        uint256 _irankMin
-    ) external returns (uint256 lastrnk, uint256 currentrnk);
+        bool _tobeSkipped
+    ) external returns (uint256 currentrnk, uint256 currentrankage);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
     function capStatus() external view returns (uint256 totalIncome, uint256 threshold, bool _cap, uint256 currentValue);
@@ -77,6 +77,7 @@ interface IInstanceStor {
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
     function getNodeLB(uint256 _level) external view returns (uint256, uint256, uint256, uint256);
+    function getRankWithAgeValue() external view returns (uint256, uint256);
     function getToggleAgeCount(uint256 key) external view returns (uint256);
     function getToggleAgeValue(uint256 key, uint256 index) external view returns (uint256);
     function id() external view returns (uint256);

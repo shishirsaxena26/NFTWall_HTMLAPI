@@ -36,10 +36,10 @@ interface IValidators {
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
     function getUserFromDelegator(address delegator) external view returns (address);
-    function getValidatorDelegatorOfUser(address user) external view returns (address, address);
+    function getValidatorDelegatorOfUser(address user) external view returns (address, address, bool);
+    function importIncome(address userfrom, address userto) external;
     function incomeOf(address user) external view returns (uint256);
-    function isValidatorDelegatorOf(address user, address validator) external view returns (bool);
-    function mapDelegator(address user, address vald) external;
+    function mapValidatorDelegator(address user, address vald) external;
     function owner() external view returns (address);
     function systemAge() external view returns (uint256);
     function updateDelegators(address[] memory valds, address[] memory dels, bool[] memory active) external;
