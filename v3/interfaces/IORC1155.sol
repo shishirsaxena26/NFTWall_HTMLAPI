@@ -58,7 +58,7 @@ interface IORC1155 {
     function mintedqty() external view returns (uint256);
     function name() external view returns (string memory);
     function names(uint256) external view returns (string memory);
-    function onTokenImport(address _from, address _to, bytes memory payload) external;
+    function onTokenImport(address _to, bytes memory payload) external;
     function onTokenTransfer(address _from, address _to, uint256 _id, uint256 _qty, bool _byforce, bytes memory payload)
         external;
     function owner() external view returns (address);

@@ -2641,6 +2641,9 @@ async function loadRule() {
         <th>Rank</th>
         <th>Direct Required</th>
         <th>NFT Amount</th>
+        <th>Eligible Rank</th>
+        <th>Grace Amount</th>
+        <th>Grace Period</th>
         </tr>
         </thead>
         <tbody id="rankClauseBody"></tbody>
@@ -2652,13 +2655,15 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const r = await rule.methods.rankClause(i).call();
-
                 document.getElementById("rankClauseBody")
                     .insertAdjacentHTML("beforeend",
                         `<tr>
                             <td>${i}</td>
                             <td>${r.direct}</td>
                             <td>${r.nftAmount}</td>
+                            <td>${r.eRnk}</td>
+                            <td>${r.gRnk}</td>
+                            <td>${r.gPrd}</td>
                         </tr>`
                     );
 
@@ -2699,6 +2704,7 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const rw = await rule.methods.royalityClause(i).call();
+               
                 if (parseInt(rw.rwNum) === 0) continue;
                 const percent = toPercent(rw.rwNum, rw.rwDen);
 
@@ -2916,9 +2922,9 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const t = await rule.methods.tourClause(i).call();
-                debugger;
+               
                 const ct = await rule.methods.computeTour(i).call();
-                debugger;
+               
                 // skip if 0
                 if (parseInt(t) === 0) continue;
 

@@ -72,7 +72,10 @@ interface I741Rules {
         );
     function poolNFT1() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
     function poolNFT2() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
-    function rankClause(uint256) external view returns (uint256 direct, uint256 nftAmount);
+    function rankClause(uint256)
+        external
+        view
+        returns (uint256 direct, uint256 nftAmount, uint256 eRnk, uint256 gRnk, uint256 gPrd);
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
     function setAllowForceTransfer(bool _f) external;
@@ -100,7 +103,7 @@ interface I741Rules {
         uint256 _ypernum,
         uint256 _yperden
     ) external;
-    function setrankClause(uint256 rank, uint256 direct, uint256 nftAmount) external;
+    function setrankClause(uint256 rnk, uint256 dirc, uint256 nftAmt, uint256 ernk, uint256 grnk, uint256 gprd) external;
     function setrankforDAO(uint256 _r) external;
     function setshutdown(bool _shutdown) external;
     function shutdown() external view returns (bool);
