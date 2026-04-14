@@ -114,7 +114,8 @@ const treeData = {
 };
 
 const step = 5000;
-
+let sysAge;
+let rankClauses = {};
 
 
 async function load(){
@@ -483,7 +484,7 @@ async function loadSystem() {
     const panelSys = addPanel("System Data");
     try{
     const nodes = await nested.methods.getNodesCount().call();
-    const sysAge = await nested.methods.systemAge().call();
+    sysAge = await nested.methods.systemAge().call();
     const forms = await transferRequests.methods.getFormsCount().call();
     const isSafe = await safeguard.methods.isSafe().call();
 
@@ -499,7 +500,7 @@ async function loadSystem() {
         addRow(panelMarket,"Error","Unable to load marketplace");
     }
 
-    await onGetDailyBusiness();
+    //await onGetDailyBusiness();
     hideLoader();
     //setTimeout(() => loadSystem(), 15000);
    
@@ -631,7 +632,7 @@ async function loadSystemTreasuriesNSecurebase(){
     
 
     addRow(panelBusiness, "", table1);
-    onGetDailyBusiness();
+    //onGetDailyBusiness();
     
 }
 
@@ -2398,7 +2399,7 @@ async function loadValidatorPage() {
 }
 
 async function renderULTreePanel() {
-
+  clearPanels();  
   const panel = addPanel("🌳 Upline + Downline View");
 
   // ---------- INPUT UI ----------
@@ -2418,14 +2419,22 @@ async function renderULTreePanel() {
   input.style.color = "#00ffff";
 
   const btn = document.createElement("button");
-  btn.textContent = "Load";
+  btn.textContent = "Load Tree";
   btn.style.padding = "8px 14px";
   btn.style.borderRadius = "8px";
   btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
   btn.style.border = "none";
 
+  const btnIncView = document.createElement("button");
+  btnIncView.textContent = "Income View";
+  btnIncView.style.padding = "8px 14px";
+  btnIncView.style.borderRadius = "8px";
+  btnIncView.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+  btnIncView.style.border = "none";
+
   inputWrap.appendChild(input);
   inputWrap.appendChild(btn);
+  inputWrap.appendChild(btnIncView);
   panel.appendChild(inputWrap);
 
   // ---------- CONTAINER ----------
@@ -2561,9 +2570,181 @@ async function getChildren(id) {
     loadTree(addr);
   };
 
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") btn.click();
-  });
+
+  // ---------- LOAD INCOME VIEW ----------
+  async function loadIncomeView(addr) {
+    runTableTrace(await buildDataSet(addr),rankClauses)
+  }
+
+  async function buildDataSet(addr) {
+
+        const ranks = [];
+        const ages = [];
+
+        // 🔹 get node info from address
+        let uid = await nested.methods.UserToId(addr).call();
+
+        for (let lvl = 0; lvl < 16 && uid != 0; lvl++) {
+
+
+            // 🔹 get node details
+            const node = await nested.methods.getNode(uid).call();
+            const storAddr = node[4];
+
+            let rank = 0;
+            let age = 0;
+            
+            if (storAddr !== "0x0000000000000000000000000000000000000000") {
+
+                const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
+                const res = await stor.methods.getRankWithAgeValue().call();
+
+                rank = Number(res[0]);
+                age = Number(res[1]);
+            }
+            
+            ranks.push(rank);
+            ages.push(age);
+
+            uid = node[2];
+        }
+
+        // 🔁 reverse to match Solidity (top → down)
+        ranks.reverse();
+        ages.reverse();
+
+        return { ranks, ages };
+  }
+
+  async function runTableTrace(dataSet, rankClause) {
+
+    const panel = addPanel("📊 Income Trace");
+
+    const currentAgeNow = Number(sysAge);
+
+    addRow(panel, "Current Age", currentAgeNow);
+
+    let iRnk = 0;
+    let ieRnk = 0;
+    let igRnk = 0;
+    let igPrd = 0;
+    let iOutDay = false;
+
+    let lastrnk = null;
+
+    const length = dataSet.ranks.length;
+    const table = document.createElement("table");
+    table.style.fontFamily = "monospace";
+
+    const header = `
+    <tr>
+    <th>Lvl</th><th></th><th>Rank</th><th>Last</th><th>Age</th>
+    <th>iRnk</th><th>ieRnk</th><th>igRnk</th><th>igPrd</th><th>Out</th>
+    </tr>`;
+    table.innerHTML = header;
+    table.style.textAlign = "right";
+    
+    panel.appendChild(table);
+
+    for (let lvl = 0; lvl < length; lvl++) {
+        
+        const currentrnk = dataSet.ranks[lvl] ?? 0;
+        const currentAge = dataSet.ages[lvl] ?? 0;
+
+        let isSkipped = false;
+
+        let iRnkStr = "";
+        let ieRnkStr = "";
+        let igRnkStr = "";
+        let igPrdStr = "";
+        let iOutDayStr = "";
+
+        // ---------- LEVEL 0 ----------
+        if (lvl === 0) {
+
+        const r0 = rankClause[currentrnk] || {};
+
+        ieRnk = r0.eRnk || 0;
+        igRnk = r0.gRnk || 0;
+        igPrd = r0.gPrd || 0;
+
+        iRnk = currentrnk;
+        lastrnk = currentrnk;
+
+        iOutDay = (currentAgeNow - currentAge) > igPrd;
+
+        iRnkStr = iRnk;
+        ieRnkStr = ieRnk;
+        igRnkStr = igRnk;
+        igPrdStr = igPrd;
+        iOutDayStr = iOutDay;
+        }
+
+        // ---------- MAIN LOGIC ----------
+        if (lvl > 0 && currentrnk !== lastrnk) {
+
+        if (currentrnk !== iRnk) {
+
+            const r = rankClause[currentrnk] || {};
+
+            if (currentrnk > iRnk) {
+            
+            iRnk = currentrnk;
+            ieRnk = r.eRnk || 0;
+            igRnk = r.gRnk || 0;
+            igPrd = r.gPrd || 0;
+
+            iOutDay = (currentAgeNow - currentAge) > igPrd;
+
+            iRnkStr = iRnk;
+            ieRnkStr = ieRnk;
+            igRnkStr = igRnk;
+            igPrdStr = igPrd;
+            iOutDayStr = iOutDay;
+            }
+        }
+
+        isSkipped = !(
+            (currentrnk >= ieRnk) ||
+            (currentrnk >= igRnk && currentrnk < ieRnk && !iOutDay)
+        );
+        
+        }
+
+        // ---------- RENDER ROW ----------
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${lvl}</td>
+        <td>${isSkipped ? "❌" : "✅"}</td>
+        <td>${currentrnk}</td>
+        <td>${lastrnk}</td>
+        <td>${currentAge}</td>
+        <td>${iRnkStr}</td>
+        <td>${ieRnkStr}</td>
+        <td>${igRnkStr}</td>
+        <td>${igPrdStr}</td>
+        <td>${iOutDayStr}</td>
+        `;
+        if (isSkipped) row.style.color = "#ff4d4d";       // red
+        else if (iRnkStr) row.style.color = "#00ff9f";    // green
+        else row.style.color = "#00ffff";                 // cyan
+        table.appendChild(row);
+        lastrnk = currentrnk;
+    }
+ }
+
+
+  btnIncView.onclick = () => {
+        const addr = input.value.trim();
+        if (!addr) return alert("Enter address");
+        loadIncomeView(addr);
+   };
+
+    
+
+   input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") btn.click();
+   });
 }
 
 
@@ -2655,6 +2836,13 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const r = await rule.methods.rankClause(i).call();
+                rankClauses[i] = {
+                    direct: Number(r.direct),
+                    nftAmount: Number(r.nftAmount),
+                    eRnk: Number(r.eRnk),
+                    gRnk: Number(r.gRnk),
+                    gPrd: Number(r.gPrd),
+                };
                 document.getElementById("rankClauseBody")
                     .insertAdjacentHTML("beforeend",
                         `<tr>
@@ -2939,7 +3127,7 @@ async function loadRule() {
 
         // ---------------- OTHER SETTINGS ----------------
         const panelOthers = addPanel("OTHER SETTINGS");
-        const sysAge = await rule.methods.systemAge().call();
+        sysAge = await rule.methods.systemAge().call();
         addRow(panelOthers, "Owner", await rule.methods.owner().call());
         addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
         addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());
@@ -2953,10 +3141,21 @@ async function loadRule() {
         const panelErr = addPanel("Error");
         addRow(panelErr, "Error", "Failed to load rule data");
     }
-    renderULTreePanel();
-    hideLoader();
 
-   
+    
+    const btnUplineDownline = document.createElement("button");
+    btnUplineDownline.textContent = "Load View";
+    btnUplineDownline.style.padding = "8px 14px";
+    btnUplineDownline.style.borderRadius = "8px";
+    btnUplineDownline.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btnUplineDownline.style.border = "none";
+    const panelUplineDownline = addPanel("🌳 Upline + Downline View");
+    panelUplineDownline.appendChild(btnUplineDownline);
+    // ---------- CLICK ----------
+    btnUplineDownline.onclick = () => {
+       renderULTreePanel();
+    };
+    hideLoader();
 }
 
 
