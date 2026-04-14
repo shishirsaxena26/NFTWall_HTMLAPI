@@ -121,6 +121,7 @@ let rankClauses = {};
 async function load(){
     await init();
     //loadRule();
+    renderULTreePanel();
     
 }
 
@@ -2610,8 +2611,8 @@ async function getChildren(id) {
         }
 
         // 🔁 reverse to match Solidity (top → down)
-        ranks.reverse();
-        ages.reverse();
+        //ranks.reverse();
+        //ages.reverse();
 
         return { ranks, ages };
   }
@@ -2833,7 +2834,7 @@ async function loadRule() {
         panelRank.appendChild(tableRank);
 
         // load data
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 0; i <= 7; i++) {
             try {
                 const r = await rule.methods.rankClause(i).call();
                 rankClauses[i] = {
