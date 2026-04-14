@@ -120,4 +120,5 @@ interface IHexBase {
     function updateTreasuryTVLRoyality(address addr) external;
     function updateTreasuryTVLTour(address addr) external;
     function updateValidator(address addr) external;
+    function updateValidatorOld(address addr) external;
 }
