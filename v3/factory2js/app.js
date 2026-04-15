@@ -1400,7 +1400,7 @@ async function onNewProposer() {
 
         const SUBJECT = "Trigger.rule.proposal.UpdateMintQty";
         const TARGET = in741Rule;
-        const DATA_SUCCESS = rule.methods.setMintQty(2, 50000).encodeABI();
+        const DATA_SUCCESS = rule.methods.setMintQty(1, 50000).encodeABI();
         const VALUE_SUCCESS = 0;
         const EXPIRE = 7
         ;
@@ -1447,11 +1447,11 @@ async function onMovedownlineProposer() {
 
         //Raise  DAO request
     
-      //  const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
+        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
    
        //if approved by DAO
 
-         const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
+        // const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
  
         if (tx.status) {
             alert("Movedownline succeeded");
