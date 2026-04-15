@@ -1099,8 +1099,8 @@ async function loadUser() {
         addRow(panel, "Downline Size (1 level)",teamSizeAndZeroDownlevelCount[1]);
         addRow(panel, "TotalTeamSize",teamSizeAndZeroDownlevelCount[0]);
         
-        addRow(panel,"Are you Eligible Delegator ", isdelegator);
-        addRow(panel,"Are you Active Delegator Node ", isdelegatorNode);
+        addRow(panel,"Are you Eligible DAO Delegator ", isdelegator);
+        addRow(panel,"Are you Active DAO Delegator ", isdelegatorNode);
         const instAddr = node[3];
         const storAddr = node[4];
         addRow(panel, "INST---", "");
