@@ -2446,8 +2446,29 @@ async function renderULTreePanel() {
   // ---------- STYLE ----------
   const style = document.createElement("style");
   style.innerHTML = `
-    .ulTreeWrap ul { list-style:none; padding-left:15px; }
-    .ulTreeWrap li { margin:3px 0; color:#00ffff; font-size:12px; }
+        .ulTreeWrap ul { 
+            list-style:none; 
+            padding-left:15px; 
+        }
+
+        .ulTreeWrap li { 
+            margin:3px 0; 
+            color:#00ffff; 
+            font-size:12px;
+        }
+
+        /* 👇 clickable area ONLY */
+        .ulTreeWrap .node {
+            display: inline-block;
+            cursor: pointer;
+            padding: 2px 6px;
+            transition: all 0.2s ease;
+        }
+
+        .ulTreeWrap .node:hover {
+            background: rgba(0,255,255,0.15);
+            border-radius: 4px;
+        }
   `;
   document.head.appendChild(style);
 
@@ -2471,25 +2492,51 @@ async function getChildren(id) {
     }
     return arr;
   }
-  
+
+  // ---------- BUILD DOWNLINE ----------
+  async function buildDownline(parentId, level = 1) {
+    if (level > MAX_LEVEL) return null;
+
+    const children = await getChildren(parentId);
+    if (!children.length) return null;
+
+    const ul = document.createElement("ul");
+
+    for (let c of children) {
+        const li = document.createElement("li");
+
+        li.addr = c.address;
+        li.innerHTML = `<span class="node">${c.id} (${shortAddr(c.address)})</span>`;
+
+        // 🔁 recursive call
+        const childUL = await buildDownline(c.id, level + 1);
+        if (childUL) li.appendChild(childUL);
+
+        ul.appendChild(li);
+    }
+
+    return ul;
+    }
   // ---------- LOAD ----------
+  const MAX_LEVEL = 3; // 👈 change this anytime (2,3,4...)
   async function loadTree(addr) {
 
     container.innerHTML = "⏳ Loading...";
 
     try {
-        
+      const selfid = await nested.methods.UserToId(addr).call();  
       const info = await nested.methods.getNodeParent(addr).call();
       let uid = info[0];
 
       const chain = [];
 
       // 🔥 SELF NODE
-      const selfNode = { id: "You", address: addr };
+      const selfNode = { id: selfid, address: addr };
       chain.push(selfNode);
 
       // 🔼 UPLINE
       while (uid != 0) {
+        
         const node = await getNode(uid);
         chain.push(node);
         uid = await nested.methods.getNodeParentId(uid).call();
@@ -2499,62 +2546,49 @@ async function getChildren(id) {
 
       // ---------- BUILD TREE ----------
       const ul = document.createElement("ul");
+      ul.id = "mainTree";
+
+      // ✅ ADD CLICK HERE 👇
+        ul.addEventListener("click", (e) => {
+        const li = e.target.closest("li");
+        if (!li || !li.addr) return;
+
+        console.log("👤 Clicked (main UL):", li.addr);
+
+        // reload tree OR call your panel
+        loadTree(li.addr);   // OR renderULTreePanel(li.addr)
+        });
+
+
+
+
       let currentUL = ul;
       let lastLI = null;
-
+  
       for (let i = 0; i < chain.length; i++) {
 
         const n = chain[i];
 
         const li = document.createElement("li");
-        li.textContent = `${n.id} (${shortAddr(n.address)})`;
-
+        if(n.id==selfid)
+            li.innerHTML  = `<span class="node">${n.id} (${shortAddr(n.address)})🧑‍💻</span>`;
+        else 
+            li.innerHTML  = `<span class="node">${n.id} (${shortAddr(n.address)})</span>`;
         const nextUL = document.createElement("ul");
 
+        li.addr = n.address; 
         li.appendChild(nextUL);
         currentUL.appendChild(li);
 
         currentUL = nextUL;
         lastLI = li;
       }
-
+    
       // 🔽 ADD DOWNLINE (ONLY FOR SELF NODE)
-      const selfId = chain[chain.length - 1].id === "You"
-        ? (await nested.methods.getNodeParent(addr).call())[0]
-        : null;
-
-      if (selfId) {
-
-        const children = await getChildren(selfId);
-        
-        const downUL = document.createElement("ul");
-
-        for (let c of children) {
-
-          const cli = document.createElement("li");
-          cli.textContent = `${c.id} (${shortAddr(c.address)})`;
-
-          // 🔽 LEVEL 2
-          const subChildren = await getChildren(c.id);
-
-          if (subChildren.length) {
-            const subUL = document.createElement("ul");
-
-            subChildren.forEach(sc => {
-              const scli = document.createElement("li");
-              scli.textContent = `${sc.id} (${shortAddr(sc.address)})`;
-              subUL.appendChild(scli);
-            });
-
-            cli.appendChild(subUL);
-          }
-
-          downUL.appendChild(cli);
-        }
-
-        lastLI.appendChild(downUL);
+      if (selfid) {
+            const downUL = await buildDownline(selfid, 1);
+            if (downUL) lastLI.appendChild(downUL);
       }
-
       container.innerHTML = "";
       container.appendChild(ul);
 
