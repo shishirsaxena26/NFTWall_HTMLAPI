@@ -33,6 +33,7 @@ interface IInstanceStor {
     error ImportLimitExceeded();
     error InvalidClone();
     error InvalidMintCycleLimit();
+    error InvalidValue();
     error InvalidnewOwner();
     error MintLimitExceeded();
     error PreInitException();
