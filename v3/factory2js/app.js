@@ -1193,7 +1193,7 @@ async function loadMyStor(id, panel) {
             for(let r = 0; r<getRankAgeInBatch.length; r++){
                 const row = document.createElement("tr")
                     row.innerHTML = `
-                    <td>${r}</td>
+                    <td>${parseInt(r)+1}</td>
                     <td>${getRankAgeInBatch[r]}</td>
                     <td>${getAgeDateRange(getRankAgeInBatch[r]).start}</td>
                 `;

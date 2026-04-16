@@ -68,18 +68,18 @@ interface IInstanceStor {
         payable
         returns (uint256 _tvl, uint256 _amt);
     function addLevelnGetRank(
-        uint256 _direct,
         uint256 _amount,
         uint256 _qty,
         uint256 _level,
         uint256 _epochAge,
         uint256 _free,
         bool _tobeSkipped
-    ) external returns (uint256 currentrnk, uint256 currentrankage);
+    ) external returns (uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
     function capStatus() external view returns (uint256 totalIncome, uint256 threshold, bool _cap, uint256 currentValue);
     function dage() external view returns (uint256);
+    function directsCount() external view returns (uint256);
     function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
@@ -96,7 +96,7 @@ interface IInstanceStor {
     function isLock() external view returns (bool);
     function mintCount() external view returns (uint256);
     function mints(uint256) external view returns (uint256 amt, uint256 qty, uint256 mage, address nft);
-    function moveLvlIncome(uint256 _direct, uint256 _amount, uint256 _qty, uint256 _level, uint256 _epochAge, bool _op)
+    function moveLvlIncome(uint256 _amount, uint256 _qty, uint256 _level, uint256 _epochAge, bool _op)
         external
         returns (uint256 lastrnk, uint256 currentrnk);
     function owner() external view returns (address);
@@ -107,6 +107,7 @@ interface IInstanceStor {
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
+    function setdirect(bool addremove) external;
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);
