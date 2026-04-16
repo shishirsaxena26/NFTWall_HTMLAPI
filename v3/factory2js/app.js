@@ -31,6 +31,7 @@ let indaocore = {};
 let indaoassembly = {};
 let inproposals = [];
 let inNftProxy = {};
+let invalidator;
 
 let nested;
 let rule;
@@ -139,6 +140,7 @@ async function init(){
     IDAOAssemblyABI = await fetch('abistandardv3/DAOAssembly.sol/DAOAssembly.json?v='+version).then(res => res.json());
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v='+version).then(res => res.json());
     INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v='+version).then(res => res.json());
+    IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v='+version).then(res => res.json());
      
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
@@ -170,7 +172,10 @@ async function init(){
         await priceContract.methods.ozonePriceInUSDT().call()
     );
 
-    validator = new web3Main.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
+    invalidator = await hexBase.methods.invalidator().call();
+
+    validator = new web3Main.eth.Contract(IValidatorsABI.abi, invalidator);
+    debugger;
    
     inNftProxy = await hexBase.methods.inNftProxy().call();
     nftProxy = new web3.eth.Contract(INFTProxyABI.abi, inNftProxy);
@@ -550,8 +555,8 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelBase,"instance",inst);
     const nftproxy = await hexBase.methods.inNftProxy().call();
     addRow(panelBase,"NFTProxy",nftproxy);
-    const validator = await hexBase.methods.invalidator().call();
-    addRow(panelBase,"Validator",validator);
+    const nftvalidator = await hexBase.methods.invalidator().call();
+    addRow(panelBase,"Validator",nftvalidator);
 
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
@@ -1193,7 +1198,7 @@ async function loadMyStor(id, panel) {
             for(let r = 0; r<getRankAgeInBatch.length; r++){
                 const row = document.createElement("tr")
                     row.innerHTML = `
-                    <td>${parseInt(r)+1}</td>
+                    <td>${parseInt(r)}</td>
                     <td>${getRankAgeInBatch[r]}</td>
                     <td>${getAgeDateRange(getRankAgeInBatch[r]).start}</td>
                 `;
@@ -2350,6 +2355,7 @@ async function loadNFTArchive(){
 }
 
 async function loadValidatorPage() {
+    
     clearPanels();
     const panel = addPanel("Validator Module");
     try {
@@ -2357,60 +2363,17 @@ async function loadValidatorPage() {
         row.className="row";
 
         const left = document.createElement("div");
-
-        const btnGetDeligator=document.createElement("button");
-        btnGetDeligator.innerText="Get Deligator Info";
-        btnGetDeligator.style.marginLeft="10px";
        
-        btnGetDeligator.onclick = async () => {
-            try {
-                const _v = prompt("Enter deligator address:");
-                const deligatorAdd = _v.trim();
-                if (!deligatorAdd || !web3.utils.isAddress(deligatorAdd)) {
-                    alert("Enter a valid deligatorAdd");
-                    return;
-                }
-                
-                // Enable wallet
-                //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                
-                //if(currentAccount.trim().toLowerCase() !== accounts[0].toLowerCase())
-                //    throw "Incorrect account selected";
-                
-                // Initialize contract
-                //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
-                
-                const isDelegator = await validator.methods.isDelegator(deligatorAdd).call();
-                const deluser = await validator.methods.getUser(deligatorAdd).call();
-                const subrow=document.createElement("div");
-                subrow.className="row";
-
-                const right=document.createElement("div");
-                right.innerHTML =
-                "Deligator: "+deligatorAdd+" | isDelegator: "+isDelegator+" | "+ "User: "+deluser+" ";
-                
-                subrow.appendChild(right);
-                panel.appendChild(subrow);
-            }
-            catch(err){
-                console.error(err);
-                addRow(panel,"Error", err.message);
-                addRow(panel,"Error","Failed to Deligator Module");
-            }
-        };
-
-        left.appendChild(btnGetDeligator);
-        
         const btnGetUserDeligator=document.createElement("button");
         btnGetUserDeligator.innerText="Get User's Deligator";
         btnGetUserDeligator.style.marginLeft="10px";
 
         btnGetUserDeligator.onclick = async () => {
             try {
-                const _u = prompt("Enter User address:");
-                const userAdd = _u.trim();
-                if (!userAdd || !web3.utils.isAddress(userAdd)) {
-                    alert("Enter a valid userAdd");
+                const input = document.getElementById("userAddrInput");
+                const user = input.value.trim();
+                if (!user || !web3.utils.isAddress(user)) {
+                    alert("Enter a valid Ethereum address");
                     return;
                 }
                 
@@ -2423,14 +2386,15 @@ async function loadValidatorPage() {
                 // Initialize contract
                 //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
                 
-                
-                const delegatorAdd = await validator.methods.getDelegator(userAdd).call();
+                debugger
+                const valdelact = await validator.methods.getValidatorDelegatorOfUser(user).call();
+                debugger
                 const subrow=document.createElement("div");
                 subrow.className="row";
 
                 const right=document.createElement("div");
                 right.innerHTML =
-                "User: "+userAdd+" | Delegator: "+delegatorAdd +" ";
+                "User: "+userAdd+" | Validator: "+valdelact[0] +" | Delegator: "+valdelact[1] +" | Active: "+valdelact[2] +" ";
                 
                 subrow.appendChild(right);
                 panel.appendChild(subrow);

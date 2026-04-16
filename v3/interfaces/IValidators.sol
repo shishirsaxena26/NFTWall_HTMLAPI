@@ -33,11 +33,12 @@ interface IValidators {
     function getUserFromDelegator(address delegator) external view returns (address);
     function getValidatorDelegator(address _v, address _d) external view returns (bool);
     function getValidatorDelegatorOfUser(address user) external view returns (address, address, bool);
-    function importIncome(address userfrom, address userto) external;
+    function importData(address _u) external;
     function incomeOf(address user) external view returns (uint256);
     function mapValidatorDelegator(address user, address vald, bool activate) external;
     function owner() external view returns (address);
     function systemAge() external view returns (uint256);
+    function transferUser(address userfrom, address userto) external;
     function updateDelegators(address[] memory valds, address[] memory dels, bool[] memory active) external;
     function updateIncome(address[] memory users, uint256[] memory amounts, bool increase, uint256 _age) external;
 }
