@@ -19,6 +19,13 @@ library InstanceStor {
         uint256 f7;
         int256 lsb;
     }
+
+    struct LevelInfoStr {
+        uint256 lvlbs;
+        uint256 lvlqty;
+        uint256 lvlrwrd;
+        uint256 lvlyei;
+    }
 }
 
 interface IInstanceStor {
@@ -76,7 +83,12 @@ interface IInstanceStor {
     function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
-    function getNodeLB(uint256 _level) external view returns (uint256, uint256, uint256, uint256);
+    function getNodeLB(uint256 _level) external view returns (InstanceStor.LevelInfoStr memory);
+    function getNodeLvlInfoBatch(uint256 from, uint256 to)
+        external
+        view
+        returns (InstanceStor.LevelInfoStr[] memory info);
+    function getRankAgeInBatch() external view returns (uint256[] memory rankagebatch);
     function getRankWithAgeValue() external view returns (uint256, uint256);
     function getToggleAgeCount(uint256 key) external view returns (uint256);
     function getToggleAgeValue(uint256 key, uint256 index) external view returns (uint256);

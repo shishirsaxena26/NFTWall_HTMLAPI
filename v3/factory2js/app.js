@@ -788,10 +788,35 @@ async function loadUserPanel(user){
     const dage = await stor.methods.dage().call();
     const rankWithAge= await stor.methods.getRankWithAgeValue().call();
     const cage = await stor.methods.cage().call();
-
+    addRow(userPanel,"Stor Cage",cage);
     addRow(userPanel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
     addRow(userPanel,"Stor Rank",`Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
-    addRow(userPanel,"Stor Cage",cage);
+     const table = document.createElement("table");
+        table.border = "1";
+        table.cellPadding = "5";
+        table.style.width = "100%";
+        // ✅ THEAD (Header)
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+        <tr>
+            <th>#</th>
+            <th>Desc</th>
+            <th>Target</th>
+            <th>Up</th>
+            <th>Dn</th>
+            <th>Win</th>
+            <th>Approved</th>
+            <th>Resolved</th>
+            <th>Creator</th>
+            <th>Vote</th>
+            <th>Sign</th>
+        </tr>
+        `;
+        table.appendChild(thead);
+        
+    addRow(userPanel,"",table);
+    
+    
 }
 async function addConnectedUserPanel(){
 
@@ -1144,10 +1169,40 @@ async function loadMyStor(id, panel) {
             const cage = await stor.methods.cage().call();
             const isLock = await stor.methods.isLock().call();
  
-            addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
-            addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
             addRow(panel,"Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
-            
+            addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
+            addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]}`);
+            const tableRg = document.createElement("table");
+                tableRg.border = "1";
+                tableRg.cellPadding = "5";
+                tableRg.style.width = "50%";
+                tableRg.style.display= "table-cell";
+            addRow(panel,"Rank ages",tableRg);
+                // ✅ THEAD (Header)
+            const theadRg = document.createElement("thead");
+                theadRg.innerHTML = `
+                <tr>
+                    <th>Rank</th>
+                    <th>Age</th>
+                    <th>Date</th>
+                </tr>
+                `;
+            tableRg.appendChild(theadRg);
+            const tbodyRg = document.createElement("tbody");
+            const getRankAgeInBatch = await stor.methods.getRankAgeInBatch().call();
+            for(let r = 0; r<getRankAgeInBatch.length; r++){
+                const row = document.createElement("tr")
+                    row.innerHTML = `
+                    <td>${r}</td>
+                    <td>${getRankAgeInBatch[r]}</td>
+                    <td>${getAgeDateRange(getRankAgeInBatch[r]).start}</td>
+                `;
+                tbodyRg.appendChild(row);
+            }
+
+            // ✅ Attach tbody
+            tableRg.appendChild(tbodyRg);
+
              /*
             let aj1 = await stor.methods.comp(15,2).call();
             let aj2 = await stor.methods.comp(15,1).call();
@@ -1964,15 +2019,18 @@ async function loadMyNFT(){
     
   
     const levelpanel = addPanel("Level Business");
-    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild | RankAge`);
+    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
+    const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0,15).call();
     for(let i=0; i<=15; i++){
-        ;
-        const lvl = await storeContract.methods.getNodeLB(i).call();
-        let rankage = 0;
-        if(i<8)
-            rankage = await storeContract.methods.rankage(i).call();
-        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} | ${getAgeDateRange(rankage).start} {${rankage}}`);
+        const lvl = lvlBatch[i];
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }
+    /*debugger;
+    for(let i=0; i<=15; i++){
+        
+        const lvl = await storeContract.methods.getNodeLB(i).call();
+        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
+    }*/
     
 
 

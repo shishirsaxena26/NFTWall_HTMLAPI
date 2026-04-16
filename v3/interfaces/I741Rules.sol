@@ -41,13 +41,10 @@ interface I741Rules {
     function getBalance() external view returns (uint256);
     function getBatchRoyaltyClauses() external view returns (lib741Rules.RoyalityStr[7] memory clauses);
     function getHexbase() external view returns (address);
-    function getLevelIncomeOnRank() external view returns (uint256, uint256);
     function levelClause(uint256)
         external
         view
         returns (uint256 rank, uint256 rwNum, uint256 rwrDen, uint256 yeiNum, uint256 yeiDen);
-    function lvlincrankmax() external view returns (uint256);
-    function lvlincrankmin() external view returns (uint256);
     function maxClaimPerDay() external view returns (uint256);
     function maxGlobalClaimPerDay() external view returns (uint256);
     function maxMintQty() external view returns (uint256);
@@ -83,7 +80,6 @@ interface I741Rules {
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setFreeIntervals(uint256 _d) external;
     function setGlobalClaimPerDay(uint256 _ac) external;
-    function setLevelIncomeOnRank(uint256 _min, uint256 _max) external;
     function setMaxMintsPerCycle(uint256 _max) external;
     function setMaxNFTSend(uint256 _d) external;
     function setMintCycleDays(uint256 _d) external;
