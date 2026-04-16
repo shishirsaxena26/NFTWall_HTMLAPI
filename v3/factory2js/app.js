@@ -3101,14 +3101,6 @@ async function loadRule() {
 
         panelNFTPool.appendChild(tableNFT);
 
-        // ---------------- LEVEL INCOME RANGE ----------------
-        const panelLvlRange = addPanel("LEVEL INCOME RANGE");
-        const lvlIncome = await rule.methods.getLevelIncomeOnRank().call();
-
-        addRow(panelLvlRange, "Level Income allowed from: ",
-            `${lvlIncome[0]} rank - ${lvlIncome[1]} rank`
-        );
-
         // ---------------- MINT SETTINGS ----------------
         const panelMint = addPanel("Mint Config");
 
