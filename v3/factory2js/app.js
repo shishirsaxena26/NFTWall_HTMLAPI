@@ -173,9 +173,7 @@ async function init(){
     );
 
     invalidator = await hexBase.methods.invalidator().call();
-
-    validator = new web3Main.eth.Contract(IValidatorsABI.abi, invalidator);
-    debugger;
+    validator = new web3.eth.Contract(IValidatorsABI.abi, invalidator);
    
     inNftProxy = await hexBase.methods.inNftProxy().call();
     nftProxy = new web3.eth.Contract(INFTProxyABI.abi, inNftProxy);
@@ -2386,18 +2384,28 @@ async function loadValidatorPage() {
                 // Initialize contract
                 //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
                 
-                debugger
+                
                 const valdelact = await validator.methods.getValidatorDelegatorOfUser(user).call();
-                debugger
+                const inc = await validator.methods.incomeOf(user).call();
+                
                 const subrow=document.createElement("div");
                 subrow.className="row";
 
-                const right=document.createElement("div");
-                right.innerHTML =
-                "User: "+userAdd+" | Validator: "+valdelact[0] +" | Delegator: "+valdelact[1] +" | Active: "+valdelact[2] +" ";
+                const right1=document.createElement("div");
+                right1.innerHTML = "User: " + user + " | Income: " + inc;
+
+                const right2=document.createElement("div");
+                right2.innerHTML =
+                "Validator: " + valdelact[0] + " | Delegator: "+valdelact[1] + " | Active: "+ valdelact[2];
                 
-                subrow.appendChild(right);
+                subrow.appendChild(right1);
+
+                const subrow2=document.createElement("div");
+                subrow2.className="row";
+                subrow2.appendChild(right2);
+
                 panel.appendChild(subrow);
+                panel.appendChild(subrow2);
             }
             catch(err){
                 console.error(err);
