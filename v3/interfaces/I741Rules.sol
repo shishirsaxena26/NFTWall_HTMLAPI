@@ -22,7 +22,10 @@ interface I741Rules {
     receive() external payable;
 
     function Burn(uint256 amount) external;
+    function NFTAgePointer() external view returns (uint256);
     function NFTSendPerCycle() external view returns (uint256);
+    function StartAgePointerGT() external view returns (uint256);
+    function StartAgePointerLEQ() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _isDelegatorNode(address sender) external view returns (bool);
@@ -41,6 +44,9 @@ interface I741Rules {
     function getBalance() external view returns (uint256);
     function getBatchRoyaltyClauses() external view returns (lib741Rules.RoyalityStr[7] memory clauses);
     function getHexbase() external view returns (address);
+    function getNftPool(uint256 _type, uint256 _mintage)
+        external
+        returns (uint256 _startfrom, uint256 _roiN, uint256 _roiD, uint256 _roiInt);
     function levelClause(uint256)
         external
         view
@@ -85,6 +91,7 @@ interface I741Rules {
     function setMintCycleDays(uint256 _d) external;
     function setMintFee(uint256 _fe) external;
     function setMintQty(uint256 _min, uint256 _max) external;
+    function setNFTAgePointer(uint256 _point, uint256 _leq, uint256 _gt) external;
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;

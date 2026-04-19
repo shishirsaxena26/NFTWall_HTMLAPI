@@ -501,7 +501,7 @@ async function loadSystem() {
 
     } catch(err){
         console.error(err);
-        addRow(panelMarket,"Error","Unable to load marketplace");
+        addRow(panelSys,"Error","Unable to load marketplace");
     }
 
     //await onGetDailyBusiness();
@@ -1144,12 +1144,13 @@ async function loadUser() {
         } 
         addRow(panel, "STOR---", "");
         addRow(panel, "StorAddr", node[4]);
+       
         await loadMyStor(id, panel);
-
+ 
         await loadMyNFT();
     } catch(err){
         console.error(err);
-        addRow(panelMarket,"Error","Unable to load marketplace");
+        addRow(panel,"Error","Unable to load marketplace");
     }
 
     hideLoader();
@@ -1944,6 +1945,12 @@ async function loadMyNFT(){
         const mintedAge = await nft.methods.mintedAge().call();
         const clonedOf = await nft.methods.clonedOf().call();
         const balance = await nft.methods.balanceOf(user, tokenId).call();
+          const getNftPool = await rule.methods.getNftPool(1, mintedAge).call();
+     
+        const unlocked = await nft.methods.getUnlockedNFT().call();
+        const claimed = await nft.methods.claimed().call(); 
+        
+        const startfrom = getNftPool._startfrom;
 
         const uri = await nft.methods.uri(tokenId).call();
         const meta = await fetch(uri).then(r=>r.json());
@@ -1966,23 +1973,53 @@ async function loadMyNFT(){
         img.width = 40;
         img.height = 40;
 
-        const idText = document.createElement("span");
-        idText.innerText = ' CLONNED_OF ';
+        
 
         rowTop.appendChild(idSpan);
         rowTop.appendChild(img);
-        rowTop.appendChild(renderAddress(nftAddr));
-        rowTop.appendChild(idText);
-        rowTop.appendChild(renderAddress(clonedOf));
+
+        const nftaddrdivMain = document.createElement("div");
+        nftaddrdivMain.style.display = "";
+        nftaddrdivMain.style.alignItems = "center";
+        nftaddrdivMain.style.gap = "8px";
+
+
+        const nftaddrdiv = document.createElement("div");
+        nftaddrdiv.style.display = "flex";
+        nftaddrdiv.style.alignItems = "center";
+        nftaddrdiv.style.gap = "8px";
+
+        const ageText = document.createElement("span");
+        ageText.innerText = " | Age: "+ mintedAge;
+        nftaddrdiv.appendChild(renderAddress(nftAddr));
+        nftaddrdiv.appendChild(ageText);
+
+
+        const nftaddrdiv1 = document.createElement("div");
+        nftaddrdiv1.style.display = "flex";
+        nftaddrdiv1.style.alignItems = "center";
+        nftaddrdiv1.style.gap = "8px";
+        const idText = document.createElement("span");
+        idText.innerText = ' CLONNED_OF ';
+        nftaddrdiv1.appendChild(idText);
+        nftaddrdiv1.appendChild(renderAddress(clonedOf));
+
+        nftaddrdivMain.appendChild(nftaddrdiv);
+        nftaddrdivMain.appendChild(nftaddrdiv1);
+
+        rowTop.appendChild(nftaddrdivMain);
+
         left.appendChild(rowTop);
-
         const right=document.createElement("div");
-
         right.innerHTML =
         "Balance: "+balance+
-        " | Minted : "+mintedqty+
         " | Fee: "+Number(web3.utils.fromWei(mintedfee,"ether")).toFixed(3)+
-        " | Age: "+ `${getAgeDateRange(mintedAge).start} {${mintedAge}}`+" ";
+        " | Minted : "+mintedqty+
+        " | Unlocked: "+unlocked+
+        " | Claimed: "+claimed + 
+        " | startAge: "+startfrom+ "";
+        
+        //" | Age: "+ `${getAgeDateRange(mintedAge).start} {${mintedAge}}`+" ";
         /* CHECKBOX */
 
         const checkbox = document.createElement("input");
