@@ -1,3 +1,147 @@
+
+/*
+let capstatus = {
+  totalIcnome: 0.010810810811,
+  threshold: 0.000000040000,
+  cap: true,
+  burned: 0,
+  currentValue: 0.010810810811
+};
+*/
+
+let capstatus = {
+  totalIcnome:  70.6,
+  threshold: 12.4,
+  cap: false,
+  burned: 24.0,
+  currentValue: 11.6
+};
+
+
+const SCALE = 1e18;
+const sx = {
+  totalIcnome: BigInt(Math.round(capstatus.totalIcnome * SCALE)),
+  threshold: BigInt(Math.round(capstatus.threshold * SCALE)),
+  burned: BigInt(Math.round(capstatus.burned * SCALE)),
+  currentValue: BigInt(Math.round(capstatus.currentValue * SCALE)),
+  cap: capstatus.cap,
+  burned4X: BigInt(Math.round((capstatus.burned*2) * SCALE))
+};
+
+
+function getScale(o) {
+
+    totalIcnome= BigInt(Math.round(o.totalIcnome * SCALE)),
+    threshold= BigInt(Math.round(o.threshold * SCALE)),
+    burned= BigInt(Math.round(o.burned * SCALE)),
+    currentValue= BigInt(Math.round(o.currentValue * SCALE)),
+    cap= o.cap,
+    burned4X= BigInt(Math.round((o.burned*2) * SCALE))
+    
+    function clean(n, d = 8) {
+        const num = Number(n);
+        return Number(num.toFixed(d));
+    }
+
+    // =========================
+    // SAFE BASE CHECK
+    // =========================
+    const t = Number(threshold);
+
+    if (!t || t <= 0) {
+        return {
+            min: 0,
+            max: 1,
+            tick: 0.1,
+            decimals: 0,
+            thresholdPosition: 9,
+            totalIcnome: totalIcnome,
+            threshold: threshold,
+            burned: burned,
+            currentValue: currentValue,
+            cap: cap,
+            burned4X: burned4X,
+            warningRange: {
+                fromValue: 0,
+                toValue: 0,
+                fromPos: 0,
+                toPos: 0
+            }
+        };
+    }
+
+    const TICKS = 10;
+
+    // =========================
+    // FORCE 9th tick rule
+    // =========================
+    const tick = t / 9;
+    const max = tick * TICKS;
+
+    // =========================
+    // FIXED POSITIONS
+    // =========================
+    const WARNING_FROM_POS = 7.5;
+    const WARNING_TO_POS = 9;
+    const THRESHOLD_POS = 9;
+
+    // =========================
+    // WARNING RANGE (inline, no extra object)
+    // =========================
+    const warningFromValue = tick * WARNING_FROM_POS;
+
+    // =========================
+    // DECIMALS HANDLING (safe for small numbers)
+    // =========================
+    let decimals = 0;
+
+    const str = threshold.toString();
+
+    if (str.includes('e-')) {
+        decimals = parseInt(str.split('e-')[1], 10) + 2;
+    } else if (str.includes('.')) {
+        decimals = str.split('.')[1].length;
+    }
+
+    decimals = Math.min(decimals, 18);
+
+    // =========================
+    // FINAL OUTPUT (Highcharts safe)
+    // =========================
+    return {
+        min: BigInt(0),
+        max: BigInt(max),
+        tick: clean(tick, decimals),
+        threshold: t,
+        thresholdPosition: THRESHOLD_POS,
+        totalIcnome: totalIcnome,
+        threshold: threshold,
+        burned: burned,
+        currentValue: currentValue,
+        cap: cap,
+        burned4X: burned4X,        
+        warningRange: {
+            fromValue: BigInt(warningFromValue),
+            toValue: BigInt(t),
+            fromPos: WARNING_FROM_POS,
+            toPos: THRESHOLD_POS
+        },
+        decimals
+    };
+}
+
+function adjustedValues(a) {
+    a.currentValueAdj = a.currentValue>=a.max?a.max:a.currentValue;
+    
+    return a;
+}
+
+const s = adjustedValues(getScale(capstatus));
+
+console.log(s);
+;
+
+
 let web3;
 web3 = new Web3(provider);
 
@@ -1176,6 +1320,7 @@ async function loadMyStor(id, panel) {
             addRow(panel,"Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
             addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
             addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]}`);
+
             const tableRg = document.createElement("table");
                 tableRg.border = "1";
                 tableRg.cellPadding = "5";
@@ -1275,6 +1420,8 @@ async function loadMyStor(id, panel) {
                 }
                 addRow(panel, incomeTypes[i], `${comp} | ${compFlush} | ${drwn} | ${flsh} | ${unpaidVal}| ${parseInt(susCount)%2==1}`);
             }
+
+
             
             // Burned & Self Proposed
 
@@ -1285,8 +1432,62 @@ async function loadMyStor(id, panel) {
             addRow(panel, "LOCKED", isLock);
             
             const capCount =  await stor.methods.getToggleAgeCount(200).call();
-            
             addRow(panel, "ToggleAgeCount(_CAP_IX)->", `${parseInt(capCount)%2==1}`);
+            
+            const toggleAgeListdiv =document.createElement("div");
+            toggleAgeListdiv.style.display = "-webkit-inline-box";
+            toggleAgeListdiv.style.alignItems = "center";
+            toggleAgeListdiv.style.gap = "8px"; 
+
+            const guagecontainer=document.createElement("div");
+            guagecontainer.id="container";
+            guagecontainer.style.width= "520px";
+
+            const tableToggle = document.createElement("table");
+                tableToggle.border = "1";
+                tableToggle.cellPadding = "5";
+                tableToggle.style.width = "50%";
+                tableToggle.style.display= "table-cell";
+            toggleAgeListdiv.appendChild(guagecontainer);
+            toggleAgeListdiv.appendChild(tableToggle);
+            addRow(panel,"ToggleAgeList",toggleAgeListdiv);
+                // ✅ THEAD (Header)
+            const theadToggle = document.createElement("thead");
+            theadToggle.innerHTML = `
+                <tr>
+                    <th>Head</th>
+                    <th>Count</th>
+                    <th>ages</th>
+                </tr>
+                `;
+            tableToggle.appendChild(theadToggle);
+            const tbodyToggle = document.createElement("tbody");
+            const values = [...Array.from({ length: 7 }, (_, i) => i + 1), 200];
+            for (const v of values) {
+                console.log(v);
+                const susCount =  await stor.methods.getToggleAgeCount(v).call();
+                const result = [];
+                for (let i = 0; i < susCount; i++) {
+                    const value = await stor.methods.getToggleAgeValue(v, i).call();
+                    result.push({
+                        index: i,
+                        value: value
+                    });
+                }
+
+                const row = document.createElement("tr")
+                    row.innerHTML = `
+                    <td>${v}</td>
+                    <td>${susCount}</td>
+                    <td>${result.map(item => `<div>${item.index} - ${item.value}</div>`).join("")}</td>
+                `;
+                tbodyToggle.appendChild(row);
+            }
+
+            // ✅ Attach tbody
+            tableToggle.appendChild(tbodyToggle);
+            loadGraph(null);
+
             const capStatus =  await stor.methods.capStatus().call();
             addRow(panel, "CAP Status", "TotalInc | Threshold | IsCap | CurrentValue");
             addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
@@ -1945,8 +2146,10 @@ async function loadMyNFT(){
         const mintedAge = await nft.methods.mintedAge().call();
         const clonedOf = await nft.methods.clonedOf().call();
         const balance = await nft.methods.balanceOf(user, tokenId).call();
-          const getNftPool = await rule.methods.getNftPool(1, mintedAge).call();
-     
+        const getNftPool = await rule.methods.getNftPool(1, mintedAge).call();
+       
+        const jsunlocked = await getUnlockedNFT(parseInt(mintedAge), parseInt(mintedqty));
+        ;
         const unlocked = await nft.methods.getUnlockedNFT().call();
         const claimed = await nft.methods.claimed().call(); 
         
@@ -2065,7 +2268,7 @@ async function loadMyNFT(){
         const lvl = lvlBatch[i];
         addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }
-    /*debugger;
+    /*;
     for(let i=0; i<=15; i++){
         
         const lvl = await storeContract.methods.getNodeLB(i).call();
@@ -2077,6 +2280,104 @@ async function loadMyNFT(){
 
     hideLoader();
 }
+
+
+    async function getUnlockedNFT(mintedAge, mintedqty) {
+    const ONE = 1e18;
+    sysAge = await nested.methods.systemAge().call();    
+    // if shutdown()
+    const isShutdown = await rule.methods.shutdown().call();
+    if (isShutdown) {
+        return mintedqty;
+    }
+
+    let totalNFT = 0;
+
+    const processPool = async (poolId) => {
+        const pool = await rule.methods.getNftPool(poolId, mintedAge).call();
+
+        let startfrom = Number(pool._startfrom);
+        let roiN = Number(pool._roiN);
+        let roiD = Number(pool._roiD);
+        let roiInt = Number(pool._roiInt);
+       
+        if (sysAge < (mintedAge + startfrom)) {
+        return 0;
+        }
+     
+        if (roiInt > 0) {
+        let cycles = Math.floor((sysAge - (mintedAge + startfrom)) / roiInt);
+
+        if (cycles > 0) {
+            return (mintedqty * ONE * roiN / (100 * roiD)) * cycles;
+        }
+        }
+
+        return 0;
+    };
+   
+    totalNFT += await processPool(1);
+    totalNFT += await processPool(2);
+    
+    // normalize
+    totalNFT = totalNFT / ONE;
+
+    // cap
+    if (totalNFT > mintedqty) {
+        totalNFT = mintedqty;
+    }
+
+    return parseInt(totalNFT);
+    }
+
+    async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead = 5000) {
+        const ONE = 1e18;
+
+        const isShutdown = await rule.methods.shutdown().call();
+        if (isShutdown) return null;
+
+        const processPool = (ag, pool) => {
+            let startfrom = Number(pool.startfrom);
+            let roiN = Number(pool.roiN);
+            let roiD = Number(pool.roiD);
+            let roiInt = Number(pool.roiInt);
+
+            if (ag < (mintedAge + startfrom)) return 0;
+
+            if (roiInt > 0) {
+            let cycles = Math.floor((ag - (mintedAge + startfrom)) / roiInt);
+
+            if (cycles > 0) {
+                return (mintedqty * ONE * roiN / (100 * roiD)) * cycles;
+            }
+            }
+            return 0;
+        };
+
+        for (let ag = mintedAge; ag < mintedAge + maxLookahead; ag++) {
+
+            const pool1 = await rule.methods.getNftPool(1, mintedAge).call();
+            const pool2 = await rule.methods.getNftPool(2, mintedAge).call();
+
+            let totalNFT =
+            processPool(ag, pool1) +
+            processPool(ag, pool2);
+
+            totalNFT = totalNFT / ONE;
+
+            if (totalNFT > 1) {
+            return {
+                age: ag,
+                nft: totalNFT
+            };
+            }
+        }
+
+        return null;
+        }
+
+
+
 
 async function onCapBurn() {
     showLoader();
@@ -3253,7 +3554,336 @@ async function loadRule() {
 }
 
 
+async function loadGraph(cp)
+{
 
+    let capstatus = {
+    totalIcnome: parseFloat(70.6),
+    threshold: parseFloat(12.4),
+    cap: false,
+    burned: parseFloat(24.0),
+    currentValue: parseFloat(11.6)
+    };
+
+    let minvalue = 0;
+    let maxvalue = parseInt(capstatus.threshold);
+    maxvalue = maxvalue%2==0? maxvalue + 2 : maxvalue + 1; 
+    let alertvalue = maxvalue-4;
+
+    let burned4x = capstatus.burned*4;
+    burned4x=parseFloat(burned4x).toFixed(1);
+    if(burned4x>0){
+    burned4x = burned4x >= maxvalue ? maxvalue : burned4x;
+    burned4x=(burned4x-capstatus.currentValue).toFixed(1);
+    }
+
+
+    //burned4x=8.0;
+
+    //capstatus.currentValue=maxvalue-burned4x;
+
+    Highcharts.chart('container', {
+
+        chart: {
+            type: 'gauge',
+            alignTicks: false,
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+
+        title: {
+            useHTML: true,
+            text: `
+            <span style="font-size:17px; color:#ccc;">CAP STATUS</span><br/><br/>
+                <span style="color:${capstatus.cap ? '#FFA500' : '#55BF3B'}; font-weight:600;font-size:16px;">
+                    ${capstatus.cap ? '🚨 ACTIVE' : (capstatus.currentValue>=alertvalue ? '⚠ ALERT' : '🟢 NORMAL')}
+                </span>
+                
+            `
+        },
+
+        pane: {
+            startAngle: -90,
+            endAngle: +90,
+            background: null, // Optional: keeps it clean
+            size: '100%',   // ensure consistent scaling
+            //center: ['50%', '70%'] // Adjusts the vertical position of the half-circle
+        },
+
+        yAxis: [{
+            min: minvalue,
+            max: maxvalue,
+            tickPositions: [minvalue, capstatus.currentValue, (maxvalue/2),  maxvalue], // Add 72 here
+            tickPosition: 'outside',
+            lineColor: '#fff',
+            lineWidth: 0,
+            reversed: false, 
+            minorTickPosition: 'outside',
+            tickColor: '#fff',
+            minorTickColor: '#fff',
+            tickLength: 0,
+            minorTickLength: 5,
+            /*title: {
+                text: '<span class="arrow">➔</span> Income Moving towards 4X <span class="arrow">➔</span>',
+                useHTML: true,
+                y: -60,
+                textAlign: 'center',
+                textPath: {
+                    enabled: true,
+                    attributes: { dy: -25 } // Moves text slightly above the arc line
+                },
+                style: {
+                    color: '#FFFFFF',
+                    fontSize: '11px'
+                }
+            },*/
+            labels: {
+                distance: 14,
+                rotation: 'auto',
+                useHTML: true,
+                
+                // 1. Prevents clipping of labels that move outside the wrapper
+                overflow: 'allow', 
+                // 2. Ensures labels aren't cut off if they move outside the plot area
+                crop: false,
+                formatter: function() {
+                        return    `<span style="
+                        display: block; 
+                        transform: translateY(-${0}px); 
+                        color: white; 
+                        font-weight: bold;
+                        background: rgba(0,0,0,0.3); /* Optional: darkens background for legibility */
+                        padding: 2px;
+                        border-radius: 3px;
+                    ">
+                        ${this.value}
+                    </span>`
+                },
+                style: {
+                        color: '#fff',
+                        fontWeight: 'normal',
+                        fontSize: '10px'
+                }
+                
+
+            },
+            offset: -40,
+            endOnTick: false,
+            plotLines: [{
+                value: capstatus.threshold,
+                color: '#DF5353',
+                width: 0,
+                zIndex: 4,
+                label: {
+                    
+                    text: `<-- ${capstatus.threshold} *`,
+                    align: 'center',
+                    verticalAlign: 'top', // Position it on the outside of the arc
+                    rotation: -0,
+                    x: 125,// Offset to move it away from the line
+                    y: -5,// Offset to move it away from the line
+                    style: {
+                        color: '#DF5353',
+                        fontWeight: 'normal',
+                        fontSize: '12px'
+                },
+                }
+            }],
+
+            plotBands: [{
+        from: minvalue,
+        to: maxvalue - 4,
+        thickness: 25,
+        color: {
+            pattern: {
+                path: {
+                    // This SVG path defines a small arrow
+                    d: 'M 0 10 L 8 10 L 8 5 L 15 12 L 8 19 L 8 14 L 0 14 Z',
+                    fill: '#55BF3B'
+                },
+                width: 20,
+                height: 25
+            }
+        }
+    },{
+                from: minvalue,
+                to: alertvalue,
+                color: '#55BF3B', // green
+                thickness:15,
+                borderRadius: '50%',
+                
+            }, {
+                from: alertvalue,
+                to: capstatus.threshold,
+                color: '#DDDF0D', // yellow
+                thickness: 15,
+                borderRadius: '50%'
+            }, {
+            
+                from: capstatus.threshold,
+                to: maxvalue,
+                color: '#DF5353', // red
+                thickness: 15,
+                borderRadius: '50%'
+
+            }]
+        },
+        {
+            min: minvalue,
+            max: maxvalue,
+            /*title: {
+                text: 'BURNED'
+            },*/
+            tickPositions: [minvalue, (maxvalue/2), burned4x, maxvalue], // Add 72 here
+            lineColor: '#2caffe',
+            tickColor: '#2caffe',
+            minorTickColor: '#2caffe',
+            offset: -60,
+            lineWidth: 0,
+            labels: {
+                distance: 5,
+                rotation: 'auto',
+                formatter: function() {
+                // alert(this.value);
+                //alert(this.value);
+                return `${this.value}`;
+                if (this.value == maxvalue )  return `${this.value} ←`;
+                if (this.value == minvalue )  return `${this.value} ←`;
+                return `${this.value}`;
+                //return '<span style="color:red">5</span> custom units';
+                },
+                style: {
+                        color: '#55BF3B',
+                        fontWeight: 'normal',
+                        fontSize: '10px'
+                }
+            },
+            tickLength: 5,
+            reversed: true,
+            minorTickLength: 1,
+            endOnTick: false,
+            plotBands: [{
+                from: minvalue,
+                to: parseFloat(burned4x),
+                color: '#55BF3B', // green
+                thickness:5,
+                innerRadius: '15%',  // Tuck this band INSIDE
+                outerRadius: '50%',
+                borderRadius: '0%'
+            }]
+        /* ,plotLines: [{
+                value: capstatus.burned4x,
+                color: 'red',
+                width: 0,
+                zIndex: 4,
+                label: {
+                    text: `Threadhold: ${capstatus.burned*4}`,
+                    align: 'center',
+                    verticalAlign: 'top', // Position it on the outside of the arc
+                    rotation: -0,
+                    y: 6,// Offset to move it away from the line
+                    style: {
+                        color: 'red',
+                        fontWeight: 'bold',
+                        fontSize: '10px'
+                },
+                }
+            }], */
+        }],
+
+        series: [
+    
+            {
+            name: '',
+            data: [(capstatus.currentValue+(91))],
+            
+            yAxis: 0,
+        
+            dial: {
+                //radius: '50%',
+                // Path is [M, x, y, L, x, y...]
+                // 0,0 is the center pivot point
+                path: [
+                    'M', -5, -150, 'L', 5, -150, 'L', 1, -141, 'L', -1, -141, 'Z', // TOP PIECE
+                    'M', -1, -71, 'L', 1, -71, 'L', 1.5, 0, 'L', -1.5, 0, 'Z'      // BOTTOM PIECE
+                ],
+                backgroundColor: '#F5F5F5',
+                borderWidth: 0,
+                baseWidth: 0, // Set to 0 so it doesn't draw the default needle
+                
+            },
+            pivot: {
+                radius: 6,
+                backgroundColor: '#F5F5F5'
+            },
+            useHTML: true,
+            dataLabels: {
+                format: '<span style="padding:15px;line-height:1;"><span style="color:#000">Income: '+capstatus.totalIcnome+'</span><br/>' +
+                    '<span style="color:#fff">Current: '+capstatus.currentValue+'</span><br/>' +
+                    '<span style="color:#DF5353">Threashold: '+capstatus.threshold+'</span><br/>' +
+                    '<span style="color:#55BF3B">Burned: '+capstatus.burned+'</span><br/>' +
+                    '<span style="color:#55BF3B">BurnedX: '+burned4x+'</span></span>',
+                backgroundColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, 'var(--highcharts-neutral-color-20, #ddd)'],
+                        [1, 'var(--highcharts-background-color, #fff)']
+                    ]
+                },
+                style: {
+                    textOutline: 'none'
+                }
+            },
+            tooltip: {
+                enabled: false
+            }
+        },
+        {
+                name: '',
+                data: [capstatus.burned4x],
+                yAxis: 1,
+            // dial: { backgroundColor: 'green' },
+            /* dataLabels: {
+                    format: '<span style="color:#2caffe">Income: '+capstatus.totalIcnome+'</span><br/>' +
+                        '<span style="color:#2caffe">Threashold: '+capstatus.threshold+'</span><br/>' +
+                        '<span style="color:#2caffe">Burned: '+capstatus.burned+'</span><br/>',
+                    backgroundColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, 'var(--highcharts-neutral-color-20, #ddd)'],
+                            [1, 'var(--highcharts-background-color, #fff)']
+                        ]
+                    },
+                    style: {
+                        textOutline: 'none'
+                    }
+                }, */
+                tooltip: {
+                    enabled: false
+                }
+            }
+        ]
+
+    },
+    // Add some life
+    function (chart) {
+    
+
+    });
+
+}
 
 
 
