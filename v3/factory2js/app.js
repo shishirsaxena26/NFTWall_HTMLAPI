@@ -1489,8 +1489,8 @@ async function loadMyStor(id, panel) {
             loadGraph(null);
 
             const capStatus =  await stor.methods.capStatus().call();
-            addRow(panel, "CAP Status", "TotalInc | Threshold | IsCap | CurrentValue");
-            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
+            addRow(panel, "CAP Status", "TotalInc | burned4x | Threshold | IsCap | CurrentValue");
+            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burned4x)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
 
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
