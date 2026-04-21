@@ -3814,7 +3814,9 @@ async function loadGraph(cp)
     let minvalue = s.range[0];
     let maxvalue = s.range[1];
     let alertvalue = s.ticks[8];
-   
+
+    let statuscolor  = cp.cap ? '#ff3c00' : (s.current.value>=s.ticks[8]? '#f5e664' : '#55BF3B');
+
     Highcharts.chart('container', {
 
     chart: {
@@ -3831,8 +3833,8 @@ async function loadGraph(cp)
        useHTML: true,
             text: `
             <span style="font-size:17px; color:#ccc;">Capping: 
-                <span style="color:${cp.cap ? '#FFA500' : '#55BF3B'}; font-weight:600;font-size:16px;">
-                    ${cp.cap ? '🚨 weight' : (s.current.value>=s.ticks[8] ? '⚠ WARNING' : '🟢 NORMAL')}
+                <span style="color:${statuscolor}; font-weight:600;font-size:16px;">
+                    ${cp.cap ? '🚨 ACTIVE' : (s.current.value>=s.ticks[8] ? '⚠ WARNING' : '🟢 NORMAL')}
                 </span> </span>
                 
             `
@@ -3853,7 +3855,7 @@ async function loadGraph(cp)
         tickPixelInterval: 72,
         tickPosition: 'inside',
         tickColor: 'var(--highcharts-background-color, #FFFFFF)',
-        tickPositions: [s.ticks[0], s.current.value, s.ticks[9],  s.ticks[10]], // Add 72 here
+        tickPositions: [s.ticks[0], s.current.value, s.ticks[8], s.ticks[9],  s.ticks[10]], // Add 72 here
         tickLength: 20,
         tickWidth: 2,
         minorTickInterval: null,
@@ -3864,9 +3866,12 @@ async function loadGraph(cp)
                 color: '#fff'
             },
             formatter: function () {
-                var t= '<span color="grey">'+this.value == s.ticks[10] ? 'max' : this.value.toString()+'</span>';
-                if(this.value == s.ticks[9]) t = '<span color="red">🅣</span>';
-                if(this.value == s.current.value) t = '<span color="white">🅲</span>';
+                var t= '<span color="grey">'+this.value.toString()+'</span>';
+               
+                if(this.value == s.ticks[8]) t = '<span color="yellow">⚠</span>';
+                if(this.value == s.ticks[9]) t = '<span color="red">🚨</span>';
+                if(this.value == s.current.value) t = '<span color="'+statuscolor+'">©️</span>';
+                if(this.value == s.ticks[10]) t = '<span color="grey">max</span>';
                 return t;
             }
         },
@@ -3949,13 +3954,13 @@ async function loadGraph(cp)
     }],
 
     series: [{
-        name: 'current: ' + cp.currentValue,
+        name: 'current: ',
         data: [s.current.value],
         tooltip: {
           enabled: false
         },
         dataLabels: {
-            format: '<span style="padding:20px;line-height:1;"><span style="color:#000">Income: '+cp.totalIncome+'</span><br/>' +
+            format: '<span style="font-size:11px; padding:10px; line-height:1rem;"><span style="color:grey">Income: '+cp.totalIncome+'</span><br/>' +
                     '<span style="color:#fff">Current: '+cp.currentValue+'</span><br/>' +
                     '<span style="color:#DF5353">Threashold: '+cp.threshold+'</span><br/>' +
                     '<span style="color:#55BF3B">BurnedX: '+cp.burned4x+'</span></span>',
@@ -3969,12 +3974,12 @@ async function loadGraph(cp)
             radius: '80%',
             backgroundColor: 'white',
             baseColor: 'red',
-            baseWidth: 1,
+            baseWidth: 10,
             baseLength: '0%',
             rearLength: '0%'
         },
         pivot: {
-            backgroundColor: 'blue',
+            backgroundColor: 'grey',
             radius: 9
         }
 
@@ -3983,309 +3988,6 @@ async function loadGraph(cp)
 });
 
 
-
-return;
-
-    let capstatus1 = {
-        totalIcnome: 70.6,
-        burned4x: 24.0,
-        threshold: 12.4,
-        cap: false,
-        currentValue: 11.6
-    };
-    const s1 = getGraphConfig(capstatus.threshold,capstatus.currentValue,capstatus.burned4x);
-  
-    let minvalue1 = s.range[0];
-    let maxvalue1 = s.range[1];
-    let alertvalue1 = s.ticks[8];
-
-
-    Highcharts.chart('container', {
-
-        chart: {
-            type: 'gauge',
-            plotBackgroundColor: null,
-            plotBackgroundImage: null,
-            plotBorderWidth: 0,
-            plotShadow: false,
-            height: '80%',
-            backgroundColor: '#0f172a' // deep dark
-        },
-
-        title: {
-            useHTML: true,
-            text: `
-            <span style="font-size:17px; color:#ccc;">CAP STATUS</span><br/><br/>
-                <span style="color:${capstatus.cap ? '#FFA500' : '#55BF3B'}; font-weight:600;font-size:16px;">
-                    ${capstatus.cap ? '🚨 ACTIVE' : (s.current.value>=alertvalue ? '⚠ ALERT' : '🟢 NORMAL')}
-                </span>
-                
-            `
-        },
-
-        pane: {
-            startAngle: -90,
-            endAngle: +90,
-            background: null,
-            center: ['50%', '75%'],
-            size: '110%'
-        },
-
-        yAxis: [{
-            min: minvalue,
-            max: maxvalue,
-            tickPositions: [s.ticks[0], s.current.value, s.ticks[8], s.ticks[9],  s.ticks[10]], // Add 72 here
-            tickPosition: 'outside',
-            lineColor: 'var(--highcharts-background-color, #FFFFFF)',
-            lineWidth: 0,
-            reversed: false, 
-            minorTickPosition: 'outside',
-            tickColor: '#FFFFFF',
-            minorTickColor: '#FFFFFF',
-            tickLength: 0,
-            minorTickLength: 5,
-            /*title: {
-                text: '<span class="arrow">➔</span> Income Moving towards 4X <span class="arrow">➔</span>',
-                useHTML: true,
-                y: -60,
-                textAlign: 'center',
-                textPath: {
-                    enabled: true,
-                    attributes: { dy: -25 } // Moves text slightly above the arc line
-                },
-                style: {
-                    color: '#FFFFFF',
-                    fontSize: '11px'
-                }
-            },*/
-            labels: {
-                distance: 14,
-                //rotation: 'auto',
-                useHTML: true,
-                
-                // 1. Prevents clipping of labels that move outside the wrapper
-                overflow: 'allow', 
-                // 2. Ensures labels aren't cut off if they move outside the plot area
-                crop: false,
-                formatter: function() {
-                        let tick = this.value == s.ticks[10] ? 'max' : this.value.toString();
-                        return    `<span style="
-                        display: block; 
-                        transform: translateY(-${0}px); 
-                        color: '#FFFFFF'; 
-                        font-weight: normal;
-                        background: '#FFFFFF'; /* Optional: darkens background for legibility */
-                        padding: 2px;
-                        border-radius: 3px;
-                    ">
-                        ${tick}
-                    </span>`
-                },
-                style: {
-                        color: '#fff',
-                        fontWeight: 'normal',
-                        fontSize: '10px'
-                }
-                
-
-            },
-            offset: -40,
-            endOnTick: false,
-            plotLines: [{
-                value: s.threshold,
-                color: '#DF5353',
-                width: 0,
-                zIndex: 4,
-                label: {
-                    
-                    text: `<-- ${s.threshold} *`,
-                    align: 'center',
-                    verticalAlign: 'top', // Position it on the outside of the arc
-                    rotation: -0,
-                    x: 125,// Offset to move it away from the line
-                    y: -5,// Offset to move it away from the line
-                    style: {
-                        color: '#DF5353',
-                        fontWeight: 'normal',
-                        fontSize: '12px'
-                },
-                }
-            }],
-
-            plotBands: [{
-                from: s.ticks[0],
-                to: s.ticks[8],
-                color: '#55BF3B', // green
-                thickness:15,
-                borderRadius: '50%',
-                
-            }, {
-                from: s.ticks[8],
-                to: s.ticks[9],
-                color: '#DDDF0D', // yellow
-                thickness: 15,
-                borderRadius: '50%'
-            }, {
-            
-                from: s.ticks[9],
-                to:s.ticks[10],
-                color: '#DF5353', // red
-                thickness: 15,
-                borderRadius: '50%'
-
-            }]
-        },
-        {
-            min: minvalue,
-            max: maxvalue,
-            /*title: {
-                text: 'BURNED'
-            },*/
-            tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
-            lineColor: '#2caffe',
-            tickColor: '#2caffe',
-            minorTickColor: '#2caffe',
-            offset: -60,
-            lineWidth: 0,
-            labels: {
-                distance: 5,
-                rotation: 'auto',
-                formatter: function() {
-                // alert(this.value);
-                //alert(this.value);
-                return `${this.value}`;
-                if (this.value == maxvalue )  return `${this.value} ←`;
-                if (this.value == minvalue )  return `${this.value} ←`;
-                return `${this.value}`;
-                //return '<span style="color:red">5</span> custom units';
-                },
-                style: {
-                        color: '#55BF3B',
-                        fontWeight: 'normal',
-                        fontSize: '10px'
-                }
-            },
-            tickLength: 5,
-            reversed: true,
-            minorTickLength: 1,
-            endOnTick: false,
-            plotBands: [{
-                from: s.ticks[0],
-                to: s.burned.value,
-                color: '#55BF3B', // green
-                thickness:5,
-                innerRadius: '15%',  // Tuck this band INSIDE
-                outerRadius: '50%',
-                borderRadius: '0%'
-            }]
-        /* ,plotLines: [{
-                value: capstatus.burned4x,
-                color: 'red',
-                width: 0,
-                zIndex: 4,
-                label: {
-                    text: `Threadhold: ${capstatus.burned*4}`,
-                    align: 'center',
-                    verticalAlign: 'top', // Position it on the outside of the arc
-                    rotation: -0,
-                    y: 6,// Offset to move it away from the line
-                    style: {
-                        color: 'red',
-                        fontWeight: 'bold',
-                        fontSize: '10px'
-                },
-                }
-            }], */
-        }],
-
-        series: [
-    
-            {
-            name: '',
-            data: [(s.current.value)],
-            
-            yAxis: 0,
-        
-            dial: {
-                //radius: '50%',
-                // Path is [M, x, y, L, x, y...]
-                // 0,0 is the center pivot point
-                path: [
-                    'M', -5, -150, 'L', 5, -150, 'L', 1, -141, 'L', -1, -141, 'Z', // TOP PIECE
-                    'M', -1, -71, 'L', 1, -71, 'L', 1.5, 0, 'L', -1.5, 0, 'Z'      // BOTTOM PIECE
-                ],
-                backgroundColor: '#F5F5F5',
-                borderWidth: 0,
-                baseWidth: 0, // Set to 0 so it doesn't draw the default needle
-                
-            },
-            pivot: {
-                radius: 6,
-                backgroundColor: '#F5F5F5'
-            },
-            useHTML: true,
-            dataLabels: {
-                format: '<span style="padding:15px;line-height:1;"><span style="color:#000">Income: '+capstatus.totalIcnome+'</span><br/>' +
-                    '<span style="color:#fff">Current: '+capstatus.currentValue+'</span><br/>' +
-                    '<span style="color:#DF5353">Threashold: '+capstatus.threshold+'</span><br/>' +
-                    '<span style="color:#55BF3B">BurnedX: '+capstatus.burned4x+'</span></span>',
-                backgroundColor: {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
-                    stops: [
-                        [0, 'var(--highcharts-neutral-color-20, #ddd)'],
-                        [1, 'var(--highcharts-background-color, #fff)']
-                    ]
-                },
-                style: {
-                    textOutline: 'none'
-                }
-            },
-            tooltip: {
-                enabled: false
-            }
-        },
-        {
-                name: '',
-                data: [s.burned.value],
-                yAxis: 1,
-            // dial: { backgroundColor: 'green' },
-            /* dataLabels: {
-                    format: '<span style="color:#2caffe">Income: '+capstatus.totalIcnome+'</span><br/>' +
-                        '<span style="color:#2caffe">Threashold: '+capstatus.threshold+'</span><br/>' +
-                        '<span style="color:#2caffe">Burned: '+capstatus.burned+'</span><br/>',
-                    backgroundColor: {
-                        linearGradient: {
-                            x1: 0,
-                            y1: 0,
-                            x2: 0,
-                            y2: 1
-                        },
-                        stops: [
-                            [0, 'var(--highcharts-neutral-color-20, #ddd)'],
-                            [1, 'var(--highcharts-background-color, #fff)']
-                        ]
-                    },
-                    style: {
-                        textOutline: 'none'
-                    }
-                }, */
-                tooltip: {
-                    enabled: false
-                }
-            }
-        ]
-
-    },
-    // Add some life
-    function (chart) {
-    
-
-    });
 
 }
 
