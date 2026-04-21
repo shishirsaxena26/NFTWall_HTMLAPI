@@ -138,7 +138,7 @@ function adjustedValues(a) {
 
 const s = adjustedValues(getScale(capstatus));
 
-console.log(s);
+//console.log(s);
 ;
 
 
@@ -612,7 +612,7 @@ function pad3(v){
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
     if(!value) return "NULL";
-    return Number(web3.utils.fromWei(value, "ether")).toFixed(12) + " OZN";
+    return Number(web3.utils.fromWei(value, "ether")).toFixed(12);
 }
 
 async function printRow(addr, balpanel){
@@ -1486,9 +1486,17 @@ async function loadMyStor(id, panel) {
 
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
-            loadGraph(null);
+            
 
             const capStatus =  await stor.methods.capStatus().call();
+            loadGraph({
+                totalIncome: formatOZN(capStatus.totalIncome),
+                burned4x: formatOZN(capStatus.burned4x),
+                threshold: formatOZN(capStatus.threshold),
+                cap: capStatus._cap,
+                currentValue:formatOZN(capStatus.currentValue)
+
+            });
             addRow(panel, "CAP Status", "TotalInc | burned4x | Threshold | IsCap | CurrentValue");
             addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burned4x)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
 
@@ -3553,44 +3561,455 @@ async function loadRule() {
     hideLoader();
 }
 
+function getGraphConfigOld(n) {
+ const maxRange = n + 2;
+ let axisTitle = "Value";
+ let formatter;
+
+
+
+ // 1. Handle extremely small numbers (e.g., 0.00000004)
+ if (n > 0 && n < 0.0001) {
+ const exponent = Math.floor(Math.log10(n));
+ axisTitle = `Value (×10^${exponent})`;
+ // Scaled ticks (e.g., 4.0 instead of 0.00000004)
+ formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
+ }
+
+ // 2. Handle numbers with decimals (e.g., 12.004)
+ else if (n % 1 !== 0) {
+ axisTitle = "Value";
+ formatter = (val) => val.toFixed(2); // Keep labels short
+ }
+
+ // 3. Handle standard whole numbers
+ else {
+ axisTitle = "Value";
+ formatter = (val) => Math.round(val);
+ }
+
+
+
+ return {
+ range: [0, maxRange],
+ title: axisTitle,
+ tickFormatter: formatter
+ };
+}
+
+
+
+// Examples:
+//console.log(getGraphConfigOld(0.00000004)); // Title: "Value (×10^-8)", Range: [0, 2.00000004]
+//console.log(getGraphConfigOld(12.004)); // Title: "Value", Range: [0, 14.004]
+// ----------------------------
+function round2(n) {
+    return Number(n.toFixed(2));
+}
+
+// ----------------------------
+function classifyInput(n) {
+    if (n === null || n === undefined || isNaN(n)) {
+        return { type: "zero", value: 0 };
+    }
+
+    n = Number(n);
+
+    if (n === 0) {
+        return { type: "zero", value: 0 };
+    }
+
+    return { type: "normal", value: n };
+}
+
+// ----------------------------
+function normalizeSmall(n) {
+    let value = Math.abs(n);
+    let shift = 0;
+
+    while (value < 0.1) {
+        value *= 10;
+        shift++;
+    }
+
+    return {
+        scaledValue: value,
+        scaleFactor: shift
+    };
+}
+
+// ----------------------------
+// 🔥 CORE MAPPING (CLEAN)
+// ----------------------------
+function mapToGraph(value, scaleRatio, range) {
+
+    if (!value || isNaN(value)) {
+        return {
+            value: 0,
+            isMin: true,
+            isMax: false
+        };
+    }
+
+    let scaled = value * scaleRatio;
+
+    let clamped = Math.max(range[0], Math.min(range[1], scaled));
+
+    return {
+        value: round2(clamped),
+        isMin: clamped === range[0],
+        isMax: clamped === range[1]
+    };
+}
+
+// ----------------------------
+// 🔥 MAIN FUNCTION
+// ----------------------------
+function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
+
+    const classified = classifyInput(thresholdInput);
+
+    // ZERO CASE
+    if (classified.type === "zero") {
+        return {
+            threshold: 0,
+            range: [0, 0],
+            ticks: Array(11).fill(0),
+
+            current: { value: 0, isMin: true, isMax: false },
+            burned:  { value: 0, isMin: true, isMax: false }
+        };
+    }
+
+    let rawThreshold = classified.value;
+
+    let scaledThreshold = rawThreshold;
+    let scaleFactor = 1;
+
+    // SCALE SMALL VALUES
+    if (Math.abs(rawThreshold) < 0.001) {
+        const res = normalizeSmall(rawThreshold);
+        scaledThreshold = res.scaledValue;
+        scaleFactor = res.scaleFactor;
+    }
+
+    scaledThreshold = round2(scaledThreshold);
+
+    // GRAPH BUILD
+    const step = scaledThreshold / 9;
+
+    let max = step * 10;
+
+    // ✅ SCALE RATIO
+    const scaleRatio = rawThreshold !== 0
+        ? scaledThreshold / rawThreshold
+        : 0;
+
+    // 🔥 PRE-SCALE values
+    const scaledCurrent = currentValue * scaleRatio;
+    const scaledBurned  = burned4x * scaleRatio;
+
+    // 🔥 AUTO EXPAND (prevents clipping)
+    max = Math.max(max, scaledCurrent, scaledBurned);
+
+    max = round2(max);
+
+    const range = [0, max];
+
+    // 🔥 recompute step based on final max
+    const finalStep = max / 10;
+
+    const ticks = Array.from({ length: 11 }, (_, i) =>
+        round2(i * finalStep)
+    );
+
+    // MAP VALUES
+    const current = mapToGraph(currentValue, scaleRatio, range);
+    const burned  = mapToGraph(burned4x, scaleRatio, range);
+
+    return {
+        rawThreshold,
+        currentValue,
+        burned4x,
+        scaledThreshold,
+        scaleFactor,
+        scaleRatio,
+        step: round2(finalStep),
+        range,
+
+        ticks,
+
+        thresholdTickIndex: 9, // approximate now (may shift slightly)
+        maxTickIndex: 10,
+
+        tickAtIndex9: ticks[9],
+        tickAtIndex10: ticks[10],
+
+        current,
+        burned
+    };
+}
+const tests = [
+    { t: 12,              c: 10,        b: 5 },
+    { t: 12.4,            c: 15,        b: 8 },
+    { t: 12.0004,         c: 20,        b: 1 },
+
+    { t: 0.124,           c: 0.5,       b: 0.2 },
+
+    { t: 0.00000000124,   c: 0.54546,   b: 0.2 },
+
+    { t: 0,               c: 10,        b: 2 },
+    { t: null,            c: 5,         b: 1 },
+    { t: undefined,       c: 2,         b: 0.5 }
+];
+/*
+tests.forEach(({ t, c, b }) => {
+
+    console.log("\n====================");
+
+    const res = getGraphConfig(t, c, b);
+
+    console.log("INPUT →",
+        "Threshold:", t,
+        "| Current:", c,
+        "| Burned:", b
+    );
+
+    console.log("\n--- SCALED VALUES ---");
+    console.log("SCALED →",
+        "Threshold:",  res.threshold,
+        "| Current:", res.current.value,
+        "| Burned:", res.burned.value
+    );
+ 
+    console.log("\n--- SCALE INFO ---");
+    console.log("Scale Factor:", res.scaleFactor);
+    console.log("Raw Threshold:", res.rawThreshold);
+    console.log("Scaled Threshold:", res.scaledThreshold);
+
+    console.log("\n--- RANGE ---");
+    console.log("Range:", res.range);
+    console.log("Step :", res.step);
+
+    console.log("\n--- TICKS ---");
+    console.log(res.ticks);
+});
+ */
 
 async function loadGraph(cp)
 {
+    /*cp = {
+        totalIncome: 70.6,
+        burned4x: 13.0,
+        threshold: 12.4,
+        cap: false,
+        currentValue: 11.6
+    };*/
+ 
+   
+    const s = getGraphConfig(cp.threshold,cp.currentValue,cp.burned4x);
+    
+    console.log(s);
 
-    let capstatus = {
-    totalIcnome: parseFloat(70.6),
-    threshold: parseFloat(12.4),
-    cap: false,
-    burned: parseFloat(24.0),
-    currentValue: parseFloat(11.6)
+    let minvalue = s.range[0];
+    let maxvalue = s.range[1];
+    let alertvalue = s.ticks[8];
+   
+    Highcharts.chart('container', {
+
+    chart: {
+        type: 'gauge',
+        plotBackgroundColor: null,
+        plotBackgroundImage: null,
+        plotBorderWidth: 0,
+        plotShadow: false,
+        height: '70%',
+        backgroundColor: '#0f172a' // deep dark
+    },
+
+    title: {
+       useHTML: true,
+            text: `
+            <span style="font-size:17px; color:#ccc;">Capping: 
+                <span style="color:${cp.cap ? '#FFA500' : '#55BF3B'}; font-weight:600;font-size:16px;">
+                    ${cp.cap ? '🚨 weight' : (s.current.value>=s.ticks[8] ? '⚠ WARNING' : '🟢 NORMAL')}
+                </span> </span>
+                
+            `
+    },
+
+    pane: {
+        startAngle: -90,
+        endAngle: 89.9,
+        background: null,
+        center: ['50%', '75%'],
+        size: '110%'
+    },
+
+    // the value axis
+    yAxis: [{
+        min: s.ticks[0],
+        max: s.ticks[10],
+        tickPixelInterval: 72,
+        tickPosition: 'inside',
+        tickColor: 'var(--highcharts-background-color, #FFFFFF)',
+        tickPositions: [s.ticks[0], s.current.value, s.ticks[9],  s.ticks[10]], // Add 72 here
+        tickLength: 20,
+        tickWidth: 2,
+        minorTickInterval: null,
+        labels: {
+            distance: 20,
+            style: {
+                fontSize: '14px',
+                color: '#fff'
+            },
+            formatter: function () {
+                var t= '<span color="grey">'+this.value == s.ticks[10] ? 'max' : this.value.toString()+'</span>';
+                if(this.value == s.ticks[9]) t = '<span color="red">🅣</span>';
+                if(this.value == s.current.value) t = '<span color="white">🅲</span>';
+                return t;
+            }
+        },
+        lineWidth: 0,
+        plotBands: [{
+            from: s.ticks[0],
+            to: s.ticks[8],
+            color: '#55BF3B', // green
+            thickness: 20,
+            borderRadius: '50%'
+        }, {
+            from: s.ticks[8],
+            to: s.ticks[9],
+            color: '#DDDF0D', // yellow
+            thickness: 20,
+            borderRadius: '50%'
+        }, {
+            from: s.ticks[9],
+            to: s.ticks[10],
+            color: '#DF5353', // red
+            thickness: 20,
+            borderRadius: '50%'
+        }]
+    },{
+            min: s.ticks[0],
+            max: s.ticks[10],
+            /*title: {
+                text: 'BURNED'
+            },*/
+            tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
+            lineColor: '#2caffe',
+            tickColor: '#2caffe',
+            minorTickColor: '#2caffe',
+            offset: -60,
+            lineWidth: 0,
+            labels: {
+                distance: 5,
+                rotation: 'auto',
+                formatter: function() {
+                    var t= this.value == s.ticks[10] ? 'max' : this.value.toString();
+                    return '<span>' + t + '</span>';
+                },
+                style: {
+                        color: '#55BF3B',
+                        fontWeight: 'normal',
+                        fontSize: '10px'
+                }
+            },
+            tickLength: 5,
+            reversed: true,
+            minorTickLength: 1,
+            endOnTick: false,
+            plotBands: [{
+                from: s.ticks[0],
+                to: s.ticks[10]-s.current.value,
+                color: '#55BF3B', // green
+                thickness:5,
+                innerRadius: '15%',  // Tuck this band INSIDE
+                outerRadius: '50%',
+                borderRadius: '0%'
+            }]
+        /* ,plotLines: [{
+                value: capstatus.burned4x,
+                color: 'red',
+                width: 0,
+                zIndex: 4,
+                label: {
+                    text: `Threadhold: ${capstatus.burned*4}`,
+                    align: 'center',
+                    verticalAlign: 'top', // Position it on the outside of the arc
+                    rotation: -0,
+                    y: 6,// Offset to move it away from the line
+                    style: {
+                        color: 'red',
+                        fontWeight: 'bold',
+                        fontSize: '10px'
+                },
+                }
+            }], */
+    }],
+
+    series: [{
+        name: 'current: ' + cp.currentValue,
+        data: [s.current.value],
+        tooltip: {
+          enabled: false
+        },
+        dataLabels: {
+            format: '<span style="padding:20px;line-height:1;"><span style="color:#000">Income: '+cp.totalIncome+'</span><br/>' +
+                    '<span style="color:#fff">Current: '+cp.currentValue+'</span><br/>' +
+                    '<span style="color:#DF5353">Threashold: '+cp.threshold+'</span><br/>' +
+                    '<span style="color:#55BF3B">BurnedX: '+cp.burned4x+'</span></span>',
+            borderWidth: 0,
+           
+            style: {
+                fontSize: '13px'
+            }
+        },
+        dial: {
+            radius: '80%',
+            backgroundColor: 'white',
+            baseColor: 'red',
+            baseWidth: 1,
+            baseLength: '0%',
+            rearLength: '0%'
+        },
+        pivot: {
+            backgroundColor: 'blue',
+            radius: 9
+        }
+
+    }]
+
+});
+
+
+
+return;
+
+    let capstatus1 = {
+        totalIcnome: 70.6,
+        burned4x: 24.0,
+        threshold: 12.4,
+        cap: false,
+        currentValue: 11.6
     };
+    const s1 = getGraphConfig(capstatus.threshold,capstatus.currentValue,capstatus.burned4x);
+  
+    let minvalue1 = s.range[0];
+    let maxvalue1 = s.range[1];
+    let alertvalue1 = s.ticks[8];
 
-    let minvalue = 0;
-    let maxvalue = parseInt(capstatus.threshold);
-    maxvalue = maxvalue%2==0? maxvalue + 2 : maxvalue + 1; 
-    let alertvalue = maxvalue-4;
-
-    let burned4x = capstatus.burned*4;
-    burned4x=parseFloat(burned4x).toFixed(1);
-    if(burned4x>0){
-    burned4x = burned4x >= maxvalue ? maxvalue : burned4x;
-    burned4x=(burned4x-capstatus.currentValue).toFixed(1);
-    }
-
-
-    //burned4x=8.0;
-
-    //capstatus.currentValue=maxvalue-burned4x;
 
     Highcharts.chart('container', {
 
         chart: {
             type: 'gauge',
-            alignTicks: false,
             plotBackgroundColor: null,
             plotBackgroundImage: null,
             plotBorderWidth: 0,
-            plotShadow: false
+            plotShadow: false,
+            height: '80%',
+            backgroundColor: '#0f172a' // deep dark
         },
 
         title: {
@@ -3598,7 +4017,7 @@ async function loadGraph(cp)
             text: `
             <span style="font-size:17px; color:#ccc;">CAP STATUS</span><br/><br/>
                 <span style="color:${capstatus.cap ? '#FFA500' : '#55BF3B'}; font-weight:600;font-size:16px;">
-                    ${capstatus.cap ? '🚨 ACTIVE' : (capstatus.currentValue>=alertvalue ? '⚠ ALERT' : '🟢 NORMAL')}
+                    ${capstatus.cap ? '🚨 ACTIVE' : (s.current.value>=alertvalue ? '⚠ ALERT' : '🟢 NORMAL')}
                 </span>
                 
             `
@@ -3607,22 +4026,22 @@ async function loadGraph(cp)
         pane: {
             startAngle: -90,
             endAngle: +90,
-            background: null, // Optional: keeps it clean
-            size: '100%',   // ensure consistent scaling
-            //center: ['50%', '70%'] // Adjusts the vertical position of the half-circle
+            background: null,
+            center: ['50%', '75%'],
+            size: '110%'
         },
 
         yAxis: [{
             min: minvalue,
             max: maxvalue,
-            tickPositions: [minvalue, capstatus.currentValue, (maxvalue/2),  maxvalue], // Add 72 here
+            tickPositions: [s.ticks[0], s.current.value, s.ticks[8], s.ticks[9],  s.ticks[10]], // Add 72 here
             tickPosition: 'outside',
-            lineColor: '#fff',
+            lineColor: 'var(--highcharts-background-color, #FFFFFF)',
             lineWidth: 0,
             reversed: false, 
             minorTickPosition: 'outside',
-            tickColor: '#fff',
-            minorTickColor: '#fff',
+            tickColor: '#FFFFFF',
+            minorTickColor: '#FFFFFF',
             tickLength: 0,
             minorTickLength: 5,
             /*title: {
@@ -3641,7 +4060,7 @@ async function loadGraph(cp)
             },*/
             labels: {
                 distance: 14,
-                rotation: 'auto',
+                //rotation: 'auto',
                 useHTML: true,
                 
                 // 1. Prevents clipping of labels that move outside the wrapper
@@ -3649,16 +4068,17 @@ async function loadGraph(cp)
                 // 2. Ensures labels aren't cut off if they move outside the plot area
                 crop: false,
                 formatter: function() {
+                        let tick = this.value == s.ticks[10] ? 'max' : this.value.toString();
                         return    `<span style="
                         display: block; 
                         transform: translateY(-${0}px); 
-                        color: white; 
-                        font-weight: bold;
-                        background: rgba(0,0,0,0.3); /* Optional: darkens background for legibility */
+                        color: '#FFFFFF'; 
+                        font-weight: normal;
+                        background: '#FFFFFF'; /* Optional: darkens background for legibility */
                         padding: 2px;
                         border-radius: 3px;
                     ">
-                        ${this.value}
+                        ${tick}
                     </span>`
                 },
                 style: {
@@ -3672,13 +4092,13 @@ async function loadGraph(cp)
             offset: -40,
             endOnTick: false,
             plotLines: [{
-                value: capstatus.threshold,
+                value: s.threshold,
                 color: '#DF5353',
                 width: 0,
                 zIndex: 4,
                 label: {
                     
-                    text: `<-- ${capstatus.threshold} *`,
+                    text: `<-- ${s.threshold} *`,
                     align: 'center',
                     verticalAlign: 'top', // Position it on the outside of the arc
                     rotation: -0,
@@ -3693,37 +4113,22 @@ async function loadGraph(cp)
             }],
 
             plotBands: [{
-        from: minvalue,
-        to: maxvalue - 4,
-        thickness: 25,
-        color: {
-            pattern: {
-                path: {
-                    // This SVG path defines a small arrow
-                    d: 'M 0 10 L 8 10 L 8 5 L 15 12 L 8 19 L 8 14 L 0 14 Z',
-                    fill: '#55BF3B'
-                },
-                width: 20,
-                height: 25
-            }
-        }
-    },{
-                from: minvalue,
-                to: alertvalue,
+                from: s.ticks[0],
+                to: s.ticks[8],
                 color: '#55BF3B', // green
                 thickness:15,
                 borderRadius: '50%',
                 
             }, {
-                from: alertvalue,
-                to: capstatus.threshold,
+                from: s.ticks[8],
+                to: s.ticks[9],
                 color: '#DDDF0D', // yellow
                 thickness: 15,
                 borderRadius: '50%'
             }, {
             
-                from: capstatus.threshold,
-                to: maxvalue,
+                from: s.ticks[9],
+                to:s.ticks[10],
                 color: '#DF5353', // red
                 thickness: 15,
                 borderRadius: '50%'
@@ -3736,7 +4141,7 @@ async function loadGraph(cp)
             /*title: {
                 text: 'BURNED'
             },*/
-            tickPositions: [minvalue, (maxvalue/2), burned4x, maxvalue], // Add 72 here
+            tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
             lineColor: '#2caffe',
             tickColor: '#2caffe',
             minorTickColor: '#2caffe',
@@ -3765,8 +4170,8 @@ async function loadGraph(cp)
             minorTickLength: 1,
             endOnTick: false,
             plotBands: [{
-                from: minvalue,
-                to: parseFloat(burned4x),
+                from: s.ticks[0],
+                to: s.burned.value,
                 color: '#55BF3B', // green
                 thickness:5,
                 innerRadius: '15%',  // Tuck this band INSIDE
@@ -3797,7 +4202,7 @@ async function loadGraph(cp)
     
             {
             name: '',
-            data: [(capstatus.currentValue+(91))],
+            data: [(s.current.value)],
             
             yAxis: 0,
         
@@ -3823,8 +4228,7 @@ async function loadGraph(cp)
                 format: '<span style="padding:15px;line-height:1;"><span style="color:#000">Income: '+capstatus.totalIcnome+'</span><br/>' +
                     '<span style="color:#fff">Current: '+capstatus.currentValue+'</span><br/>' +
                     '<span style="color:#DF5353">Threashold: '+capstatus.threshold+'</span><br/>' +
-                    '<span style="color:#55BF3B">Burned: '+capstatus.burned+'</span><br/>' +
-                    '<span style="color:#55BF3B">BurnedX: '+burned4x+'</span></span>',
+                    '<span style="color:#55BF3B">BurnedX: '+capstatus.burned4x+'</span></span>',
                 backgroundColor: {
                     linearGradient: {
                         x1: 0,
@@ -3847,7 +4251,7 @@ async function loadGraph(cp)
         },
         {
                 name: '',
-                data: [capstatus.burned4x],
+                data: [s.burned.value],
                 yAxis: 1,
             // dial: { backgroundColor: 'green' },
             /* dataLabels: {
