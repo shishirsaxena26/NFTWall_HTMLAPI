@@ -1751,7 +1751,7 @@ async function onSubmitTrasfer() {
         const trContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
     
         const tx = await trContract.methods
-            .submitTransferForm(fromAddress)
+            .submitTransferForm(fromAddress, 10)
             .send({
                 from: currentAccount,
                 value: 0 // change if initialization requires ETH
