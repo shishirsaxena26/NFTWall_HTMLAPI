@@ -3798,13 +3798,13 @@ tests.forEach(({ t, c, b }) => {
 
 async function loadGraph(cp)
 {
-    /*cp = {
+    cp = {
         totalIncome: 70.6,
         burned4x: 13.0,
         threshold: 12.4,
         cap: false,
         currentValue: 11.6
-    };*/
+    };
  
    
     const s = getGraphConfig(cp.threshold,cp.currentValue,cp.burned4x);
@@ -3840,6 +3840,10 @@ async function loadGraph(cp)
             `
     },
 
+    exporting: {
+        enabled: false
+    },
+
     pane: {
         startAngle: -90,
         endAngle: 89.9,
@@ -3854,7 +3858,7 @@ async function loadGraph(cp)
         max: s.ticks[10],
         tickPixelInterval: 72,
         tickPosition: 'inside',
-        tickColor: 'var(--highcharts-background-color, #FFFFFF)',
+        //tickColor: 'var(--highcharts-background-color, #FFFFFF)',
         tickPositions: [s.ticks[0], s.current.value, s.ticks[8], s.ticks[9],  s.ticks[10]], // Add 72 here
         tickLength: 20,
         tickWidth: 2,
@@ -3875,25 +3879,63 @@ async function loadGraph(cp)
                 return t;
             }
         },
+        title: {
+            text: `<div style="text-align:center; width:220px;">
+                        <div style="
+                            font-size:16px;
+                            font-weight:700;
+                            color:#22c55e;
+                            letter-spacing:1px;
+                        ">
+                            ${cp.currentValue}<br/>
+                            <span style="
+                                font-size:13px;
+                                color:#94a3b8;
+                                margin-top:2px;
+                            "> Current Value </span>
+                        </div>
+
+                     
+                    </div>`,
+            y: 40
+        },
         lineWidth: 0,
         plotBands: [{
             from: s.ticks[0],
             to: s.ticks[8],
-            color: '#55BF3B', // green
-            thickness: 20,
-            borderRadius: '50%'
+            color: {
+                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+                stops: [
+                    [0.0, '#22c55e'],  // green start
+                    [0.5, '#4ade80'],  // soft green
+                    [0.75, '#a3e635'], // green-yellow mix
+                    [1.0, '#facc15']   // yellow end
+                ]
+            },
+            thickness: 20
         }, {
             from: s.ticks[8],
             to: s.ticks[9],
-            color: '#DDDF0D', // yellow
-            thickness: 20,
-            borderRadius: '50%'
+            color: {
+                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+                stops: [
+                    [1.0, '#facc15'],  // yellow start
+                    [0.0, '#f5bc1e'],  // yellow start
+                    [1.0, '#f87171'],  // orange                  
+                ]
+            },
+            thickness: 20
         }, {
             from: s.ticks[9],
             to: s.ticks[10],
-            color: '#DF5353', // red
-            thickness: 20,
-            borderRadius: '50%'
+            color: {
+                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+                stops: [
+                    [1, '#f87171'],   // red
+                    [0, '#f87171']    // soft red
+                ]
+            },
+            thickness: 20
         }]
     },{
             min: s.ticks[0],
@@ -3902,23 +3944,39 @@ async function loadGraph(cp)
                 text: 'BURNED'
             },*/
             tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
-            lineColor: '#2caffe',
-            tickColor: '#2caffe',
-            minorTickColor: '#2caffe',
+            lineColor: '#8b5cf6',
+            tickColor: '#8b5cf6',
+            minorTickColor: '#8b5cf6',
             offset: -60,
             lineWidth: 0,
             labels: {
                 distance: 5,
-                rotation: 'auto',
+                //rotation: 'auto',
                 formatter: function() {
-                    var t= this.value == s.ticks[10] ? 'max' : this.value.toString();
-                    return '<span>' + t + '</span>';
+                    var t = '<span>'+this.value+'</span>';
+                    if(this.value == s.burned.value) t = `<span style="
+                            display:inline-flex;
+                            align-items:center;
+                            justify-content:center;
+                            width:18px;
+                            height:18px;
+                            border-radius:50%;
+                            background:#8b5cf6;   /* violet */
+                            color:#fff;
+                            font-size:11px;
+                            font-weight:600;
+                        ">
+                            B
+                        </span>`;
+                    if(this.value == s.ticks[10]) t = '<span">max</span>';
+                    return t;
                 },
                 style: {
-                        color: '#55BF3B',
+                        color: 'Violet',
                         fontWeight: 'normal',
-                        fontSize: '10px'
+                        fontSize: '12px'
                 }
+               
             },
             tickLength: 5,
             reversed: true,
@@ -3927,11 +3985,11 @@ async function loadGraph(cp)
             plotBands: [{
                 from: s.ticks[0],
                 to: s.ticks[10]-s.current.value,
-                color: '#55BF3B', // green
+                color: 'Violet', // Violet
                 thickness:5,
-                innerRadius: '15%',  // Tuck this band INSIDE
-                outerRadius: '50%',
-                borderRadius: '0%'
+                innerRadius: '60%',  // Tuck this band INSIDE
+                outerRadius: '55%',
+                /*borderRadius: '0%'*/
             }]
         /* ,plotLines: [{
                 value: capstatus.burned4x,
@@ -3960,24 +4018,40 @@ async function loadGraph(cp)
           enabled: false
         },
         dataLabels: {
-            format: '<span style="font-size:11px; padding:10px; line-height:1rem;"><span style="color:grey">Income: '+cp.totalIncome+'</span><br/>' +
-                    '<span style="color:#fff">Current: '+cp.currentValue+'</span><br/>' +
-                    '<span style="color:#DF5353">Threashold: '+cp.threshold+'</span><br/>' +
-                    '<span style="color:#55BF3B">BurnedX: '+cp.burned4x+'</span></span>',
+            useHTML: true,
+            format: `<!-- 📊 INFO BLOCK -->
+                        <div style="
+                            text-align:left;
+                            font-size:12px;
+                            line-height:1.6;
+                            color:#cbd5e1;
+                            display:"inline-block";
+                            width: 400px;
+                        ">
+                            <div style="color:#22c55e">💰 Income: <span style="margin-left:10px">${cp.totalIncome}</span></div>
+                            <div style="color:red">🎯 Threshold: <span style="margin-left:10px">${cp.threshold}</span></div>
+                            <div style="color:Violet">🔥 BurnedX: <span style="margin-left:10px">${cp.burned4x}</span></div>
+                    </div>`,
             borderWidth: 0,
            
             style: {
                 fontSize: '13px'
             }
         },
-        dial: {
+        /*dial: {
             radius: '80%',
             backgroundColor: 'white',
             baseColor: 'red',
             baseWidth: 10,
             baseLength: '0%',
             rearLength: '0%'
-        },
+        }*/
+        dial: {
+                radius: '100%',
+                backgroundColor: 'white',
+                baseWidth: 1,
+                rearLength: '20%'
+            },
         pivot: {
             backgroundColor: 'grey',
             radius: 9
@@ -3985,7 +4059,9 @@ async function loadGraph(cp)
 
     }]
 
-});
+    });
+
+
 
 
 
