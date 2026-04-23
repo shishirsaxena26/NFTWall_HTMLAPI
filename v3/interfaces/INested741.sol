@@ -43,15 +43,7 @@ interface INested741 {
     function getNode(uint256 _id)
         external
         view
-        returns (
-            uint256 _i,
-            address _node,
-            uint256 _pid,
-            address _inst,
-            address _stor,
-            bool _active,
-            uint256 _direcCount
-        );
+        returns (uint256 _i, uint256 _pid, address _inst, address _stor, bool _active, uint256 _direcCount);
     function getNodeChild(uint256 _id, uint256 inx) external view returns (uint256 child);
     function getNodeDirectsCount(uint256 _id) external view returns (uint256 count);
     function getNodeParent(address _user) external view returns (uint256, address);
@@ -67,6 +59,7 @@ interface INested741 {
     function getbusiness(uint256 ag) external view returns (uint256);
     function getjoining(uint256 ag) external view returns (uint256);
     function getrankCount(uint256 ag, uint256 rnk) external view returns (uint256 count);
+    function gettotqty(uint256 ag) external view returns (uint256);
     function getwithdrawn(uint256 ag) external view returns (uint256);
     function importBusiness(uint256 _amt, uint256 _ag) external;
     function importJoining(uint256 _cnt, uint256 _ag) external;

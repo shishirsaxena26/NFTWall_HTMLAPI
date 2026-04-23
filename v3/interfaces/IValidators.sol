@@ -5,6 +5,7 @@ interface IValidators {
     error AlreadyMapped();
     error AlreadyUpdatedForToDay();
     error LengthMismatch();
+    error MapLimitOver();
     error NotMapped();
     error ReentrancyGuardReentrantCall();
     error StaticCallFailed();
@@ -32,6 +33,7 @@ interface IValidators {
     function getHexbase() external view returns (address);
     function getUserFromDelegator(address delegator) external view returns (address);
     function getValidatorDelegator(address _v, address _d) external view returns (bool);
+    function getValidatorDelegatorCount(address _v, address _d) external view returns (uint256);
     function getValidatorDelegatorOfUser(address user) external view returns (address, address, bool);
     function importData(address _u) external;
     function incomeOf(address user) external view returns (uint256);

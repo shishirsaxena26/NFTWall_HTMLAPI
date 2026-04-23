@@ -24,7 +24,6 @@ interface I741Rules {
     function Burn(uint256 amount) external;
     function NFTAgePointer() external view returns (uint256);
     function NFTSendPerCycle() external view returns (uint256);
-    function StartAgePointerGT() external view returns (uint256);
     function StartAgePointerLEQ() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
@@ -73,8 +72,8 @@ interface I741Rules {
             uint256 roiInt,
             uint256 roiEnd
         );
-    function poolNFT1() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
-    function poolNFT2() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt);
+    function poolNFT1() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt, uint256 startfrom);
+    function poolNFT2() external view returns (uint256 roiN, uint256 roiD, uint256 roiInt, uint256 startfrom);
     function rankClause(uint256)
         external
         view
@@ -84,6 +83,15 @@ interface I741Rules {
     function setAllowForceTransfer(bool _f) external;
     function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei, bool _val, bool _tour) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
+    function setCoinPool(
+        uint256 _start,
+        uint256 _stakeN,
+        uint256 _stakeD,
+        uint256 _roiN,
+        uint256 _roiD,
+        uint256 _roiInt,
+        uint256 _roiEnd
+    ) external;
     function setFreeIntervals(uint256 _d) external;
     function setGlobalClaimPerDay(uint256 _ac) external;
     function setMaxMintsPerCycle(uint256 _max) external;
@@ -91,9 +99,9 @@ interface I741Rules {
     function setMintCycleDays(uint256 _d) external;
     function setMintFee(uint256 _fe) external;
     function setMintQty(uint256 _min, uint256 _max) external;
-    function setNFTAgePointer(uint256 _point, uint256 _leq, uint256 _gt) external;
+    function setNFTAgePointer(uint256 _point, uint256 _leq) external;
     function setNFTSendPerCycle(uint256 _d) external;
-    function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
+    function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt, uint256 _startfrom) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
     function setValidatorPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
