@@ -43,7 +43,15 @@ interface INested741 {
     function getNode(uint256 _id)
         external
         view
-        returns (uint256 _i, uint256 _pid, address _inst, address _stor, bool _active, uint256 _direcCount);
+        returns (
+            uint256 _i,
+            address _node,
+            uint256 _pid,
+            address _inst,
+            address _stor,
+            bool _active,
+            uint256 _direcCount
+        );
     function getNodeChild(uint256 _id, uint256 inx) external view returns (uint256 child);
     function getNodeDirectsCount(uint256 _id) external view returns (uint256 count);
     function getNodeParent(address _user) external view returns (uint256, address);
