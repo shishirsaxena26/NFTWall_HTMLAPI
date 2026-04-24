@@ -2850,12 +2850,16 @@ async function renderULTreePanel() {
 
   // ---------- HELPERS ----------
   function shortAddr(addr) {
-    return addr ? "0x.."+addr.slice(-4) : "----";
+    return addr ? addr.slice(-4) : "----";
   }
 
   async function getNode(id) {
-    const addr = await nested.methods.nodes(id).call();
-    return { id: id.toString(), address: addr };
+    const n = await nested.methods.getNode(id).call();
+    const storC = new web3.eth.Contract(IInstanceStorABI.abi,n[4]);
+        debugger;
+    let rnk = await storC.methods.rank().call();  
+
+    return { id: n[0].toString(), pid:n[2], address: n[1], rank: rnk };
   }
 
 async function getChildren(id) {
@@ -2882,7 +2886,7 @@ async function getChildren(id) {
         const li = document.createElement("li");
 
         li.addr = c.address;
-        li.innerHTML = `<span class="node">${c.id} (${shortAddr(c.address)})</span>`;
+        li.innerHTML = `<span class="node">${c.id} (${c.rank}*...${shortAddr(c.address)})</span>`;
 
         // 🔁 recursive call
         const childUL = await buildDownline(c.id, level + 1);
@@ -2894,28 +2898,32 @@ async function getChildren(id) {
     return ul;
     }
   // ---------- LOAD ----------
-  const MAX_LEVEL = 3; // 👈 change this anytime (2,3,4...)
+  const MAX_LEVEL = 7; // 👈 change this anytime (2,3,4...)
   async function loadTree(addr) {
 
     container.innerHTML = "⏳ Loading...";
 
     try {
       const selfid = await nested.methods.UserToId(addr).call();  
-      const info = await nested.methods.getNodeParent(addr).call();
-      let uid = info[0];
-
+      const info = await nested.methods.getNode(selfid).call();
+      const storC = new web3.eth.Contract(IInstanceStorABI.abi,info[4]);;  
+      debugger
+      let rnk = await storC.methods.rank().call();  
+      
+      let pid = info[2];
+      
       const chain = [];
 
       // 🔥 SELF NODE
-      const selfNode = { id: selfid, address: addr };
+      const selfNode = { id: selfid, pid: pid, address: addr, rank:rnk };
       chain.push(selfNode);
 
       // 🔼 UPLINE
-      while (uid != 0) {
+      while (pid != 0) {
         
-        const node = await getNode(uid);
+        const node = await getNode(pid);
         chain.push(node);
-        uid = await nested.methods.getNodeParentId(uid).call();
+        pid = node.pid;
       }
 
       chain.reverse();
