@@ -2956,9 +2956,9 @@ async function getChildren(id) {
 
         const li = document.createElement("li");
         if(n.id==selfid)
-            li.innerHTML  = `<span class="node">${n.id} (${c.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
+            li.innerHTML  = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
         else 
-            li.innerHTML  = `<span class="node">${n.id} (${c.rank}*...${shortAddr(n.address)})</span>`;
+            li.innerHTML  = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})</span>`;
         const nextUL = document.createElement("ul");
 
         li.addr = n.address; 
