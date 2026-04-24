@@ -1378,10 +1378,11 @@ async function loadMyStor(id, panel) {
             const flushed = await stor.methods.getAllIncome(1,0).call();
             const unpaid = await stor.methods.getAllIncome(2,0).call();
             const misc = await stor.methods.getAllIncome(3,0).call();
+            const voult = await stor.methods.getAllIncome(4,0).call();
             
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(4,50).call();
+                compute = await stor.methods.getAllIncome(5,50).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
