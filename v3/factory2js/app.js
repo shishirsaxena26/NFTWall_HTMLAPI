@@ -1392,7 +1392,7 @@ async function loadMyStor(id, panel) {
             console.log(`compute: `  + compute);
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(5,50).call();
+                computeFlush = await stor.methods.getAllIncome(6,50).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -2857,7 +2857,7 @@ async function renderULTreePanel() {
   async function getNode(id) {
     const n = await nested.methods.getNode(id).call();
     const storC = new web3.eth.Contract(IInstanceStorABI.abi,n[4]);
-        debugger;
+    
     let rnk = await storC.methods.rank().call();  
 
     return { id: n[0].toString(), pid:n[2], address: n[1], rank: rnk };
@@ -2956,9 +2956,9 @@ async function getChildren(id) {
 
         const li = document.createElement("li");
         if(n.id==selfid)
-            li.innerHTML  = `<span class="node">${n.id} (${shortAddr(n.address)})🧑‍💻</span>`;
+            li.innerHTML  = `<span class="node">${n.id} (${c.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
         else 
-            li.innerHTML  = `<span class="node">${n.id} (${shortAddr(n.address)})</span>`;
+            li.innerHTML  = `<span class="node">${n.id} (${c.rank}*...${shortAddr(n.address)})</span>`;
         const nextUL = document.createElement("ul");
 
         li.addr = n.address; 
