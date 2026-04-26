@@ -1,147 +1,3 @@
-
-/*
-let capstatus = {
-  totalIcnome: 0.010810810811,
-  threshold: 0.000000040000,
-  cap: true,
-  burned: 0,
-  currentValue: 0.010810810811
-};
-*/
-
-let capstatus = {
-  totalIcnome:  70.6,
-  threshold: 12.4,
-  cap: false,
-  burned: 24.0,
-  currentValue: 11.6
-};
-
-
-const SCALE = 1e18;
-const sx = {
-  totalIcnome: BigInt(Math.round(capstatus.totalIcnome * SCALE)),
-  threshold: BigInt(Math.round(capstatus.threshold * SCALE)),
-  burned: BigInt(Math.round(capstatus.burned * SCALE)),
-  currentValue: BigInt(Math.round(capstatus.currentValue * SCALE)),
-  cap: capstatus.cap,
-  burned4X: BigInt(Math.round((capstatus.burned*2) * SCALE))
-};
-
-
-function getScale(o) {
-
-    totalIcnome= BigInt(Math.round(o.totalIcnome * SCALE)),
-    threshold= BigInt(Math.round(o.threshold * SCALE)),
-    burned= BigInt(Math.round(o.burned * SCALE)),
-    currentValue= BigInt(Math.round(o.currentValue * SCALE)),
-    cap= o.cap,
-    burned4X= BigInt(Math.round((o.burned*2) * SCALE))
-    
-    function clean(n, d = 8) {
-        const num = Number(n);
-        return Number(num.toFixed(d));
-    }
-
-    // =========================
-    // SAFE BASE CHECK
-    // =========================
-    const t = Number(threshold);
-
-    if (!t || t <= 0) {
-        return {
-            min: 0,
-            max: 1,
-            tick: 0.1,
-            decimals: 0,
-            thresholdPosition: 9,
-            totalIcnome: totalIcnome,
-            threshold: threshold,
-            burned: burned,
-            currentValue: currentValue,
-            cap: cap,
-            burned4X: burned4X,
-            warningRange: {
-                fromValue: 0,
-                toValue: 0,
-                fromPos: 0,
-                toPos: 0
-            }
-        };
-    }
-
-    const TICKS = 10;
-
-    // =========================
-    // FORCE 9th tick rule
-    // =========================
-    const tick = t / 9;
-    const max = tick * TICKS;
-
-    // =========================
-    // FIXED POSITIONS
-    // =========================
-    const WARNING_FROM_POS = 7.5;
-    const WARNING_TO_POS = 9;
-    const THRESHOLD_POS = 9;
-
-    // =========================
-    // WARNING RANGE (inline, no extra object)
-    // =========================
-    const warningFromValue = tick * WARNING_FROM_POS;
-
-    // =========================
-    // DECIMALS HANDLING (safe for small numbers)
-    // =========================
-    let decimals = 0;
-
-    const str = threshold.toString();
-
-    if (str.includes('e-')) {
-        decimals = parseInt(str.split('e-')[1], 10) + 2;
-    } else if (str.includes('.')) {
-        decimals = str.split('.')[1].length;
-    }
-
-    decimals = Math.min(decimals, 18);
-
-    // =========================
-    // FINAL OUTPUT (Highcharts safe)
-    // =========================
-    return {
-        min: BigInt(0),
-        max: BigInt(max),
-        tick: clean(tick, decimals),
-        threshold: t,
-        thresholdPosition: THRESHOLD_POS,
-        totalIcnome: totalIcnome,
-        threshold: threshold,
-        burned: burned,
-        currentValue: currentValue,
-        cap: cap,
-        burned4X: burned4X,        
-        warningRange: {
-            fromValue: BigInt(warningFromValue),
-            toValue: BigInt(t),
-            fromPos: WARNING_FROM_POS,
-            toPos: THRESHOLD_POS
-        },
-        decimals
-    };
-}
-
-function adjustedValues(a) {
-    a.currentValueAdj = a.currentValue>=a.max?a.max:a.currentValue;
-    
-    return a;
-}
-
-const s = adjustedValues(getScale(capstatus));
-
-//console.log(s);
-;
-
-
 let web3;
 web3 = new Web3(provider);
 
@@ -1435,7 +1291,7 @@ async function loadMyStor(id, panel) {
             
             //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
             addRow(panel, "VOULT", formatOZN(voult[0]));
-            addRow(panel, "INVESTED_DOLLAR", formatOZN(voult[1]));
+            addRow(panel, "INVESTED_DOLLAR", voult[1]);
             addRow(panel, "CLAIMED_DOLLAR", formatOZN(voult[2]));
             addRow(panel, "vouldDage", misc[3]);
       
@@ -3581,39 +3437,39 @@ async function loadRule() {
 }
 
 function getGraphConfigOld(n) {
- const maxRange = n + 2;
- let axisTitle = "Value";
- let formatter;
+    const maxRange = n + 2;
+    let axisTitle = "Value";
+    let formatter;
 
 
 
- // 1. Handle extremely small numbers (e.g., 0.00000004)
- if (n > 0 && n < 0.0001) {
- const exponent = Math.floor(Math.log10(n));
- axisTitle = `Value (×10^${exponent})`;
- // Scaled ticks (e.g., 4.0 instead of 0.00000004)
- formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
- }
+    // 1. Handle extremely small numbers (e.g., 0.00000004)
+    if (n > 0 && n < 0.0001) {
+    const exponent = Math.floor(Math.log10(n));
+    axisTitle = `Value (×10^${exponent})`;
+    // Scaled ticks (e.g., 4.0 instead of 0.00000004)
+    formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
+    }
 
- // 2. Handle numbers with decimals (e.g., 12.004)
- else if (n % 1 !== 0) {
- axisTitle = "Value";
- formatter = (val) => val.toFixed(2); // Keep labels short
- }
+    // 2. Handle numbers with decimals (e.g., 12.004)
+    else if (n % 1 !== 0) {
+    axisTitle = "Value";
+    formatter = (val) => val.toFixed(2); // Keep labels short
+    }
 
- // 3. Handle standard whole numbers
- else {
- axisTitle = "Value";
- formatter = (val) => Math.round(val);
- }
+    // 3. Handle standard whole numbers
+    else {
+    axisTitle = "Value";
+    formatter = (val) => Math.round(val);
+    }
 
 
 
- return {
- range: [0, maxRange],
- title: axisTitle,
- tickFormatter: formatter
- };
+    return {
+    range: [0, maxRange],
+    title: axisTitle,
+    tickFormatter: formatter
+    };
 }
 
 
@@ -3956,8 +3812,9 @@ async function loadGraph(cp)
                 text: 'BURNED'
             },*/
             tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
-            lineColor: '#8b5cf6',
+            lineColor: '#020102',
             tickColor: '#8b5cf6',
+            reversed: true,
             minorTickColor: '#8b5cf6',
             offset: -60,
             lineWidth: 0,
@@ -3989,36 +3846,19 @@ async function loadGraph(cp)
                
             },
             tickLength: 5,
-            reversed: true,
+            
             minorTickLength: 1,
             endOnTick: false,
             plotBands: [{
                 from: s.ticks[0],
-                to: s.ticks[10]-s.current.value,
+                to: s.burned.value,
                 color: 'Violet', // Violet
                 thickness:5,
                 innerRadius: '60%',  // Tuck this band INSIDE
                 outerRadius: '55%',
-                /*borderRadius: '0%'*/
+             
             }]
-        /* ,plotLines: [{
-                value: capstatus.burned4x,
-                color: 'red',
-                width: 0,
-                zIndex: 4,
-                label: {
-                    text: `Threadhold: ${capstatus.burned*4}`,
-                    align: 'center',
-                    verticalAlign: 'top', // Position it on the outside of the arc
-                    rotation: -0,
-                    y: 6,// Offset to move it away from the line
-                    style: {
-                        color: 'red',
-                        fontWeight: 'bold',
-                        fontSize: '10px'
-                },
-                }
-            }], */
+        
     }],
 
     series: [{
@@ -4065,7 +3905,8 @@ async function loadGraph(cp)
         }
 
     },{ 
-        data: [s.current.value],
+        name: 'Burned',
+        data: [0.1],
         tooltip: {
           enabled: false
         },
@@ -4074,7 +3915,7 @@ async function loadGraph(cp)
                 baseWidth: 1,
                 rearLength: '0%',
                 topWidth: 1,
-                backgroundColor: '#F5F5F5',
+                backgroundColor: 'red',
                 borderWidth: 0,
             },
         pivot: {
