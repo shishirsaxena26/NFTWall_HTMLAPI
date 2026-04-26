@@ -541,7 +541,7 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelBase,"DeployerAsRoot",deployer);
     
     addRow(panelBase,"inPrice",inPrice);
-    
+
     const old741 = await hexBase.methods.in741Old().call();
     addRow(panelBase,"in741Old",old741);
     addRow(panelBase,"in741",inNested741);
@@ -837,7 +837,7 @@ async function addConnectedUserPanel(){
     btnImport.style.display = "none";
 
     if (!currentAccount || !web3.utils.isAddress(currentAccount)) return;
-
+    textAlign
     try{
         const id = await nested.methods.UserToId(currentAccount).call();
         const node = await nested.methods.getNode(id).call();
