@@ -1425,11 +1425,21 @@ async function loadMyStor(id, panel) {
 
             
             // Burned & Self Proposed
+            ////[BURNED, BURNED_DOLLAR, CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old, 0]
+            addRow(panel, "BURNED", formatOZN(misc[0]));
+            addRow(panel, "BURNED_DOLLAR", formatOZN(misc[1]));
+            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[2]));
+            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
+            addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
+            addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
+            
+            //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
+            addRow(panel, "VOULT", formatOZN(voult[0]));
+            addRow(panel, "INVESTED_DOLLAR", formatOZN(voult[1]));
+            addRow(panel, "CLAIMED_DOLLAR", formatOZN(voult[2]));
+            addRow(panel, "vouldDage", misc[3]);
+      
 
-            addRow(panel, "Burned", formatOZN(misc[0]));
-            addRow(panel, "Self Proposed", formatOZN(misc[1]));
-            addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
-            addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
             addRow(panel, "LOCKED", isLock);
             
             const capCount =  await stor.methods.getToggleAgeCount(200).call();
@@ -1492,14 +1502,14 @@ async function loadMyStor(id, panel) {
             const capStatus =  await stor.methods.capStatus().call();
             loadGraph({
                 totalIncome: formatOZN(capStatus.totalIncome),
-                burned4x: formatOZN(capStatus.burned4x),
+                burned4x: formatOZN(capStatus.burnedx),
                 threshold: formatOZN(capStatus.threshold),
                 cap: capStatus._cap,
                 currentValue:formatOZN(capStatus.currentValue)
 
             });
             addRow(panel, "CAP Status", "TotalInc | burned4x | Threshold | IsCap | CurrentValue");
-            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burned4x)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
+            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burnedx)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
 
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");

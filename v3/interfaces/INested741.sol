@@ -2,8 +2,13 @@
 pragma solidity ^0.8.4;
 
 interface INested741 {
+    error CallFailed();
     error FailedDeployment();
     error InsufficientBalance(uint256 balance, uint256 needed);
+    error InvalidAddress();
+    error InvalidState();
+    error NotAuthorized();
+    error NotSafe();
     error ReentrancyGuardReentrantCall();
     error TargetCallFailed(bytes4 selector);
 

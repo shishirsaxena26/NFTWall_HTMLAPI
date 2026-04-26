@@ -2,6 +2,11 @@
 pragma solidity ^0.8.4;
 
 interface IInstanceMe {
+    error CallFailed();
+    error InvalidAddress();
+    error InvalidState();
+    error NotAuthorized();
+    error NotSafe();
     error ReentrancyGuardReentrantCall();
     error TargetCallFailed(bytes4 selector);
 

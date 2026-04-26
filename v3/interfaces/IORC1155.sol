@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 interface IORC1155 {
+    error CallFailed();
     error ERC1155InsufficientBalance(address sender, uint256 balance, uint256 needed, uint256 tokenId);
     error ERC1155InvalidApprover(address approver);
     error ERC1155InvalidArrayLength(uint256 idsLength, uint256 valuesLength);
@@ -11,6 +12,10 @@ interface IORC1155 {
     error ERC1155MissingApprovalForAll(address operator, address owner);
     error FailedDeployment();
     error InsufficientBalance(uint256 balance, uint256 needed);
+    error InvalidAddress();
+    error InvalidState();
+    error NotAuthorized();
+    error NotSafe();
     error ReentrancyGuardReentrantCall();
     error TargetCallFailed(bytes4 selector);
 

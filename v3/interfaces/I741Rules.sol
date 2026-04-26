@@ -10,6 +10,11 @@ library lib741Rules {
 }
 
 interface I741Rules {
+    error CallFailed();
+    error InvalidAddress();
+    error InvalidState();
+    error NotAuthorized();
+    error NotSafe();
     error TargetCallFailed(bytes4 selector);
 
     event EthBurned(address indexed sender, uint256 amount);
@@ -36,7 +41,9 @@ interface I741Rules {
         external
         view
         returns (uint256 multiple, bool rw, bool ry, bool self, bool yei, bool val, bool tour);
+    function computeDollarToOzone(uint256 _dollar) external view returns (uint256);
     function computeMintValue(uint256 _qty) external view returns (uint256);
+    function computeOzoneToDollar(uint256 _ozone) external view returns (uint256);
     function computeTour(uint256 _r) external view returns (uint256);
     function eachclaimCycle() external view returns (uint256);
     function freeIntervals() external view returns (uint256);
@@ -55,6 +62,7 @@ interface I741Rules {
     function maxMintQty() external view returns (uint256);
     function maxMintsPerCycle() external view returns (uint256);
     function maxNFTSend() external view returns (uint256);
+    function maxVaultSend() external view returns (uint256);
     function minClaimPerDay() external view returns (uint256);
     function minMintQty() external view returns (uint256);
     function mintCycleDays() external view returns (uint256);
@@ -105,6 +113,7 @@ interface I741Rules {
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
     function setValidatorPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
+    function setVaultData(uint256 _d, uint256 _v, uint256 _c) external;
     function setclaimCycle(uint256 _d) external;
     function setlevelClause(
         uint256 lvl,
@@ -120,6 +129,9 @@ interface I741Rules {
     function shutdown() external view returns (bool);
     function systemAge() external view returns (uint256);
     function tourClause(uint256) external view returns (uint256);
-    function valExternal() external view returns (uint256 qty, uint256 roiN, uint256 roiD, uint256 roiInt);
-    function valInternal() external view returns (uint256 qty, uint256 roiN, uint256 roiD, uint256 roiInt);
+    function valExternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);
+    function valInternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);
+    function vault() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);
+    function vaultOnStakeAmt() external view returns (uint256);
+    function vaultSendPerCycle() external view returns (uint256);
 }

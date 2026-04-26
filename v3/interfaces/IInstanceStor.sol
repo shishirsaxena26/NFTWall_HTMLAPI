@@ -29,18 +29,17 @@ library InstanceStor {
 }
 
 interface IInstanceStor {
-    error GlobalPoolLimitReached();
-    error ImportLimitExceeded();
-    error InvalidClone();
-    error InvalidMintCycleLimit();
-    error InvalidValue();
-    error InvalidnewOwner();
-    error MintLimitExceeded();
-    error PreInitException();
+    error Auth();
+    error CallFailed();
+    error InvalidAddress();
+    error InvalidOp(uint256 code);
+    error InvalidState();
+    error LimitExceeded(uint256 code);
+    error NotAuthorized();
+    error NotSafe();
+    error Pause();
     error ReentrancyGuardReentrantCall();
-    error StorLocked();
     error TargetCallFailed(bytes4 selector);
-    error UnsecureORC1155();
 
     event EthBurned(address indexed sender, uint256 amount);
     event EthTransferred(address indexed to, uint256 amount);
@@ -53,7 +52,7 @@ interface IInstanceStor {
     receive() external payable;
 
     function Burn(uint256 amount) external;
-    function BurnCoin() external payable;
+    function BurnCoin(uint256 _dollar) external payable;
     function LSB(uint256) external view returns (int256);
     function _compute(uint256 endage) external view returns (InstanceStor.ComputeResult memory r);
     function _delegatorCount() external view returns (uint256);
@@ -81,7 +80,8 @@ interface IInstanceStor {
     function capStatus()
         external
         view
-        returns (uint256 totalIncome, uint256 burned4x, uint256 threshold, bool _cap, uint256 currentValue);
+        returns (uint256 totalIncome, uint256 burnedx, uint256 threshold, bool _cap, uint256 currentValue);
+    function currentCycle() external view returns (uint256);
     function dage() external view returns (uint256);
     function directsCount() external view returns (uint256);
     function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
@@ -115,5 +115,6 @@ interface IInstanceStor {
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);
+    function vouldDage() external view returns (uint256);
     function withdrawlDage() external view returns (uint256);
 }

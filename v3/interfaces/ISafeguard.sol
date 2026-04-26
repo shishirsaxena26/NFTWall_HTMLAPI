@@ -2,6 +2,11 @@
 pragma solidity ^0.8.4;
 
 interface ISafeguard {
+    error CallFailed();
+    error InvalidAddress();
+    error InvalidState();
+    error NotAuthorized();
+    error NotSafe();
     error TargetCallFailed(bytes4 selector);
 
     event EthBurned(address indexed sender, uint256 amount);
