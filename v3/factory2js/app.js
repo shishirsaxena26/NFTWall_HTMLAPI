@@ -1276,7 +1276,7 @@ async function loadMyStor(id, panel) {
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
                 const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
-                stor.methods.getToggleAgeCount(200).call().then(console.log);
+                stor.methods.getToggleAgeCount(999).call().then(console.log);
                 if(susCount>1){
                     stor.methods.getToggleAgeValue(i+1,0).call().then(console.log);
                     stor.methods.getToggleAgeValue(i+1,1).call().then(console.log);
@@ -1300,7 +1300,7 @@ async function loadMyStor(id, panel) {
 
             addRow(panel, "LOCKED", isLock);
             
-            const capCount =  await stor.methods.getToggleAgeCount(200).call();
+            const capCount =  await stor.methods.getToggleAgeCount(999).call();
             addRow(panel, "ToggleAgeCount(_CAP_IX)->", `${parseInt(capCount)%2==1}`);
             
             const toggleAgeListdiv =document.createElement("div");
@@ -1331,7 +1331,7 @@ async function loadMyStor(id, panel) {
                 `;
             tableToggle.appendChild(theadToggle);
             const tbodyToggle = document.createElement("tbody");
-            const values = [...Array.from({ length: 7 }, (_, i) => i + 1), 200];
+            const values = [...Array.from({ length: 7 }, (_, i) => i + 1), 999];
             for (const v of values) {
                 console.log(v);
                 const susCount =  await stor.methods.getToggleAgeCount(v).call();
