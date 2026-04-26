@@ -837,8 +837,10 @@ async function addConnectedUserPanel(){
     btnImport.style.display = "none";
 
     if (!currentAccount || !web3.utils.isAddress(currentAccount)) return;
-    textAlign
+
     try{
+
+        document.getElementById("userAddrInput").value = currentAccount;
         const id = await nested.methods.UserToId(currentAccount).call();
         const node = await nested.methods.getNode(id).call();
 
