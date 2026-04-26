@@ -1294,7 +1294,7 @@ async function loadMyStor(id, panel) {
             addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
             addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
-            
+            debugger;
             //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
             addRow(panel, "VOULT", formatOZN(voult[0]));
             addRow(panel, "INVESTED_DOLLAR", voult[1]);
