@@ -1294,13 +1294,9 @@ async function loadMyStor(id, panel) {
             addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
             addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
-            debugger;
-            //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
-            addRow(panel, "VOULT", formatOZN(voult[0]));
-            addRow(panel, "INVESTED_DOLLAR", voult[1]);
-            addRow(panel, "CLAIMED_DOLLAR", formatOZN(voult[2]));
-            addRow(panel, "voultDage", voult[3]);
       
+            //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
+           
 
             addRow(panel, "LOCKED", isLock);
             
@@ -1359,7 +1355,11 @@ async function loadMyStor(id, panel) {
 
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
-            
+            const vaultStatus =  await stor.methods.vaultStatus().call();
+            addRow(panel, "Voult Status", "VOULT | INVESTED_DOLLAR | CLAIMED_DOLLAR | voultDage");
+            addRow(panel, "..", `${formatOZN(voult[0])} | ${voult[1]} | ${formatOZN(voult[2])} | ${voult[3]}`);
+            addRow(panel, "=>", "TotalClaimed | TotalClaimedDollar | CalVaultROI | VaultCap");
+            addRow(panel, "..", `${formatOZN(vaultStatus.totclaimed)} | ${formatOZN(vaultStatus.totclaimedDollar)} | ${formatOZN(vaultStatus.calVaultAmt)} | ${formatOZN(vaultStatus.capvault)}`);
 
             const capStatus =  await stor.methods.capStatus().call();
             loadGraph({
@@ -1371,7 +1371,7 @@ async function loadMyStor(id, panel) {
 
             });
             addRow(panel, "CAP Status", "TotalInc | burned4x | Threshold | IsCap | CurrentValue");
-            addRow(panel, "", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burnedx)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
+            addRow(panel, "..", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burnedx)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
 
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
@@ -2352,7 +2352,7 @@ async function onClaim() {
         const tx = await instancecontract.methods
             .Txn(ZERO,49,0,7)
             .send({
-                from: currentAccount,
+                from: accounts[0],
                 value: "0" // change if initialization requires ETH
             });
 

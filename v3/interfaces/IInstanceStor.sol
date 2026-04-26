@@ -115,6 +115,10 @@ interface IInstanceStor {
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);
-    function vouldDage() external view returns (uint256);
+    function vaultStatus()
+        external
+        view
+        returns (uint256 totclaimed, uint256 totclaimedDollar, uint256 calVaultAmt, uint256 capvault);
+    function voultDage() external view returns (uint256);
     function withdrawlDage() external view returns (uint256);
 }
