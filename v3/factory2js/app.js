@@ -34,6 +34,7 @@ let inNftProxy = {};
 let invalidator;
 
 let nested;
+let price;
 let rule;
 let safeguard;
 let daocore;
@@ -167,9 +168,9 @@ async function init(){
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
     
     inPrice  = await hexBase.methods.inPrice().call();
-    const priceContract = new web3.eth.Contract(IPriceABI.abi, inPrice);
+    price = new web3.eth.Contract(IPriceABI.abi, inPrice);
     console.log("💰 Ozone Price in USDT:", 
-        await priceContract.methods.ozonePriceInUSDT().call()
+        await price.methods.ozonePriceInUSDT().call()
     );
 
     invalidator = await hexBase.methods.invalidator().call();
@@ -497,6 +498,7 @@ async function loadSystem() {
     addRow(panelSys,"Form Count",forms);
     addRow(panelSys,"Is Safe",isSafe);
 
+    addRow(panelSys,"Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
     await loadSystemTreasuriesNSecurebase();
 
     } catch(err){
@@ -1872,12 +1874,12 @@ async function loadMarket(){
         const name = await orc1155.methods.name().call();
         const curSupply = await orc1155.methods.curSupply().call();
         const totSupply = await orc1155.methods.totSupply().call();
-        const price = await rule.methods.computeMintValue(1).call();
+        const nftprice = await rule.methods.computeMintValue(1).call();
 
         addRow(panelMarket,"Collection",name);
         addRow(panelMarket,"Total Supply",totSupply);
         addRow(panelMarket,"Minted",curSupply);
-        addRow(panelMarket,"Price", formatOZN(price) +" / unit");
+        addRow(panelMarket,"Price", formatOZN(nftprice) +" / unit");
         const nftRows = [];
         
         let i=1;
