@@ -1299,7 +1299,7 @@ async function loadMyStor(id, panel) {
             addRow(panel, "VOULT", formatOZN(voult[0]));
             addRow(panel, "INVESTED_DOLLAR", voult[1]);
             addRow(panel, "CLAIMED_DOLLAR", formatOZN(voult[2]));
-            addRow(panel, "vouldDage", misc[3]);
+            addRow(panel, "voultDage", voult[3]);
       
 
             addRow(panel, "LOCKED", isLock);
