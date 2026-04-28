@@ -53,7 +53,6 @@ interface IInstanceStor {
 
     function Burn(uint256 amount) external;
     function BurnCoin(uint256 _dollar) external payable;
-    function INVESTED_DOLLAR() external view returns (uint256);
     function LSB(uint256, uint256) external view returns (int256);
     function _compute(uint256 endage) external view returns (InstanceStor.ComputeResult memory r);
     function _delegatorCount() external view returns (uint256);
@@ -85,7 +84,7 @@ interface IInstanceStor {
     function capStatus(uint256 maxinterwal)
         external
         view
-        returns (uint256 totalIncome, uint256 burnedx, uint256 threshold, bool _cap, uint256 currentValue);
+        returns (uint256 totInc, uint256 thresholdx, uint256 thresholdollarx, bool _cap);
     function currentCycle() external view returns (uint256);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
@@ -122,7 +121,5 @@ interface IInstanceStor {
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);
-    function vaultStatus() external view returns (uint256 calVaultROI, uint256 capvault);
-    function voultDage() external view returns (uint256);
     function withdrawlDage() external view returns (uint256);
 }

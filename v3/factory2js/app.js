@@ -1256,13 +1256,13 @@ async function loadMyStor(id, panel) {
             }
             */
 
+     
             // Drawn, Flushed, Unpaid, Compute
             const drawn = await stor.methods.getAllIncome(1,0).call();
-           
             const flushed = await stor.methods.getAllIncome(2,0).call();
             const unpaid = await stor.methods.getAllIncome(3,0).call();
-            const voult = await stor.methods.getAllIncome(4,0).call();
-            const misc = await stor.methods.getAllIncome(5,0).call();
+            const misc = await stor.methods.getAllIncome(4,0).call();
+            const consts = await stor.methods.getAllIncome(5,0).call();
             debugger
             let compute;
             try {
@@ -1283,13 +1283,11 @@ async function loadMyStor(id, panel) {
                 // Fallback → prevent UI break
                 computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-            console.log(`computeFlush: `  + computeFlush);
-            stor.methods.getAllIncome(6,10).call().then(console.log);
 
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
-            addRow(panel, "Income Type", formatRow(["Compute","ComputeFlush","Drawn","Flushed","Unpaid","Vault(Locked)"]));
+            addRow(panel, "Income Type", formatRow(["Compute","ComputeFlush","Drawn","Flushed","Unpaid"]));
 
             for (let i = 0; i < 7; i++) {
                 const comp = formatOZN(compute[i]);
@@ -1297,7 +1295,6 @@ async function loadMyStor(id, panel) {
                 const drwn = formatOZN(drawn[i]);
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
-                const vaultVal = formatOZN(voult[i]);
                 const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
                 
                 addRow(panel, `${incomeTypes[i]} (${parseInt(susCount)%2==1?"F":"T"})`, 
@@ -1306,8 +1303,7 @@ async function loadMyStor(id, panel) {
                         String(compFlush),
                         String(drwn),
                         String(flsh),
-                        String(unpaidVal),
-                        String(vaultVal)
+                        String(unpaidVal)
                     ])
                 );
             }
@@ -1368,58 +1364,53 @@ async function loadMyStor(id, panel) {
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
             
-            const INVESTED_DOLLAR =  (new BN(await stor.methods.INVESTED_DOLLAR().call()).mul(new BN("3000000000000000000"))).toString();
-            const voultDage =  await stor.methods.voultDage().call();
-           
-            const vaultStatus =  await stor.methods.vaultStatus().call();
-            addRow(panel, "Voult Status", formatRow([
-                "INVESTED_3X_$",
-                "TotalClaimed_$",
-                "CalVaultROI(7d)",
-                "VaultCap",
-                "voultDage"
-                ]));
-
-            addRow(panel, "..", formatRow([
-                formatOZN(INVESTED_DOLLAR),
-                formatOZN(misc[6]),
-                formatOZN(vaultStatus.calVaultROI),
-                formatOZN(vaultStatus.capvault),
-                voultDage
-            ]));
-
+            
             const capStatus =  await stor.methods.capStatus(50).call();
-            loadGraph({
+            /*loadGraph({
                 totalIncome: formatOZN(capStatus.totalIncome),
                 burned4x: formatOZN(capStatus.burnedx),
                 threshold: formatOZN(capStatus.threshold),
                 cap: capStatus._cap,
                 currentValue:formatOZN(capStatus.currentValue)
 
-            });
-            addRow(panel, "CAP Status", formatRow([
-                "TotalInc",
-                "burned3X",
-                "Threshold",
-                "IsCap",
-                "CurrentValue"
+            });*/
+            
+
+            addRow(panel, "CONST", formatRow([
+                "BURNED",
+                "BURNED_DOLLAR",
+                "INVESTED_DOLLAR",
+                "CLAIMED_DOLLAR"
             ]));
 
             addRow(panel, "..", formatRow([
-                formatOZN(capStatus.totalIncome),
-                formatOZN(capStatus.burnedx),
-                formatOZN(capStatus.threshold),
-                capStatus._cap,
-                formatOZN(capStatus.currentValue)
+                consts[0],
+                consts[1],
+                consts[2],
+                consts[3]
             ]));
+            addRow(panel, "CAP Status", formatRow([
+                "TotalInc",
+                "Threshold_3X_$",
+                "Threshold_3X_$",
+                "IsCap"
+            ]));
+
+            addRow(panel, "..", formatRow([
+                formatOZN(capStatus.totInc),
+                formatOZN(capStatus.thresholdx),
+                formatOZN(capStatus.thresholdollarx),
+                capStatus._cap
+            ]));
+
             // Burned & Self Proposed
-            ////[BURNED, BURNED_DOLLAR, CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old, 0]
-            addRow(panel, "BURNED", formatOZN(misc[0]));
-            addRow(panel, "BURNED_DOLLAR", formatOZN(misc[1]));
-            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[2]));
-            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
-            addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
-            addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
+            //CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old
+            //BURNED, BURNED_DOLLAR, INVESTED_DOLLAR, CLAIMED_DOLLAR, 0, 0, 0
+           
+            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[0]));
+            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[1]));
+            addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
+            addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
             addRow(panel, "LOCKED", isLock);
            
             const right=document.createElement("div");
