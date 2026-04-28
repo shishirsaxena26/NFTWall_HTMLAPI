@@ -82,7 +82,7 @@ interface IInstanceStor {
     ) external returns (uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
-    function capStatus()
+    function capStatus(uint256 maxinterwal)
         external
         view
         returns (uint256 totalIncome, uint256 burnedx, uint256 threshold, bool _cap, uint256 currentValue);
@@ -122,10 +122,7 @@ interface IInstanceStor {
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);
-    function vaultStatus()
-        external
-        view
-        returns (uint256 totclaimed, uint256 totclaimedDollar, uint256 calVaultROI, uint256 capvault);
+    function vaultStatus() external view returns (uint256 calVaultROI, uint256 capvault);
     function voultDage() external view returns (uint256);
     function withdrawlDage() external view returns (uint256);
 }

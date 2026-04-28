@@ -1369,12 +1369,12 @@ async function loadMyStor(id, panel) {
             tableToggle.appendChild(tbodyToggle);
             
             const INVESTED_DOLLAR =  (new BN(await stor.methods.INVESTED_DOLLAR().call()).mul(new BN("3000000000000000000"))).toString();
+            const voultDage =  await stor.methods.voultDage().call();
            
             const vaultStatus =  await stor.methods.vaultStatus().call();
             addRow(panel, "Voult Status", formatRow([
-                "INVESTED$",
-                "TotalClaimed",
-                "TotalClaimed$",
+                "INVESTED_3X_$",
+                "TotalClaimed_$",
                 "CalVaultROI(7d)",
                 "VaultCap",
                 "voultDage"
@@ -1382,14 +1382,13 @@ async function loadMyStor(id, panel) {
 
             addRow(panel, "..", formatRow([
                 formatOZN(INVESTED_DOLLAR),
-                formatOZN(vaultStatus.totclaimed),
-                formatOZN(vaultStatus.totclaimedDollar),
+                formatOZN(misc[6]),
                 formatOZN(vaultStatus.calVaultROI),
                 formatOZN(vaultStatus.capvault),
-                misc[6]
+                voultDage
             ]));
 
-            const capStatus =  await stor.methods.capStatus().call();
+            const capStatus =  await stor.methods.capStatus(50).call();
             loadGraph({
                 totalIncome: formatOZN(capStatus.totalIncome),
                 burned4x: formatOZN(capStatus.burnedx),
@@ -1400,7 +1399,7 @@ async function loadMyStor(id, panel) {
             });
             addRow(panel, "CAP Status", formatRow([
                 "TotalInc",
-                "burned4x",
+                "burned3X",
                 "Threshold",
                 "IsCap",
                 "CurrentValue"
