@@ -53,7 +53,8 @@ interface IInstanceStor {
 
     function Burn(uint256 amount) external;
     function BurnCoin(uint256 _dollar) external payable;
-    function LSB(uint256) external view returns (int256);
+    function INVESTED_DOLLAR() external view returns (uint256);
+    function LSB(uint256, uint256) external view returns (int256);
     function _compute(uint256 endage) external view returns (InstanceStor.ComputeResult memory r);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
@@ -63,10 +64,14 @@ interface IInstanceStor {
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
     function _txnType7(uint256 _maxint, uint256 _ag) external payable returns (uint256[9] memory CALC_INC);
-    function _txnType_1_0(address paramAdd, uint256 _id_maxint, uint256 _qty, uint256 _msgValue, uint256 _type)
-        external
-        payable
-        returns (uint256 _tvl, uint256 _amt);
+    function _txnType_1_0(
+        address paramAdd,
+        uint256 _id_maxint,
+        uint256 _qty,
+        uint256 _msgValue,
+        uint256 _type,
+        uint256 _ag
+    ) external payable returns (uint256 _tvl, uint256 _amt);
     function addLevelnGetRank(
         uint256 _amount,
         uint256 _qty,
@@ -82,6 +87,7 @@ interface IInstanceStor {
         view
         returns (uint256 totalIncome, uint256 burnedx, uint256 threshold, bool _cap, uint256 currentValue);
     function currentCycle() external view returns (uint256);
+    function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
     function directsCount() external view returns (uint256);
     function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
@@ -108,6 +114,7 @@ interface IInstanceStor {
     function preinit(address _hex, address _own, uint256 _id) external;
     function rank() external view returns (uint256);
     function rankage(uint256) external view returns (uint256);
+    function refreshCap() external;
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
@@ -118,7 +125,7 @@ interface IInstanceStor {
     function vaultStatus()
         external
         view
-        returns (uint256 totclaimed, uint256 totclaimedDollar, uint256 calVaultAmt, uint256 capvault);
+        returns (uint256 totclaimed, uint256 totclaimedDollar, uint256 calVaultROI, uint256 capvault);
     function voultDage() external view returns (uint256);
     function withdrawlDage() external view returns (uint256);
 }

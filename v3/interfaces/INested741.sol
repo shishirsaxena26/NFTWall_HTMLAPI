@@ -23,6 +23,7 @@ interface INested741 {
 
     function Burn(uint256 amount) external;
     function UserToId(address) external view returns (uint256);
+    function _ageNow() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _isDelegatorNode(address sender) external view returns (bool);

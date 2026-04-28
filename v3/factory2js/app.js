@@ -148,6 +148,8 @@ async function init(){
     
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
+    sysAge = await nested.methods.systemAge().call();
+    document.getElementById("sysAgeid").innerHTML = sysAge;
 
     in741Rule = await hexBase.methods.in741Rule().call();
     rule = new web3.eth.Contract(I741RulesABI.abi, in741Rule);
@@ -406,7 +408,8 @@ function addPanel(title) {
 function addRow(panel, field, value) {
   const row = document.createElement("div");
   row.className = "row";
-
+  row.style.whiteSpace = "pre";
+row.style.fontFamily = "monospace";  
   const f = document.createElement("div");
 
   if (field instanceof HTMLElement) {
@@ -466,6 +469,10 @@ function pad3(v){
     return "00"+v;
 }
 
+function padStr(v, len = 20) {
+  return String(v).padStart(len, ' ');
+}
+
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
     if(!value) return "NULL";
@@ -490,6 +497,7 @@ async function loadSystem() {
     try{
     const nodes = await nested.methods.getNodesCount().call();
     sysAge = await nested.methods.systemAge().call();
+    document.getElementById("sysAgeid").innerHTML = sysAge;
     const forms = await transferRequests.methods.getFormsCount().call();
     const isSafe = await safeguard.methods.isSafe().call();
 
@@ -696,6 +704,8 @@ async function onGetDailyBusiness() {
     document.getElementById("tabDBBody").innerHTML = "";
 	
 	let age = await nested.methods.systemAge().call();
+    
+    document.getElementById("sysAgeid").innerHTML = age;
 	for (let i = age; i>=parseInt(age)-8; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
@@ -914,7 +924,7 @@ async function joinUser() {
             
 
             let accounts = await ethereum.enable();
-            if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+            if(currentAccount!=accounts[0]) {  throw "Incorrect account selected";}
             window.web3T = new Web3(window.ethereum);
             // encode constructor args
             const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
@@ -944,7 +954,7 @@ async function joinUser() {
         
         }catch(e){
             console.error(e);
-            alert("Transaction failed");
+            alert(e.message);
         }  
 
     hideLoader();
@@ -961,7 +971,7 @@ async function initUser(){
 
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
        
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
@@ -985,7 +995,7 @@ async function initUser(){
 
     }catch(e){
         console.log(e);
-        alert("Transaction failed");
+        alert("Transfer failed: " + (err.message || err));
     }
      hideLoader();
 }
@@ -996,7 +1006,7 @@ async function importUser() {
 
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
         const userId = await nested.methods.UserToId(currentAccount).call();
         if(userId==0) { alert("Invalid user"); return;}
         const limit = 5; // change according to your import batch size
@@ -1018,7 +1028,7 @@ async function importUser() {
 
     }catch(e){
         console.log(e);
-        alert("Transaction failed");
+        alert("Transfer failed: " + (err.message || err));
     }
     hideLoader();
 }
@@ -1048,7 +1058,7 @@ async function buyNFT(o1155, tokenId){
                         }
                        
                         let accounts = await ethereum.enable();
-                        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+                        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
 		                window.web3T = new Web3(window.ethereum);
                         const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
                         const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
@@ -1086,7 +1096,8 @@ async function buyNFT(o1155, tokenId){
 
                     }catch(e){
                         console.error(e);
-                        alert("Transaction failed");
+                       
+                        alert("Transfer failed: " + (err.message || err));
                     }
  hideLoader();
 }
@@ -1119,6 +1130,10 @@ async function loadUser() {
     clearPanels();
     const panel = addPanel("User Data");
     try{
+        
+        sysAge = await nested.methods.systemAge().call(); 
+        document.getElementById("sysAgeid").innerHTML = sysAge;
+
         const id = await nested.methods.UserToId(user).call();
         const node = await nested.methods.getNode(id).call();
         const isdelegator = await nested.methods._isDelegatorNode(user).call();
@@ -1162,6 +1177,13 @@ async function loadUser() {
     hideLoader();
 
     
+}
+
+
+function formatRow(arr, width = 15) {
+  return arr
+    .map(v => String(v).padStart(width, " "))
+    .join(' | ');
 }
 
 async function loadMyStor(id, panel) {
@@ -1235,16 +1257,16 @@ async function loadMyStor(id, panel) {
             */
 
             // Drawn, Flushed, Unpaid, Compute
-            const drawn = await stor.methods.getAllIncome(0,0).call();
+            const drawn = await stor.methods.getAllIncome(1,0).call();
            
-            const flushed = await stor.methods.getAllIncome(1,0).call();
-            const unpaid = await stor.methods.getAllIncome(2,0).call();
-            const misc = await stor.methods.getAllIncome(3,0).call();
+            const flushed = await stor.methods.getAllIncome(2,0).call();
+            const unpaid = await stor.methods.getAllIncome(3,0).call();
             const voult = await stor.methods.getAllIncome(4,0).call();
-            
+            const misc = await stor.methods.getAllIncome(5,0).call();
+            debugger
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(5,50).call();
+                compute = await stor.methods.getAllIncome(6,50).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -1254,7 +1276,7 @@ async function loadMyStor(id, panel) {
             console.log(`compute: `  + compute);
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(6,50).call();
+                computeFlush = await stor.methods.getAllIncome(7,50).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -1267,7 +1289,7 @@ async function loadMyStor(id, panel) {
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
-            addRow(panel, "Income Type", "Compute | ComputeFlush | Drawn | Flushed | Unpaid | Suspend");
+            addRow(panel, "Income Type", formatRow(["Compute","ComputeFlush","Drawn","Flushed","Unpaid","Vault(Locked)"]));
 
             for (let i = 0; i < 7; i++) {
                 const comp = formatOZN(compute[i]);
@@ -1275,33 +1297,22 @@ async function loadMyStor(id, panel) {
                 const drwn = formatOZN(drawn[i]);
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
+                const vaultVal = formatOZN(voult[i]);
                 const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
-                stor.methods.getToggleAgeCount(999).call().then(console.log);
-                if(susCount>1){
-                    stor.methods.getToggleAgeValue(i+1,0).call().then(console.log);
-                    stor.methods.getToggleAgeValue(i+1,1).call().then(console.log);
-                }
-                addRow(panel, incomeTypes[i], `${comp} | ${compFlush} | ${drwn} | ${flsh} | ${unpaidVal}| ${parseInt(susCount)%2==1}`);
+                
+                addRow(panel, `${incomeTypes[i]} (${parseInt(susCount)%2==1?"F":"T"})`, 
+                    formatRow([
+                        String(comp),
+                        String(compFlush),
+                        String(drwn),
+                        String(flsh),
+                        String(unpaidVal),
+                        String(vaultVal)
+                    ])
+                );
             }
 
 
-            
-            // Burned & Self Proposed
-            ////[BURNED, BURNED_DOLLAR, CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old, 0]
-            addRow(panel, "BURNED", formatOZN(misc[0]));
-            addRow(panel, "BURNED_DOLLAR", formatOZN(misc[1]));
-            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[2]));
-            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
-            addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
-            addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
-      
-            //if(typeId == 4) return [VOULT, INVESTED_DOLLAR, CLAIMED_DOLLAR, vouldDage, 0, 0, 0 ];
-           
-
-            addRow(panel, "LOCKED", isLock);
-            
-            const capCount =  await stor.methods.getToggleAgeCount(999).call();
-            addRow(panel, "ToggleAgeCount(_CAP_IX)->", `${parseInt(capCount)%2==1}`);
             
             const toggleAgeListdiv =document.createElement("div");
             toggleAgeListdiv.style.display = "-webkit-inline-box";
@@ -1353,13 +1364,30 @@ async function loadMyStor(id, panel) {
                 tbodyToggle.appendChild(row);
             }
 
+
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
+            
+            const INVESTED_DOLLAR =  (new BN(await stor.methods.INVESTED_DOLLAR().call()).mul(new BN("3000000000000000000"))).toString();
+           
             const vaultStatus =  await stor.methods.vaultStatus().call();
-            addRow(panel, "Voult Status", "VOULT | INVESTED_DOLLAR | CLAIMED_DOLLAR | voultDage");
-            addRow(panel, "..", `${formatOZN(voult[0])} | ${voult[1]} | ${formatOZN(voult[2])} | ${voult[3]}`);
-            addRow(panel, "=>", "TotalClaimed | TotalClaimedDollar | CalVaultROI | VaultCap");
-            addRow(panel, "..", `${formatOZN(vaultStatus.totclaimed)} | ${formatOZN(vaultStatus.totclaimedDollar)} | ${formatOZN(vaultStatus.calVaultAmt)} | ${formatOZN(vaultStatus.capvault)}`);
+            addRow(panel, "Voult Status", formatRow([
+                "INVESTED$",
+                "TotalClaimed",
+                "TotalClaimed$",
+                "CalVaultROI(7d)",
+                "VaultCap",
+                "voultDage"
+                ]));
+
+            addRow(panel, "..", formatRow([
+                formatOZN(INVESTED_DOLLAR),
+                formatOZN(vaultStatus.totclaimed),
+                formatOZN(vaultStatus.totclaimedDollar),
+                formatOZN(vaultStatus.calVaultROI),
+                formatOZN(vaultStatus.capvault),
+                misc[6]
+            ]));
 
             const capStatus =  await stor.methods.capStatus().call();
             loadGraph({
@@ -1370,9 +1398,31 @@ async function loadMyStor(id, panel) {
                 currentValue:formatOZN(capStatus.currentValue)
 
             });
-            addRow(panel, "CAP Status", "TotalInc | burned4x | Threshold | IsCap | CurrentValue");
-            addRow(panel, "..", `${formatOZN(capStatus.totalIncome)} |${formatOZN(capStatus.burnedx)} ||${formatOZN(capStatus.threshold)} | ${capStatus._cap} | ${formatOZN(capStatus.currentValue)}`);
+            addRow(panel, "CAP Status", formatRow([
+                "TotalInc",
+                "burned4x",
+                "Threshold",
+                "IsCap",
+                "CurrentValue"
+            ]));
 
+            addRow(panel, "..", formatRow([
+                formatOZN(capStatus.totalIncome),
+                formatOZN(capStatus.burnedx),
+                formatOZN(capStatus.threshold),
+                capStatus._cap,
+                formatOZN(capStatus.currentValue)
+            ]));
+            // Burned & Self Proposed
+            ////[BURNED, BURNED_DOLLAR, CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old, 0]
+            addRow(panel, "BURNED", formatOZN(misc[0]));
+            addRow(panel, "BURNED_DOLLAR", formatOZN(misc[1]));
+            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[2]));
+            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
+            addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
+            addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
+            addRow(panel, "LOCKED", isLock);
+           
             const right=document.createElement("div");
             const btnClaim=document.createElement("button");
             btnClaim.innerText="Claim";
@@ -1535,7 +1585,7 @@ async function onNewProposer() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
        
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
@@ -1582,7 +1632,7 @@ async function onMovedownlineProposer() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
     
         const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
@@ -1619,7 +1669,7 @@ async function onSubmitTrasfer() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
        
         const trContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
     
@@ -1803,7 +1853,7 @@ async function closeTransferTarget(to) {
     try {
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
         
         const transferContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
         
@@ -1824,7 +1874,7 @@ async function vote(proposalId, support) {
 	try {
 	window.web3T = new Web3(window.ethereum);
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+    if(currentAccount!=accounts[0]) { throw "Incorrect account selected";}
        
     const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 	  
@@ -1845,7 +1895,7 @@ async function vote(proposalId, support) {
     try {
 	window.web3T = new Web3(window.ethereum);
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+    if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
        
     const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 	  
@@ -1986,7 +2036,7 @@ async function loadMyNFT(){
 
     const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
     const mintCount = await storeContract.methods.mintCount().call();
-
+    const currentLSBversion = await storeContract.methods.currentLSBversion().call();
     const lsbpanel = addPanel("LSB Amount");
     let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
@@ -2001,7 +2051,7 @@ async function loadMyNFT(){
     }));
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
-            innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(lsbindex)).call(),"ether")}`
+            innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(lsbindex)).call(),"ether")}`
     }));
     
 
@@ -2132,11 +2182,11 @@ async function loadMyNFT(){
        
         lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
-            innerHTML: `Mint LSB[${parseInt(mintedAge)+2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(mintedAge)+2).call(),"ether")}`
+            innerHTML: `Mint LSB[${parseInt(mintedAge)+2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(mintedAge)+2).call(),"ether")}`
         }));
         lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
-            innerHTML: `Mint LSB[${parseInt(mintedAge)+2+600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(parseInt(mintedAge)+2+600).call(),"ether")}`
+            innerHTML: `Mint LSB[${parseInt(mintedAge)+2+600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(mintedAge)+2+600).call(),"ether")}`
         }));
     }
 
@@ -2163,9 +2213,10 @@ async function loadMyNFT(){
 }
 
 
-    async function getUnlockedNFT(mintedAge, mintedqty) {
+async function getUnlockedNFT(mintedAge, mintedqty) {
     const ONE = 1e18;
-    sysAge = await nested.methods.systemAge().call();    
+    sysAge = await nested.methods.systemAge().call(); 
+    document.getElementById("sysAgeid").innerHTML = sysAge;
     // if shutdown()
     const isShutdown = await rule.methods.shutdown().call();
     if (isShutdown) {
@@ -2281,12 +2332,12 @@ async function onCapBurn() {
             return;
         }
 
-        const amountStr = prompt("Enter amount to burn:");
-        if (!amountStr) {
+        const amountStrDollar = prompt("Enter amount to burn:");
+        if (!amountStrDollar) {
             throw 'Amount required';
         }
-        const amount = parseFloat(amountStr);
-        if (isNaN(amount)) {
+        const amountDollar = parseFloat(amountStrDollar);
+        if (isNaN(amountDollar)) {
             throw 'Invalid amount';
         }
 
@@ -2296,15 +2347,17 @@ async function onCapBurn() {
         if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
             throw "Incorrect account selected";
         }
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
        
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
-    
+        
+        const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
+        debugger;
         const tx = await storeContract.methods
-            .BurnCoin()
+            .BurnCoin(web3.utils.toWei(amountDollar.toString(), 'ether'))
             .send({
                 from: currentAccount,
-                value: web3.utils.toWei(amount.toString(), 'ether') // change if initialization requires ETH
+                value: amountOzone.toString() // change if initialization requires ETH
             });
 
         if (tx.status) {
@@ -2342,7 +2395,7 @@ async function onClaim() {
         if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
             throw "Incorrect account selected";
         }
-        if(currentAccount!=accounts[0]) { alert("Incorrect account selected"); return;}
+        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
        
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
@@ -2641,6 +2694,7 @@ async function loadValidatorPage() {
     }   
     catch(err){
         console.error(err);
+        alert("Validator failed: " + (err.message || err));
         addRow(panel,"Error", err.message);
         addRow(panel,"Error","Failed to Validator Module");
     }
@@ -3383,8 +3437,6 @@ async function loadRule() {
         addRow(panelCap, "RY", cap.ry);
         addRow(panelCap, "SELF", cap.self);
         addRow(panelCap, "YEI", cap.yei);
-        addRow(panelCap, "VAL", cap.val);
-        addRow(panelCap, "TOUR", cap.tour);
 
         
 
@@ -3412,6 +3464,7 @@ async function loadRule() {
         // ---------------- OTHER SETTINGS ----------------
         const panelOthers = addPanel("OTHER SETTINGS");
         sysAge = await rule.methods.systemAge().call();
+        document.getElementById("sysAgeid").innerHTML = sysAge;
         addRow(panelOthers, "Owner", await rule.methods.owner().call());
         addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
         addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());

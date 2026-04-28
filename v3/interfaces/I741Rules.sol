@@ -37,10 +37,7 @@ interface I741Rules {
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
     function allowForceTransfer() external view returns (bool);
-    function capping()
-        external
-        view
-        returns (uint256 multiple, bool rw, bool ry, bool self, bool yei, bool val, bool tour);
+    function capping() external view returns (uint256 multiple, bool rw, bool ry, bool self, bool yei);
     function computeDollarToOzone(uint256 _dollar) external view returns (uint256);
     function computeMintValue(uint256 _qty) external view returns (uint256);
     function computeOzoneToDollar(uint256 _ozone) external view returns (uint256);
@@ -89,7 +86,7 @@ interface I741Rules {
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
     function setAllowForceTransfer(bool _f) external;
-    function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei, bool _val, bool _tour) external;
+    function setCapping(uint256 _multiple, bool _rw, bool _ry, bool _self, bool _yei) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setCoinPool(
         uint256 _start,
