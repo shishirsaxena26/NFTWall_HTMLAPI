@@ -1374,33 +1374,37 @@ async function loadMyStor(id, panel) {
                 currentValue:formatOZN(capStatus.currentValue)
 
             });*/
-            
+            addRow(panel, "CAP Status",  capStatus._cap);
+             
+            const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
 
-            addRow(panel, "CONST", formatRow([
-                "BURNED",
-                "BURNED_DOLLAR",
+            addRow(panel, "CAP DOLLAR", formatRow([
                 "INVESTED_DOLLAR",
-                "CLAIMED_DOLLAR"
+                "BURNED_DOLLAR",
+                "Threshold_3X_",
+                "CLAIMED_DOLLAR",
             ]));
 
             addRow(panel, "..", formatRow([
-                consts[0],
-                consts[1],
                 consts[2],
-                consts[3]
+                consts[1],
+                formatOZN(capStatus.thresholdollarx),
+                consts[3],
             ]));
-            addRow(panel, "CAP Status", formatRow([
-                "TotalInc",
+
+            addRow(panel, "CAP OZONE", formatRow([
+                "TotalBusiness",
+                "BURNED",
                 "Threshold_3X",
-                "Threshold_3X_$",
-                "IsCap"
+                "TotalInc"
             ]));
 
             addRow(panel, "..", formatRow([
-                formatOZN(capStatus.totInc),
+                formatOZN(lvlBatch[0][0]),
+                consts[0],
                 formatOZN(capStatus.thresholdx),
-                formatOZN(capStatus.thresholdollarx),
-                capStatus._cap
+                formatOZN(capStatus.totInc),
+              
             ]));
 
             // Burned & Self Proposed
