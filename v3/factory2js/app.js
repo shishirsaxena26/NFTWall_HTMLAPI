@@ -1391,7 +1391,7 @@ async function loadMyStor(id, panel) {
             ]));
             addRow(panel, "CAP Status", formatRow([
                 "TotalInc",
-                "Threshold_3X_$",
+                "Threshold_3X",
                 "Threshold_3X_$",
                 "IsCap"
             ]));
