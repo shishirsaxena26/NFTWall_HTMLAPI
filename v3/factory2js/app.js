@@ -927,23 +927,36 @@ async function joinUser() {
             if(currentAccount!=accounts[0]) {  throw "Incorrect account selected";}
             window.web3T = new Web3(window.ethereum);
             // encode constructor args
-            const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
-            const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
+            //const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
+            //const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
             
             // append args to bytecode
-            const deployBytecode = byteCodeStandard + encodedArgs.slice(2);
-            
+            //const deployBytecode = byteCodeStandard + encodedArgs.slice(2);
+
+            const contract = new web3T.eth.Contract(IInstanceMeABI.abi);
             // deploy transaction
-            const tx = await web3T.eth.sendTransaction({
+            const deployTx = contract.deploy({
+                data: byteCodeStandard,
+                arguments: [hexBaseAddress, parent]
+            });
+            
+            const gas = await deployTx.estimateGas({ from: currentAccount });
+            
+            const block = await web3T.eth.getBlock("latest");
+            const baseFee = BigInt(block.baseFeePerGas || 0);
+
+            const tx = await deployTx.send({
                 from: currentAccount,
-                data: deployBytecode,
-                value: "0"
+                gas: Math.floor(gas * 1.1),
+
+                maxPriorityFeePerGas: "1", // small tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
             
             console.log("Deploy TX:", tx);
-          
+            
             // contract address from receipt
-            currentInstance = tx.contractAddress;
+            currentInstance = tx.options.address;;
             alert("User Joined: "+currentInstance);
             // update UI
             document.getElementById("walletInst").innerText =
@@ -980,14 +993,31 @@ async function initUser(){
 
         instancecontract.methods.owner().call(console.log);
         instancecontract.methods.getHexbase().call(console.log);
-      
-        await instancecontract.methods
+        
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // estimate gas
+        const gas = await instancecontract.methods
+            .initialize()
+            .estimateGas({
+                from: currentAccount,
+                value: "0"
+            });
+
+        // send transaction
+        const receipt = await instancecontract.methods
             .initialize()
             .send({
                 from: currentAccount,
-                value: "0" // change if initialization requires ETH
-            });
+                value: "0",
 
+                gas: Math.floor(gas * 1.1), // small buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+            });
+            
         console.log("Instance initialized");
 
         // reload panel so stor address appears
@@ -1084,20 +1114,40 @@ async function buyNFT(o1155, tokenId){
                         // reduce bonus
                         value = bonus >= value ? 0n : (value - bonus);
                         
-                        // execute transaction
-                        await instancecontract.methods
-                            .Txn(o1155,tokenId,qty,1)
-                            .send({
-                                from: currentAccount,
+                        // get latest base fee
+                        const block = await web3T.eth.getBlock("latest");
+                        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+                        // estimate gas
+                        const gas = await instancecontract.methods
+                            .Txn(o1155, tokenId, qty, 1)
+                            .estimateGas({
+                                from: accounts[0],
                                 value: value.toString()
                             });
 
-                        alert("NFT Purchased");
+                        // send transaction
+                        const receipt = await instancecontract.methods
+                            .Txn(o1155, tokenId, qty, 1)
+                            .send({
+                                from: accounts[0],
+                                value: value.toString(),
+
+                                gas: Math.floor(gas * 1.1), // small buffer
+
+                                maxPriorityFeePerGas: "1", // low tip
+                                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+                            });
+                    
+                        if (receipt.status) {
+                            alert("NFT Purchased");
+                        } else {
+                            alert("NFT Failed");
+                        }
 
                     }catch(e){
                         console.error(e);
-                       
-                        alert("Transfer failed: " + (err.message || err));
+                        alert("Purchased failed: " + (err.message || err));
                     }
  hideLoader();
 }
@@ -1462,7 +1512,7 @@ async function loadUpline(){
 
     } catch (err) {
         console.error(err);
-        alert("Burning failed: " + (err.message || err));
+        alert("loadUpline failed: " + (err.message || err));
     } 
         
     hideLoader();
@@ -1480,7 +1530,7 @@ async function _loadUpline(id){
 
     } catch (err) {
         console.error(err);
-        alert("Burning failed: " + (err.message || err));
+        alert("loadUpline failed: " + (err.message || err));
     } 
 }
 
@@ -2346,19 +2396,41 @@ async function onCapBurn() {
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
         
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        debugger;
-        const tx = await storeContract.methods
-            .BurnCoin(web3.utils.toWei(amountDollar.toString(), 'ether'))
-            .send({
-                from: currentAccount,
-                value: amountOzone.toString() // change if initialization requires ETH
-            });
+                
+            // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
 
-        if (tx.status) {
+        // prepare method
+        const method = storeContract.methods.BurnCoin(
+            web3.utils.toWei(amountDollar.toString(), 'ether')
+        );
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount,
+            value: amountOzone.toString()
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+            value: amountOzone.toString(),
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
             alert("Burn succeeded");
         } else {
             alert("Burn failed");
         }
+
+        console.log("Tx Hash:", receipt.transactionHash);
+        console.log("Gas Used:", receipt.gasUsed);
        
 
     } catch (err) {
@@ -2396,14 +2468,36 @@ async function onClaim() {
             currentInstance
         );
       
-        const tx = await instancecontract.methods
-            .Txn(ZERO,49,0,7)
-            .send({
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // estimate gas
+        const gas = await instancecontract.methods
+            .Txn(ZERO, 49, 0, 7)
+            .estimateGas({
                 from: accounts[0],
-                value: "0" // change if initialization requires ETH
+                value: "0"
             });
 
-        if (tx.status) {
+        // send tx
+        const receipt = await instancecontract.methods
+            .Txn(ZERO, 49, 0, 7)
+            .send({
+                from: accounts[0],
+                value: "0",
+
+                gas: Math.floor(gas * 1.1), // buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString()
+            });
+
+        console.log("Txn receipt:", receipt);
+        console.log("Tx Hash:", receipt.transactionHash);
+        console.log("Gas Used:", receipt.gasUsed);
+
+        if (receipt.status) {
             alert("Claimed succeeded");
         } else {
             alert("Claimed failed");

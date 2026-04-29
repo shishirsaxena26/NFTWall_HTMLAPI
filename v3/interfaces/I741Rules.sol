@@ -53,6 +53,7 @@ interface I741Rules {
     function getNftPool(uint256 _type, uint256 _mintage)
         external
         returns (uint256 _startfrom, uint256 _roiN, uint256 _roiD, uint256 _roiInt);
+    function iAge() external view returns (uint256);
     function levelClause(uint256)
         external
         view
@@ -127,6 +128,7 @@ interface I741Rules {
     function setrankforDAO(uint256 _r) external;
     function setshutdown(bool _shutdown) external;
     function shutdown() external view returns (bool);
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function tourClause(uint256) external view returns (uint256);
     function valExternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);

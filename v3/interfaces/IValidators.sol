@@ -44,6 +44,7 @@ interface IValidators {
     function incomeOf(address user) external view returns (uint256);
     function mapValidatorDelegator(address user, address vald, bool activate) external;
     function owner() external view returns (address);
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function transferUser(address userfrom, address userto) external;
     function updateDelegators(address[] memory valds, address[] memory dels, bool[] memory active) external;

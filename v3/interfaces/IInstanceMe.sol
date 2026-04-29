@@ -40,5 +40,6 @@ interface IInstanceMe {
     function setName(string memory _name) external;
     function setParent(address newparent) external;
     function stor() external view returns (address);
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
 }

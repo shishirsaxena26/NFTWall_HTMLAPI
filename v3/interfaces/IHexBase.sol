@@ -75,6 +75,7 @@ interface IHexBase {
         address _hexUserEngine,
         address _hexInstanceEngine
     ) external;
+    function syncAllSystem() external;
     function testTxnSys() external;
     function update741(address addr) external;
     function update741Old(address addr) external;

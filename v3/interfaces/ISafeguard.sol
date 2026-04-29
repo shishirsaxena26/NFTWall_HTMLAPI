@@ -34,5 +34,6 @@ interface ISafeguard {
     function owner() external view returns (address);
     function safeSecureBaseCallback(address sender, bool action) external;
     function signerCallback(address _singer, bool action) external;
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
 }

@@ -2,24 +2,6 @@
 pragma solidity ^0.8.4;
 
 library InstanceStor {
-    struct ComputeResult {
-        uint256 p1;
-        uint256 p2;
-        uint256 p3;
-        uint256 p4;
-        uint256 p5;
-        uint256 p6;
-        uint256 p7;
-        uint256 f1;
-        uint256 f2;
-        uint256 f3;
-        uint256 f4;
-        uint256 f5;
-        uint256 f6;
-        uint256 f7;
-        int256 lsb;
-    }
-
     struct LevelInfoStr {
         uint256 lvlbs;
         uint256 lvlqty;
@@ -54,7 +36,6 @@ interface IInstanceStor {
     function Burn(uint256 amount) external;
     function BurnCoin(uint256 _dollar) external payable;
     function LSB(uint256, uint256) external view returns (int256);
-    function _compute(uint256 endage) external view returns (InstanceStor.ComputeResult memory r);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _importOld(uint256 limit) external payable;
@@ -118,6 +99,7 @@ interface IInstanceStor {
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
     function setdirect(bool addremove) external;
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;
     function userCycleMintCount(uint256) external view returns (uint256);

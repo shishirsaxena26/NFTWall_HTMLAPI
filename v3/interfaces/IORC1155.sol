@@ -95,6 +95,7 @@ interface IORC1155 {
     function setcurSupply(uint256 _s) external;
     function setsupply(uint256 _s) external;
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function totSupply() external view returns (uint256);
     function totalNFTSent() external view returns (uint256);

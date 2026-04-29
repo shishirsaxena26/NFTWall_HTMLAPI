@@ -89,6 +89,7 @@ interface INested741 {
     function owner() external view returns (address);
     function setDefaultRankCount(uint256 _limit) external;
     function setMoveDownlineApproval(uint256 uid, uint256 newpid) external;
+    function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function tokenImport(uint256 _id, uint256 mintid) external;
     function updateUsers(address from, address to) external returns (uint256 _id, address _stor, address _parent);
