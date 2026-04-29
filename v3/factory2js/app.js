@@ -1308,15 +1308,15 @@ async function loadMyStor(id, panel) {
 
      
             // Drawn, Flushed, Unpaid, Compute
-            const drawn = await stor.methods.getAllIncome(1,0).call();
-            const flushed = await stor.methods.getAllIncome(2,0).call();
-            const unpaid = await stor.methods.getAllIncome(3,0).call();
-            const misc = await stor.methods.getAllIncome(4,0).call();
-            const consts = await stor.methods.getAllIncome(5,0).call();
+            const drawn = await stor.methods.getAllData(1,0).call();
+            const flushed = await stor.methods.getAllData(2,0).call();
+            const unpaid = await stor.methods.getAllData(3,0).call();
+            const misc = await stor.methods.getAllData(4,0).call();
+            const consts = await stor.methods.getAllData(5,0).call();
             debugger
             let compute;
             try {
-                compute = await stor.methods.getAllIncome(6,50).call();
+                compute = await stor.methods.getAllData(6,50).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -1326,13 +1326,25 @@ async function loadMyStor(id, panel) {
             console.log(`compute: `  + compute);
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllIncome(7,50).call();
+                computeFlush = await stor.methods.getAllData(7,50).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
                 // Fallback → prevent UI break
                 computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
+
+            let capstatus;
+            try {
+                capstatus = await stor.methods.getAllData(8,50).call();
+            } catch (err) {
+                console.error("❌ compute() failed:", err.message);
+
+                // Fallback → prevent UI break
+                capstatus = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+            }
+            console.log(`capstatus: `  + capstatus);
+            
 
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
@@ -1413,9 +1425,7 @@ async function loadMyStor(id, panel) {
 
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
-            
-            
-            const capStatus =  await stor.methods.capStatus(50).call();
+                 
             /*loadGraph({
                 totalIncome: formatOZN(capStatus.totalIncome),
                 burned4x: formatOZN(capStatus.burnedx),
@@ -1424,37 +1434,44 @@ async function loadMyStor(id, panel) {
                 currentValue:formatOZN(capStatus.currentValue)
 
             });*/
-            addRow(panel, "CAP Status",  capStatus._cap);
+
+
+            addRow(panel, "CAP",  capstatus[4]==1);
              
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
 
             addRow(panel, "CAP DOLLAR", formatRow([
-                "INVESTED_DOLLAR",
-                "BURNED_DOLLAR",
-                "Threshold_3X_",
-                "CLAIMED_DOLLAR",
+                "Invested_Dollar",
+                "Burned_Dollar",
+                "Threshold_3X_Dollar",
+                "TotalInc_Dollar",
+                "Claimed_Dollar",
+                "CAP_STATUS"
             ]));
 
             addRow(panel, "..", formatRow([
                 consts[2],
                 consts[1],
-                formatOZN(capStatus.thresholdollarx),
-                consts[3],
+                formatOZN(capstatus[3]),
+                formatOZN(capstatus[2]),
+                formatOZN(consts[3]),
+                (formatOZN(capstatus[2])>formatOZN(capstatus[3]))
             ]));
 
             addRow(panel, "CAP OZONE", formatRow([
                 "TotalBusiness",
                 "BURNED",
                 "Threshold_3X",
-                "TotalInc"
+                "TotalInc",
+                "CAP_STATUS"
             ]));
 
             addRow(panel, "..", formatRow([
                 formatOZN(lvlBatch[0][0]),
                 consts[0],
-                formatOZN(capStatus.thresholdx),
-                formatOZN(capStatus.totInc),
-              
+                formatOZN(capstatus[1]),
+                formatOZN(capstatus[0]),
+                (formatOZN(capstatus[0])>formatOZN(capstatus[1]))
             ]));
 
             // Burned & Self Proposed

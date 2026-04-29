@@ -62,10 +62,6 @@ interface IInstanceStor {
     ) external returns (uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
-    function capStatus(uint256 maxinterwal)
-        external
-        view
-        returns (uint256 totInc, uint256 thresholdx, uint256 thresholdollarx, bool _cap);
     function capping()
         external
         view
@@ -74,7 +70,7 @@ interface IInstanceStor {
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
     function directsCount() external view returns (uint256);
-    function getAllIncome(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
+    function getAllData(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
     function getNodeLB(uint256 _level) external view returns (InstanceStor.LevelInfoStr memory);
