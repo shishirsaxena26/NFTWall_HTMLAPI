@@ -66,6 +66,10 @@ interface IInstanceStor {
         external
         view
         returns (uint256 totInc, uint256 thresholdx, uint256 thresholdollarx, bool _cap);
+    function capping()
+        external
+        view
+        returns (uint256 multiple, uint256 multipledollar, bool rw, bool ry, bool self, bool yei);
     function currentCycle() external view returns (uint256);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
@@ -99,6 +103,7 @@ interface IInstanceStor {
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
     function setdirect(bool addremove) external;
+    function storcache() external;
     function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
     function updateOwner(address _newowner) external;

@@ -37,6 +37,10 @@ interface I741Rules {
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
     function allowForceTransfer() external view returns (bool);
+    function burncnfg()
+        external
+        view
+        returns (address target1, uint256 roiN1, uint256 roiD1, address target2, uint256 roiN2, uint256 roiD2);
     function capping()
         external
         view
@@ -90,6 +94,14 @@ interface I741Rules {
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
     function setAllowForceTransfer(bool _f) external;
+    function setBurnConfig(
+        address _target1,
+        uint256 _roiN1,
+        uint256 _roiD1,
+        address _target2,
+        uint256 _roiN2,
+        uint256 _roiD2
+    ) external;
     function setCapping(uint256 _multiple, uint256 _multipledollar, bool _rw, bool _ry, bool _self, bool _yei) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setCoinPool(
