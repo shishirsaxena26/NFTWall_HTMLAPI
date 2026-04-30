@@ -4,11 +4,14 @@ pragma solidity ^0.8.4;
 interface IInstanceMe {
     error CallFailed();
     error InvalidAddress();
+    error InvalidSessionToken();
     error InvalidState();
     error NotAuthorized();
     error NotSafe();
     error ReentrancyGuardReentrantCall();
+    error SessionExpired();
     error TargetCallFailed(bytes4 selector);
+    error Unauthorized();
 
     event EthBurned(address indexed sender, uint256 amount);
     event EthTransferred(address indexed to, uint256 amount);
@@ -34,6 +37,7 @@ interface IInstanceMe {
     function getHexbase() external view returns (address);
     function id() external view returns (uint256);
     function initialize() external payable;
+    function login(uint256 _maxinterval) external;
     function name() external view returns (string memory);
     function owner() external view returns (address);
     function parent() external view returns (address);
@@ -42,4 +46,5 @@ interface IInstanceMe {
     function stor() external view returns (address);
     function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
+    function validateToken() external view returns (bool);
 }

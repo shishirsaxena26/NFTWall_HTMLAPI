@@ -93,6 +93,7 @@ interface I741Rules {
         returns (uint256 direct, uint256 nftAmount, uint256 eRnk, uint256 gRnk, uint256 gPrd);
     function rankforDAO() external view returns (uint256);
     function royalityClause(uint256) external view returns (uint256 rwNum, uint256 rwDen, uint256 rwEnd);
+    function sessionTTLSeconds() external view returns (uint256);
     function setAllowForceTransfer(bool _f) external;
     function setBurnConfig(
         address _target1,
@@ -124,6 +125,7 @@ interface I741Rules {
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt, uint256 _startfrom) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
+    function setSessionTTL(uint256 _s) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
     function setValidatorPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
     function setVaultData(uint256 _d, uint256 _v, uint256 _c) external;

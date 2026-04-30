@@ -838,10 +838,12 @@ async function loadUserPanel(user){
 async function addConnectedUserPanel(){
 
     
+    const btnLogin = document.getElementById("btnLogin");
     const btnJoin = document.getElementById("btnJoin");
     const btnInit = document.getElementById("btnInit");
     const btnImport = document.getElementById("btnImport");
 
+    btnLogin.style.display = "none";
     btnJoin.style.display = "none";
     btnInit.style.display = "none";
     btnImport.style.display = "none";
@@ -879,18 +881,29 @@ async function addConnectedUserPanel(){
             currentStor = node[4];
             document.getElementById("walletInst").innerText =
                 "Inst " + shortAddr(currentInstance);
-            const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
-            const postInit = await stor.methods.postInit().call();
-            if(!postInit){
-                btnImport.style.display = "block";
-                return;
-            } else {
-                
-                document.getElementById("walletStor").innerText =
-                "Stor " + shortAddr(currentStor);
+            debugger;
+            const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);  
+            if(await instan.methods.validateToken().call()) {
+
+                const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
+                const postInit = await stor.methods.postInit().call();
+                if(!postInit){
+                    btnImport.style.display = "block";
+                    return;
+                } else {
+                    
+                    document.getElementById("walletStor").innerText =
+                    "Stor " + shortAddr(currentStor);
+                }
+            }
+            else {
+                 btnLogin.style.display = "block";
+                 return;
             }
            
         }
+
+        
 
     }catch(e){
         console.log(e);
@@ -1029,6 +1042,64 @@ async function initUser(){
     }
      hideLoader();
 }
+
+async function loginUser(){
+
+    if(!currentInstance){
+        alert("Instance not found");
+        return;
+    }
+
+    try{
+
+        let accounts = await ethereum.enable();
+        window.web3T = new Web3(window.ethereum);
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
+       
+        const instancecontract = new web3T.eth.Contract(
+            IInstanceMeABI.abi,
+            currentInstance
+        );
+
+        instancecontract.methods.owner().call(console.log);
+        instancecontract.methods.getHexbase().call(console.log);
+        
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // estimate gas
+        const gas = await instancecontract.methods
+            .login(50)
+            .estimateGas({
+                from: currentAccount,
+                value: "0"
+            });
+
+        // send transaction
+        const receipt = await instancecontract.methods
+            .login(50)
+            .send({
+                from: currentAccount,
+                value: "0",
+
+                gas: Math.floor(gas * 1.1), // small buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+            });
+            
+        console.log("Login successful");
+
+        // reload panel so stor address appears
+        await addConnectedUserPanel();
+
+    }catch(e){
+        console.log(e);
+        alert("Login failed: " + (err.message || err));
+    }
+    hideLoader();
+}
+
 
 async function importUser() {
 
@@ -1434,8 +1505,12 @@ async function loadMyStor(id, panel) {
                 currentValue:formatOZN(capStatus.currentValue)
 
             });*/
-
-
+           
+            debugger;
+           
+            
+            const amountOzone = await rule.methods.computeDollarToOzone(capstatus[6].toString()).call();
+        
             addRow(panel, "CAP",  capstatus[4]==1);
              
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
@@ -1455,7 +1530,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(capstatus[3]),
                 formatOZN(capstatus[2]),
                 formatOZN(consts[3]),
-                (formatOZN(capstatus[2])>formatOZN(capstatus[3]))
+                (parseFloat(formatOZN(capstatus[2]))>parseFloat(formatOZN(capstatus[3])))
             ]));
 
             addRow(panel, "CAP OZONE", formatRow([
@@ -1471,7 +1546,7 @@ async function loadMyStor(id, panel) {
                 consts[0],
                 formatOZN(capstatus[1]),
                 formatOZN(capstatus[0]),
-                (formatOZN(capstatus[0])>formatOZN(capstatus[1]))
+                (parseFloat(formatOZN(capstatus[0]))>parseFloat(formatOZN(capstatus[1])))
             ]));
 
             // Burned & Self Proposed

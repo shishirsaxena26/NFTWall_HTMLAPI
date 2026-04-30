@@ -34,7 +34,7 @@ interface IInstanceStor {
     receive() external payable;
 
     function Burn(uint256 amount) external;
-    function BurnCoin(uint256 _dollar) external payable;
+    function BurnCoin(uint256 _dollar, uint256 maxinterwal) external payable;
     function LSB(uint256, uint256) external view returns (int256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
@@ -94,7 +94,7 @@ interface IInstanceStor {
     function preinit(address _hex, address _own, uint256 _id) external;
     function rank() external view returns (uint256);
     function rankage(uint256) external view returns (uint256);
-    function refreshCap() external;
+    function refreshCap(uint256 maxinterwal) external;
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
