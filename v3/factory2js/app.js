@@ -1637,6 +1637,8 @@ async function loadDAO() {
         addRow(panel,"DAO Assembly",indaoassembly);
 
         const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
+        const delegatorCount1 = await daoassembly.methods.getdelegatorCount1().call();
+        const delegatorCount2 = await daoassembly.methods.getdelegatorCount2().call();
         debugger;
         const rankforDAO = await rule.methods.rankforDAO().call();
       
