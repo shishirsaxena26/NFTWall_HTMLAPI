@@ -67,7 +67,6 @@ interface I741Rules {
     function maxMintQty() external view returns (uint256);
     function maxMintsPerCycle() external view returns (uint256);
     function maxNFTSend() external view returns (uint256);
-    function maxVaultSend() external view returns (uint256);
     function minClaimPerDay() external view returns (uint256);
     function minMintQty() external view returns (uint256);
     function mintCycleDays() external view returns (uint256);
@@ -128,7 +127,6 @@ interface I741Rules {
     function setSessionTTL(uint256 _s) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
     function setValidatorPool(uint256 _type, uint256 _qty, uint256 _roiN, uint256 _roiD, uint256 _roiInt) external;
-    function setVaultData(uint256 _d, uint256 _v, uint256 _c) external;
     function setclaimCycle(uint256 _d) external;
     function setlevelClause(
         uint256 lvl,
@@ -147,6 +145,4 @@ interface I741Rules {
     function tourClause(uint256) external view returns (uint256);
     function valExternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);
     function valInternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);
-    function vaultOnStakeAmt() external view returns (uint256);
-    function vaultSendPerCycle() external view returns (uint256);
 }

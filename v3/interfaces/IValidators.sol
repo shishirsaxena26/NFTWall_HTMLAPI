@@ -42,6 +42,7 @@ interface IValidators {
     function getValidatorDelegatorOfUser(address user) external view returns (address, address, bool);
     function importData(address _u) external;
     function incomeOf(address user) external view returns (uint256);
+    function lastUpdatedEpochOf(address user) external view returns (uint256);
     function mapValidatorDelegator(address user, address vald, bool activate) external;
     function owner() external view returns (address);
     function syncBaseAddr() external;

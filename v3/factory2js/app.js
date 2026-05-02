@@ -682,7 +682,7 @@ async function onSetDefaultRankCount() {
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
     
     const tx = await nestedContractV1.methods
-        .setDefaultRankCount(10)
+        .setDefaultRankCount(20)
         .send({
             from: accounts[0]
     });
@@ -1637,6 +1637,7 @@ async function loadDAO() {
         addRow(panel,"DAO Assembly",indaoassembly);
 
         const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
+        debugger;
         const rankforDAO = await rule.methods.rankforDAO().call();
       
         // const blacklistedCount = await daoassembly.methods.blacklistedCount().call();
@@ -3600,11 +3601,11 @@ async function loadRule() {
 
         // grouped view
         addRow(panelDelegation, "Internal",
-            `Qty:${valInternal.qty} | ROI:${toPercent(valInternal.roiN, valInternal.roiD)} (${valInternal.roiN}/${valInternal.roiD}) | Int:${valInternal.roiInt}`
+            `Qty:${valInternal.qtyORmul} | ROI:${toPercent(valInternal.roiN, valInternal.roiD)} (${valInternal.roiN}/${valInternal.roiD}) | Int:${valInternal.roiInt}`
         );
 
         addRow(panelDelegation, "External",
-            `Qty:${valExternal.qty} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
+            `Qty:${valExternal.qtyORmul} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
         );
 
         
@@ -3613,6 +3614,7 @@ async function loadRule() {
 
         const cap = await rule.methods.capping().call();
         addRow(panelCap, "Multiple", cap.multiple);
+        addRow(panelCap, "multipledollar", cap.multipledollar);
         addRow(panelCap, "RW", cap.rw);
         addRow(panelCap, "RY", cap.ry);
         addRow(panelCap, "SELF", cap.self);
@@ -3652,6 +3654,7 @@ async function loadRule() {
         addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
         // ✅ NEW
         addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
+        addRow(panelOthers, "Session_TTL (Seconds)", await rule.methods.sessionTTLSeconds().call());
 
     } catch (err) {
         console.error(err);
