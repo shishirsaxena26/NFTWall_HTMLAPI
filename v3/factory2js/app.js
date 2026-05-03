@@ -682,7 +682,7 @@ async function onSetDefaultRankCount() {
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
     
     const tx = await nestedContractV1.methods
-        .setDefaultRankCount(20)
+        .setDefaultRankCount(50)
         .send({
             from: accounts[0]
     });
@@ -706,7 +706,7 @@ async function onGetDailyBusiness() {
 	let age = await nested.methods.systemAge().call();
     
     document.getElementById("sysAgeid").innerHTML = age;
-	for (let i = age; i>=parseInt(age)-8; i--) {
+	for (let i = age; i>=parseInt(age)-10; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
@@ -1637,8 +1637,6 @@ async function loadDAO() {
         addRow(panel,"DAO Assembly",indaoassembly);
 
         const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
-        const delegatorCount1 = await daoassembly.methods.getdelegatorCount1().call();
-        const delegatorCount2 = await daoassembly.methods.getdelegatorCount2().call();
         debugger;
         const rankforDAO = await rule.methods.rankforDAO().call();
       
