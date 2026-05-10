@@ -27,6 +27,7 @@ interface ITransferRequests {
     function _isSafe() external view returns (bool);
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
+    function actualTVL() external view returns (uint256);
     function closeTransferTarget(address to) external;
     function forms(uint256) external view returns (address from, address to, uint256 proposalId, bool autoclosed);
     function getBalance() external view returns (uint256);

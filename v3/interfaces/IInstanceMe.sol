@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 interface IInstanceMe {
     error CallFailed();
     error InvalidAddress();
-    error InvalidSessionToken();
     error InvalidState();
     error NotAuthorized();
     error NotSafe();
@@ -38,6 +37,7 @@ interface IInstanceMe {
     function id() external view returns (uint256);
     function initialize() external payable;
     function login(uint256 _maxinterval) external;
+    function logout() external;
     function name() external view returns (string memory);
     function owner() external view returns (address);
     function parent() external view returns (address);

@@ -98,6 +98,7 @@ interface IInstanceStor {
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
+    function setburnclaimdollar(uint256 claimdollar, uint256 burndollar) external;
     function setdirect(bool addremove) external;
     function storcache() external;
     function syncBaseAddr() external;

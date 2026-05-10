@@ -40,7 +40,7 @@ interface INested741 {
     ) external;
     function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256, uint256);
     function closemdrequest(uint256 uid) external;
-    function compileRoyality(uint256 prevAge) external;
+    function compileRoyality(uint256 prevAge, uint256[7] memory _cnt) external;
     function createmdrequest(uint256 uid, uint256 newpid) external;
     function getBalance() external view returns (uint256);
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
