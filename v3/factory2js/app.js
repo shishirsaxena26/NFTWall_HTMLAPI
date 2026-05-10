@@ -692,9 +692,8 @@ async function onSetDefaultRankCount() {
     } else {
         alert("ExecuteRoyality failed");
     }
-       
-    
 }
+
 async function onGetDailyBusiness() {
 	showLoader();
 	var r3 = new BN("0");
@@ -835,6 +834,7 @@ async function loadUserPanel(user){
     
     
 }
+
 async function addConnectedUserPanel(){
 
     
@@ -1100,7 +1100,6 @@ async function loginUser(){
     hideLoader();
 }
 
-
 async function importUser() {
 
     try{
@@ -1239,6 +1238,7 @@ async function loadID() {
         
     hideLoader();
  }
+
 // -------------------- LOAD USER FULL --------------------
 async function loadUser() {
     const input = document.getElementById("userAddrInput");
@@ -2489,8 +2489,9 @@ async function onCapBurn() {
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
         
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-                
-            // get latest base fee
+        
+        
+        // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
