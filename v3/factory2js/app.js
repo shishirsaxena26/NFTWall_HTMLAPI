@@ -1321,11 +1321,13 @@ async function loadMyStor(id, panel) {
             const rankWithAge= await stor.methods.getRankWithAgeValue().call();
             const cage = await stor.methods.cage().call();
             const isLock = await stor.methods.isLock().call();
+            const postInit = await stor.methods.postInit().call();
  
             addRow(panel,"Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
             addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
             addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]}`);
-
+            addRow(panel,"Stor postInit",`postInit: ${postInit}`);
+            
             const tableRg = document.createElement("table");
                 tableRg.border = "1";
                 tableRg.cellPadding = "5";

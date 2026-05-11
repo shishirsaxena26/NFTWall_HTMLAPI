@@ -407,6 +407,7 @@ async function LoadSystemPoolClause() {
 		
 		$("#tabPoolNFT").append('<tr>' + td + '</tr>');
 
+		
 
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let age = await window.nestedcontract.methods.age().call();
@@ -582,6 +583,9 @@ async function loadStructure(n, header) {
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let instance = await window.nestedcontract.methods.UserToInst(n).call();
 	td =td + '<td>' + instance + '</td>';
+	
+	let depth = await window.nestedcontract.methods.getNodeLvlDepth(instance).call();
+	alert(depth);
 	
 	td =td + '<td>' +  web3.utils.fromWei((await web3.eth.getBalance(instance)), 'ether') + '</td>';
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
