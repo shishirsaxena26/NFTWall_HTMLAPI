@@ -1,4 +1,4 @@
-const provider = "https://rpc-testnet.ozonescan.com";
+const provider = "https://chain.ozonescan.com"; // "https://rpc-testnet.ozonescan.com";
 const providerMain = "https://chain.ozonescan.com";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
