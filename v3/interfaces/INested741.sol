@@ -22,6 +22,7 @@ interface INested741 {
     receive() external payable;
 
     function Burn(uint256 amount) external;
+    function TVLrefresh(uint256 _id) external;
     function UserToId(address) external view returns (uint256);
     function _ageNow() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);

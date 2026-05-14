@@ -44,9 +44,9 @@ interface ITransferRequests {
     function importuser(uint256 batchSize) external;
     function owner() external view returns (address);
     function resolveTransferTarget(address to) external view returns (address);
+    function setSysData(uint256 _price, uint256 prevAge, uint256[7] memory _cnt) external;
     function submitTransferForm(address _from, address _to, uint256 _deadline) external;
     function syncBaseAddr() external;
     function syncSystem() external;
     function systemAge() external view returns (uint256);
-    function testTxnSys(address paramAdd, uint256 _id_maxint, uint256 _qty, uint256 _amt) external payable;
 }
