@@ -47,6 +47,10 @@ interface INested741 {
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
     function getDownlineCountByLevel(uint256 uid, uint256 lvl) external view returns (uint256);
     function getHexbase() external view returns (address);
+    function getMoveDownline(uint256 uid)
+        external
+        view
+        returns (uint256 proposalId, uint256 newpid, bool isapproved, bool exist, bool op);
     function getNode(uint256 _id)
         external
         view
