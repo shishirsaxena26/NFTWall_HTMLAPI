@@ -705,7 +705,7 @@ async function onGetDailyBusiness() {
 	let age = await nested.methods.systemAge().call();
     
     document.getElementById("sysAgeid").innerHTML = age;
-	for (let i = age; i>=parseInt(age)-10; i--) {
+	for (let i = age; i>=parseInt(age)-15; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
