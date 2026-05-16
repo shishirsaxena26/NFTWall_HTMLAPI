@@ -13,6 +13,11 @@ interface ISafeguard {
     event EthTransferred(address indexed to, uint256 amount);
     event HexBaseUpdated(address indexed previousHexBase, address indexed newHexBase);
     event OwnerUpdated(address indexed previousOwner, address indexed newOwner);
+    event SafeApproval(address indexed signer, uint256 approvals, uint256 required);
+    event SafeStatusChanged(bool status);
+    event SecureBaseUpdated(address indexed user, bool action);
+    event SignerApproval(address indexed approver, address indexed targetSigner, bool action, uint256 approvals);
+    event SignerUpdated(address indexed targetSigner, bool action);
 
     fallback() external payable;
 
@@ -25,15 +30,25 @@ interface ISafeguard {
     function _isSafe() external view returns (bool);
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
-    function approveSafe(bool action) external;
+    function approveSafe() external;
+    function approveSigner(address targetSigner, bool action) external;
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
     function isSafe() external view returns (bool);
     function isSecureBase(address s) external view returns (bool);
     function isSigner(address s) external view returns (bool);
     function owner() external view returns (address);
-    function safeSecureBaseCallback(address sender, bool action) external;
-    function signerCallback(address _singer, bool action) external;
+    function safeApprovalCount() external view returns (uint256);
+    function safeApproved(uint256, address) external view returns (bool);
+    function safeRound() external view returns (uint256);
+    function safesecurebasecurd(address sender, bool action) external;
+    function signerApproved(uint256, address, address) external view returns (bool);
+    function signerProposal(address)
+        external
+        view
+        returns (bool action, uint256 approvals, bool executed, uint256 round);
+    function signerRound() external view returns (uint256);
     function syncBaseAddr() external;
     function systemAge() external view returns (uint256);
+    function totalSigners() external view returns (uint256);
 }

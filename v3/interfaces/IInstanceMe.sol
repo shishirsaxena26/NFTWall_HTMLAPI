@@ -10,7 +10,6 @@ interface IInstanceMe {
     error ReentrancyGuardReentrantCall();
     error SessionExpired();
     error TargetCallFailed(bytes4 selector);
-    error Unauthorized();
 
     event EthBurned(address indexed sender, uint256 amount);
     event EthTransferred(address indexed to, uint256 amount);
