@@ -42,15 +42,12 @@ interface INested741 {
     function claimIncome(uint256 _id, uint256 _maxint) external returns (uint256, uint256);
     function closemdform(uint256 uid) external;
     function compileRoyality(uint256 prevAge, uint256[7] memory _cnt) external;
-    function createmdform(uint256 uid, uint256 newpid, uint256 proposalId, bool status) external;
+    function createmdform(uint256 uid, uint256 newpid) external;
     function getBalance() external view returns (uint256);
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
     function getDownlineCountByLevel(uint256 uid, uint256 lvl) external view returns (uint256);
     function getHexbase() external view returns (address);
-    function getMoveDownline(uint256 uid)
-        external
-        view
-        returns (uint256 proposalId, uint256 newpid, bool isapproved, bool exist, bool op);
+    function getMoveDownline(uint256 uid) external view returns (uint256 newpid, bool isapproved, bool exist, bool op);
     function getNode(uint256 _id)
         external
         view
