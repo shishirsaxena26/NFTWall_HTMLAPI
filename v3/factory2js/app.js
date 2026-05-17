@@ -1875,7 +1875,7 @@ async function loadProposals() {
             <th>Up</th>
             <th>Dn</th>
             <th>Win</th>
-            <th>Approved</th>
+            <th>Status</th>
             <th>Resolved</th>
             <th>Creator</th>
             <th>Vote</th>
