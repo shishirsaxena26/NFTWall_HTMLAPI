@@ -11,7 +11,6 @@ library InstanceStor {
 }
 
 interface IInstanceStor {
-    error Auth();
     error CallFailed();
     error InvalidAddress();
     error InvalidOp(uint256 code);
@@ -19,7 +18,6 @@ interface IInstanceStor {
     error LimitExceeded(uint256 code);
     error NotAuthorized();
     error NotSafe();
-    error Pause();
     error ReentrancyGuardReentrantCall();
     error TargetCallFailed(bytes4 selector);
 
@@ -94,7 +92,6 @@ interface IInstanceStor {
     function preinit(address _hex, address _own, uint256 _id) external;
     function rank() external view returns (uint256);
     function rankage(uint256) external view returns (uint256);
-    function refreshCap(uint256 maxinterwal) external;
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;

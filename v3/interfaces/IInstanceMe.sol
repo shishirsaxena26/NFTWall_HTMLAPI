@@ -40,6 +40,7 @@ interface IInstanceMe {
     function name() external view returns (string memory);
     function owner() external view returns (address);
     function parent() external view returns (address);
+    function refresh(uint256 _maxinterval) external;
     function setName(string memory _name) external;
     function setParent(address newparent) external;
     function stor() external view returns (address);

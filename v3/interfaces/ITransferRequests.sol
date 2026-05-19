@@ -21,7 +21,6 @@ interface ITransferRequests {
 
     function Burn(uint256 amount) external;
     function UserToForm(address) external view returns (uint256);
-    function UserToWithdrawDollar(address) external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _isDelegatorNode(address sender) external view returns (bool);
@@ -30,6 +29,7 @@ interface ITransferRequests {
     function _isSigner(address sender) external view returns (bool);
     function actualTVL() external view returns (uint256);
     function closeTransferTarget(address to) external;
+    function currentRefreshId() external view returns (uint256);
     function forms(uint256) external view returns (address from, address to);
     function getBalance() external view returns (uint256);
     function getForm(uint256 formId) external view returns (address from, address to);
@@ -41,8 +41,17 @@ interface ITransferRequests {
     function importedNode(uint256) external view returns (address);
     function importuser(uint256 batchSize) external;
     function owner() external view returns (address);
+    function refreshusers(uint256 batchSize, uint256 maxintervals, uint256 lastdays) external;
     function resolveTransferTarget(address to) external view returns (address);
-    function setSysData(uint256 _price, uint256 prevAge, uint256[7] memory _cnt) external;
+    function setsysdata(uint256 _price, uint256 prevAge, uint256[7] memory _cnt) external;
+    function setsysdatawithrefresh(
+        uint256 batchSize,
+        uint256 maxintervals,
+        uint256 lastdays,
+        uint256 _price,
+        uint256 prevAge,
+        uint256[7] memory _cnt
+    ) external;
     function submitTransferForm(address _from, address _to) external;
     function syncBaseAddr() external;
     function syncSystem() external;
