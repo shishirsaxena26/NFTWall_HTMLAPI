@@ -772,6 +772,7 @@ async function loadUserPanel(user){
     }
 
     clearPanels();
+    
     const userPanel = addPanel("User Data");
 
     //const user = "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8";
@@ -779,7 +780,7 @@ async function loadUserPanel(user){
     const node = await nested.methods.getNode(id).call();
     const isdelegator = await nested.methods._isDelegatorNode(user).call();
 
-    addRow(userPanel,"ID",node[0]);
+    addRow(userPanel,"--",node[0]);
     addRow(userPanel,"Node",node[1]);
     addRow(userPanel,"Are you Delegator ", isdelegator);
     addRow(userPanel,"Parent",node[2]);
@@ -1249,6 +1250,9 @@ async function loadUser() {
     }
     
     clearPanels();
+    
+    
+
     const panel = addPanel("User Data");
     try{
         
@@ -1654,7 +1658,43 @@ async function loadDAO() {
                     //+ ' | ProposalsCount: ' + proposalsCount    
                     + '</div>';
 
-        const right=document.createElement("div");
+        const left2=document.createElement("div");
+        const right2=document.createElement("div");
+       
+        const btnChangeParent=document.createElement("button");
+        btnChangeParent.innerText="ChangeParent";
+        btnChangeParent.style.marginLeft="10px";
+        btnChangeParent.onclick = () => {
+              onChangeParent();
+        };
+
+        const btnChangeOwner=document.createElement("button");
+        btnChangeOwner.innerText="ChangeOwner";
+        btnChangeOwner.style.marginLeft="10px";
+        btnChangeOwner.onclick = () => {
+              onChangeOwner();
+        };
+
+        const btnSuspendIncome=document.createElement("button");
+        btnSuspendIncome.innerText="SuspendIncome";
+        btnSuspendIncome.style.marginLeft="10px";
+        btnSuspendIncome.onclick = () => {
+              onSuspendIncome();
+        };
+
+        const btnLockUser=document.createElement("button");
+        btnLockUser.innerText="LockUser";
+        btnLockUser.style.marginLeft="10px";
+        btnLockUser.onclick = () => {
+              onLockuser();
+        };
+
+        
+        left2.appendChild(btnChangeParent);
+        left2.appendChild(btnChangeOwner);
+        left2.appendChild(btnSuspendIncome);
+        left2.appendChild(btnLockUser);
+
         const btnTransferForms=document.createElement("button");
         btnTransferForms.innerText="TransferForms";
         btnTransferForms.style.marginLeft="10px";
@@ -1669,34 +1709,13 @@ async function loadDAO() {
               loadProposals();
         };
          
-        const btnSubmitTrasfer=document.createElement("button");
-        btnSubmitTrasfer.innerText="SubmitTransfer";
-        btnSubmitTrasfer.style.marginLeft="10px";
-        btnSubmitTrasfer.onclick = () => {
-              onSubmitTrasfer();
-        };
 
-        const btnNewProposer=document.createElement("button");
-        btnNewProposer.innerText="NewProposer";
-        btnNewProposer.style.marginLeft="10px";
-        btnNewProposer.onclick = () => {
-              onNewProposer();
-        };
+        right2.appendChild(btnTransferForms);
+        right2.appendChild(btnProposals);
 
-        const btnMovedownlineProposer=document.createElement("button");
-        btnMovedownlineProposer.innerText="Movedownline";
-        btnMovedownlineProposer.style.marginLeft="10px";
-        btnMovedownlineProposer.onclick = () => {
-              onMovedownlineProposer();
-        };
-
-        right.appendChild(btnNewProposer);
-        right.appendChild(btnTransferForms);
-        right.appendChild(btnSubmitTrasfer);
-        right.appendChild(btnProposals);
-        addRow(panel, left, right);
-        addRow(panel, 'ProposalsCount: ' + proposalsCount, btnMovedownlineProposer);
-
+        addRow(panel, left, "");
+        addRow(panel, 'ProposalsCount: ' + proposalsCount, "");
+        addRow(panel, left2, right2);
     } catch (err) {
         console.error(err);
         addRow(panel, "", err.message);
@@ -1714,33 +1733,62 @@ echo "$SUBJECT"
 #send "$PKKEY" "$DAOAssemblyCore" "0" "newProposal(string,address,uint256,bytes,uint256)" "$SUBJECT" "$TARGET" "$VALUE_SUCCESS" "$DATA_SUCCESS" "7" 
 */
 //function setMoveDownlineApproval(uint256 _id, address parent, bool approval)
-async function onNewProposer() {
+async function onChangeOwner() {
      try {
         
-        const ok = confirm("Are you sure you want to execute this transaction?");
+        const olduseraddress = prompt("Enter old User id needs to be changed");
 
-        if(!ok) return;
+        if (olduseraddress !== null && olduseraddress !== "") {
+            if(!nested.method.isUserExists(olduseraddress)) { alert('incorrect address'); return }
+        } else {
+            alert("No User address entered");
+            return;
+        }
+
+        const newuseraddress = prompt("Enter new User id needs to be update");
+
+        if (newuseraddress !== null && newuseraddress !== "") {
+            if(nested.method.isUserExists(newuseraddress)) { alert('already exists'); return }
+        } else {
+            alert("No User address entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["address", "address"],
+            [olduseraddress, newuseraddress]
+        );
 
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
         if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-       
+        
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+        
+        // prepare method
+        const method = daoContract.methods.newProposal(2,ZERO,params,0);
 
-        const SUBJECT = "Trigger.rule.proposal.UpdateMintQty";
-        const TARGET = in741Rule;
-        const DATA_SUCCESS = rule.methods.setMintQty(1, 50000).encodeABI();
-        const VALUE_SUCCESS = 0;
-        const EXPIRE = 7
-        ;
-        const tx = await daoContract.methods
-            .newProposal(SUBJECT,TARGET,VALUE_SUCCESS,DATA_SUCCESS,EXPIRE)
-            .send({
-                from: currentAccount
-            });
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
 
-        if (tx.status) {
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+        
+        if (receipt.status) {
             alert("NewProposer succeeded");
         } else {
             alert("NewProposer failed");
@@ -1753,43 +1801,259 @@ async function onNewProposer() {
     } 
 } 
 
-
-async function onMovedownlineProposer() {
-    try {
+async function onChangeParent() {
+     try {
         
-        const uid = prompt("Enter ID:");
-        if (!uid && parseInt(uid)>0) 
-            throw 'valid ID required';
+        const userId = prompt("Enter User id needs to be moved:");
 
-        const newpid = prompt("Enter new parent ID:");
-        if (!newpid && parseInt(newpid)>0) 
-            throw 'valid ID required';
+        if (userId !== null && userId !== "") {
+            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+        } else {
+            alert("No User ID entered");
+            return;
+        }
 
-        const ok = confirm("Are you sure you want to execute this transaction?");
-        if(!ok) return;
+        const parentId = prompt("Enter parent id needs to be switched:");
+
+        if (parentId !== null && parentId !== "") {
+            if(!nested.method.isNode(parentId)) { alert('incorrect id'); return }
+        } else {
+            alert("No Parent ID entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["uint256", "uint256"],
+            [userId, parentId]
+        );
 
         // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
+        
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+        
+        // prepare method
+        const method = daoContract.methods.newProposal(1,ZERO,params,0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+        
+        if (receipt.status) {
+            alert("NewProposer succeeded");
+        } else {
+            alert("NewProposer failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("NewProposer failed: " + (err.message || err));
+    } 
+} 
+
+async function onSuspendIncome() {
+     try {
+        
+        const userId = prompt("Enter User id needs to be suspend:");
+
+        if (userId !== null && userId !== "") {
+            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+        } else {
+            alert("No User ID entered");
+            return;
+        }
+
+        const incomekey = prompt("Enter Income key:");
+
+        if (incomekey !== null && incomekey !== "") {
+            if(parseInt(incomekey)>=1 && parseInt(incomekey)<=7) { alert('incorrect key'); return }
+        } else {
+            alert("No key entered");
+            return;
+        }
+
+
+        const startstop = prompt("Type- 1:stop | 0:start");
+
+        if (startstop !== null && startstop !== "") {
+            if(parseInt(startstop)>=0 && parseInt(startstop)<=1) { alert('incorrect startstop'); return }
+        } else {
+            alert("No startstop entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["uint256", "bool"],
+            [incomekey, startstop==1]
+        );
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
+        
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const useraddress = nested.methods.nodes(userId);
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+        
+        // prepare method
+        const method = daoContract.methods.newProposal(3,useraddress,params,0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+        
+        if (receipt.status) {
+            alert("NewProposer succeeded");
+        } else {
+            alert("NewProposer failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("NewProposer failed: " + (err.message || err));
+    } 
+} 
+
+async function onLockuser() {
+     try {
+        
+        const userId = prompt("Enter User id needs to be locked:");
+
+        if (userId !== null && userId !== "") {
+            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+        } else {
+            alert("No User ID entered");
+            return;
+        }
+
+        const startstop = prompt("Type- 1:lock | 0:unlocked");
+
+        if (startstop !== null && startstop !== "") {
+            if(parseInt(startstop)>=0 && parseInt(startstop)<=1) { alert('incorrect lock'); return }
+        } else {
+            alert("No lock entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["bool"],
+            [startstop==1]
+        );
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
+        
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const useraddress = nested.methods.nodes(userId);
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+        
+        // prepare method
+        const method = daoContract.methods.newProposal(4,useraddress,params,0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+        
+        if (receipt.status) {
+            alert("NewProposer succeeded");
+        } else {
+            alert("NewProposer failed");
+        }
+       
+
+    } catch (err) {
+        console.error(err);
+        alert("NewProposer failed: " + (err.message || err));
+    } 
+} 
+
+async function onMovedownlineProposer(uid) {
+   
+    try {
+              
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
         if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
     
         const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
-        //Raise  DAO request
-    
-        const tx = await nestedContractT.methods.createmdrequest(uid,newpid).send({ from: currentAccount });
-   
-       //if approved by DAO
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
 
-        // const tx = await nestedContractT.methods.moveDownline(uid).send({ from: currentAccount });
- 
-        if (tx.status) {
-            alert("Movedownline succeeded");
-        } else {
-            alert("Movedownline failed");
-        }
+        // estimate gas
+        const gas = await nestedContractT.methods
+            .moveDownline(uid)
+            .estimateGas({
+                from: currentAccount,
+                value: "0"
+            });
+
+        // send transaction
+        const receipt = await nestedContractT.methods
+            .moveDownline(uid)
+            .send({
+                from: currentAccount,
+                value: "0",
+
+                gas: Math.floor(gas * 1.1), // small buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+            });
        
-
+            if (receipt.status) {
+                alert("Movedownline succeeded");
+            } else {
+                alert("Movedownline failed");
+            }
     } catch (err) {
         console.error(err);
         alert("Movedownline failed: " + (err.message || err));
@@ -1839,27 +2103,6 @@ async function loadProposals() {
         const count = await daocore.methods.getProposalsCount().call();
         
         let limit = 3;
-        /* for (let i = count; i >= 1 && limit>0; i--) {
-                const p = await contract.methods.getProposal(i).call();
-                const r = await contract.methods.getResult(i).call();
-                let sgn =r[5];
-                if(r[4]==4) sgn = "RESOLVE";
-                else if(r[4]==3) sgn = "REJECT";
-                else if(r[4]==2) sgn = "SIGN-APPROVED2";
-                else if(r[4]==1) sgn = "SIGN-APPROVED1";
-                else sgn = "PENDING";
-
-                '<div style="display:flex;align-items:center;gap:8px;">'
-                + ' | ' + p[0] 
-                + ' | ' + r[0] 
-                + ' | ' + r[1]        
-                + ' | ' + r[3]        
-                + ' | DelegatorCount: ' + p[1]            
-                + ' | RankForDAO: ' + p[3]         
-                + ' | BlacklistedCount: ' + sgn    
-                + ' | ' + p[5]       
-                        + '</div>';
-            } */
       
         const table = document.createElement("table");
         table.border = "1";
@@ -1908,8 +2151,7 @@ async function loadProposals() {
             <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
           </td>
           <td>
-            <button class="vote-btn upvote" onclick="execute(${i}, true)">Sign(Y)</button>
-            <button class="vote-btn downvote" onclick="execute(${i}, false)">Sign(N)</button>
+            <button onclick="cancelproposal(${i})">Cancel</button>
           </td>
         `;
         tbody.appendChild(row);
@@ -2338,6 +2580,20 @@ async function loadMyNFT(){
         const lvl = lvlBatch[i];
         addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }
+
+    const getMD = await nested.methods.getMoveDownline(id).call();
+        
+    const caption = getMD.op?"Attach":"Detach";
+
+    const btnMovedownlineProposer=document.createElement("button");
+        btnMovedownlineProposer.innerText="Movedownline"+caption;
+        btnMovedownlineProposer.style.marginLeft="10px";
+        btnMovedownlineProposer.style.display = getMD.exist?"block":"none";
+        btnMovedownlineProposer.onclick = () => {
+              onMovedownlineProposer(id);
+        };
+
+    addRow(levelpanel,"--",btnMovedownlineProposer);
     /*;
     for(let i=0; i<=15; i++){
         
