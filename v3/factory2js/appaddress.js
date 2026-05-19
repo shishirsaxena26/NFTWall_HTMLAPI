@@ -3,7 +3,7 @@ const providerMain = "https://chain.ozonescan.com";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";
-let hexBaseAddress = "0xf72F060724d817BF3bd87c206d9A0120Ee95EF4F";
+let hexBaseAddress = "0xae41797B1AF86b7E79304Da7B173b3dDC33a9Ebb";
 const minBlock = 3884916;
 
 const DEAD = "0x000000000000000000000000000000000000dEaD"
