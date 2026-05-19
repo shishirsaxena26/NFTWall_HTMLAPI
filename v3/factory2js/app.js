@@ -46,6 +46,8 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
+const maxintervals= 30;
+
 const treeData = {
   id: "1",
   address: "0x0089188449F0d4119715c9A10eA8955FB26EE308",
@@ -882,7 +884,7 @@ async function addConnectedUserPanel(){
             currentStor = node[4];
             document.getElementById("walletInst").innerText =
                 "Inst " + shortAddr(currentInstance);
-            debugger;
+            
             const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);  
             if(await instan.methods.validateToken().call()) {
 
@@ -1062,15 +1064,16 @@ async function loginUser(){
             currentInstance
         );
 
+        
         instancecontract.methods.owner().call(console.log);
         instancecontract.methods.getHexbase().call(console.log);
         
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+        
         // estimate gas
         const gas = await instancecontract.methods
-            .login(50)
+            .login(maxintervals)
             .estimateGas({
                 from: currentAccount,
                 value: "0"
@@ -1078,7 +1081,7 @@ async function loginUser(){
 
         // send transaction
         const receipt = await instancecontract.methods
-            .login(50)
+            .login(maxintervals)
             .send({
                 from: currentAccount,
                 value: "0",
@@ -1095,8 +1098,9 @@ async function loginUser(){
         await addConnectedUserPanel();
 
     }catch(e){
-        console.log(e);
-        alert("Login failed: " + (err.message || err));
+        
+        
+        alert("Login failed: " + (err.message));
     }
     hideLoader();
 }
@@ -1393,7 +1397,7 @@ async function loadMyStor(id, panel) {
             debugger
             let compute;
             try {
-                compute = await stor.methods.getAllData(6,50).call();
+                compute = await stor.methods.getAllData(6,maxintervals).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -1403,7 +1407,7 @@ async function loadMyStor(id, panel) {
             console.log(`compute: `  + compute);
             let computeFlush;
             try {
-                computeFlush = await stor.methods.getAllData(7,50).call();
+                computeFlush = await stor.methods.getAllData(7,maxintervals).call();
             } catch (err) {
                 console.error("❌ computeFlush() failed:", err.message);
 
@@ -1413,7 +1417,7 @@ async function loadMyStor(id, panel) {
 
             let capstatus;
             try {
-                capstatus = await stor.methods.getAllData(8,50).call();
+                capstatus = await stor.methods.getAllData(8,maxintervals).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
@@ -1512,7 +1516,7 @@ async function loadMyStor(id, panel) {
 
             });*/
            
-            debugger;
+            
            
             
             const amountOzone = await rule.methods.computeDollarToOzone(capstatus[6].toString()).call();
@@ -1643,7 +1647,7 @@ async function loadDAO() {
         addRow(panel,"DAO Assembly",indaoassembly);
 
         const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
-        debugger;
+        
         const rankforDAO = await rule.methods.rankforDAO().call();
       
         // const blacklistedCount = await daoassembly.methods.blacklistedCount().call();
@@ -2826,15 +2830,15 @@ async function onClaim() {
 
         // estimate gas
         const gas = await instancecontract.methods
-            .Txn(ZERO, 49, 0, 7)
+            .Txn(ZERO, maxintervals, 0, 7)
             .estimateGas({
                 from: accounts[0],
                 value: "0"
             });
-
+                                  
         // send tx
         const receipt = await instancecontract.methods
-            .Txn(ZERO, 49, 0, 7)
+            .Txn(ZERO, maxintervals, 0, 7)
             .send({
                 from: accounts[0],
                 value: "0",
