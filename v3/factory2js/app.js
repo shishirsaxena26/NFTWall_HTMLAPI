@@ -639,7 +639,7 @@ async function loadSystemTreasuriesNSecurebase(){
     <th>Day</th><th>Business</th><th>Withdrawn</th><th>Joining</th>
     <th>Ct0</th><th>Ct1</th><th>Ct2</th><th>Ct3</th>
     <th>Ct4</th><th>Ct5</th><th>Ct6</th><th>Ct7</th>
-    <th>Royal3-2</th><th>Royal5-4</th><th>Royal7</th>
+    <th>Royal3</th><th>Royal5</th><th>Royal7</th>
     </tr>
     </thead>
     <tbody id="tabDBBody"></tbody>
@@ -707,7 +707,7 @@ async function onGetDailyBusiness() {
 	let age = await nested.methods.systemAge().call();
     
     document.getElementById("sysAgeid").innerHTML = age;
-	for (let i = age; i>=parseInt(age)-15; i--) {
+	for (let i = parseInt(age)+1; i>=parseInt(age)-15; i--) {
 		let b = await nested.methods.getbusiness(i).call();
 		let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
@@ -755,7 +755,7 @@ async function onGetDailyBusiness() {
         console.log(`constRoyal: ${constRoyal}`);
 		document.getElementById("tabDBBody")
         .insertAdjacentHTML("beforeend",
-            '<tr><td>'+`${getAgeDateRange(i).start} {${i}}`+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[1].toString()+'</td><td>'+constRoyal[3].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
+            '<tr><td>'+`${getAgeDateRange(i).start} {${i}}`+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[2].toString()+'</td><td>'+constRoyal[4].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
         );
 	}	
 
