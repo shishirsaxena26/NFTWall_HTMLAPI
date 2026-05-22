@@ -42,15 +42,16 @@ interface ITransferRequests {
     function importuser(uint256 batchSize) external;
     function owner() external view returns (address);
     function refreshusers(uint256 batchSize, uint256 maxintervals, uint256 lastdays) external;
+    function resolveParent(address) external view returns (address);
     function resolveTransferTarget(address to) external view returns (address);
-    function setsysdata(uint256 _price, uint256 prevAge, uint256[7] memory _cnt) external;
+    function setsysdata(uint256 price, uint256 prevAge, uint256[7] memory cnt) external;
     function setsysdatawithrefresh(
         uint256 batchSize,
         uint256 maxintervals,
         uint256 lastdays,
-        uint256 _price,
+        uint256 price,
         uint256 prevAge,
-        uint256[7] memory _cnt
+        uint256[7] memory cnt
     ) external;
     function submitTransferForm(address _from, address _to) external;
     function syncBaseAddr() external;

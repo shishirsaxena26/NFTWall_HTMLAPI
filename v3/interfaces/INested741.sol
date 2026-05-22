@@ -63,8 +63,9 @@ interface INested741 {
     function getNodeChild(uint256 _id, uint256 inx) external view returns (uint256 child);
     function getNodeDirectsCount(uint256 _id) external view returns (uint256 count);
     function getNodeInstStor(uint256 _id) external view returns (address _inst, address _stor);
-    function getNodeParent(address _user) external view returns (uint256, address);
+    function getNodeParent(address _user) external view returns (address);
     function getNodeParentId(uint256 _id) external view returns (uint256);
+    function getNodeParentwithId(address _user) external view returns (uint256, address);
     function getNodesCount() external view returns (uint256 nodesCount);
     function getRoyalityAmountBatch(uint256 ag) external view returns (uint256[7] memory royal);
     function getTeamSize(uint256 uid) external view returns (uint256);
