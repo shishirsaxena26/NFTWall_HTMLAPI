@@ -36,7 +36,6 @@ interface IInstanceStor {
     function LSB(uint256, uint256) external view returns (int256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
-    function _importOld(uint256 limit) external payable;
     function _isDelegatorNode(address sender) external view returns (bool);
     function _isSafe() external view returns (bool);
     function _isSecureBase(address sender) external view returns (bool);
@@ -81,6 +80,7 @@ interface IInstanceStor {
     function getToggleAgeCount(uint256 key) external view returns (uint256);
     function getToggleAgeValue(uint256 key, uint256 index) external view returns (uint256);
     function id() external view returns (uint256);
+    function importOld(uint256 limit) external payable;
     function isLock() external view returns (bool);
     function mintCount() external view returns (uint256);
     function mints(uint256) external view returns (uint256 amt, uint256 qty, uint256 mage, address nft);
