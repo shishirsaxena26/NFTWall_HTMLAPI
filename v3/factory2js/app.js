@@ -2125,7 +2125,7 @@ async function loadProposals() {
             <th>Win</th>
             <th>Status</th>
             <th>Resolved</th>
-            <th>Creator</th>
+            <th>params</th>
             <th>Vote</th>
             <th>Sign</th>
         </tr>
