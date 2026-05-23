@@ -61,7 +61,7 @@ interface IDAOCore {
     function getProposal(uint256 proposalId)
         external
         view
-        returns (string memory, address, uint256, address, bool, uint256);
+        returns (string memory, address, uint256, address, bool, uint256, bytes memory);
     function getProposalsCount() external view returns (uint256);
     function getResult(uint256 proposalId) external view returns (uint256, uint256, uint256, uint256, bool, bool);
     function getStatus(uint256 proposalId) external view returns (bool, bool);

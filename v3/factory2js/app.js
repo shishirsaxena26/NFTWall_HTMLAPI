@@ -691,9 +691,9 @@ async function onSetDefaultRankCount() {
     });
 
     if (tx.status) {
-        alert("ExecuteRoyality succeeded");
+        alert("setDefaultRankCount succeeded");
     } else {
-        alert("ExecuteRoyality failed");
+        alert("setDefaultRankCount failed");
     }
 }
 
