@@ -130,7 +130,7 @@ async function load(){
 }
 
 async function init(){
-    debugger;
+    
     //scanBlocks(50); // scan last 20 blocks
     IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
     ISafeguardABI = await fetch('abistandardv3/libSafeguard.sol/libSafeguard.json?v='+version).then(res => res.json());
@@ -145,45 +145,45 @@ async function init(){
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v='+version).then(res => res.json());
     INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v='+version).then(res => res.json());
     IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v='+version).then(res => res.json());
-     debugger;
+     
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
-    debugger;
+    
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
     sysAge = await nested.methods.systemAge().call();
     document.getElementById("sysAgeid").innerHTML = sysAge;
-debugger;
+
     in741Rule = await hexBase.methods.in741Rule().call();
     rule = new web3.eth.Contract(I741RulesABI.abi, in741Rule);
-debugger;
+
     insafeguard = await hexBase.methods.insafeguard().call();
     safeguard = new web3.eth.Contract(ISafeguardABI.abi, insafeguard);
-debugger;
+
     indaocore = await hexBase.methods.daocore().call();
     daocore = new web3.eth.Contract(IDAOCoreABI.abi, indaocore);
-debugger;
+
     indaoassembly = await hexBase.methods.daoassembly().call();
     daoassembly = new web3.eth.Contract(IDAOAssemblyABI.abi, indaoassembly);
-    debugger;
+    
     inInstanceMe = await hexBase.methods.inInstance().call();
     instanceme = new web3.eth.Contract(IInstanceMeABI.abi,inInstanceMe);
-debugger;
+
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-    debugger;
+    
     inPrice  = await hexBase.methods.inPrice().call();
     price = new web3.eth.Contract(IPriceABI.abi, inPrice);
     console.log("💰 Ozone Price in USDT:", 
         await price.methods.ozonePriceInUSDT().call()
     );
-debugger;
+
     invalidator = await hexBase.methods.invalidator().call();
     validator = new web3.eth.Contract(IValidatorsABI.abi, invalidator);
-   debugger;
+   
     inNftProxy = await hexBase.methods.inNftProxy().call();
     nftProxy = new web3.eth.Contract(INFTProxyABI.abi, inNftProxy);
-    debugger;
+    
     currentAccount = null;
     currentInstance = null;
     currentStor = null;
@@ -197,7 +197,7 @@ debugger;
             }
         });
     }
-   debugger;
+   
     hideLoader();
     //name(); 
     //debugTransaction();
@@ -2023,7 +2023,8 @@ async function onLockuser() {
 async function onMovedownlineProposer(uid) {
    
     try {
-              
+        
+          
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
         if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
@@ -2032,15 +2033,10 @@ async function onMovedownlineProposer(uid) {
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+ debugger;
         // estimate gas
-        const gas = await nestedContractT.methods
-            .moveDownline(uid)
-            .estimateGas({
-                from: currentAccount,
-                value: "0"
-            });
-
+        const gas = 9999999;
+ 
         // send transaction
         const receipt = await nestedContractT.methods
             .moveDownline(uid)
