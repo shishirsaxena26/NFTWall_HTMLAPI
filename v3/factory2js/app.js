@@ -2139,14 +2139,14 @@ async function loadProposals() {
         row.innerHTML = `
           <td>${i}</td>
           <td title="${p[0]}">${p[0]}</td>
-          <td class="shortAddr" title="${p[1]}">${shortAddr(p[1])}</td>
+          <td class="shortAddr " title="${p[1]}">${shortAddr(p[1])}</td>
           
           <td>${r[0]}</td>
           <td>${r[1]}</td>
           <td>${r[3]}</td>
           <td>${r[4]}</td>
           <td>${approve}</td>
-          <td class="shortAddr" title="${p[5]}">${shortAddr(p[3])}</td>
+          <td class="shortAddr paramsCell" title="${p[5]}">${p[6]}</td>
           <td>
             <button class="vote-btn upvote" onclick="vote(${i}, true)">Vote(Y)</button>
             <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
