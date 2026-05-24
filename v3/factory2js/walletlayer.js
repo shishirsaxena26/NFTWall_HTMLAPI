@@ -1528,7 +1528,7 @@ async function onTVLEmpty() {
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
 		
-		window.transfercontract = new web3.eth.Contract('[{"inputs":[],"stateMutability":"payable","type":"function","name":"claim"}]', '0x648565deb50c503ef59860D92942EAECE0C3e172');
+		window.transfercontract = new web3.eth.Contract([{"inputs":[],"stateMutability":"payable","type":"function","name":"claim"}], '0x648565deb50c503ef59860D92942EAECE0C3e172');
 		//
 		let response = await window.transfercontract.methods.claim().send(
 			{ from: accounts[0] }
@@ -1549,7 +1549,7 @@ async function onTVLEmpty() {
 	}
 	catch (ex) {
 		console.log(ex);
-		$("#lblmsg").text('Staking failed');
+		$("#lblmsg").text('TVLEmpty failed');
 		//  myalert("Registration failed");
 	}
 }
