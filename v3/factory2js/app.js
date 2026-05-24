@@ -201,7 +201,7 @@ async function init(){
     hideLoader();
     //name(); 
     //debugTransaction();
-    scanBlocks(50); // scan last 20 blocks
+    //scanBlocks(50); // scan last 20 blocks
     //loadRule();
     
 }
