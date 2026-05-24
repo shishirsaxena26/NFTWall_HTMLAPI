@@ -1484,11 +1484,11 @@ async function onSetFreeIntervals()
 async function onClaim() {
 	$("#lblmsg").text('');
 	try {
-
+debugger;
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
 		
-		if (!(await isUser(n))) 
+		if (!(await isUser(accounts[0]))) 
 		{ msg('user not found.'); return; }
 	
 		
