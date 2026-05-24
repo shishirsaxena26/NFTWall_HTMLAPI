@@ -305,6 +305,11 @@ async function LoadRules()
 	let shutdown = await window.ruleContract.methods.shutdown().call();
 	$('#shutdown').text(`Shutdown: `+ shutdown);
 
+	
+	window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
+	let isSafe = await window.safecontract.methods.isSafe().call();
+	$('#isSafe').text(`isSafe: `+ isSafe);
+
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let freeIntervals = await window.ruleContract.methods.freeIntervals().call();
 	$('#freeIntervals').text(`FreeIntervals: `+ freeIntervals);
