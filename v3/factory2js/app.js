@@ -201,7 +201,7 @@ async function init(){
     hideLoader();
     //name(); 
     //debugTransaction();
-    //scanBlocks(50); // scan last 20 blocks
+    scanBlocks(50); // scan last 20 blocks
     //loadRule();
     
 }
@@ -249,7 +249,7 @@ async function _callpayload(){
 
 async function scanBlocks(limit = 10) {
 
-
+debugger;
   const latestBlock = await web3.eth.getBlockNumber();
   //console.log("Latest Block:", latestBlock);
 
