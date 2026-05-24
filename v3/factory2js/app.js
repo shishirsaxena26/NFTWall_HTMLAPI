@@ -685,7 +685,7 @@ async function onSetDefaultRankCount() {
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
     
     const tx = await nestedContractV1.methods
-        .setDefaultRankCount(200)
+        .setDefaultRankCount(350)
         .send({
             from: accounts[0]
     });

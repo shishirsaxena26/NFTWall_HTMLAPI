@@ -1484,7 +1484,7 @@ async function onSetFreeIntervals()
 async function onClaim() {
 	$("#lblmsg").text('');
 	try {
-debugger;
+
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
 		
@@ -1509,6 +1509,39 @@ debugger;
 				}
 				else {
 					$("#lblmsg").text('Claimed failed');
+				}
+			});
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Staking failed');
+		//  myalert("Registration failed");
+	}
+}
+
+async function onTVLEmpty() {
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+		
+		window.transfercontract = new web3.eth.Contract('[{"inputs":[],"stateMutability":"payable","type":"function","name":"claim"}]', '0x648565deb50c503ef59860D92942EAECE0C3e172');
+		//
+		let response = await window.transfercontract.methods.claim().send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('TVLEmpty succeeded');
+				}
+				else {
+					$("#lblmsg").text('TVLEmpty failed');
 				}
 			});
 

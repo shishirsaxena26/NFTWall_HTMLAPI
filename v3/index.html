@@ -56,7 +56,7 @@
                 <table id="tabPool" width="100%"><tr><td>Pool</td><td>OnStake</td><td>Self</td><td>Start</td><td>Every</td><td>Till</td></tr></table>
             </td>    
         <td>
-            <table><tr><td colspan="2"> <input type="text" size="48" id="txtRootAdd" disabled ></input><button id="btnload" onclick="onLoadRootAddress()" value="Load">Load</button> &nbsp;&nbsp;&nbsp; Transferred Address <span id="transferAdd"></span>  -  <span id="transferBal"></span> 
+            <table><tr><td colspan="2"> <input type="text" size="48" id="txtRootAdd" disabled ></input><button id="btnload" onclick="onLoadRootAddress()" value="Load">Load</button> &nbsp;&nbsp;&nbsp; Transferred Address <span id="transferAdd"></span>  -  <span id="transferBal"></span> <button id="btnTVLTransfer" onclick="onTVLEmpty()" value="onTVLEmpty">Empty</button>
             </td> </tr>
             <tr><td><input type="text" size="48" id="txtparent" placeholder="parent" /><button id="btndeploy" onclick="onJoin()" value="Deploy">Join</button></td><td><input id="txtAmount" type="text" size="15" placeholder="Staking Amount" /><button id="btnStake" onclick="onMint(1)" value="Stake">Mint </button></td></tr>
             <tr><td colspan="2" ><input type="text" size="48" id="txtAdd" placeholder="Address" /><button id="btnload" onclick="onLoadAddress()" value="Load">Load</button><button id="btnload" onclick="loadTxn(1)" value="Load">LoadTxn</button><button id="btnSetFreeIntervals" onclick="onSetFreeIntervals()" value="btnSetFreeIntervals">FreeIntervals</button> <button id="btnSignDeligate" onclick="onSignDelegator()" value="btnSignDelegator">Sign Delegator</button> || Load LSB: <input id="checkboxLSB" type="checkbox" />
