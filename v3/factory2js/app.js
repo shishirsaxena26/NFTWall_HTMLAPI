@@ -1407,19 +1407,6 @@ async function loadMyStor(id, panel) {
             }
             console.log(`compute: `  + compute);
            
-
-            let capstatus;
-            try {
-                capstatus = await stor.methods.getAllData(8,maxintervals).call();
-            } catch (err) {
-                console.error("❌ compute() failed:", err.message);
-
-                // Fallback → prevent UI break
-                capstatus = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-            }
-            console.log(`capstatus: `  + capstatus);
-            
-           
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
@@ -1512,7 +1499,8 @@ async function loadMyStor(id, panel) {
             
             debugger;
             
-            const amountOzone = await rule.methods.computeDollarToOzone(capstatus[6].toString()).call();
+            const minpaydollartozonewei = await rule.methods.computeDollarToOzone(compute.minpaydollar.toString()).call();
+            const minpaydollartozone = formatOZN(minpaydollartozonewei);
         
             addRow(panel, "CAP",  compute.cap);
              
@@ -1534,7 +1522,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(compute.thresholdollarx),
                 formatOZN(compute.totIncdollar),
                 formatOZN(consts[3]),
-                parseFloat(formatOZN(compute.minpaydollar)),
+                parseFloat(formatOZN(compute.minpaydollar)) + '('+minpaydollartozone+')',
                 compute.capinc
             ]));
 
