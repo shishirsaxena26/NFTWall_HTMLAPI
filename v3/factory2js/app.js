@@ -1427,7 +1427,7 @@ async function loadMyStor(id, panel) {
             }
             console.log(`capstatus: `  + capstatus);
             
-
+            debugger;
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
@@ -1532,6 +1532,7 @@ async function loadMyStor(id, panel) {
                 "Threshold_3X_Dollar",
                 "TotalInc_Dollar",
                 "Claimed_Dollar",
+                "MinPay_Dollar",
                 "CAP_STATUS"
             ]));
 
@@ -1541,6 +1542,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(capstatus[3]),
                 formatOZN(capstatus[2]),
                 formatOZN(consts[3]),
+                parseFloat(formatOZN(capstatus[6])),
                 (parseFloat(formatOZN(capstatus[2]))>parseFloat(formatOZN(capstatus[3])))
             ]));
 
@@ -1549,6 +1551,7 @@ async function loadMyStor(id, panel) {
                 "BURNED",
                 "Threshold_3X",
                 "TotalInc",
+                "MinPay",
                 "CAP_STATUS"
             ]));
 
@@ -1557,6 +1560,7 @@ async function loadMyStor(id, panel) {
                 consts[0],
                 formatOZN(capstatus[1]),
                 formatOZN(capstatus[0]),
+                parseFloat(formatOZN(capstatus[5])),
                 (parseFloat(formatOZN(capstatus[0]))>parseFloat(formatOZN(capstatus[1])))
             ]));
 
