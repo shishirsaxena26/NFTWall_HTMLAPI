@@ -2,6 +2,33 @@
 pragma solidity ^0.8.4;
 
 library InstanceStor {
+    struct ComputeResult {
+        uint256 p1;
+        uint256 p2;
+        uint256 p3;
+        uint256 p4;
+        uint256 p5;
+        uint256 p6;
+        uint256 p7;
+        uint256 f1;
+        uint256 f2;
+        uint256 f3;
+        uint256 f4;
+        uint256 f5;
+        uint256 f6;
+        uint256 f7;
+        int256 lsb;
+        uint256 totInc;
+        uint256 thresholdx;
+        uint256 totIncdollar;
+        uint256 thresholdollarx;
+        uint256 minpay;
+        uint256 minpaydollar;
+        bool cap;
+        bool capinc;
+        bool capdollar;
+    }
+
     struct LevelInfoStr {
         uint256 lvlbs;
         uint256 lvlqty;
@@ -63,10 +90,10 @@ interface IInstanceStor {
         external
         view
         returns (uint256 multiple, uint256 multipledollar, bool rw, bool ry, bool self, bool yei);
-    function currentCycle() external view returns (uint256);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
     function directsCount() external view returns (uint256);
+    function getAllComputeData(uint256 maxinterwal) external view returns (InstanceStor.ComputeResult memory cr);
     function getAllData(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
     function getBalance() external view returns (uint256);
     function getHexbase() external view returns (address);
@@ -91,7 +118,6 @@ interface IInstanceStor {
     function postInit() external view returns (bool);
     function preinit(address _hex, address _own, uint256 _id) external;
     function rank() external view returns (uint256);
-    function rankage(uint256) external view returns (uint256);
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
