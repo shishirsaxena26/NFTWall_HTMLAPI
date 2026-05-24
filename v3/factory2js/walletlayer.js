@@ -1,3 +1,7 @@
+
+//const provider = "https://chain.ozonescan.com"; // "https://rpc-testnet.ozonescan.com";
+//const provider = "https://chain.ozonescan.com";
+
 function copyAddress(element) {
     const fullAddress = element.getAttribute("data-full");
     navigator.clipboard.writeText(fullAddress).then(() => {
@@ -290,6 +294,7 @@ async function onGetDailyBusiness(){
 
 async function LoadRules()
 {
+	debugger
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	
 	let ozn = await window.ruleContract.methods.ozoneprice().call();
@@ -1125,6 +1130,7 @@ async function onAddOwnerReset()
 
 async function onApprove(i)
 {
+	debugger;
 		if(i==1) onApprove1();
 		if(i==2) onApprove2();
 		if(i==3) onApprove3();
@@ -1141,7 +1147,7 @@ async function onApprove1() {
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
-
+debugger;
 		let response = await window.safecontract.methods.approveByV1(true).send(
 			{ from: account }
 		)
