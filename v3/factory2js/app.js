@@ -249,7 +249,7 @@ async function _callpayload(){
 
 async function scanBlocks(limit = 10) {
 
-debugger;
+
   const latestBlock = await web3.eth.getBlockNumber();
   //console.log("Latest Block:", latestBlock);
 
@@ -1395,26 +1395,18 @@ async function loadMyStor(id, panel) {
             const unpaid = await stor.methods.getAllData(3,0).call();
             const misc = await stor.methods.getAllData(4,0).call();
             const consts = await stor.methods.getAllData(5,0).call();
-            debugger
+            
             let compute;
             try {
-                compute = await stor.methods.getAllData(6,maxintervals).call();
+                compute = await stor.methods.getAllComputeData(maxintervals).call();
             } catch (err) {
                 console.error("❌ compute() failed:", err.message);
 
                 // Fallback → prevent UI break
-                compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+                //compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
             console.log(`compute: `  + compute);
-            let computeFlush;
-            try {
-                computeFlush = await stor.methods.getAllData(7,maxintervals).call();
-            } catch (err) {
-                console.error("❌ computeFlush() failed:", err.message);
-
-                // Fallback → prevent UI break
-                computeFlush = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-            }
+           
 
             let capstatus;
             try {
@@ -1427,15 +1419,15 @@ async function loadMyStor(id, panel) {
             }
             console.log(`capstatus: `  + capstatus);
             
-            debugger;
+           
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
             addRow(panel, "Income Type", formatRow(["Compute","ComputeFlush","Drawn","Flushed","Unpaid"]));
 
             for (let i = 0; i < 7; i++) {
-                const comp = formatOZN(compute[i]);
-                const compFlush = formatOZN(computeFlush[i]);
+                const comp = formatOZN(compute[`p${i+1}`]);
+                const compFlush = formatOZN(compute[`f${i+1}`]);
                 const drwn = formatOZN(drawn[i]);
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
@@ -1453,7 +1445,7 @@ async function loadMyStor(id, panel) {
             }
 
 
-            
+             
             const toggleAgeListdiv =document.createElement("div");
             toggleAgeListdiv.style.display = "-webkit-inline-box";
             toggleAgeListdiv.style.alignItems = "center";
@@ -1518,11 +1510,11 @@ async function loadMyStor(id, panel) {
             });*/
            
             
-           
+            debugger;
             
             const amountOzone = await rule.methods.computeDollarToOzone(capstatus[6].toString()).call();
         
-            addRow(panel, "CAP",  capstatus[4]==1);
+            addRow(panel, "CAP",  compute.cap);
              
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
 
@@ -1539,11 +1531,11 @@ async function loadMyStor(id, panel) {
             addRow(panel, "..", formatRow([
                 consts[2],
                 consts[1],
-                formatOZN(capstatus[3]),
-                formatOZN(capstatus[2]),
+                formatOZN(compute.thresholdollarx),
+                formatOZN(compute.totIncdollar),
                 formatOZN(consts[3]),
-                parseFloat(formatOZN(capstatus[6])),
-                (parseFloat(formatOZN(capstatus[2]))>parseFloat(formatOZN(capstatus[3])))
+                parseFloat(formatOZN(compute.minpaydollar)),
+                compute.capinc
             ]));
 
             addRow(panel, "CAP OZONE", formatRow([
@@ -1558,10 +1550,10 @@ async function loadMyStor(id, panel) {
             addRow(panel, "..", formatRow([
                 formatOZN(lvlBatch[0][0]),
                 consts[0],
-                formatOZN(capstatus[1]),
-                formatOZN(capstatus[0]),
-                parseFloat(formatOZN(capstatus[5])),
-                (parseFloat(formatOZN(capstatus[0]))>parseFloat(formatOZN(capstatus[1])))
+                formatOZN(compute.thresholdx),
+                formatOZN(compute.totInc),
+                parseFloat(formatOZN(compute.minpay)),
+                compute.capdollar
             ]));
 
             // Burned & Self Proposed
@@ -2037,7 +2029,7 @@ async function onMovedownlineProposer(uid) {
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
- debugger;
+ 
         // estimate gas
         const gas = 9999999;
  
