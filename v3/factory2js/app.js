@@ -1502,6 +1502,10 @@ async function loadMyStor(id, panel) {
             const minpaydollartozonewei = await rule.methods.computeDollarToOzone(compute.minpaydollar.toString()).call();
             const minpaydollartozone = formatOZN(minpaydollartozonewei);
         
+            const totincdollartozonewei = await rule.methods.computeDollarToOzone(compute.totIncdollar.toString()).call();
+            const totincdollartozone = formatOZN(totincdollartozonewei);
+        
+
             addRow(panel, "CAP",  compute.cap);
              
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
@@ -1520,7 +1524,7 @@ async function loadMyStor(id, panel) {
                 consts[2],
                 consts[1],
                 formatOZN(compute.thresholdollarx),
-                formatOZN(compute.totIncdollar),
+                formatOZN(compute.totIncdollar) + '('+totincdollartozone+')',
                 formatOZN(consts[3]),
                 parseFloat(formatOZN(compute.minpaydollar)) + '('+minpaydollartozone+')',
                 compute.capdollar
