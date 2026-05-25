@@ -1523,7 +1523,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(compute.totIncdollar),
                 formatOZN(consts[3]),
                 parseFloat(formatOZN(compute.minpaydollar)) + '('+minpaydollartozone+')',
-                compute.capinc
+                compute.capdollar
             ]));
 
             addRow(panel, "CAP OZONE", formatRow([
@@ -1541,7 +1541,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
                 parseFloat(formatOZN(compute.minpay)),
-                compute.capdollar
+                compute.capinc
             ]));
 
             // Burned & Self Proposed
