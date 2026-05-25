@@ -5,7 +5,7 @@ const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";
 
 //✅ 
-let hexBaseAddress = "0xcae9b83d1cEec9af92a393C14EE2c366CAc68EE9";
+let hexBaseAddress = "0x797A77b6035fE41e16c6f66d16047a1313F59889";
 
 const minBlock = 3884916;
 
