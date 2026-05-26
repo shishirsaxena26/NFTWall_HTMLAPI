@@ -1535,6 +1535,7 @@ async function loadMyStor(id, panel) {
                 "BURNED",
                 "Threshold_3X",
                 "TotalInc",
+                "Claimed",
                 "MinPay",
                 "CAP_STATUS"
             ]));
@@ -1544,6 +1545,7 @@ async function loadMyStor(id, panel) {
                 consts[4],
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
+                 formatOZN(consts[2]),
                 parseFloat(formatOZN(compute.minpay)),
                 compute.capinc
             ]));
