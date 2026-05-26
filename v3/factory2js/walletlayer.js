@@ -168,6 +168,12 @@ async function pageload() {
 			$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
 		}
 	
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	debugger;
+	let ins1 = await nestedcontract.methods.getNodeByIndex(103547).call(console.log);
+	let ins2 = await nestedcontract.methods.getNodeByIndex(103546).call(console.log);
+	await nestedcontract.methods.InstToUser(ins1).call(console.log);
+	await nestedcontract.methods.InstToUser(ins2).call(console.log);
 }
 var profilecontract;
 var t = web3.eth.getChainId(console.log);
@@ -369,6 +375,8 @@ async function LoadSystemRankClause() {
 		
 
 		$("#tabRank").append('<tr>' + td + '</tr>');
+	
+
 	}
 }
 async function LoadSystemLevelClause() {
