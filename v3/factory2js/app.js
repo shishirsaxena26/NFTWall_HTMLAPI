@@ -2732,11 +2732,14 @@ async function onCapBurn() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
+            throw "Incorrect account selected";
+        }
+        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
        
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
         
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        const amountDollarReverse = await rule.methods.computeOzoneToDollar(amountOzone).call();
         
         
         // get latest base fee
@@ -2752,13 +2755,13 @@ async function onCapBurn() {
         // estimate gas
         const gas = await method.estimateGas({
             from: currentAccount,
-            value: amountOzone.toString()
+            value: amountOzone
         });
 
         // send tx
         const receipt = await method.send({
             from: currentAccount,
-            value: amountOzone.toString(),
+            value: amountOzone,
 
             gas: Math.floor(gas * 1.1),
 
