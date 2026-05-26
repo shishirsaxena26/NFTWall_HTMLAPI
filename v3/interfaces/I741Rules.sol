@@ -41,10 +41,7 @@ interface I741Rules {
         external
         view
         returns (address target1, uint256 roiN1, uint256 roiD1, address target2, uint256 roiN2, uint256 roiD2);
-    function capping()
-        external
-        view
-        returns (uint256 multiple, uint256 multipledollar, bool rw, bool ry, bool self, bool yei);
+    function capping() external view returns (uint256 multiple, uint256 multipledollar);
     function computeDollarToOzone(uint256 _dollar) external view returns (uint256);
     function computeMintValue(uint256 _qty) external view returns (uint256);
     function computeOzoneToDollar(uint256 _ozone) external view returns (uint256);
@@ -102,7 +99,7 @@ interface I741Rules {
         uint256 _roiN2,
         uint256 _roiD2
     ) external;
-    function setCapping(uint256 _multiple, uint256 _multipledollar, bool _rw, bool _ry, bool _self, bool _yei) external;
+    function setCapping(uint256 _multiple, uint256 _multipledollar) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setCoinPool(
         uint256 _start,

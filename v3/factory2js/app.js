@@ -1521,8 +1521,8 @@ async function loadMyStor(id, panel) {
             ]));
 
             addRow(panel, "..", formatRow([
-                consts[2],
                 consts[1],
+                consts[5],
                 formatOZN(compute.thresholdollarx),
                 formatOZN(compute.totIncdollar) + '('+totincdollartozone+')',
                 formatOZN(consts[3]),
@@ -1541,7 +1541,7 @@ async function loadMyStor(id, panel) {
 
             addRow(panel, "..", formatRow([
                 formatOZN(lvlBatch[0][0]),
-                consts[0],
+                consts[4],
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
                 parseFloat(formatOZN(compute.minpay)),

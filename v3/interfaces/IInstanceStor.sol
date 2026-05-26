@@ -40,14 +40,21 @@ library InstanceStor {
 interface IInstanceStor {
     error CallFailed();
     error InvalidAddress();
-    error InvalidOp(uint256 code);
     error InvalidState();
-    error LimitExceeded(uint256 code);
     error NotAuthorized();
     error NotSafe();
     error ReentrancyGuardReentrantCall();
     error TargetCallFailed(bytes4 selector);
 
+    event CapReset(
+        uint256 invested,
+        uint256 claimed,
+        uint256 claimedDollar,
+        uint256 investedDollar,
+        uint256 burned,
+        uint256 burnedDollar,
+        uint256 ag
+    );
     event EthBurned(address indexed sender, uint256 amount);
     event EthTransferred(address indexed to, uint256 amount);
     event HexBaseUpdated(address indexed previousHexBase, address indexed newHexBase);
@@ -86,10 +93,6 @@ interface IInstanceStor {
     ) external returns (uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
-    function capping()
-        external
-        view
-        returns (uint256 multiple, uint256 multipledollar, bool rw, bool ry, bool self, bool yei);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
     function directsCount() external view returns (uint256);
@@ -116,12 +119,12 @@ interface IInstanceStor {
         returns (uint256 lastrnk, uint256 currentrnk);
     function owner() external view returns (address);
     function postInit() external view returns (bool);
-    function preinit(address _hex, address _own, uint256 _id) external;
+    function preinit(address _hex, address _own, uint256 _id, bool isnew) external;
     function rank() external view returns (uint256);
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
-    function setburnclaimdollar(uint256 claimdollar, uint256 burndollar) external;
+    function setburnclaimdollar(uint256 claim, uint256 claimdollar) external;
     function setdirect(bool addremove) external;
     function storcache() external;
     function syncBaseAddr() external;
