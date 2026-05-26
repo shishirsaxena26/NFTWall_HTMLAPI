@@ -1521,8 +1521,8 @@ async function loadMyStor(id, panel) {
             ]));
 
             addRow(panel, "..", formatRow([
-                consts[1],
-                consts[5],
+                formatOZN(consts[1]),
+                formatOZN(consts[5]),
                 formatOZN(compute.thresholdollarx),
                 formatOZN(compute.totIncdollar) + '('+totincdollartozone+')',
                 formatOZN(consts[3]),
@@ -1542,7 +1542,7 @@ async function loadMyStor(id, panel) {
 
             addRow(panel, "..", formatRow([
                 formatOZN(consts[0]),
-                consts[4],
+                formatOZN(consts[4]),
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
                  formatOZN(consts[2]),
@@ -2732,15 +2732,12 @@ async function onCapBurn() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
-            throw "Incorrect account selected";
-        }
-        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
        
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
         
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        debugger;
+        const amountDollarReverse = await rule.methods.computeOzoneToDollar(amountOzone).call();
+        
         
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
@@ -2748,7 +2745,7 @@ async function onCapBurn() {
 
         // prepare method
         const method = storeContract.methods.BurnCoin(
-            amountDollar,
+            web3.utils.toWei(amountDollar.toString(), 'ether'),
             maxintervals
         );
 
