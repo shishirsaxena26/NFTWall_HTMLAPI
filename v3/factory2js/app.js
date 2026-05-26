@@ -2727,6 +2727,8 @@ async function onCapBurn() {
             throw 'Invalid amount';
         }
 
+      
+
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -2738,7 +2740,7 @@ async function onCapBurn() {
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
         
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        
+        debugger;
         
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
@@ -2746,7 +2748,8 @@ async function onCapBurn() {
 
         // prepare method
         const method = storeContract.methods.BurnCoin(
-            web3.utils.toWei(amountDollar.toString(), 'ether')
+            amountDollar,
+            maxintervals
         );
 
         // estimate gas
