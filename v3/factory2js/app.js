@@ -1540,7 +1540,7 @@ async function loadMyStor(id, panel) {
             ]));
 
             addRow(panel, "..", formatRow([
-                formatOZN(lvlBatch[0][0]),
+                formatOZN(consts[0]),
                 consts[4],
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
