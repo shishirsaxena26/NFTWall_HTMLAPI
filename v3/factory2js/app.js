@@ -46,75 +46,75 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const maxintervals= 30;
+const maxintervals = 30;
 
 const treeData = {
-  id: "1",
-  address: "0x0089188449F0d4119715c9A10eA8955FB26EE308",
-  children: [
-    {
-      id: "2",
-      address: "0x2242C969aaFD0D61Dd83e9a9c5E5dB046eeC922C",
-      children: [
+    id: "1",
+    address: "0x0089188449F0d4119715c9A10eA8955FB26EE308",
+    children: [
         {
-          id: "4",
-          address: "0x65595A6F3F2c71D2Daf9e816FbA3bfF80C8388c2",
-          children: [
-            {
-              id: "6",
-              address: "0x3700Ec1c787B382363f8CEF7c6605f6D8d8CBbBB",
-              children: [
+            id: "2",
+            address: "0x2242C969aaFD0D61Dd83e9a9c5E5dB046eeC922C",
+            children: [
                 {
-                  id: "8",
-                  address: "0x35312d50cf3c4ea8e997f2cB55c89b674E769161",
-                  children: [
-                    {
-                      id: "9",
-                      address: "0xBC422C995f416C44FDCD2f755622F74E76c1782f",
-                      children: [
+                    id: "4",
+                    address: "0x65595A6F3F2c71D2Daf9e816FbA3bfF80C8388c2",
+                    children: [
                         {
-                          id: "10",
-                          address: "0x38d8980013588181A3ee358F4aFcF573c1454A21",
-                          children: [
-                            {
-                              id: "11",
-                              address: "0x7017313e77417D9F66EFc6c4E38623Ec28E50266",
-                              children: []
-                            }
-                          ]
+                            id: "6",
+                            address: "0x3700Ec1c787B382363f8CEF7c6605f6D8d8CBbBB",
+                            children: [
+                                {
+                                    id: "8",
+                                    address: "0x35312d50cf3c4ea8e997f2cB55c89b674E769161",
+                                    children: [
+                                        {
+                                            id: "9",
+                                            address: "0xBC422C995f416C44FDCD2f755622F74E76c1782f",
+                                            children: [
+                                                {
+                                                    id: "10",
+                                                    address: "0x38d8980013588181A3ee358F4aFcF573c1454A21",
+                                                    children: [
+                                                        {
+                                                            id: "11",
+                                                            address: "0x7017313e77417D9F66EFc6c4E38623Ec28E50266",
+                                                            children: []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "7",
+                            address: "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8",
+                            children: []
                         }
-                      ]
-                    }
-                  ]
+                    ]
+                },
+                {
+                    id: "5",
+                    address: "0x8fBD8b80F831735B1d0f21c67600e2b29a43A143",
+                    children: [
+                        {
+                            id: "12",
+                            address: "0xd2e355C594775d9cE44959C05879085c4fD94229",
+                            children: []
+                        }
+                    ]
                 }
-              ]
-            },
-            {
-              id: "7",
-              address: "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8",
-              children: []
-            }
-          ]
+            ]
         },
         {
-          id: "5",
-          address: "0x8fBD8b80F831735B1d0f21c67600e2b29a43A143",
-          children: [
-            {
-              id: "12",
-              address: "0xd2e355C594775d9cE44959C05879085c4fD94229",
-              children: []
-            }
-          ]
+            id: "3",
+            address: "0x9653e22e7De603e3f4F80d6e6964Da487a4440bD",
+            children: []
         }
-      ]
-    },
-    {
-      id: "3",
-      address: "0x9653e22e7De603e3f4F80d6e6964Da487a4440bD",
-      children: []
-    }
-  ]
+    ]
 };
 
 const step = 5000;
@@ -122,33 +122,33 @@ let sysAge;
 let rankClauses = {};
 
 
-async function load(){
+async function load() {
     await init();
     //loadRule();
     renderULTreePanel();
-    
+
 }
 
-async function init(){
-    
+async function init() {
+
     //scanBlocks(50); // scan last 20 blocks
-    IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v='+version).then(res => res.json());
-    ISafeguardABI = await fetch('abistandardv3/libSafeguard.sol/libSafeguard.json?v='+version).then(res => res.json());
-    IHexBaseABI = await fetch('abistandardv3/hexBase.sol/hexBase.json?v='+version).then(res => res.json());
-    I741RulesABI = await fetch('abistandardv3/lib741Rules.sol/lib741Rules.json?v='+version).then(res => res.json());
-    INested741ABI = await fetch('abistandardv3/Nested741.sol/Nested741.json?v='+version).then(res => res.json());
-    IInstanceMeABI = await fetch('abistandardv3/Nftwall-InstanceMe.sol/InstanceMe.json?v='+version).then(res => res.json());
-    IORC1155ABI = await fetch('abistandardv3/ORC1155.sol/ORC1155.json?v='+version).then(res => res.json());
-    IInstanceStorABI = await fetch('abistandardv3/InstanceStor.sol/InstanceStor.json?v='+version).then(res => res.json());
-    IDAOCoreABI = await fetch('abistandardv3/DAOCore.sol/DAOCore.json?v='+version).then(res => res.json());
-    IDAOAssemblyABI = await fetch('abistandardv3/DAOAssembly.sol/DAOAssembly.json?v='+version).then(res => res.json());
-    ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v='+version).then(res => res.json());
-    INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v='+version).then(res => res.json());
-    IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v='+version).then(res => res.json());
-     
+    IPriceABI = await fetch('abistandardv3/lib741Price.sol/lib741Price.json?v=' + version).then(res => res.json());
+    ISafeguardABI = await fetch('abistandardv3/libSafeguard.sol/libSafeguard.json?v=' + version).then(res => res.json());
+    IHexBaseABI = await fetch('abistandardv3/hexBase.sol/hexBase.json?v=' + version).then(res => res.json());
+    I741RulesABI = await fetch('abistandardv3/lib741Rules.sol/lib741Rules.json?v=' + version).then(res => res.json());
+    INested741ABI = await fetch('abistandardv3/Nested741.sol/Nested741.json?v=' + version).then(res => res.json());
+    IInstanceMeABI = await fetch('abistandardv3/Nftwall-InstanceMe.sol/InstanceMe.json?v=' + version).then(res => res.json());
+    IORC1155ABI = await fetch('abistandardv3/ORC1155.sol/ORC1155.json?v=' + version).then(res => res.json());
+    IInstanceStorABI = await fetch('abistandardv3/InstanceStor.sol/InstanceStor.json?v=' + version).then(res => res.json());
+    IDAOCoreABI = await fetch('abistandardv3/DAOCore.sol/DAOCore.json?v=' + version).then(res => res.json());
+    IDAOAssemblyABI = await fetch('abistandardv3/DAOAssembly.sol/DAOAssembly.json?v=' + version).then(res => res.json());
+    ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v=' + version).then(res => res.json());
+    INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v=' + version).then(res => res.json());
+    IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v=' + version).then(res => res.json());
+
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
-    
+
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
     sysAge = await nested.methods.systemAge().call();
@@ -165,329 +165,329 @@ async function init(){
 
     indaoassembly = await hexBase.methods.daoassembly().call();
     daoassembly = new web3.eth.Contract(IDAOAssemblyABI.abi, indaoassembly);
-    
+
     inInstanceMe = await hexBase.methods.inInstance().call();
-    instanceme = new web3.eth.Contract(IInstanceMeABI.abi,inInstanceMe);
+    instanceme = new web3.eth.Contract(IInstanceMeABI.abi, inInstanceMe);
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-    
-    inPrice  = await hexBase.methods.inPrice().call();
+
+    inPrice = await hexBase.methods.inPrice().call();
     price = new web3.eth.Contract(IPriceABI.abi, inPrice);
-    console.log("💰 Ozone Price in USDT:", 
+    console.log("💰 Ozone Price in USDT:",
         await price.methods.ozonePriceInUSDT().call()
     );
 
     invalidator = await hexBase.methods.invalidator().call();
     validator = new web3.eth.Contract(IValidatorsABI.abi, invalidator);
-   
+
     inNftProxy = await hexBase.methods.inNftProxy().call();
     nftProxy = new web3.eth.Contract(INFTProxyABI.abi, inNftProxy);
-    
+
     currentAccount = null;
     currentInstance = null;
     currentStor = null;
 
-    if(window.ethereum){
-        window.ethereum.request({method:'eth_accounts'}).then(async (accounts)=>{
-            if(accounts.length){
+    if (window.ethereum) {
+        window.ethereum.request({ method: 'eth_accounts' }).then(async (accounts) => {
+            if (accounts.length) {
                 currentAccount = accounts[0];
                 showWallet();
                 await addConnectedUserPanel();
             }
         });
     }
-   
+
     hideLoader();
     //name(); 
     //debugTransaction();
     //scanBlocks(50); // scan last 20 blocks
     //loadRule();
-    
+
 }
 
 async function name() {
- 
-    const orc1155contract = new web3.eth.Contract(IORC1155ABI.abi,"0xC9627f194Cb4Ed859132F3f9D0E0577ee9c9f443");
+
+    const orc1155contract = new web3.eth.Contract(IORC1155ABI.abi, "0xC9627f194Cb4Ed859132F3f9D0E0577ee9c9f443");
     const events = await orc1155contract.getPastEvents("TransferSingle", {
-    fromBlock: minBlock,
-    toBlock: parseInt(minBlock)+10000
+        fromBlock: minBlock,
+        toBlock: parseInt(minBlock) + 10000
     });
     console.log(events);
 }
 
-async function _callpayload(){
+async function _callpayload() {
     const data = web3.eth.abi.encodeFunctionCall({
-            name: "subscribed",
-            type: "function",
-            inputs: [
-                {type: "address", name: "_user"}
-            ]
-            }, ["0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8"]);
+        name: "subscribed",
+        type: "function",
+        inputs: [
+            { type: "address", name: "_user" }
+        ]
+    }, ["0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8"]);
 
-        const payload = web3.eth.abi.encodeParameters(
-            ["address", "bytes"],
-            ["0xFcb3B3914e3E93040884696De45fb99b1a8Cbb90", data]
-        );
-        
-            window.web3T = new Web3(window.ethereum);
-        // Initialize contract
-        const hexcontract = new web3T.eth.Contract(IHexBaseABI.abi, inhexBase);
-            // Send transfer
-            const tx = await hexcontract.methods
-                .onTokenTransfer(payload)
-                .send({ from: currentAccount });
+    const payload = web3.eth.abi.encodeParameters(
+        ["address", "bytes"],
+        ["0xFcb3B3914e3E93040884696De45fb99b1a8Cbb90", data]
+    );
 
-            console.log(tx);
+    window.web3T = new Web3(window.ethereum);
+    // Initialize contract
+    const hexcontract = new web3T.eth.Contract(IHexBaseABI.abi, inhexBase);
+    // Send transfer
+    const tx = await hexcontract.methods
+        .onTokenTransfer(payload)
+        .send({ from: currentAccount });
 
-            if (tx.status) 
-                alert("Burning succeeded");
-            else 
-                throw "Burning failed"; 
-      
+    console.log(tx);
+
+    if (tx.status)
+        alert("Burning succeeded");
+    else
+        throw "Burning failed";
+
 }
 
 async function scanBlocks(limit = 10) {
 
 
-  const latestBlock = await web3.eth.getBlockNumber();
-  //console.log("Latest Block:", latestBlock);
+    const latestBlock = await web3.eth.getBlockNumber();
+    //console.log("Latest Block:", latestBlock);
 
-  for (let i = latestBlock; i > 0; i--) {
+    for (let i = latestBlock; i > 0; i--) {
 
-    const block = await web3.eth.getBlock(i, true); // true = include tx objects
-    if( block.transactions.length==0) continue;
-    console.log("------------------------------------------------");
-   
-   
-    console.log("Block Number:", block.number);
-    console.log("Block Hash:", block.hash);
-    console.log("Timestamp:", block.timestamp);
-    console.log("Miner:", block.miner);
-    console.log("Gas Used:", block.gasUsed);
-    console.log("Transaction Count:", block.transactions.length);
+        const block = await web3.eth.getBlock(i, true); // true = include tx objects
+        if (block.transactions.length == 0) continue;
+        console.log("------------------------------------------------");
 
-    block.transactions.forEach((tx, index) => {
-      console.log("   TX#", index + 1);
-      console.log("   Hash:", tx.hash);
-      console.log("   From:", tx.from);
-      console.log("   To:", tx.to);
-      console.log("   Value:", web3.utils.fromWei(tx.value, "ether"), "ETH");
-      console.log("   Gas:", tx.gas);
-      console.log("   GasPrice:", tx.gasPrice);
-      console.log("   Nonce:", tx.nonce);
-      console.log("   Input:", tx.input);
-      console.log("   ---------------------------");
-    });
 
-  }
+        console.log("Block Number:", block.number);
+        console.log("Block Hash:", block.hash);
+        console.log("Timestamp:", block.timestamp);
+        console.log("Miner:", block.miner);
+        console.log("Gas Used:", block.gasUsed);
+        console.log("Transaction Count:", block.transactions.length);
+
+        block.transactions.forEach((tx, index) => {
+            console.log("   TX#", index + 1);
+            console.log("   Hash:", tx.hash);
+            console.log("   From:", tx.from);
+            console.log("   To:", tx.to);
+            console.log("   Value:", web3.utils.fromWei(tx.value, "ether"), "ETH");
+            console.log("   Gas:", tx.gas);
+            console.log("   GasPrice:", tx.gasPrice);
+            console.log("   Nonce:", tx.nonce);
+            console.log("   Input:", tx.input);
+            console.log("   ---------------------------");
+        });
+
+    }
 }
 
 async function debugTransaction() {
     const txHash = "0xa4de0d0d4355b21d9158ead76af831b1505de7d99b10ac543eb7293f66592501";
     web3.currentProvider.send(
-    {
-        jsonrpc: "2.0",
-        method: "debug_traceTransaction",
-        params: [
-            txHash,
-            { tracer: "callTracer" }
-        ],
-        id: 1
-    },
-    function (err, result) {
-      if (err) {
-        console.error("Debug error:", err);
-        return;
-      }
-
-      console.log("Trace result:", result);
-
-      /* OPTIONAL: Also fetch receipt */
-
-      web3.eth.getTransactionReceipt(txHash)
-        .then(function(receipt){
-
-            console.log("Transaction Receipt:", receipt);
-
-            if(receipt && receipt.logs){
-
-                console.log("Event Logs:");
-
-                receipt.logs.forEach(function(log,i){
-
-                    console.log("Log #"+i, log);
-
-                });
-
+        {
+            jsonrpc: "2.0",
+            method: "debug_traceTransaction",
+            params: [
+                txHash,
+                { tracer: "callTracer" }
+            ],
+            id: 1
+        },
+        function (err, result) {
+            if (err) {
+                console.error("Debug error:", err);
+                return;
             }
 
-        })
-        .catch(function(err){
-            console.error("Error fetching receipt:", err);
-        });
+            console.log("Trace result:", result);
 
-    }
-  );
+            /* OPTIONAL: Also fetch receipt */
+
+            web3.eth.getTransactionReceipt(txHash)
+                .then(function (receipt) {
+
+                    console.log("Transaction Receipt:", receipt);
+
+                    if (receipt && receipt.logs) {
+
+                        console.log("Event Logs:");
+
+                        receipt.logs.forEach(function (log, i) {
+
+                            console.log("Log #" + i, log);
+
+                        });
+
+                    }
+
+                })
+                .catch(function (err) {
+                    console.error("Error fetching receipt:", err);
+                });
+
+        }
+    );
 }
 
 
 
 // -------------------- PANEL FUNCTIONS --------------------
 function clearPanels() {
-  document.getElementById("systemPanels").innerHTML = "";
+    document.getElementById("systemPanels").innerHTML = "";
 }
 
-function renderAddress(value){
-  const v = document.createElement("div");
+function renderAddress(value) {
+    const v = document.createElement("div");
 
-  if(typeof value === "string" && value.startsWith("0x")){
-    v.className = "addr";
+    if (typeof value === "string" && value.startsWith("0x")) {
+        v.className = "addr";
 
-    const short = document.createElement("span");
-    short.className = "shortAddr";
-    short.innerText = value.slice(0,6) + "..." + value.slice(-4);
+        const short = document.createElement("span");
+        short.className = "shortAddr";
+        short.innerText = value.slice(0, 6) + "..." + value.slice(-4);
 
-    const btn = document.createElement("button");
-    btn.className = "copyBtn";
-    btn.innerText = "📋";
+        const btn = document.createElement("button");
+        btn.className = "copyBtn";
+        btn.innerText = "📋";
 
-    btn.onclick = ()=>{
-      navigator.clipboard.writeText(value);
-      btn.innerText="✓";
-      setTimeout(()=>{ btn.innerText="📋"; },1000);
-    };
+        btn.onclick = () => {
+            navigator.clipboard.writeText(value);
+            btn.innerText = "✓";
+            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+        };
 
-    v.appendChild(short);
-    v.appendChild(btn);
-  } 
-  else{
-    v.innerText = value;
-  }
+        v.appendChild(short);
+        v.appendChild(btn);
+    }
+    else {
+        v.innerText = value;
+    }
 
-  return v;
+    return v;
 }
 
-function renderAddressLongX(value){
-  const v = document.createElement("div");
+function renderAddressLongX(value) {
+    const v = document.createElement("div");
 
-  if(typeof value === "string" && value.startsWith("0x")){
-    v.className = "addr";
+    if (typeof value === "string" && value.startsWith("0x")) {
+        v.className = "addr";
 
-    const short = document.createElement("span");
-    short.className = "shortAddr";
-    short.innerText = value.slice(0,10) + "..." + value.slice(-10);
+        const short = document.createElement("span");
+        short.className = "shortAddr";
+        short.innerText = value.slice(0, 10) + "..." + value.slice(-10);
 
-    const btn = document.createElement("button");
-    btn.className = "copyBtn";
-    btn.innerText = "📋";
+        const btn = document.createElement("button");
+        btn.className = "copyBtn";
+        btn.innerText = "📋";
 
-    btn.onclick = ()=>{
-      navigator.clipboard.writeText(value);
-      btn.innerText="✓";
-      setTimeout(()=>{ btn.innerText="📋"; },1000);
-    };
+        btn.onclick = () => {
+            navigator.clipboard.writeText(value);
+            btn.innerText = "✓";
+            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+        };
 
-    v.appendChild(short);
-    v.appendChild(btn);
-  } 
-  else{
-    v.innerText = value;
-  }
+        v.appendChild(short);
+        v.appendChild(btn);
+    }
+    else {
+        v.innerText = value;
+    }
 
-  return v;
+    return v;
 }
 
 function addPanel(title) {
-  const panel = document.createElement("div");
-  panel.className = "panel";
-  const h3 = document.createElement("h3");
-  h3.innerText = title;
-  panel.appendChild(h3);
-  document.getElementById("systemPanels").appendChild(panel);
-  return panel;
+    const panel = document.createElement("div");
+    panel.className = "panel";
+    const h3 = document.createElement("h3");
+    h3.innerText = title;
+    panel.appendChild(h3);
+    document.getElementById("systemPanels").appendChild(panel);
+    return panel;
 }
 
 function addRow(panel, field, value) {
-  const row = document.createElement("div");
-  row.className = "row";
-  row.style.whiteSpace = "pre";
-row.style.fontFamily = "monospace";  
-  const f = document.createElement("div");
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.whiteSpace = "pre";
+    row.style.fontFamily = "monospace";
+    const f = document.createElement("div");
 
-  if (field instanceof HTMLElement) {
-    f.appendChild(field); row.appendChild(f); 
-  }
-  else {
-    if(field!="") { f.innerText = field;  row.appendChild(f); }
-  }
+    if (field instanceof HTMLElement) {
+        f.appendChild(field); row.appendChild(f);
+    }
+    else {
+        if (field != "") { f.innerText = field; row.appendChild(f); }
+    }
 
-  const v = document.createElement("div");
-  if (value instanceof HTMLElement) {
-    // ⬅️ If value is HTML object → append it
-    v.width = "100%";
-    v.appendChild(value);
-    
-  } else if(typeof value === "string" && value.startsWith("0x")){
-    v.className = "addr";
-    const short = document.createElement("span");
-    short.className = "shortAddr";
-    short.innerText = value.slice(0,6) + "..." + value.slice(-4);
+    const v = document.createElement("div");
+    if (value instanceof HTMLElement) {
+        // ⬅️ If value is HTML object → append it
+        v.width = "100%";
+        v.appendChild(value);
 
-    const btn = document.createElement("button");
-    btn.className="copyBtn";
-    btn.innerText="📋";
-    btn.onclick = ()=>{
-      navigator.clipboard.writeText(value);
-      btn.innerText="✓";
-      setTimeout(()=>{ btn.innerText="📋"; },1000);
-    };
+    } else if (typeof value === "string" && value.startsWith("0x")) {
+        v.className = "addr";
+        const short = document.createElement("span");
+        short.className = "shortAddr";
+        short.innerText = value.slice(0, 6) + "..." + value.slice(-4);
 
-    const balpanel = document.createElement("span");
-    balpanel.className = "shortAddr";
-    printRow(value,balpanel);
+        const btn = document.createElement("button");
+        btn.className = "copyBtn";
+        btn.innerText = "📋";
+        btn.onclick = () => {
+            navigator.clipboard.writeText(value);
+            btn.innerText = "✓";
+            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+        };
 
-    v.appendChild(short);
-    v.append(balpanel);
-    v.appendChild(btn);
-  } else {
-    v.innerText = value;
-  }
+        const balpanel = document.createElement("span");
+        balpanel.className = "shortAddr";
+        printRow(value, balpanel);
 
- 
-  row.appendChild(v);
-  panel.appendChild(row);
+        v.appendChild(short);
+        v.append(balpanel);
+        v.appendChild(btn);
+    } else {
+        v.innerText = value;
+    }
+
+
+    row.appendChild(v);
+    panel.appendChild(row);
 }
 
-function shortAddr(addr){
-    if(!addr) return "";
-    if(addr.length <= 10) return addr;
-    return addr.slice(0,6) + "..." + addr.slice(-4);
+function shortAddr(addr) {
+    if (!addr) return "";
+    if (addr.length <= 10) return addr;
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-function pad3(v){
-    v=parseInt(v);
-    if(v>=100) return v.toString();
-    if(v>=10) return "0"+v;
-    return "00"+v;
+function pad3(v) {
+    v = parseInt(v);
+    if (v >= 100) return v.toString();
+    if (v >= 10) return "0" + v;
+    return "00" + v;
 }
 
 function padStr(v, len = 20) {
-  return String(v).padStart(len, ' ');
+    return String(v).padStart(len, ' ');
 }
 
 // Helper: format wei → OZN with 3 decimals
 function formatOZN(value) {
-    if(!value) return "NULL";
+    if (!value) return "NULL";
     return Number(web3.utils.fromWei(value, "ether")).toFixed(12);
 }
 
-async function printRow(addr, balpanel){
+async function printRow(addr, balpanel) {
     const bal = await web3.eth.getBalance(addr);
-   /* let eth3 = new web3.utils.BN(bal).div(new web3.utils.BN("1000000000"));
-    let major = eth3.div(new web3.utils.BN("1000")).toString();
-    let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString()); */
-    
+    /* let eth3 = new web3.utils.BN(bal).div(new web3.utils.BN("1000000000"));
+     let major = eth3.div(new web3.utils.BN("1000")).toString();
+     let minor = pad3(eth3.mod(new web3.utils.BN("1000")).toString()); */
+
     let res = " | " + Number(web3.utils.fromWei(bal, "ether")).toFixed(12) + " OZN";
     balpanel.innerText = res;
     return res;
@@ -497,32 +497,32 @@ async function printRow(addr, balpanel){
 async function loadSystem() {
     clearPanels();
     const panelSys = addPanel("System Data");
-    try{
-    const nodes = await nested.methods.getNodesCount().call();
-    sysAge = await nested.methods.systemAge().call();
-    document.getElementById("sysAgeid").innerHTML = sysAge;
-    const isSafe = await safeguard.methods.isSafe().call();
-   
-    addRow(panelSys,"Nodes Count",nodes);
-    addRow(panelSys,"System Age",`${getAgeDateRange(sysAge).start} {${sysAge}}`);
-    addRow(panelSys,"Is Safe",isSafe);
+    try {
+        const nodes = await nested.methods.getNodesCount().call();
+        sysAge = await nested.methods.systemAge().call();
+        document.getElementById("sysAgeid").innerHTML = sysAge;
+        const isSafe = await safeguard.methods.isSafe().call();
 
-    addRow(panelSys,"Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
-    await loadSystemTreasuriesNSecurebase();
+        addRow(panelSys, "Nodes Count", nodes);
+        addRow(panelSys, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
+        addRow(panelSys, "Is Safe", isSafe);
 
-    } catch(err){
+        addRow(panelSys, "Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
+        await loadSystemTreasuriesNSecurebase();
+
+    } catch (err) {
         console.error(err);
-        addRow(panelSys,"Error","Unable to load marketplace");
+        addRow(panelSys, "Error", "Unable to load marketplace");
     }
 
     //await onGetDailyBusiness();
     hideLoader();
     //setTimeout(() => loadSystem(), 15000);
-   
+
 }
 
 // -------------------- SYSTEM TREASURY + SECUREBASE --------------------
-async function loadSystemTreasuriesNSecurebase(){
+async function loadSystemTreasuriesNSecurebase() {
     const container = document.getElementById("systemPanels");
 
     const panelBase = addPanel("BASE");
@@ -543,103 +543,103 @@ async function loadSystemTreasuriesNSecurebase(){
         hexBaseAddress = _hex;
         init();
     });
-    addRow(panelBase,link,hexBaseAddress);
-   
+    addRow(panelBase, link, hexBaseAddress);
+
 
     const deployer = await hexBase.methods.inDeployerAsRoot().call();
-    addRow(panelBase,"DeployerAsRoot",deployer);
-    
+    addRow(panelBase, "DeployerAsRoot", deployer);
+
     const deployerasservice = await hexBase.methods.inDeployerAService().call();
-    addRow(panelBase,"DeployerAsService",deployerasservice);
-    
-    addRow(panelBase,"inPrice",inPrice);
+    addRow(panelBase, "DeployerAsService", deployerasservice);
+
+    addRow(panelBase, "inPrice", inPrice);
 
     const old741 = await hexBase.methods.in741Old().call();
-    addRow(panelBase,"in741Old",old741);
-    addRow(panelBase,"in741",inNested741);
+    addRow(panelBase, "in741Old", old741);
+    addRow(panelBase, "in741", inNested741);
 
     const daoCore = await hexBase.methods.daocore().call();
-    addRow(panelBase,"DAO Core",daoCore);
+    addRow(panelBase, "DAO Core", daoCore);
     const daoAsm = await hexBase.methods.daoassembly().call();
-    addRow(panelBase,"DAO Assembly",daoAsm);
+    addRow(panelBase, "DAO Assembly", daoAsm);
 
     const prop0 = await hexBase.methods.proposals(0).call();
-    addRow(panelBase,"proposal(0)",prop0);
+    addRow(panelBase, "proposal(0)", prop0);
     const inst = await hexBase.methods.inInstance().call();
-    addRow(panelBase,"instance",inst);
+    addRow(panelBase, "instance", inst);
     const nftproxy = await hexBase.methods.inNftProxy().call();
-    addRow(panelBase,"NFTProxy",nftproxy);
+    addRow(panelBase, "NFTProxy", nftproxy);
     const nftvalidator = await hexBase.methods.invalidator().call();
-    addRow(panelBase,"Validator",nftvalidator);
+    addRow(panelBase, "Validator", nftvalidator);
 
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
-    addRow(panelTreasury,"Factory",factory);
+    addRow(panelTreasury, "Factory", factory);
     const mining = await hexBase.methods.inTreaseryTVLMining().call();
-    addRow(panelTreasury,"TVL Mining",mining);
+    addRow(panelTreasury, "TVL Mining", mining);
     const reward = await hexBase.methods.inTreaseryTVLReward().call();
-    addRow(panelTreasury,"TVL Reward",reward);
+    addRow(panelTreasury, "TVL Reward", reward);
     const roy = await hexBase.methods.inTreaseryTVLRoyality().call();
-    addRow(panelTreasury,"TVL Royality",roy);
+    addRow(panelTreasury, "TVL Royality", roy);
     const val = await hexBase.methods.inTreaseryTVLValidator().call();
-    addRow(panelTreasury,"TVL Validator",val);
+    addRow(panelTreasury, "TVL Validator", val);
     const panelByteCode = addPanel("BYTECODE");
-    addRow(panelByteCode,"Bytecode", byteCodeStandard);
-    addRow(panelByteCode,"Download ABI", "https://drive.google.com/drive/folders/1O4J0hFtdSdbBcDyA5SxrLUOM8NqtQl0-");
-    
-    //////////////////////////////////////////
-    ///////////////////////////////////////////
-    
-    const panelSecure = addPanel("SECUREBASE");
-    const propSafe = await safeguard.methods.isSecureBase(prop0).call();
-    addRow(panelSecure,"proposal(0)",propSafe);
+    addRow(panelByteCode, "Bytecode", byteCodeStandard);
+    addRow(panelByteCode, "Download ABI", "https://drive.google.com/drive/folders/1O4J0hFtdSdbBcDyA5SxrLUOM8NqtQl0-");
 
     //////////////////////////////////////////
     ///////////////////////////////////////////
-    
+
+    const panelSecure = addPanel("SECUREBASE");
+    const propSafe = await safeguard.methods.isSecureBase(prop0).call();
+    addRow(panelSecure, "proposal(0)", propSafe);
+
+    //////////////////////////////////////////
+    ///////////////////////////////////////////
+
     const panelPorp = addPanel("PROPOSALS(0)");
     const importedNodeCount = await transferRequests.methods.getimportedNodeCount().call();
     const forms = await transferRequests.methods.getFormsCount().call();
     const actualTVL = await transferRequests.methods.actualTVL().call();
-    
-    addRow(panelPorp,"Form Count",forms);
-    addRow(panelPorp,"Imported Users",importedNodeCount);
-    addRow(panelPorp,"ActualTVL",formatOZN(actualTVL));
-  
+
+    addRow(panelPorp, "Form Count", forms);
+    addRow(panelPorp, "Imported Users", importedNodeCount);
+    addRow(panelPorp, "ActualTVL", formatOZN(actualTVL));
+
     //////////////////////////////////////////
     ///////////////////////////////////////////
 
-    const panelBusiness= addPanel("Business");
-      
-    const rBusiness=document.createElement("div");
+    const panelBusiness = addPanel("Business");
 
-    const btnExecuteRoyality=document.createElement("button");
-            btnExecuteRoyality.innerText="ExecuteRoyality";
-            btnExecuteRoyality.style.marginLeft="10px";
-            btnExecuteRoyality.onclick = () => {
-              onExecuteRoyality();
+    const rBusiness = document.createElement("div");
+
+    const btnExecuteRoyality = document.createElement("button");
+    btnExecuteRoyality.innerText = "ExecuteRoyality";
+    btnExecuteRoyality.style.marginLeft = "10px";
+    btnExecuteRoyality.onclick = () => {
+        onExecuteRoyality();
     };
 
-    const btnDefaultRankCount=document.createElement("button");
-            btnDefaultRankCount.innerText="DefaultRankCount";
-            btnDefaultRankCount.style.marginLeft="10px";
-            btnDefaultRankCount.onclick = () => {
-              onSetDefaultRankCount();
+    const btnDefaultRankCount = document.createElement("button");
+    btnDefaultRankCount.innerText = "DefaultRankCount";
+    btnDefaultRankCount.style.marginLeft = "10px";
+    btnDefaultRankCount.onclick = () => {
+        onSetDefaultRankCount();
     };
-    
 
-    const btnBusiness=document.createElement("button");
-            btnBusiness.innerText="GetBusiness";
-            btnBusiness.style.marginLeft="10px";
-            btnBusiness.onclick = () => {
-              onGetDailyBusiness();
+
+    const btnBusiness = document.createElement("button");
+    btnBusiness.innerText = "GetBusiness";
+    btnBusiness.style.marginLeft = "10px";
+    btnBusiness.onclick = () => {
+        onGetDailyBusiness();
     };
-    
+
     rBusiness.appendChild(btnDefaultRankCount);
     rBusiness.appendChild(btnExecuteRoyality);
     rBusiness.appendChild(btnBusiness);
 
-    addRow(panelBusiness,"Click to get business",rBusiness);
+    addRow(panelBusiness, "Click to get business", rBusiness);
     // Create table
     const table1 = document.createElement("table");
     table1.id = "tabDailyBusiness";
@@ -658,14 +658,14 @@ async function loadSystemTreasuriesNSecurebase(){
     </thead>
     <tbody id="tabDBBody"></tbody>
     `;
-  
-    
+
+
     const idSpan = document.createElement("span");
-    
+
 
     addRow(panelBusiness, "", table1);
     //onGetDailyBusiness();
-    
+
 }
 
 async function onExecuteRoyality() {
@@ -674,19 +674,19 @@ async function onExecuteRoyality() {
     window.web3T = new Web3(window.ethereum);
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
-    
+
     const tx = await nestedContractV1.methods
         .compileRoyality(systemAge)
         .send({
             from: accounts[0]
-    });
+        });
 
     if (tx.status) {
         alert("ExecuteRoyality succeeded");
     } else {
         alert("ExecuteRoyality failed");
     }
-       
+
 
 }
 
@@ -696,12 +696,12 @@ async function onSetDefaultRankCount() {
     window.web3T = new Web3(window.ethereum);
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
-    
+
     const tx = await nestedContractV1.methods
         .setDefaultRankCount(350)
         .send({
             from: accounts[0]
-    });
+        });
 
     if (tx.status) {
         alert("setDefaultRankCount succeeded");
@@ -711,53 +711,51 @@ async function onSetDefaultRankCount() {
 }
 
 async function onGetDailyBusiness() {
-	showLoader();
-	var r3 = new BN("0");
-	var r5 = new BN("0");
-	var r7 = new BN("0");
-	document.getElementById("tabDBBody").replaceChildren();
+    showLoader();
+    var r3 = new BN("0");
+    var r5 = new BN("0");
+    var r7 = new BN("0");
+    document.getElementById("tabDBBody").replaceChildren();
     document.getElementById("tabDBBody").innerHTML = "";
-	
-	let age = await nested.methods.systemAge().call();
-    
+
+    let age = await nested.methods.systemAge().call();
+
     document.getElementById("sysAgeid").innerHTML = age;
-	for (let i = parseInt(age); i>=parseInt(age)-15; i--) {
-		let b = await nested.methods.getbusiness(i).call();
-		let w = await nested.methods.getwithdrawn(i).call();
+    for (let i = parseInt(age); i >= parseInt(age) - 15; i--) {
+        let b = await nested.methods.getbusiness(i).call();
+        let w = await nested.methods.getwithdrawn(i).call();
         let j = await nested.methods.getjoining(i).call();
 
-		
-		let Ct0 = await nested.methods.getrankCount(i,0).call();
-		let Ct1 = await nested.methods.getrankCount(i,1).call();
-		let Ct2 = await nested.methods.getrankCount(i,2).call();
-		let Ct3 = await nested.methods.getrankCount(i,3).call();
-		let Ct4 = await nested.methods.getrankCount(i,4).call();
-		let Ct5 = await nested.methods.getrankCount(i,5).call();
-		let Ct6 = await nested.methods.getrankCount(i,6).call();
-		let Ct7 = await nested.methods.getrankCount(i,7).call();
-		var royal3 = new BN('0');
-		var royal5 = new BN('0');
-		var royal7 = new BN('0');
-		
-		if(parseInt(Ct3)>0)
-		{	royal3=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct3.toString()));
-		}
-		if(parseInt(Ct5)>0)
-		{
-			royal5=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct5.toString()));
-		}
-		if(parseInt(Ct7)>0)
-		{
-			royal7=(new BN(((new BN(b)).mul(new BN("9")).div(new BN("1000"))).toString())).div(new BN(Ct7.toString()));
-		}
-		
-		r3=r3.add(new BN(royal3.toString()));
-		r5=r5.add(new BN(royal5.toString()));
-		r7=r7.add(new BN(royal7.toString()));
-		
-		//console.log(r3.toString());
-		//console.log(r5.toString());
-		//console.log(r7.toString());
+
+        let Ct0 = await nested.methods.getrankCount(i, 0).call();
+        let Ct1 = await nested.methods.getrankCount(i, 1).call();
+        let Ct2 = await nested.methods.getrankCount(i, 2).call();
+        let Ct3 = await nested.methods.getrankCount(i, 3).call();
+        let Ct4 = await nested.methods.getrankCount(i, 4).call();
+        let Ct5 = await nested.methods.getrankCount(i, 5).call();
+        let Ct6 = await nested.methods.getrankCount(i, 6).call();
+        let Ct7 = await nested.methods.getrankCount(i, 7).call();
+        var royal3 = new BN('0');
+        var royal5 = new BN('0');
+        var royal7 = new BN('0');
+
+        if (parseInt(Ct3) > 0) {
+            royal3 = (new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct3.toString()));
+        }
+        if (parseInt(Ct5) > 0) {
+            royal5 = (new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct5.toString()));
+        }
+        if (parseInt(Ct7) > 0) {
+            royal7 = (new BN(((new BN(b)).mul(new BN("9")).div(new BN("1000"))).toString())).div(new BN(Ct7.toString()));
+        }
+
+        r3 = r3.add(new BN(royal3.toString()));
+        r5 = r5.add(new BN(royal5.toString()));
+        r7 = r7.add(new BN(royal7.toString()));
+
+        //console.log(r3.toString());
+        //console.log(r5.toString());
+        //console.log(r7.toString());
         // 1. Check addresses
         //console.log("nested:", nested.options.address);
 
@@ -765,30 +763,30 @@ async function onGetDailyBusiness() {
         //console.log("in741:", in741Addr);
         let constRoyal = await nested.methods.getRoyalityAmountBatch(i).call();
 
-		console.log(`i: ${getAgeDateRange(i).start} {${i}}`);
+        console.log(`i: ${getAgeDateRange(i).start} {${i}}`);
         console.log(`constRoyal: ${constRoyal}`);
-		document.getElementById("tabDBBody")
-        .insertAdjacentHTML("beforeend",
-            '<tr><td>'+`${getAgeDateRange(i).start} {${i}}`+'</td><td>'+b+'</td><td>'+w+'</td><td>'+j+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+constRoyal[2].toString()+'</td><td>'+constRoyal[4].toString()+'</td><td>'+constRoyal[6].toString()+'</td></tr>'
-        );
-	}	
+        document.getElementById("tabDBBody")
+            .insertAdjacentHTML("beforeend",
+                '<tr><td>' + `${getAgeDateRange(i).start} {${i}}` + '</td><td>' + b + '</td><td>' + w + '</td><td>' + j + '</td><td>' + Ct0 + '</td><td>' + Ct1 + '</td><td>' + Ct2 + '</td><td>' + Ct3 + '</td><td>' + Ct4 + '</td><td>' + Ct5 + '</td><td>' + Ct6 + '</td><td>' + Ct7 + '</td><td>' + constRoyal[2].toString() + '</td><td>' + constRoyal[4].toString() + '</td><td>' + constRoyal[6].toString() + '</td></tr>'
+            );
+    }
 
-	
 
-	hideLoader();
-	
+
+    hideLoader();
+
 }
 
 //NOT IN USED
 // -------------------- LOAD USER (NOT IN USED) --------------------
-async function loadUserPanel(user){
-    if(!user || !web3.utils.isAddress(user)){
+async function loadUserPanel(user) {
+    if (!user || !web3.utils.isAddress(user)) {
         alert("Please enter a valid address");
         return;
     }
 
     clearPanels();
-    
+
     const userPanel = addPanel("User Data");
 
     //const user = "0xE77aB47de567b3a79849F38dbAd1d321b3ACE9d8";
@@ -796,41 +794,41 @@ async function loadUserPanel(user){
     const node = await nested.methods.getNode(id).call();
     const isdelegator = await nested.methods._isDelegatorNode(user).call();
 
-    addRow(userPanel,"--",node[0]);
-    addRow(userPanel,"Node",node[1]);
-    addRow(userPanel,"Are you Delegator ", isdelegator);
-    addRow(userPanel,"Parent",node[2]);
-    addRow(userPanel,"Active",node[5]);
-    addRow(userPanel,"Direct Count",node[6]);
+    addRow(userPanel, "--", node[0]);
+    addRow(userPanel, "Node", node[1]);
+    addRow(userPanel, "Are you Delegator ", isdelegator);
+    addRow(userPanel, "Parent", node[2]);
+    addRow(userPanel, "Active", node[5]);
+    addRow(userPanel, "Direct Count", node[6]);
 
     const instAddr = node[3];
     const storAddr = node[4];
 
-    if(instAddr != "0x0000000000000000000000000000000000000000"){
-        const inst = new web3.eth.Contract(IInstanceMeABI.abi,instAddr);
+    if (instAddr != "0x0000000000000000000000000000000000000000") {
+        const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
         const instId = await inst.methods.id().call();
         const instParent = await inst.methods.parent().call();
         const instStor = await inst.methods.stor().call();
 
-        addRow(userPanel,"Instance ID",instId);
-        addRow(userPanel,"Instance Parent",instParent);
-        addRow(userPanel,"Instance Stor",instStor);
+        addRow(userPanel, "Instance ID", instId);
+        addRow(userPanel, "Instance Parent", instParent);
+        addRow(userPanel, "Instance Stor", instStor);
     }
 
-    const stor = new web3.eth.Contract(IInstanceStorABI.abi,storAddr);
+    const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
     const dage = await stor.methods.dage().call();
-    const rankWithAge= await stor.methods.getRankWithAgeValue().call();
+    const rankWithAge = await stor.methods.getRankWithAgeValue().call();
     const cage = await stor.methods.cage().call();
-    addRow(userPanel,"Stor Cage",cage);
-    addRow(userPanel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
-    addRow(userPanel,"Stor Rank",`Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
-     const table = document.createElement("table");
-        table.border = "1";
-        table.cellPadding = "5";
-        table.style.width = "100%";
-        // ✅ THEAD (Header)
-        const thead = document.createElement("thead");
-        thead.innerHTML = `
+    addRow(userPanel, "Stor Cage", cage);
+    addRow(userPanel, "Stor Dage", `${getAgeDateRange(dage).start} {${dage}}`);
+    addRow(userPanel, "Stor Rank", `Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
+    const table = document.createElement("table");
+    table.border = "1";
+    table.cellPadding = "5";
+    table.style.width = "100%";
+    // ✅ THEAD (Header)
+    const thead = document.createElement("thead");
+    thead.innerHTML = `
         <tr>
             <th>#</th>
             <th>Desc</th>
@@ -845,16 +843,16 @@ async function loadUserPanel(user){
             <th>Sign</th>
         </tr>
         `;
-        table.appendChild(thead);
-        
-    addRow(userPanel,"",table);
-    
-    
+    table.appendChild(thead);
+
+    addRow(userPanel, "", table);
+
+
 }
 
-async function addConnectedUserPanel(){
+async function addConnectedUserPanel() {
 
-    
+
     const btnLogin = document.getElementById("btnLogin");
     const btnJoin = document.getElementById("btnJoin");
     const btnInit = document.getElementById("btnInit");
@@ -867,7 +865,7 @@ async function addConnectedUserPanel(){
 
     if (!currentAccount || !web3.utils.isAddress(currentAccount)) return;
 
-    try{
+    try {
 
         document.getElementById("userAddrInput").value = currentAccount;
         const id = await nested.methods.UserToId(currentAccount).call();
@@ -879,12 +877,12 @@ async function addConnectedUserPanel(){
         currentInstance = node[3];
         currentStor = node[4];
 
-       /*
-        STEP 1
-        No instance yet
-        */
+        /*
+         STEP 1
+         No instance yet
+         */
 
-        if(node[3] == ZERO){
+        if (node[3] == ZERO) {
             btnJoin.style.display = "block";
             return;
         }
@@ -893,42 +891,42 @@ async function addConnectedUserPanel(){
         STEP 2
         Import instance
         */
-        if(node[3] != ZERO && node[4] != ZERO){
+        if (node[3] != ZERO && node[4] != ZERO) {
             currentInstance = node[3];
             currentStor = node[4];
             document.getElementById("walletInst").innerText =
                 "Inst " + shortAddr(currentInstance);
-            
-            const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);  
-            if(await instan.methods.validateToken().call()) {
+
+            const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);
+            if (await instan.methods.validateToken().call()) {
 
                 const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
                 const postInit = await stor.methods.postInit().call();
-                if(!postInit){
+                if (!postInit) {
                     btnImport.style.display = "block";
                     return;
                 } else {
-                    
+
                     document.getElementById("walletStor").innerText =
-                    "Stor " + shortAddr(currentStor);
+                        "Stor " + shortAddr(currentStor);
                 }
             }
             else {
-                 btnLogin.style.display = "block";
-                 return;
+                btnLogin.style.display = "block";
+                return;
             }
-           
+
         }
 
-        
 
-    }catch(e){
+
+    } catch (e) {
         console.log(e);
         document.getElementById("walletNode").innerText = "User not registered";
     }
 }
 
-function updatePanelWithInstance(instance){
+function updatePanelWithInstance(instance) {
 
     document.getElementById("walletInst").innerText =
         "Inst " + shortAddr(instance);
@@ -938,84 +936,84 @@ function updatePanelWithInstance(instance){
 }
 
 async function joinUser() {
-        try {
-            const _p = prompt("Enter parent address:");
-            const parent = _p.trim();
-            if (!parent || !web3.utils.isAddress(parent)) {
-                alert("Enter a valid parent");
-                return;
-            }
+    try {
+        const _p = prompt("Enter parent address:");
+        const parent = _p.trim();
+        if (!parent || !web3.utils.isAddress(parent)) {
+            alert("Enter a valid parent");
+            return;
+        }
 
-            if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
-                alert("Connect to wallet");
-                return;
-            }
-            
-            
+        if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
+            alert("Connect to wallet");
+            return;
+        }
 
-            let accounts = await ethereum.enable();
-            if(currentAccount!=accounts[0]) {  throw "Incorrect account selected";}
-            window.web3T = new Web3(window.ethereum);
-            // encode constructor args
-            //const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
-            //const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
-            
-            // append args to bytecode
-            //const deployBytecode = byteCodeStandard + encodedArgs.slice(2);
 
-            const contract = new web3T.eth.Contract(IInstanceMeABI.abi);
-            // deploy transaction
-            const deployTx = contract.deploy({
-                data: byteCodeStandard,
-                arguments: [hexBaseAddress, parent]
-            });
-            
-            const gas = await deployTx.estimateGas({ from: currentAccount });
-            
-            const block = await web3T.eth.getBlock("latest");
-            const baseFee = BigInt(block.baseFeePerGas || 0);
 
-            const tx = await deployTx.send({
-                from: currentAccount,
-                gas: Math.floor(gas * 1.1),
+        let accounts = await ethereum.enable();
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+        window.web3T = new Web3(window.ethereum);
+        // encode constructor args
+        //const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
+        //const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
 
-                maxPriorityFeePerGas: "1", // small tip
-                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
-            });
-            
-            console.log("Deploy TX:", tx);
-            
-            // contract address from receipt
-            currentInstance = tx.options.address;;
-            alert("User Joined: "+currentInstance);
-            // update UI
-            document.getElementById("walletInst").innerText =
-                "Inst " + shortAddr(currentInstance);
+        // append args to bytecode
+        //const deployBytecode = byteCodeStandard + encodedArgs.slice(2);
 
-            document.getElementById("btnJoin").style.display = "none";
-            document.getElementById("btnInit").style.display = "block";
-        
-        }catch(e){
-            console.error(e);
-            alert(e.message);
-        }  
+        const contract = new web3T.eth.Contract(IInstanceMeABI.abi);
+        // deploy transaction
+        const deployTx = contract.deploy({
+            data: byteCodeStandard,
+            arguments: [hexBaseAddress, parent]
+        });
+
+        const gas = await deployTx.estimateGas({ from: currentAccount });
+
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        const tx = await deployTx.send({
+            from: currentAccount,
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1", // small tip
+            maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+        });
+
+        console.log("Deploy TX:", tx);
+
+        // contract address from receipt
+        currentInstance = tx.options.address;;
+        alert("User Joined: " + currentInstance);
+        // update UI
+        document.getElementById("walletInst").innerText =
+            "Inst " + shortAddr(currentInstance);
+
+        document.getElementById("btnJoin").style.display = "none";
+        document.getElementById("btnInit").style.display = "block";
+
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+    }
 
     hideLoader();
 }
 
-async function initUser(){
+async function initUser() {
 
-    if(!currentInstance){
+    if (!currentInstance) {
         alert("Instance not found");
         return;
     }
 
-    try{
+    try {
 
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-       
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
@@ -1023,7 +1021,7 @@ async function initUser(){
 
         instancecontract.methods.owner().call(console.log);
         instancecontract.methods.getHexbase().call(console.log);
-        
+
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
@@ -1047,44 +1045,44 @@ async function initUser(){
                 maxPriorityFeePerGas: "1", // low tip
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
-            
+
         console.log("Instance initialized");
 
         // reload panel so stor address appears
         await addConnectedUserPanel();
 
-    }catch(e){
+    } catch (e) {
         console.log(e);
         alert("Transfer failed: " + (err.message || err));
     }
-     hideLoader();
+    hideLoader();
 }
 
-async function loginUser(){
+async function loginUser() {
 
-    if(!currentInstance){
+    if (!currentInstance) {
         alert("Instance not found");
         return;
     }
 
-    try{
+    try {
 
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-       
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
         );
 
-        
+
         instancecontract.methods.owner().call(console.log);
         instancecontract.methods.getHexbase().call(console.log);
-        
+
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-        
+
         // estimate gas
         const gas = await instancecontract.methods
             .login(maxintervals)
@@ -1105,15 +1103,15 @@ async function loginUser(){
                 maxPriorityFeePerGas: "1", // low tip
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
-            
+
         console.log("Login successful");
 
         // reload panel so stor address appears
         await addConnectedUserPanel();
 
-    }catch(e){
-        
-        
+    } catch (e) {
+
+
         alert("Login failed: " + (err.message));
     }
     hideLoader();
@@ -1121,15 +1119,15 @@ async function loginUser(){
 
 async function importUser() {
 
-    try{
+    try {
 
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
         const userId = await nested.methods.UserToId(currentAccount).call();
-        if(userId==0) { alert("Invalid user"); return;}
+        if (userId == 0) { alert("Invalid user"); return; }
         const limit = 5; // change according to your import batch size
-        
+
         const nestedcontract = new web3T.eth.Contract(
             INested741ABI.abi,
             inNested741
@@ -1145,118 +1143,118 @@ async function importUser() {
 
         await addConnectedUserPanel();
 
-    }catch(e){
+    } catch (e) {
         console.log(e);
         alert("Transfer failed: " + (err.message || err));
     }
     hideLoader();
 }
 
-async function buyNFT(o1155, tokenId){
-  showLoader();
-                    try{
+async function buyNFT(o1155, tokenId) {
+    showLoader();
+    try {
 
-                        if(!currentAccount){
-                            alert("Connect wallet first");
-                            return;
-                        }
+        if (!currentAccount) {
+            alert("Connect wallet first");
+            return;
+        }
 
-                        if(currentInstance==null || currentInstance =='0x0000000000000000000000000000000000000000'){
-                            alert("invalid instance");
-                            return;
-                        }
+        if (currentInstance == null || currentInstance == '0x0000000000000000000000000000000000000000') {
+            alert("invalid instance");
+            return;
+        }
 
-                        if(currentStor==null || currentStor == '0x0000000000000000000000000000000000000000'){
-                            alert("invalid stor");
-                            return;
-                        }
-                        
-                        const qty = prompt("Enter buy amount:");
-                        if (!qty) {
-                            throw 'buy amount required';
-                        }
-                       
-                        let accounts = await ethereum.enable();
-                        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-		                window.web3T = new Web3(window.ethereum);
-                        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
-                        const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
-                       
-                        // qty = 1 (market purchase)
-                       
-                        //const tokenid = i;
+        if (currentStor == null || currentStor == '0x0000000000000000000000000000000000000000') {
+            alert("invalid stor");
+            return;
+        }
 
-                        // get mint value
-                        let value = BigInt(
-                            await rule.methods
-                            .computeMintValue(qty)
-                            .call()
-                        );
-                              
-                        // check bonus
-                        let bonus = BigInt(
-                            await storcontract.methods
-                            .bonus()
-                            .call()
-                        );
+        const qty = prompt("Enter buy amount:");
+        if (!qty) {
+            throw 'buy amount required';
+        }
 
-                        // reduce bonus
-                        value = bonus >= value ? 0n : (value - bonus);
-                        
-                        // get latest base fee
-                        const block = await web3T.eth.getBlock("latest");
-                        const baseFee = BigInt(block.baseFeePerGas || 0);
+        let accounts = await ethereum.enable();
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+        window.web3T = new Web3(window.ethereum);
+        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
+        const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
 
-                        // estimate gas
-                        const gas = await instancecontract.methods
-                            .Txn(o1155, tokenId, qty, 1)
-                            .estimateGas({
-                                from: accounts[0],
-                                value: value.toString()
-                            });
+        // qty = 1 (market purchase)
 
-                        // send transaction
-                        const receipt = await instancecontract.methods
-                            .Txn(o1155, tokenId, qty, 1)
-                            .send({
-                                from: accounts[0],
-                                value: value.toString(),
+        //const tokenid = i;
 
-                                gas: Math.floor(gas * 1.1), // small buffer
+        // get mint value
+        let value = BigInt(
+            await rule.methods
+                .computeMintValue(qty)
+                .call()
+        );
 
-                                maxPriorityFeePerGas: "1", // low tip
-                                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
-                            });
-                    
-                        if (receipt.status) {
-                            alert("NFT Purchased");
-                        } else {
-                            alert("NFT Failed");
-                        }
+        // check bonus
+        let bonus = BigInt(
+            await storcontract.methods
+                .bonus()
+                .call()
+        );
 
-                    }catch(e){
-                        console.error(e);
-                        alert("Purchased failed: " + (err.message || err));
-                    }
- hideLoader();
+        // reduce bonus
+        value = bonus >= value ? 0n : (value - bonus);
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // estimate gas
+        const gas = await instancecontract.methods
+            .Txn(o1155, tokenId, qty, 1)
+            .estimateGas({
+                from: accounts[0],
+                value: value.toString()
+            });
+
+        // send transaction
+        const receipt = await instancecontract.methods
+            .Txn(o1155, tokenId, qty, 1)
+            .send({
+                from: accounts[0],
+                value: value.toString(),
+
+                gas: Math.floor(gas * 1.1), // small buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+            });
+
+        if (receipt.status) {
+            alert("NFT Purchased");
+        } else {
+            alert("NFT Failed");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Purchased failed: " + (err.message || err));
+    }
+    hideLoader();
 }
 
 async function loadID() {
     try {
         const uid = prompt("Enter ID:");
-        if (!uid && parseInt(uid)>0) 
+        if (!uid && parseInt(uid) > 0)
             throw 'valid ID required';
         const user = await nested.methods.nodes(uid).call();
-        if(user==ZERO) alert ("No user found");
+        if (user == ZERO) alert("No user found");
         else document.getElementById("userAddrInput").value = user;
 
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         alert("Failed: " + (err.message || err));
-    } 
-        
+    }
+
     hideLoader();
- }
+}
 
 // -------------------- LOAD USER FULL --------------------
 async function loadUser() {
@@ -1266,33 +1264,33 @@ async function loadUser() {
         alert("Enter a valid Ethereum address");
         return;
     }
-    
+
     clearPanels();
-    
-    
+
+
 
     const panel = addPanel("User Data");
-    try{
-        
-        sysAge = await nested.methods.systemAge().call(); 
+    try {
+
+        sysAge = await nested.methods.systemAge().call();
         document.getElementById("sysAgeid").innerHTML = sysAge;
 
         const id = await nested.methods.UserToId(user).call();
         const node = await nested.methods.getNode(id).call();
         const isdelegator = await nested.methods._isDelegatorNode(user).call();
         const isdelegatorNode = await daoassembly.methods.isdelegatorNode(user).call();
-        const teamSizeAndZeroDownlevelCount = await nested.methods.getTotalTeamSizeWithLevel(user,1).call();
+        const teamSizeAndZeroDownlevelCount = await nested.methods.getTotalTeamSizeWithLevel(user, 1).call();
 
         addRow(panel, "ID", node[0]);
         addRow(panel, "Node", node[1]);
         addRow(panel, "Parent", node[2]);
         addRow(panel, "Active", node[5]);
         addRow(panel, "Direct Count", node[6]);
-        addRow(panel, "Downline Size (1 level)",teamSizeAndZeroDownlevelCount[1]);
-        addRow(panel, "TotalTeamSize",teamSizeAndZeroDownlevelCount[0]);
-        
-        addRow(panel,"Are you Eligible DAO Delegator ", isdelegator);
-        addRow(panel,"Are you Active DAO Delegator ", isdelegatorNode);
+        addRow(panel, "Downline Size (1 level)", teamSizeAndZeroDownlevelCount[1]);
+        addRow(panel, "TotalTeamSize", teamSizeAndZeroDownlevelCount[0]);
+
+        addRow(panel, "Are you Eligible DAO Delegator ", isdelegator);
+        addRow(panel, "Are you Active DAO Delegator ", isdelegatorNode);
         const instAddr = node[3];
         const storAddr = node[4];
         addRow(panel, "INST---", "");
@@ -1305,60 +1303,60 @@ async function loadUser() {
             addRow(panel, "Instance ID", instId);
             addRow(panel, "Instance Parent", instParent);
             addRow(panel, "Instance Stor", instStor);
-        } 
+        }
         addRow(panel, "STOR---", "");
         addRow(panel, "StorAddr", node[4]);
-       
+
         await loadMyStor(id, panel);
- 
+
         await loadMyNFT();
-    } catch(err){
+    } catch (err) {
         console.error(err);
-        addRow(panel,"Error","Unable to load marketplace");
+        addRow(panel, "Error", "Unable to load marketplace");
     }
 
     hideLoader();
 
-    
+
 }
 
 
 function formatRow(arr, width = 15) {
-  return arr
-    .map(v => String(v).padStart(width, " "))
-    .join(' | ');
+    return arr
+        .map(v => String(v).padStart(width, " "))
+        .join(' | ');
 }
 
 async function loadMyStor(id, panel) {
-    try{
+    try {
 
         const node = await nested.methods.getNode(id).call();
         const storAddr = node[4];
-        if (storAddr != "0x0000000000000000000000000000000000000000") { 
+        if (storAddr != "0x0000000000000000000000000000000000000000") {
 
-          
-            
+
+
             const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
             const dage = await stor.methods.dage().call();
-            const rankWithAge= await stor.methods.getRankWithAgeValue().call();
+            const rankWithAge = await stor.methods.getRankWithAgeValue().call();
             const cage = await stor.methods.cage().call();
             const isLock = await stor.methods.isLock().call();
             const postInit = await stor.methods.postInit().call();
- 
-            addRow(panel,"Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
-            addRow(panel,"Stor Dage",`${getAgeDateRange(dage).start} {${dage}}`);
-            addRow(panel,"Stor Rank",`Rank: ${rankWithAge[0]}`);
-            addRow(panel,"Stor postInit",`postInit: ${postInit}`);
-            
+
+            addRow(panel, "Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
+            addRow(panel, "Stor Dage", `${getAgeDateRange(dage).start} {${dage}}`);
+            addRow(panel, "Stor Rank", `Rank: ${rankWithAge[0]}`);
+            addRow(panel, "Stor postInit", `postInit: ${postInit}`);
+
             const tableRg = document.createElement("table");
-                tableRg.border = "1";
-                tableRg.cellPadding = "5";
-                tableRg.style.width = "50%";
-                tableRg.style.display= "table-cell";
-            addRow(panel,"Rank ages",tableRg);
-                // ✅ THEAD (Header)
+            tableRg.border = "1";
+            tableRg.cellPadding = "5";
+            tableRg.style.width = "50%";
+            tableRg.style.display = "table-cell";
+            addRow(panel, "Rank ages", tableRg);
+            // ✅ THEAD (Header)
             const theadRg = document.createElement("thead");
-                theadRg.innerHTML = `
+            theadRg.innerHTML = `
                 <tr>
                     <th>Rank</th>
                     <th>Age</th>
@@ -1368,9 +1366,9 @@ async function loadMyStor(id, panel) {
             tableRg.appendChild(theadRg);
             const tbodyRg = document.createElement("tbody");
             const getRankAgeInBatch = await stor.methods.getRankAgeInBatch().call();
-            for(let r = 0; r<getRankAgeInBatch.length; r++){
+            for (let r = 0; r < getRankAgeInBatch.length; r++) {
                 const row = document.createElement("tr")
-                    row.innerHTML = `
+                row.innerHTML = `
                     <td>${parseInt(r)}</td>
                     <td>${getRankAgeInBatch[r]}</td>
                     <td>${getAgeDateRange(getRankAgeInBatch[r]).start}</td>
@@ -1381,34 +1379,34 @@ async function loadMyStor(id, panel) {
             // ✅ Attach tbody
             tableRg.appendChild(tbodyRg);
 
-             /*
-            let aj1 = await stor.methods.comp(15,2).call();
-            let aj2 = await stor.methods.comp(15,1).call();
-            
-            let aj3 = await stor.methods.comp(14,2).call();
-            let aj4 = await stor.methods.comp(14,1).call();
+            /*
+           let aj1 = await stor.methods.comp(15,2).call();
+           let aj2 = await stor.methods.comp(15,1).call();
            
+           let aj3 = await stor.methods.comp(14,2).call();
+           let aj4 = await stor.methods.comp(14,1).call();
           
-            stor.methods.rankage(0).call(console.log);
-            stor.methods.rankage(1).call(console.log);
-            stor.methods.rankage(2).call(console.log);
-            
-            // Fetch LSB 1,3,30,93,95,603,695,696
-            const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
-            for (const i of lsbIndexes) {
-                const val = await stor.methods.LSB(i).call();
-                addRow(panel, `Stor LSB(${i})`, val);
-            }
-            */
+         
+           stor.methods.rankage(0).call(console.log);
+           stor.methods.rankage(1).call(console.log);
+           stor.methods.rankage(2).call(console.log);
+           
+           // Fetch LSB 1,3,30,93,95,603,695,696
+           const lsbIndexes = [1, 3, 30, 93, 95, 603, 695, 696];
+           for (const i of lsbIndexes) {
+               const val = await stor.methods.LSB(i).call();
+               addRow(panel, `Stor LSB(${i})`, val);
+           }
+           */
 
-     
+
             // Drawn, Flushed, Unpaid, Compute
-            const drawn = await stor.methods.getAllData(1,0).call();
-            const flushed = await stor.methods.getAllData(2,0).call();
-            const unpaid = await stor.methods.getAllData(3,0).call();
-            const misc = await stor.methods.getAllData(4,0).call();
-            const consts = await stor.methods.getAllData(5,0).call();
-            
+            const drawn = await stor.methods.getAllData(1, 0).call();
+            const flushed = await stor.methods.getAllData(2, 0).call();
+            const unpaid = await stor.methods.getAllData(3, 0).call();
+            const misc = await stor.methods.getAllData(4, 0).call();
+            const consts = await stor.methods.getAllData(5, 0).call();
+
             let compute;
             try {
                 compute = await stor.methods.getAllComputeData(maxintervals).call();
@@ -1418,22 +1416,22 @@ async function loadMyStor(id, panel) {
                 // Fallback → prevent UI break
                 //compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-            console.log(`compute: `  + compute);
-           
+            console.log(`compute: ` + compute);
+
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             // Add a header row
-            addRow(panel, "Income Type", formatRow(["Compute","ComputeFlush","Drawn","Flushed","Unpaid"]));
+            addRow(panel, "Income Type", formatRow(["Compute", "ComputeFlush", "Drawn", "Flushed", "Unpaid"]));
 
             for (let i = 0; i < 7; i++) {
-                const comp = formatOZN(compute[`p${i+1}`]);
-                const compFlush = formatOZN(compute[`f${i+1}`]);
+                const comp = formatOZN(compute[`p${i + 1}`]);
+                const compFlush = formatOZN(compute[`f${i + 1}`]);
                 const drwn = formatOZN(drawn[i]);
                 const flsh = formatOZN(flushed[i]);
                 const unpaidVal = formatOZN(unpaid[i]);
-                const susCount =  await stor.methods.getToggleAgeCount(i+1).call();
-                
-                addRow(panel, `${incomeTypes[i]} (${parseInt(susCount)%2==1?"F":"T"})`, 
+                const susCount = await stor.methods.getToggleAgeCount(i + 1).call();
+
+                addRow(panel, `${incomeTypes[i]} (${parseInt(susCount) % 2 == 1 ? "F" : "T"})`,
                     formatRow([
                         String(comp),
                         String(compFlush),
@@ -1445,25 +1443,25 @@ async function loadMyStor(id, panel) {
             }
 
 
-             
-            const toggleAgeListdiv =document.createElement("div");
+
+            const toggleAgeListdiv = document.createElement("div");
             toggleAgeListdiv.style.display = "-webkit-inline-box";
             toggleAgeListdiv.style.alignItems = "center";
-            toggleAgeListdiv.style.gap = "8px"; 
+            toggleAgeListdiv.style.gap = "8px";
 
-            const guagecontainer=document.createElement("div");
-            guagecontainer.id="container";
-            guagecontainer.style.width= "520px";
+            const guagecontainer = document.createElement("div");
+            guagecontainer.id = "container";
+            guagecontainer.style.width = "520px";
 
             const tableToggle = document.createElement("table");
-                tableToggle.border = "1";
-                tableToggle.cellPadding = "5";
-                tableToggle.style.width = "50%";
-                tableToggle.style.display= "table-cell";
+            tableToggle.border = "1";
+            tableToggle.cellPadding = "5";
+            tableToggle.style.width = "50%";
+            tableToggle.style.display = "table-cell";
             toggleAgeListdiv.appendChild(guagecontainer);
             toggleAgeListdiv.appendChild(tableToggle);
-            addRow(panel,"ToggleAgeList",toggleAgeListdiv);
-                // ✅ THEAD (Header)
+            addRow(panel, "ToggleAgeList", toggleAgeListdiv);
+            // ✅ THEAD (Header)
             const theadToggle = document.createElement("thead");
             theadToggle.innerHTML = `
                 <tr>
@@ -1477,7 +1475,7 @@ async function loadMyStor(id, panel) {
             const values = [...Array.from({ length: 7 }, (_, i) => i + 1), 999];
             for (const v of values) {
                 console.log(v);
-                const susCount =  await stor.methods.getToggleAgeCount(v).call();
+                const susCount = await stor.methods.getToggleAgeCount(v).call();
                 const result = [];
                 for (let i = 0; i < susCount; i++) {
                     const value = await stor.methods.getToggleAgeValue(v, i).call();
@@ -1488,7 +1486,7 @@ async function loadMyStor(id, panel) {
                 }
 
                 const row = document.createElement("tr")
-                    row.innerHTML = `
+                row.innerHTML = `
                     <td>${v}</td>
                     <td>${susCount}</td>
                     <td>${result.map(item => `<div>${item.index} - ${item.value}</div>`).join("")}</td>
@@ -1499,7 +1497,7 @@ async function loadMyStor(id, panel) {
 
             // ✅ Attach tbody
             tableToggle.appendChild(tbodyToggle);
-                 
+
             /*loadGraph({
                 totalIncome: formatOZN(capStatus.totalIncome),
                 burned4x: formatOZN(capStatus.burnedx),
@@ -1508,20 +1506,20 @@ async function loadMyStor(id, panel) {
                 currentValue:formatOZN(capStatus.currentValue)
 
             });*/
-           
-            
+
+
             debugger;
-            
+
             const minpaydollartozonewei = await rule.methods.computeDollarToOzone(compute.minpaydollar.toString()).call();
             const minpaydollartozone = formatOZN(minpaydollartozonewei);
-        
+
             const totincdollartozonewei = await rule.methods.computeDollarToOzone(compute.totIncdollar.toString()).call();
             const totincdollartozone = formatOZN(totincdollartozonewei);
-        
 
-            addRow(panel, "CAP",  compute.cap);
-             
-            const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0,0).call();
+
+            addRow(panel, "CAP", compute.cap);
+
+            const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0, 0).call();
 
             addRow(panel, "CAP DOLLAR", formatRow([
                 "Invested_Dollar",
@@ -1537,9 +1535,9 @@ async function loadMyStor(id, panel) {
                 formatOZN(consts[1]),
                 formatOZN(consts[5]),
                 formatOZN(compute.thresholdollarx),
-                formatOZN(compute.totIncdollar) + '('+totincdollartozone+')',
+                formatOZN(compute.totIncdollar) + '(' + totincdollartozone + ')',
                 formatOZN(consts[3]),
-                parseFloat(formatOZN(compute.minpaydollar)) + '('+minpaydollartozone+')',
+                parseFloat(formatOZN(compute.minpaydollar)) + '(' + minpaydollartozone + ')',
                 compute.capdollar
             ]));
 
@@ -1558,7 +1556,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(consts[4]),
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
-                 formatOZN(consts[2]),
+                formatOZN(consts[2]),
                 parseFloat(formatOZN(compute.minpay)),
                 compute.capinc
             ]));
@@ -1566,42 +1564,42 @@ async function loadMyStor(id, panel) {
             // Burned & Self Proposed
             //CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old
             //BURNED, BURNED_DOLLAR, INVESTED_DOLLAR, CLAIMED_DOLLAR, 0, 0, 0
-           
+
             addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[0]));
             addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[1]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
             addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
             addRow(panel, "LOCKED", isLock);
-           
-            const right=document.createElement("div");
-            const btnClaim=document.createElement("button");
-            btnClaim.innerText="Claim";
-            btnClaim.style.marginLeft="10px";
+
+            const right = document.createElement("div");
+            const btnClaim = document.createElement("button");
+            btnClaim.innerText = "Claim";
+            btnClaim.style.marginLeft = "10px";
             btnClaim.onclick = () => {
-              onClaim();
+                onClaim();
             };
 
-            const btnCapBurn=document.createElement("button");
-            btnCapBurn.innerText="CapBurn";
-            btnCapBurn.style.marginLeft="10px";
+            const btnCapBurn = document.createElement("button");
+            btnCapBurn.innerText = "CapBurn";
+            btnCapBurn.style.marginLeft = "10px";
 
             btnCapBurn.onclick = () => {
-              onCapBurn();
+                onCapBurn();
             };
             right.appendChild(btnClaim);
             right.appendChild(btnCapBurn);
-            
+
             addRow(panel, "Claim", right);
         }
-    } catch(err){
+    } catch (err) {
 
         console.error(err);
-        addRow(panel,"Error","Unable to load store");
+        addRow(panel, "Error", "Unable to load store");
 
     }
 }
 
-async function loadUpline(){
+async function loadUpline() {
     showLoader();
     const input = document.getElementById("userAddrInput");
     const user = input.value.trim();
@@ -1610,8 +1608,8 @@ async function loadUpline(){
         return;
     }
     clearPanels();
-    
-    try{
+
+    try {
 
         const id = await nested.methods.UserToId(user).call();
         _loadUpline(id);
@@ -1619,104 +1617,104 @@ async function loadUpline(){
     } catch (err) {
         console.error(err);
         alert("loadUpline failed: " + (err.message || err));
-    } 
-        
+    }
+
     hideLoader();
 
 }
 
 
-async function _loadUpline(id){
-    try{
-        
+async function _loadUpline(id) {
+    try {
+
         const node = await nested.methods.getNode(id).call();
         const panel = addPanel(`${node[0]} | ${node[1]} | ${node[2]}`);
         await loadMyStor(id, panel);
-        if(parseInt(node[2])>0) await _loadUpline(parseInt(node[2]));
+        if (parseInt(node[2]) > 0) await _loadUpline(parseInt(node[2]));
 
     } catch (err) {
         console.error(err);
         alert("loadUpline failed: " + (err.message || err));
-    } 
+    }
 }
 
 
 async function loadDAO() {
-     clearPanels();
-     const panel = addPanel("DAO Admin");
-     try{
-        
-      
-        addRow(panel,"DAO Core",indaocore);
-        addRow(panel,"DAO Assembly",indaoassembly);
+    clearPanels();
+    const panel = addPanel("DAO Admin");
+    try {
+
+
+        addRow(panel, "DAO Core", indaocore);
+        addRow(panel, "DAO Assembly", indaoassembly);
 
         const delegatorCount = await daoassembly.methods.getdelegatorCount().call();
-        
+
         const rankforDAO = await rule.methods.rankforDAO().call();
-      
+
         // const blacklistedCount = await daoassembly.methods.blacklistedCount().call();
         const proposalsCount = await daocore.methods.getProposalsCount().call();
         const left = document.createElement("div");
-        
+
         left.innerHTML =
-                    '<div style="display:flex;align-items:center;gap:8px;">'
-                    + ' DelegatorCount: ' + delegatorCount            
-                    + ' | RankForDAO: ' + rankforDAO         
-                    + ' | BlacklistedCount: ' + 0    
-                    //+ ' | ProposalsCount: ' + proposalsCount    
-                    + '</div>';
+            '<div style="display:flex;align-items:center;gap:8px;">'
+            + ' DelegatorCount: ' + delegatorCount
+            + ' | RankForDAO: ' + rankforDAO
+            + ' | BlacklistedCount: ' + 0
+            //+ ' | ProposalsCount: ' + proposalsCount    
+            + '</div>';
 
-        const left2=document.createElement("div");
-        const right2=document.createElement("div");
-       
-        const btnChangeParent=document.createElement("button");
-        btnChangeParent.innerText="ChangeParent";
-        btnChangeParent.style.marginLeft="10px";
+        const left2 = document.createElement("div");
+        const right2 = document.createElement("div");
+
+        const btnChangeParent = document.createElement("button");
+        btnChangeParent.innerText = "ChangeParent";
+        btnChangeParent.style.marginLeft = "10px";
         btnChangeParent.onclick = () => {
-              onChangeParent();
+            onChangeParent();
         };
 
-        const btnChangeOwner=document.createElement("button");
-        btnChangeOwner.innerText="ChangeOwner";
-        btnChangeOwner.style.marginLeft="10px";
+        const btnChangeOwner = document.createElement("button");
+        btnChangeOwner.innerText = "ChangeOwner";
+        btnChangeOwner.style.marginLeft = "10px";
         btnChangeOwner.onclick = () => {
-              onChangeOwner();
+            onChangeOwner();
         };
 
-        const btnSuspendIncome=document.createElement("button");
-        btnSuspendIncome.innerText="SuspendIncome";
-        btnSuspendIncome.style.marginLeft="10px";
+        const btnSuspendIncome = document.createElement("button");
+        btnSuspendIncome.innerText = "SuspendIncome";
+        btnSuspendIncome.style.marginLeft = "10px";
         btnSuspendIncome.onclick = () => {
-              onSuspendIncome();
+            onSuspendIncome();
         };
 
-        const btnLockUser=document.createElement("button");
-        btnLockUser.innerText="LockUser";
-        btnLockUser.style.marginLeft="10px";
+        const btnLockUser = document.createElement("button");
+        btnLockUser.innerText = "LockUser";
+        btnLockUser.style.marginLeft = "10px";
         btnLockUser.onclick = () => {
-              onLockuser();
+            onLockuser();
         };
 
-        
+
         left2.appendChild(btnChangeParent);
         left2.appendChild(btnChangeOwner);
         left2.appendChild(btnSuspendIncome);
         left2.appendChild(btnLockUser);
 
-        const btnTransferForms=document.createElement("button");
-        btnTransferForms.innerText="TransferForms";
-        btnTransferForms.style.marginLeft="10px";
+        const btnTransferForms = document.createElement("button");
+        btnTransferForms.innerText = "TransferForms";
+        btnTransferForms.style.marginLeft = "10px";
         btnTransferForms.onclick = () => {
-              loadTransferForms();
+            loadTransferForms();
         };
 
-        const btnProposals=document.createElement("button");
-        btnProposals.innerText="Proposals";
-        btnProposals.style.marginLeft="10px";
+        const btnProposals = document.createElement("button");
+        btnProposals.innerText = "Proposals";
+        btnProposals.style.marginLeft = "10px";
         btnProposals.onclick = () => {
-              loadProposals();
+            loadProposals();
         };
-         
+
 
         right2.appendChild(btnTransferForms);
         right2.appendChild(btnProposals);
@@ -1727,7 +1725,7 @@ async function loadDAO() {
     } catch (err) {
         console.error(err);
         addRow(panel, "", err.message);
-    } 
+    }
     hideLoader();
 }
 
@@ -1742,12 +1740,12 @@ echo "$SUBJECT"
 */
 //function setMoveDownlineApproval(uint256 _id, address parent, bool approval)
 async function onChangeOwner() {
-     try {
-        
+    try {
+
         const olduseraddress = prompt("Enter old User id needs to be changed");
 
         if (olduseraddress !== null && olduseraddress !== "") {
-            if(!nested.method.isUserExists(olduseraddress)) { alert('incorrect address'); return }
+            if (!nested.method.isUserExists(olduseraddress)) { alert('incorrect address'); return }
         } else {
             alert("No User address entered");
             return;
@@ -1756,7 +1754,7 @@ async function onChangeOwner() {
         const newuseraddress = prompt("Enter new User id needs to be update");
 
         if (newuseraddress !== null && newuseraddress !== "") {
-            if(nested.method.isUserExists(newuseraddress)) { alert('already exists'); return }
+            if (nested.method.isUserExists(newuseraddress)) { alert('already exists'); return }
         } else {
             alert("No User address entered");
             return;
@@ -1770,16 +1768,16 @@ async function onChangeOwner() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-        
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-        
+
         // prepare method
-        const method = daoContract.methods.newProposal(2,ZERO,params,0);
+        const method = daoContract.methods.newProposal(2, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -1795,27 +1793,27 @@ async function onChangeOwner() {
             maxPriorityFeePerGas: "1",
             maxFeePerGas: (baseFee + 2n).toString()
         });
-        
+
         if (receipt.status) {
             alert("NewProposer succeeded");
         } else {
             alert("NewProposer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("NewProposer failed: " + (err.message || err));
-    } 
-} 
+    }
+}
 
 async function onChangeParent() {
-     try {
-        
+    try {
+
         const userId = prompt("Enter User id needs to be moved:");
 
         if (userId !== null && userId !== "") {
-            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+            if (!nested.method.isNode(userId)) { alert('incorrect id'); return }
         } else {
             alert("No User ID entered");
             return;
@@ -1824,7 +1822,7 @@ async function onChangeParent() {
         const parentId = prompt("Enter parent id needs to be switched:");
 
         if (parentId !== null && parentId !== "") {
-            if(!nested.method.isNode(parentId)) { alert('incorrect id'); return }
+            if (!nested.method.isNode(parentId)) { alert('incorrect id'); return }
         } else {
             alert("No Parent ID entered");
             return;
@@ -1838,16 +1836,16 @@ async function onChangeParent() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-        
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-        
+
         // prepare method
-        const method = daoContract.methods.newProposal(1,ZERO,params,0);
+        const method = daoContract.methods.newProposal(1, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -1863,27 +1861,27 @@ async function onChangeParent() {
             maxPriorityFeePerGas: "1",
             maxFeePerGas: (baseFee + 2n).toString()
         });
-        
+
         if (receipt.status) {
             alert("NewProposer succeeded");
         } else {
             alert("NewProposer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("NewProposer failed: " + (err.message || err));
-    } 
-} 
+    }
+}
 
 async function onSuspendIncome() {
-     try {
-        
+    try {
+
         const userId = prompt("Enter User id needs to be suspend:");
 
         if (userId !== null && userId !== "") {
-            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+            if (!nested.method.isNode(userId)) { alert('incorrect id'); return }
         } else {
             alert("No User ID entered");
             return;
@@ -1892,7 +1890,7 @@ async function onSuspendIncome() {
         const incomekey = prompt("Enter Income key:");
 
         if (incomekey !== null && incomekey !== "") {
-            if(parseInt(incomekey)>=1 && parseInt(incomekey)<=7) { alert('incorrect key'); return }
+            if (parseInt(incomekey) >= 1 && parseInt(incomekey) <= 7) { alert('incorrect key'); return }
         } else {
             alert("No key entered");
             return;
@@ -1902,7 +1900,7 @@ async function onSuspendIncome() {
         const startstop = prompt("Type- 1:stop | 0:start");
 
         if (startstop !== null && startstop !== "") {
-            if(parseInt(startstop)>=0 && parseInt(startstop)<=1) { alert('incorrect startstop'); return }
+            if (parseInt(startstop) >= 0 && parseInt(startstop) <= 1) { alert('incorrect startstop'); return }
         } else {
             alert("No startstop entered");
             return;
@@ -1910,22 +1908,22 @@ async function onSuspendIncome() {
 
         const params = web3.eth.abi.encodeParameters(
             ["uint256", "bool"],
-            [incomekey, startstop==1]
+            [incomekey, startstop == 1]
         );
 
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-        
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
         const useraddress = nested.methods.nodes(userId);
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-        
+
         // prepare method
-        const method = daoContract.methods.newProposal(3,useraddress,params,0);
+        const method = daoContract.methods.newProposal(3, useraddress, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -1941,27 +1939,27 @@ async function onSuspendIncome() {
             maxPriorityFeePerGas: "1",
             maxFeePerGas: (baseFee + 2n).toString()
         });
-        
+
         if (receipt.status) {
             alert("NewProposer succeeded");
         } else {
             alert("NewProposer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("NewProposer failed: " + (err.message || err));
-    } 
-} 
+    }
+}
 
 async function onLockuser() {
-     try {
-        
+    try {
+
         const userId = prompt("Enter User id needs to be locked:");
 
         if (userId !== null && userId !== "") {
-            if(!nested.method.isNode(userId)) { alert('incorrect id'); return }
+            if (!nested.method.isNode(userId)) { alert('incorrect id'); return }
         } else {
             alert("No User ID entered");
             return;
@@ -1970,7 +1968,7 @@ async function onLockuser() {
         const startstop = prompt("Type- 1:lock | 0:unlocked");
 
         if (startstop !== null && startstop !== "") {
-            if(parseInt(startstop)>=0 && parseInt(startstop)<=1) { alert('incorrect lock'); return }
+            if (parseInt(startstop) >= 0 && parseInt(startstop) <= 1) { alert('incorrect lock'); return }
         } else {
             alert("No lock entered");
             return;
@@ -1978,22 +1976,22 @@ async function onLockuser() {
 
         const params = web3.eth.abi.encodeParameters(
             ["bool"],
-            [startstop==1]
+            [startstop == 1]
         );
 
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-        
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
         const useraddress = nested.methods.nodes(userId);
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-        
+
         // prepare method
-        const method = daoContract.methods.newProposal(4,useraddress,params,0);
+        const method = daoContract.methods.newProposal(4, useraddress, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2009,37 +2007,37 @@ async function onLockuser() {
             maxPriorityFeePerGas: "1",
             maxFeePerGas: (baseFee + 2n).toString()
         });
-        
+
         if (receipt.status) {
             alert("NewProposer succeeded");
         } else {
             alert("NewProposer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("NewProposer failed: " + (err.message || err));
-    } 
-} 
+    }
+}
 
 async function onMovedownlineProposer(uid) {
-   
+
     try {
-        
-          
+
+
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-    
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const nestedContractT = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
- 
+
         // estimate gas
         const gas = 9999999;
- 
+
         // send transaction
         const receipt = await nestedContractT.methods
             .moveDownline(uid)
@@ -2052,23 +2050,23 @@ async function onMovedownlineProposer(uid) {
                 maxPriorityFeePerGas: "1", // low tip
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
-       
-            if (receipt.status) {
-                alert("Movedownline succeeded");
-            } else {
-                alert("Movedownline failed");
-            }
+
+        if (receipt.status) {
+            alert("Movedownline succeeded");
+        } else {
+            alert("Movedownline failed");
+        }
     } catch (err) {
         console.error(err);
         alert("Movedownline failed: " + (err.message || err));
-    } 
-} 
+    }
+}
 //send "$PKKEY" "$TransferRequest" "0" "submitTransferForm(address,address[] memory)" "$ADDRESS" "$mandatedvoters_arr"
 
 async function onSubmitTrasfer() {
 
     try {
-        
+
         const fromAddress = prompt("Enter ADDRESS to be transferred:");
         if (!fromAddress) {
             throw 'Enter from Address';
@@ -2076,10 +2074,10 @@ async function onSubmitTrasfer() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-       
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const trContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-    
+
         const tx = await trContract.methods
             .submitTransferForm(fromAddress, 10)
             .send({
@@ -2092,22 +2090,22 @@ async function onSubmitTrasfer() {
         } else {
             alert("SubmitTrasfer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("SubmitTrasfer failed: " + (err.message || err));
-    } 
+    }
 
 }
 
 async function loadProposals() {
-     const panel = addPanel("Proposals");
-    try{
+    const panel = addPanel("Proposals");
+    try {
         const count = await daocore.methods.getProposalsCount().call();
-        
+
         let limit = 3;
-      
+
         const table = document.createElement("table");
         table.border = "1";
         table.cellPadding = "5";
@@ -2130,16 +2128,16 @@ async function loadProposals() {
         </tr>
         `;
         table.appendChild(thead);
-       const tbody = document.createElement("tbody");
-      for (let i = count; i >= 1 && limit>0; i--) {
-      
-        const p = await daocore.methods.getProposal(i).call();
-        const r = await daocore.methods.getResult(i).call();
-        let approve = "PENDING"
-        if(r[5]) approve = "RESOLVE";
+        const tbody = document.createElement("tbody");
+        for (let i = count; i >= 1 && limit > 0; i--) {
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
+            const p = await daocore.methods.getProposal(i).call();
+            const r = await daocore.methods.getResult(i).call();
+            let approve = "PENDING"
+            if (r[5]) approve = "RESOLVE";
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
           <td>${i}</td>
           <td title="${p[0]}">${p[0]}</td>
           <td class="shortAddr " title="${p[1]}">${shortAddr(p[1])}</td>
@@ -2158,28 +2156,28 @@ async function loadProposals() {
             <button onclick="cancelproposal(${i})">Cancel</button>
           </td>
         `;
-        tbody.appendChild(row);
-        limit--;
-      }
+            tbody.appendChild(row);
+            limit--;
+        }
 
         // ✅ Attach tbody
         table.appendChild(tbody);
 
-       
 
-      addRow(panel, "", table);
+
+        addRow(panel, "", table);
     } catch (err) {
         console.error(err);
         addRow(panel, "", err.message);
-    } 
+    }
 }
 
 async function loadTransferForms() {
 
-      const panel = addPanel("TransferForms");
-    try{
+    const panel = addPanel("TransferForms");
+    try {
         const count = await transferRequests.methods.getFormsCount().call();
-        
+
         let limit = 10;
         const table = document.createElement("table");
         table.border = "1";
@@ -2200,13 +2198,13 @@ async function loadTransferForms() {
         </tr>
         `;
         table.appendChild(thead);
-       const tbody = document.createElement("tbody");
-      for (let i = count; i >= 1 && limit>0; i--) {
-        
-        const p = await transferRequests.methods.getForm(i).call();
-      
-        const row = document.createElement("tr");
-        row.innerHTML = `
+        const tbody = document.createElement("tbody");
+        for (let i = count; i >= 1 && limit > 0; i--) {
+
+            const p = await transferRequests.methods.getForm(i).call();
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
           <td>${i}</td>
           <td class="shortAddr" title="${p[p.from]}">${shortAddr(p.from)}</td>
           <td class="shortAddr" title="${p[p.to]}">${shortAddr(p.to)}</td>
@@ -2219,36 +2217,36 @@ async function loadTransferForms() {
           </td>
 
         `;
-        tbody.appendChild(row);
-        limit--;
-      }
+            tbody.appendChild(row);
+            limit--;
+        }
 
         // ✅ Attach tbody
         table.appendChild(tbody);
 
-       
 
-      addRow(panel, "", table);
+
+        addRow(panel, "", table);
     } catch (err) {
         console.error(err);
         addRow(panel, "", err.message);
-    } 
-} 
+    }
+}
 async function closeTransferTarget(to) {
     try {
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-        
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const transferContract = new web3T.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-        
+
         const tx = await transferContract.methods.closeTransferTarget(to).send({ from: accounts[0] });
         if (tx.status) {
-                alert("Transfer Closed succeeded");
-            } 
+            alert("Transfer Closed succeeded");
+        }
         else {
-                alert("Transfer Closed failed");
-            }
+            alert("Transfer Closed failed");
+        }
     } catch (err) {
         console.error(err);
         alert("❌ Transfer Closed failed: " + (err.message || err));
@@ -2256,114 +2254,114 @@ async function closeTransferTarget(to) {
 }
 
 async function vote(proposalId, support) {
-	try {
-	window.web3T = new Web3(window.ethereum);
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    if(currentAccount!=accounts[0]) { throw "Incorrect account selected";}
-       
-    const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-	  
-	const tx = await daoContract.methods.vote(proposalId, support).send({ from: accounts[0] });
-    if (tx.status) {
+    try {
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        const tx = await daoContract.methods.vote(proposalId, support).send({ from: accounts[0] });
+        if (tx.status) {
             alert("vote succeeded");
-        } 
-    else {
+        }
+        else {
             alert("vote failed");
         }
-	} catch (err) {
-	  console.error(err);
-	  alert("❌ Vote failed: " + (err.message || err));
-	}
-  }
+    } catch (err) {
+        console.error(err);
+        alert("❌ Vote failed: " + (err.message || err));
+    }
+}
 
-  async function execute(proposalId, isapproved) {
+async function execute(proposalId, isapproved) {
     try {
-	window.web3T = new Web3(window.ethereum);
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    if(currentAccount!=accounts[0]) { throw "Incorrect account selected"; }
-       
-    const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-	  
-	const tx = await daoContract.methods.execute(proposalId, isapproved).send({ from: accounts[0] });
-    if (tx.status) {
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        const tx = await daoContract.methods.execute(proposalId, isapproved).send({ from: accounts[0] });
+        if (tx.status) {
             alert("execute succeeded");
-        } 
-    else {
+        }
+        else {
             alert("execute failed");
         }
-	} catch (err) {
-	  console.error(err);
-	  alert("❌ execute failed: " + (err.message || err));
-	}
-  }
+    } catch (err) {
+        console.error(err);
+        alert("❌ execute failed: " + (err.message || err));
+    }
+}
 
 
-async function loadMarket(){
+async function loadMarket() {
 
     clearPanels();
     const panelMarket = addPanel("Marketplace");
 
-    try{
+    try {
 
         const o1155 = await hexBase.methods.inOrc1155(0).call();
-        const orc1155 = new web3.eth.Contract(IORC1155ABI.abi,o1155);
+        const orc1155 = new web3.eth.Contract(IORC1155ABI.abi, o1155);
 
-        addRow(panelMarket,"Contract",o1155);
+        addRow(panelMarket, "Contract", o1155);
 
         const name = await orc1155.methods.name().call();
         const curSupply = await orc1155.methods.curSupply().call();
         const totSupply = await orc1155.methods.totSupply().call();
         const nftprice = await rule.methods.computeMintValue(1).call();
 
-        addRow(panelMarket,"Collection",name);
-        addRow(panelMarket,"Total Supply",totSupply);
-        addRow(panelMarket,"Minted",curSupply);
-        addRow(panelMarket,"Price", formatOZN(nftprice) +" / unit");
+        addRow(panelMarket, "Collection", name);
+        addRow(panelMarket, "Total Supply", totSupply);
+        addRow(panelMarket, "Minted", curSupply);
+        addRow(panelMarket, "Price", formatOZN(nftprice) + " / unit");
         const nftRows = [];
-        
-        let i=1;
-        let flag=true;
 
-        while(flag){
+        let i = 1;
+        let flag = true;
 
-            try{
+        while (flag) {
 
-                const tokenName = await orc1155.methods.names(i-1).call();
+            try {
 
-                if(!tokenName){
-                    flag=false;
+                const tokenName = await orc1155.methods.names(i - 1).call();
+
+                if (!tokenName) {
+                    flag = false;
                     break;
                 }
 
                 const metadataURI = await orc1155.methods.uri(i).call();
-                const meta = await fetch(metadataURI).then(r=>r.json());
+                const meta = await fetch(metadataURI).then(r => r.json());
 
                 const row = document.createElement("div");
-                row.className="row";
+                row.className = "row";
 
                 const left = document.createElement("div");
                 left.innerHTML =
                     '<div style="display:flex;align-items:center;gap:8px;">'
-                    + '<img src="'+meta.image+'" width="40" height="40">'
-                    + '<span>#'+i+' '+tokenName+'</span>'
+                    + '<img src="' + meta.image + '" width="40" height="40">'
+                    + '<span>#' + i + ' ' + tokenName + '</span>'
                     + '</div>';
 
                 const right = document.createElement("div");
 
-                if(currentAccount){
+                if (currentAccount) {
 
-                    const btn=document.createElement("button");
-                    btn.innerText="Buy";
-                    btn.style.padding="4px 8px";
+                    const btn = document.createElement("button");
+                    btn.innerText = "Buy";
+                    btn.style.padding = "4px 8px";
 
                     const tokenId = i;   // capture correct id
                     btn.onclick = () => buyNFT(o1155, tokenId);
 
                     right.appendChild(btn);
 
-                }else{
+                } else {
 
-                    right.innerText="Connect wallet";
+                    right.innerText = "Connect wallet";
 
                 }
 
@@ -2374,34 +2372,34 @@ async function loadMarket(){
 
                 i++;
 
-            }catch(e){
-                flag=false;
+            } catch (e) {
+                flag = false;
             }
 
         }
 
-        addRow(panelMarket,"Total NFT Tokens", i);
+        addRow(panelMarket, "Total NFT Tokens", i);
         const panelNFT = addPanel("NFT Marketplace");
-        nftRows.slice(0,3).forEach(r => panelNFT.appendChild(r));
+        nftRows.slice(0, 3).forEach(r => panelNFT.appendChild(r));
 
-        
 
-    }catch(err){
+
+    } catch (err) {
 
         console.error(err);
-        addRow(panelMarket,"Error","Unable to load marketplace");
+        addRow(panelMarket, "Error", "Unable to load marketplace");
 
     }
 
     hideLoader();
 }
 
-async function loadMyNFT(){
+async function loadMyNFT() {
 
     //clearPanels();
     const input = document.getElementById("userAddrInput");
     const user = input.value.trim();
-  
+
     if (!user || !web3.utils.isAddress(user)) {
         alert("Enter a valid address");
         return;
@@ -2413,9 +2411,9 @@ async function loadMyNFT(){
     const stor = node[4];
 
     const panel = addPanel("My Minted NFTs");
- 
-    if(!stor || stor==ZERO){
-        addRow(panel,"User","Instance/Stor not found");
+
+    if (!stor || stor == ZERO) {
+        addRow(panel, "User", "Instance/Stor not found");
         return;
     }
 
@@ -2435,13 +2433,13 @@ async function loadMyNFT(){
         innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
     }));
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
-            className: "row",
-            innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(lsbindex)).call(),"ether")}`
+        className: "row",
+        innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
     }));
-    
 
-  
-    for(let i=1; i<=parseInt(mintCount); i++){
+
+
+    for (let i = 1; i <= parseInt(mintCount); i++) {
 
         const mint = await storeContract.methods.mints(i).call();
         const nftAddr = mint.nft;
@@ -2449,8 +2447,8 @@ async function loadMyNFT(){
         const nft = new web3.eth.Contract(IORC1155ABI.abi, nftAddr);
 
         const mintedUser = await nft.methods.mintedUser().call();
-        
-        if(mintedUser.toLowerCase() !== user.toLowerCase()){
+
+        if (mintedUser.toLowerCase() !== user.toLowerCase()) {
             continue;
         }
 
@@ -2463,19 +2461,19 @@ async function loadMyNFT(){
         const clonedOf = await nft.methods.clonedOf().call();
         const balance = await nft.methods.balanceOf(user, tokenId).call();
         const getNftPool = await rule.methods.getNftPool(1, mintedAge).call();
-       
+
         const jsunlocked = await getUnlockedNFT(parseInt(mintedAge), parseInt(mintedqty));
         ;
         const unlocked = await nft.methods.getUnlockedNFT().call();
-        const claimed = await nft.methods.claimed().call(); 
-        
+        const claimed = await nft.methods.claimed().call();
+
         const startfrom = getNftPool._startfrom;
 
         const uri = await nft.methods.uri(tokenId).call();
-        const meta = await fetch(uri).then(r=>r.json());
+        const meta = await fetch(uri).then(r => r.json());
 
-        const row=document.createElement("div");
-        row.className="row";
+        const row = document.createElement("div");
+        row.className = "row";
 
         const left = document.createElement("div");
 
@@ -2492,7 +2490,7 @@ async function loadMyNFT(){
         img.width = 40;
         img.height = 40;
 
-        
+
 
         rowTop.appendChild(idSpan);
         rowTop.appendChild(img);
@@ -2509,7 +2507,7 @@ async function loadMyNFT(){
         nftaddrdiv.style.gap = "8px";
 
         const ageText = document.createElement("span");
-        ageText.innerText = " | Age: "+ mintedAge;
+        ageText.innerText = " | Age: " + mintedAge;
         nftaddrdiv.appendChild(renderAddress(nftAddr));
         nftaddrdiv.appendChild(ageText);
 
@@ -2529,29 +2527,29 @@ async function loadMyNFT(){
         rowTop.appendChild(nftaddrdivMain);
 
         left.appendChild(rowTop);
-        const right=document.createElement("div");
+        const right = document.createElement("div");
         right.innerHTML =
-        "Balance: "+balance+
-        " | Fee: "+Number(web3.utils.fromWei(mintedfee,"ether")).toFixed(3)+
-        " | Minted : "+mintedqty+
-        " | Unlocked: "+unlocked+
-        " | Claimed: "+claimed + 
-        " | startAge: "+startfrom+ "";
-        
+            "Balance: " + balance +
+            " | Fee: " + Number(web3.utils.fromWei(mintedfee, "ether")).toFixed(3) +
+            " | Minted : " + mintedqty +
+            " | Unlocked: " + unlocked +
+            " | Claimed: " + claimed +
+            " | startAge: " + startfrom + "";
+
         //" | Age: "+ `${getAgeDateRange(mintedAge).start} {${mintedAge}}`+" ";
         /* CHECKBOX */
 
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.style.marginRight="10px";
+        checkbox.style.marginRight = "10px";
 
         /* TRANSFER BUTTON */
 
-        const btnTransfer=document.createElement("button");
-        btnTransfer.innerText="Transfer";
-        btnTransfer.style.marginLeft="10px";
+        const btnTransfer = document.createElement("button");
+        btnTransfer.innerText = "Transfer";
+        btnTransfer.style.marginLeft = "10px";
 
-       
+
         btnTransfer.onclick = () => {
             onNFTTransfer(user, nftAddr, tokenId, checkbox.checked);
         };
@@ -2564,47 +2562,47 @@ async function loadMyNFT(){
 
         panel.appendChild(row);
 
-       
+
         lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
-            innerHTML: `Mint LSB[${parseInt(mintedAge)+2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(mintedAge)+2).call(),"ether")}`
+            innerHTML: `Mint LSB[${parseInt(mintedAge) + 2}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(mintedAge) + 2).call(), "ether")}`
         }));
         lsbpanel.appendChild(Object.assign(document.createElement("div"), {
             className: "row",
-            innerHTML: `Mint LSB[${parseInt(mintedAge)+2+600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion,parseInt(mintedAge)+2+600).call(),"ether")}`
+            innerHTML: `Mint LSB[${parseInt(mintedAge) + 2 + 600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(mintedAge) + 2 + 600).call(), "ether")}`
         }));
     }
 
-    
-  
+
+
     const levelpanel = addPanel("Level Business");
     addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
-    const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0,15).call();
-    for(let i=0; i<=15; i++){
+    const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0, 15).call();
+    for (let i = 0; i <= 15; i++) {
         const lvl = lvlBatch[i];
-        addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
+        addRow(levelpanel, "Level [" + i + "]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }
 
     const getMD = await nested.methods.getMoveDownline(id).call();
-        
-    const caption = getMD.op?"Attach":"Detach";
 
-    const btnMovedownlineProposer=document.createElement("button");
-        btnMovedownlineProposer.innerText="Movedownline"+caption;
-        btnMovedownlineProposer.style.marginLeft="10px";
-        btnMovedownlineProposer.style.display = getMD.exist?"block":"none";
-        btnMovedownlineProposer.onclick = () => {
-              onMovedownlineProposer(id);
-        };
+    const caption = getMD.op ? "Attach" : "Detach";
 
-    addRow(levelpanel,"--",btnMovedownlineProposer);
+    const btnMovedownlineProposer = document.createElement("button");
+    btnMovedownlineProposer.innerText = "Movedownline" + caption;
+    btnMovedownlineProposer.style.marginLeft = "10px";
+    btnMovedownlineProposer.style.display = getMD.exist ? "block" : "none";
+    btnMovedownlineProposer.onclick = () => {
+        onMovedownlineProposer(id);
+    };
+
+    addRow(levelpanel, "--", btnMovedownlineProposer);
     /*;
     for(let i=0; i<=15; i++){
         
         const lvl = await storeContract.methods.getNodeLB(i).call();
         addRow(levelpanel, "Level ["+i+"]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
     }*/
-    
+
 
 
 
@@ -2614,7 +2612,7 @@ async function loadMyNFT(){
 
 async function getUnlockedNFT(mintedAge, mintedqty) {
     const ONE = 1e18;
-    sysAge = await nested.methods.systemAge().call(); 
+    sysAge = await nested.methods.systemAge().call();
     document.getElementById("sysAgeid").innerHTML = sysAge;
     // if shutdown()
     const isShutdown = await rule.methods.shutdown().call();
@@ -2631,25 +2629,25 @@ async function getUnlockedNFT(mintedAge, mintedqty) {
         let roiN = Number(pool._roiN);
         let roiD = Number(pool._roiD);
         let roiInt = Number(pool._roiInt);
-       
-        if (sysAge < (mintedAge + startfrom)) {
-        return 0;
-        }
-     
-        if (roiInt > 0) {
-        let cycles = Math.floor((sysAge - (mintedAge + startfrom)) / roiInt);
 
-        if (cycles > 0) {
-            return (mintedqty * ONE * roiN / (100 * roiD)) * cycles;
+        if (sysAge < (mintedAge + startfrom)) {
+            return 0;
         }
+
+        if (roiInt > 0) {
+            let cycles = Math.floor((sysAge - (mintedAge + startfrom)) / roiInt);
+
+            if (cycles > 0) {
+                return (mintedqty * ONE * roiN / (100 * roiD)) * cycles;
+            }
         }
 
         return 0;
     };
-   
+
     totalNFT += await processPool(1);
     totalNFT += await processPool(2);
-    
+
     // normalize
     totalNFT = totalNFT / ONE;
 
@@ -2659,53 +2657,53 @@ async function getUnlockedNFT(mintedAge, mintedqty) {
     }
 
     return parseInt(totalNFT);
-    }
+}
 
-    async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead = 5000) {
-        const ONE = 1e18;
+async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead = 5000) {
+    const ONE = 1e18;
 
-        const isShutdown = await rule.methods.shutdown().call();
-        if (isShutdown) return null;
+    const isShutdown = await rule.methods.shutdown().call();
+    if (isShutdown) return null;
 
-        const processPool = (ag, pool) => {
-            let startfrom = Number(pool.startfrom);
-            let roiN = Number(pool.roiN);
-            let roiD = Number(pool.roiD);
-            let roiInt = Number(pool.roiInt);
+    const processPool = (ag, pool) => {
+        let startfrom = Number(pool.startfrom);
+        let roiN = Number(pool.roiN);
+        let roiD = Number(pool.roiD);
+        let roiInt = Number(pool.roiInt);
 
-            if (ag < (mintedAge + startfrom)) return 0;
+        if (ag < (mintedAge + startfrom)) return 0;
 
-            if (roiInt > 0) {
+        if (roiInt > 0) {
             let cycles = Math.floor((ag - (mintedAge + startfrom)) / roiInt);
 
             if (cycles > 0) {
                 return (mintedqty * ONE * roiN / (100 * roiD)) * cycles;
             }
-            }
-            return 0;
-        };
+        }
+        return 0;
+    };
 
-        for (let ag = mintedAge; ag < mintedAge + maxLookahead; ag++) {
+    for (let ag = mintedAge; ag < mintedAge + maxLookahead; ag++) {
 
-            const pool1 = await rule.methods.getNftPool(1, mintedAge).call();
-            const pool2 = await rule.methods.getNftPool(2, mintedAge).call();
+        const pool1 = await rule.methods.getNftPool(1, mintedAge).call();
+        const pool2 = await rule.methods.getNftPool(2, mintedAge).call();
 
-            let totalNFT =
+        let totalNFT =
             processPool(ag, pool1) +
             processPool(ag, pool2);
 
-            totalNFT = totalNFT / ONE;
+        totalNFT = totalNFT / ONE;
 
-            if (totalNFT > 1) {
+        if (totalNFT > 1) {
             return {
                 age: ag,
                 nft: totalNFT
             };
-            }
         }
+    }
 
-        return null;
-        }
+    return null;
+}
 
 
 
@@ -2717,7 +2715,7 @@ async function onCapBurn() {
         // Prompt for recipient
         const input = document.getElementById("userAddrInput");
         const user = input.value.trim();
-    
+
         if (!user || !web3.utils.isAddress(user)) {
             alert("Enter a valid address");
             return;
@@ -2726,7 +2724,7 @@ async function onCapBurn() {
         const id = await nested.methods.UserToId(user).call();
         const node = await nested.methods.getNode(id).call();
         const stor = node[4];
-        if(!stor || stor==ZERO){
+        if (!stor || stor == ZERO) {
             alert("Instance/Stor not found");
             return;
         }
@@ -2740,7 +2738,7 @@ async function onCapBurn() {
             throw 'Invalid amount';
         }
 
-      
+
 
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
@@ -2748,13 +2746,13 @@ async function onCapBurn() {
         if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
             throw "Incorrect account selected";
         }
-        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
-       
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
-        
+
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        
-        
+
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
@@ -2790,13 +2788,13 @@ async function onCapBurn() {
 
         console.log("Tx Hash:", receipt.transactionHash);
         console.log("Gas Used:", receipt.gasUsed);
-       
+
 
     } catch (err) {
         console.error(err);
         alert("Burn failed: " + (err.message || err));
-    } 
-        
+    }
+
     hideLoader();
 }
 
@@ -2807,7 +2805,7 @@ async function onClaim() {
         // Prompt for recipient
         const input = document.getElementById("userAddrInput");
         const user = input.value.trim();
-    
+
         if (!user || !web3.utils.isAddress(user)) {
             alert("Enter a valid address");
             return;
@@ -2820,13 +2818,13 @@ async function onClaim() {
         if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
             throw "Incorrect account selected";
         }
-        if(currentAccount!=accounts[0]) {  throw "Incorrect account selected"; }
-       
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
         const instancecontract = new web3T.eth.Contract(
             IInstanceMeABI.abi,
             currentInstance
         );
-      
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
@@ -2838,7 +2836,7 @@ async function onClaim() {
                 from: accounts[0],
                 value: "0"
             });
-                                  
+
         // send tx
         const receipt = await instancecontract.methods
             .Txn(ZERO, maxintervals, 0, 7)
@@ -2861,18 +2859,18 @@ async function onClaim() {
         } else {
             alert("Claimed failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("Claimed failed: " + (err.message || err));
-    } 
-        
+    }
+
     hideLoader();
-    
+
 }
 
-async function onNFTTransfer(user,orc1155, tokenId, isforce) {
+async function onNFTTransfer(user, orc1155, tokenId, isforce) {
     showLoader();
 
     try {
@@ -2891,7 +2889,7 @@ async function onNFTTransfer(user,orc1155, tokenId, isforce) {
         if (isNaN(amount) || amount <= 0) {
             throw 'Invalid amount';
         }
-        
+
         // Enable wallet
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
@@ -2911,7 +2909,7 @@ async function onNFTTransfer(user,orc1155, tokenId, isforce) {
                 .send({ from: user });
             if (!tx1.status) throw "Incorrect account selected";
         }
-        
+
         // Send transfer
         const tx1 = await orc1155contract.methods
             .onTokenTransfer(user, to, tokenId, amount, isforce, "0x")
@@ -2924,27 +2922,27 @@ async function onNFTTransfer(user,orc1155, tokenId, isforce) {
         } else {
             alert("Transfer failed");
         }
-       
+
 
     } catch (err) {
         console.error(err);
         alert("Transfer failed: " + (err.message || err));
-    } 
-        
+    }
+
     hideLoader();
-    
+
 }
 
-async function loadNFTArchive(){
+async function loadNFTArchive() {
 
     clearPanels();
     const panel = addPanel("NFT Archive Events");
 
-    try{
+    try {
 
         const latestBlock = await web3.eth.getBlockNumber();
 
-        
+
         let allEvents = [];
 
         const transferSingleTopic = web3.utils.sha3(
@@ -2957,7 +2955,7 @@ async function loadNFTArchive(){
             if (start < minBlock) start = minBlock;
 
             for (let block = start; block <= end; block++) {
-                
+
                 const blockData = await web3.eth.getBlock(block, true);
                 if (!blockData || !blockData.transactions) continue;
 
@@ -2967,9 +2965,9 @@ async function loadNFTArchive(){
                     if (!receipt || !receipt.logs) continue;
 
                     for (const log of receipt.logs) {
-                        
+
                         if (log.topics[0] === transferSingleTopic) {
-                            
+
                             const operator = "0x" + log.topics[1].slice(26);
                             const from = "0x" + log.topics[2].slice(26);
                             const to = "0x" + log.topics[3].slice(26);
@@ -3003,15 +3001,15 @@ async function loadNFTArchive(){
 
         }
 
-        if(allEvents.length === 0)
+        if (allEvents.length === 0)
             throw new Error("No events found");
 
         /* sort latest first */
 
-        allEvents.sort((a,b)=> b.blockNumber - a.blockNumber);
+        allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
 
-        for(const ev of allEvents){
-           
+        for (const ev of allEvents) {
+
             const e = ev.returnValues;
 
             const row = document.createElement("div");
@@ -3044,9 +3042,9 @@ async function loadNFTArchive(){
             const info = document.createElement("span");
 
             info.innerText =
-                "Block: "+ev.blockNumber+
-                " | TokenId: "+ev.id+
-                " | Amount: "+ev.value+
+                "Block: " + ev.blockNumber +
+                " | TokenId: " + ev.id +
+                " | Amount: " + ev.value +
                 " | Sender:";
 
             right.appendChild(info);
@@ -3062,28 +3060,28 @@ async function loadNFTArchive(){
         }
 
     }
-    catch(err){
+    catch (err) {
         console.error(err);
-        addRow(panel,"Error", err.message);
-        addRow(panel,"Error","Failed to load events");
+        addRow(panel, "Error", err.message);
+        addRow(panel, "Error", "Failed to load events");
     }
 
     hideLoader();
 }
 
 async function loadValidatorPage() {
-    
+
     clearPanels();
     const panel = addPanel("Validator Module");
     try {
-        const row=document.createElement("div");
-        row.className="row";
+        const row = document.createElement("div");
+        row.className = "row";
 
         const left = document.createElement("div");
-       
-        const btnGetUserDeligator=document.createElement("button");
-        btnGetUserDeligator.innerText="Get User's Deligator";
-        btnGetUserDeligator.style.marginLeft="10px";
+
+        const btnGetUserDeligator = document.createElement("button");
+        btnGetUserDeligator.innerText = "Get User's Deligator";
+        btnGetUserDeligator.style.marginLeft = "10px";
 
         btnGetUserDeligator.onclick = async () => {
             try {
@@ -3093,43 +3091,43 @@ async function loadValidatorPage() {
                     alert("Enter a valid Ethereum address");
                     return;
                 }
-                
+
                 // Enable wallet
                 //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                
+
                 //if(currentAccount.trim().toLowerCase() !== accounts[0].toLowerCase())
                 //    throw "Incorrect account selected";
-                
+
                 // Initialize contract
                 //const validatorcontract = new web3.eth.Contract(validatorsLocalsABI, validatorsLocalsAddress);
-                
-                
+
+
                 const valdelact = await validator.methods.getValidatorDelegatorOfUser(user).call();
                 const inc = await validator.methods.incomeOf(user).call();
-                
-                const subrow=document.createElement("div");
-                subrow.className="row";
 
-                const right1=document.createElement("div");
+                const subrow = document.createElement("div");
+                subrow.className = "row";
+
+                const right1 = document.createElement("div");
                 right1.innerHTML = "User: " + user + " | Income: " + inc;
 
-                const right2=document.createElement("div");
+                const right2 = document.createElement("div");
                 right2.innerHTML =
-                "Validator: " + valdelact[0] + " | Delegator: "+valdelact[1] + " | Active: "+ valdelact[2];
-                
+                    "Validator: " + valdelact[0] + " | Delegator: " + valdelact[1] + " | Active: " + valdelact[2];
+
                 subrow.appendChild(right1);
 
-                const subrow2=document.createElement("div");
-                subrow2.className="row";
+                const subrow2 = document.createElement("div");
+                subrow2.className = "row";
                 subrow2.appendChild(right2);
 
                 panel.appendChild(subrow);
                 panel.appendChild(subrow2);
             }
-            catch(err){
+            catch (err) {
                 console.error(err);
-                addRow(panel,"Error", err.message);
-                addRow(panel,"Error","Failed to Deligator Module");
+                addRow(panel, "Error", err.message);
+                addRow(panel, "Error", "Failed to Deligator Module");
             }
         };
 
@@ -3138,64 +3136,64 @@ async function loadValidatorPage() {
         row.appendChild(left);
         panel.appendChild(row);
 
-    }   
-    catch(err){
+    }
+    catch (err) {
         console.error(err);
         alert("Validator failed: " + (err.message || err));
-        addRow(panel,"Error", err.message);
-        addRow(panel,"Error","Failed to Validator Module");
+        addRow(panel, "Error", err.message);
+        addRow(panel, "Error", "Failed to Validator Module");
     }
 
     hideLoader();
 }
 
 async function renderULTreePanel() {
-  clearPanels();  
-  const panel = addPanel("🌳 Upline + Downline View");
+    clearPanels();
+    const panel = addPanel("🌳 Upline + Downline View");
 
-  // ---------- INPUT UI ----------
-  const inputWrap = document.createElement("div");
-  inputWrap.style.display = "flex";
-  inputWrap.style.alignItems = "center";
-  inputWrap.style.gap = "10px";
-  inputWrap.style.marginBottom = "12px";
+    // ---------- INPUT UI ----------
+    const inputWrap = document.createElement("div");
+    inputWrap.style.display = "flex";
+    inputWrap.style.alignItems = "center";
+    inputWrap.style.gap = "10px";
+    inputWrap.style.marginBottom = "12px";
 
-  const input = document.createElement("input");
-  input.placeholder = "Enter wallet address...";
-  input.style.flex = "1";
-  input.style.padding = "8px 10px";
-  input.style.borderRadius = "8px";
-  input.style.border = "1px solid #2a3a5a";
-  input.style.background = "#0b0f1a";
-  input.style.color = "#00ffff";
+    const input = document.createElement("input");
+    input.placeholder = "Enter wallet address...";
+    input.style.flex = "1";
+    input.style.padding = "8px 10px";
+    input.style.borderRadius = "8px";
+    input.style.border = "1px solid #2a3a5a";
+    input.style.background = "#0b0f1a";
+    input.style.color = "#00ffff";
 
-  const btn = document.createElement("button");
-  btn.textContent = "Load Tree";
-  btn.style.padding = "8px 14px";
-  btn.style.borderRadius = "8px";
-  btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-  btn.style.border = "none";
+    const btn = document.createElement("button");
+    btn.textContent = "Load Tree";
+    btn.style.padding = "8px 14px";
+    btn.style.borderRadius = "8px";
+    btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btn.style.border = "none";
 
-  const btnIncView = document.createElement("button");
-  btnIncView.textContent = "Income View";
-  btnIncView.style.padding = "8px 14px";
-  btnIncView.style.borderRadius = "8px";
-  btnIncView.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-  btnIncView.style.border = "none";
+    const btnIncView = document.createElement("button");
+    btnIncView.textContent = "Income View";
+    btnIncView.style.padding = "8px 14px";
+    btnIncView.style.borderRadius = "8px";
+    btnIncView.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btnIncView.style.border = "none";
 
-  inputWrap.appendChild(input);
-  inputWrap.appendChild(btn);
-  inputWrap.appendChild(btnIncView);
-  panel.appendChild(inputWrap);
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(btn);
+    inputWrap.appendChild(btnIncView);
+    panel.appendChild(inputWrap);
 
-  // ---------- CONTAINER ----------
-  const container = document.createElement("div");
-  container.className = "ulTreeWrap";
-  panel.appendChild(container);
+    // ---------- CONTAINER ----------
+    const container = document.createElement("div");
+    container.className = "ulTreeWrap";
+    panel.appendChild(container);
 
-  // ---------- STYLE ----------
-  const style = document.createElement("style");
-  style.innerHTML = `
+    // ---------- STYLE ----------
+    const style = document.createElement("style");
+    style.innerHTML = `
         .ulTreeWrap ul { 
             list-style:none; 
             padding-left:15px; 
@@ -3220,156 +3218,156 @@ async function renderULTreePanel() {
             border-radius: 4px;
         }
   `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
 
-  // ---------- HELPERS ----------
-  function shortAddr(addr) {
-    return addr ? addr.slice(-4) : "----";
-  }
-
-  async function getNode(id) {
-    const n = await nested.methods.getNode(id).call();
-    const storC = new web3.eth.Contract(IInstanceStorABI.abi,n[4]);
-    
-    let rnk = await storC.methods.rank().call();  
-
-    return { id: n[0].toString(), pid:n[2], address: n[1], rank: rnk };
-  }
-
-async function getChildren(id) {
-    
-    const getNodeDirectsCount = await nested.methods.getNodeDirectsCount(id).call()
-    const arr = [];
-    
-    for(let i=0;i<getNodeDirectsCount && i<10;i++) {
-        arr.push(await getNode(await nested.methods.getNodeChild(id, i).call()));
-    }
-    return arr;
-  }
-
-  // ---------- BUILD DOWNLINE ----------
-  async function buildDownline(parentId, level = 1) {
-    if (level > MAX_LEVEL) return null;
-
-    const children = await getChildren(parentId);
-    if (!children.length) return null;
-
-    const ul = document.createElement("ul");
-
-    for (let c of children) {
-        const li = document.createElement("li");
-
-        li.addr = c.address;
-        li.innerHTML = `<span class="node">${c.id} (${c.rank}*...${shortAddr(c.address)})</span>`;
-
-        // 🔁 recursive call
-        const childUL = await buildDownline(c.id, level + 1);
-        if (childUL) li.appendChild(childUL);
-
-        ul.appendChild(li);
+    // ---------- HELPERS ----------
+    function shortAddr(addr) {
+        return addr ? addr.slice(-4) : "----";
     }
 
-    return ul;
+    async function getNode(id) {
+        const n = await nested.methods.getNode(id).call();
+        const storC = new web3.eth.Contract(IInstanceStorABI.abi, n[4]);
+
+        let rnk = await storC.methods.rank().call();
+
+        return { id: n[0].toString(), pid: n[2], address: n[1], rank: rnk };
     }
-  // ---------- LOAD ----------
-  const MAX_LEVEL = 7; // 👈 change this anytime (2,3,4...)
-  async function loadTree(addr) {
 
-    container.innerHTML = "⏳ Loading...";
+    async function getChildren(id) {
 
-    try {
-      const selfid = await nested.methods.UserToId(addr).call();  
-      const info = await nested.methods.getNode(selfid).call();
-      const storC = new web3.eth.Contract(IInstanceStorABI.abi,info[4]);;  
-      debugger
-      let rnk = await storC.methods.rank().call();  
-      
-      let pid = info[2];
-      
-      const chain = [];
+        const getNodeDirectsCount = await nested.methods.getNodeDirectsCount(id).call()
+        const arr = [];
 
-      // 🔥 SELF NODE
-      const selfNode = { id: selfid, pid: pid, address: addr, rank:rnk };
-      chain.push(selfNode);
-
-      // 🔼 UPLINE
-      while (pid != 0) {
-        
-        const node = await getNode(pid);
-        chain.push(node);
-        pid = node.pid;
-      }
-
-      chain.reverse();
-
-      // ---------- BUILD TREE ----------
-      const ul = document.createElement("ul");
-      ul.id = "mainTree";
-
-      // ✅ ADD CLICK HERE 👇
-        ul.addEventListener("click", (e) => {
-        const li = e.target.closest("li");
-        if (!li || !li.addr) return;
-
-        console.log("👤 Clicked (main UL):", li.addr);
-
-        // reload tree OR call your panel
-        loadTree(li.addr);   // OR renderULTreePanel(li.addr)
-        });
-
-
-
-
-      let currentUL = ul;
-      let lastLI = null;
-  
-      for (let i = 0; i < chain.length; i++) {
-
-        const n = chain[i];
-
-        const li = document.createElement("li");
-        if(n.id==selfid)
-            li.innerHTML  = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
-        else 
-            li.innerHTML  = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})</span>`;
-        const nextUL = document.createElement("ul");
-
-        li.addr = n.address; 
-        li.appendChild(nextUL);
-        currentUL.appendChild(li);
-
-        currentUL = nextUL;
-        lastLI = li;
-      }
-    
-      // 🔽 ADD DOWNLINE (ONLY FOR SELF NODE)
-      if (selfid) {
-            const downUL = await buildDownline(selfid, 1);
-            if (downUL) lastLI.appendChild(downUL);
-      }
-      container.innerHTML = "";
-      container.appendChild(ul);
-
-    } catch (e) {
-      console.error(e);
-      container.innerHTML = "❌ Error";
+        for (let i = 0; i < getNodeDirectsCount && i < 10; i++) {
+            arr.push(await getNode(await nested.methods.getNodeChild(id, i).call()));
+        }
+        return arr;
     }
-  }
 
-  // ---------- CLICK ----------
-  btn.onclick = () => {
-    const addr = input.value.trim();
-    if (!addr) return alert("Enter address");
-    loadTree(addr);
-  };
+    // ---------- BUILD DOWNLINE ----------
+    async function buildDownline(parentId, level = 1) {
+        if (level > MAX_LEVEL) return null;
+
+        const children = await getChildren(parentId);
+        if (!children.length) return null;
+
+        const ul = document.createElement("ul");
+
+        for (let c of children) {
+            const li = document.createElement("li");
+
+            li.addr = c.address;
+            li.innerHTML = `<span class="node">${c.id} (${c.rank}*...${shortAddr(c.address)})</span>`;
+
+            // 🔁 recursive call
+            const childUL = await buildDownline(c.id, level + 1);
+            if (childUL) li.appendChild(childUL);
+
+            ul.appendChild(li);
+        }
+
+        return ul;
+    }
+    // ---------- LOAD ----------
+    const MAX_LEVEL = 7; // 👈 change this anytime (2,3,4...)
+    async function loadTree(addr) {
+
+        container.innerHTML = "⏳ Loading...";
+
+        try {
+            const selfid = await nested.methods.UserToId(addr).call();
+            const info = await nested.methods.getNode(selfid).call();
+            const storC = new web3.eth.Contract(IInstanceStorABI.abi, info[4]);;
+            debugger
+            let rnk = await storC.methods.rank().call();
+
+            let pid = info[2];
+
+            const chain = [];
+
+            // 🔥 SELF NODE
+            const selfNode = { id: selfid, pid: pid, address: addr, rank: rnk };
+            chain.push(selfNode);
+
+            // 🔼 UPLINE
+            while (pid != 0) {
+
+                const node = await getNode(pid);
+                chain.push(node);
+                pid = node.pid;
+            }
+
+            chain.reverse();
+
+            // ---------- BUILD TREE ----------
+            const ul = document.createElement("ul");
+            ul.id = "mainTree";
+
+            // ✅ ADD CLICK HERE 👇
+            ul.addEventListener("click", (e) => {
+                const li = e.target.closest("li");
+                if (!li || !li.addr) return;
+
+                console.log("👤 Clicked (main UL):", li.addr);
+
+                // reload tree OR call your panel
+                loadTree(li.addr);   // OR renderULTreePanel(li.addr)
+            });
 
 
-  // ---------- LOAD INCOME VIEW ----------
-  async function loadIncomeView(addr) {
-    runTableTrace(await buildDataSet(addr),rankClauses)
-  }
 
-  async function buildDataSet(addr) {
+
+            let currentUL = ul;
+            let lastLI = null;
+
+            for (let i = 0; i < chain.length; i++) {
+
+                const n = chain[i];
+
+                const li = document.createElement("li");
+                if (n.id == selfid)
+                    li.innerHTML = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
+                else
+                    li.innerHTML = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})</span>`;
+                const nextUL = document.createElement("ul");
+
+                li.addr = n.address;
+                li.appendChild(nextUL);
+                currentUL.appendChild(li);
+
+                currentUL = nextUL;
+                lastLI = li;
+            }
+
+            // 🔽 ADD DOWNLINE (ONLY FOR SELF NODE)
+            if (selfid) {
+                const downUL = await buildDownline(selfid, 1);
+                if (downUL) lastLI.appendChild(downUL);
+            }
+            container.innerHTML = "";
+            container.appendChild(ul);
+
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "❌ Error";
+        }
+    }
+
+    // ---------- CLICK ----------
+    btn.onclick = () => {
+        const addr = input.value.trim();
+        if (!addr) return alert("Enter address");
+        loadTree(addr);
+    };
+
+
+    // ---------- LOAD INCOME VIEW ----------
+    async function loadIncomeView(addr) {
+        runTableTrace(await buildDataSet(addr), rankClauses)
+    }
+
+    async function buildDataSet(addr) {
 
         const ranks = [];
         const ages = [];
@@ -3386,7 +3384,7 @@ async function getChildren(id) {
 
             let rank = 0;
             let age = 0;
-            
+
             if (storAddr !== "0x0000000000000000000000000000000000000000") {
 
                 const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
@@ -3395,7 +3393,7 @@ async function getChildren(id) {
                 rank = Number(res[0]);
                 age = Number(res[1]);
             }
-            
+
             ranks.push(rank);
             ages.push(age);
 
@@ -3407,106 +3405,106 @@ async function getChildren(id) {
         //ages.reverse();
 
         return { ranks, ages };
-  }
+    }
 
-  async function runTableTrace(dataSet, rankClause) {
+    async function runTableTrace(dataSet, rankClause) {
 
-    const panel = addPanel("📊 Income Trace");
+        const panel = addPanel("📊 Income Trace");
 
-    const currentAgeNow = Number(sysAge);
+        const currentAgeNow = Number(sysAge);
 
-    addRow(panel, "Current Age", currentAgeNow);
+        addRow(panel, "Current Age", currentAgeNow);
 
-    let iRnk = 0;
-    let ieRnk = 0;
-    let igRnk = 0;
-    let igPrd = 0;
-    let iOutDay = false;
+        let iRnk = 0;
+        let ieRnk = 0;
+        let igRnk = 0;
+        let igPrd = 0;
+        let iOutDay = false;
 
-    let lastrnk = null;
+        let lastrnk = null;
 
-    const length = dataSet.ranks.length;
-    const table = document.createElement("table");
-    table.style.fontFamily = "monospace";
+        const length = dataSet.ranks.length;
+        const table = document.createElement("table");
+        table.style.fontFamily = "monospace";
 
-    const header = `
+        const header = `
     <tr>
     <th>Lvl</th><th></th><th>Rank</th><th>Last</th><th>Age</th>
     <th>iRnk</th><th>ieRnk</th><th>igRnk</th><th>igPrd</th><th>Out</th>
     </tr>`;
-    table.innerHTML = header;
-    table.style.textAlign = "right";
-    
-    panel.appendChild(table);
+        table.innerHTML = header;
+        table.style.textAlign = "right";
 
-    for (let lvl = 0; lvl < length; lvl++) {
-        
-        const currentrnk = dataSet.ranks[lvl] ?? 0;
-        const currentAge = dataSet.ages[lvl] ?? 0;
+        panel.appendChild(table);
 
-        let isSkipped = false;
+        for (let lvl = 0; lvl < length; lvl++) {
 
-        let iRnkStr = "";
-        let ieRnkStr = "";
-        let igRnkStr = "";
-        let igPrdStr = "";
-        let iOutDayStr = "";
+            const currentrnk = dataSet.ranks[lvl] ?? 0;
+            const currentAge = dataSet.ages[lvl] ?? 0;
 
-        // ---------- LEVEL 0 ----------
-        if (lvl === 0) {
+            let isSkipped = false;
 
-        const r0 = rankClause[currentrnk] || {};
+            let iRnkStr = "";
+            let ieRnkStr = "";
+            let igRnkStr = "";
+            let igPrdStr = "";
+            let iOutDayStr = "";
 
-        ieRnk = r0.eRnk || 0;
-        igRnk = r0.gRnk || 0;
-        igPrd = r0.gPrd || 0;
+            // ---------- LEVEL 0 ----------
+            if (lvl === 0) {
 
-        iRnk = currentrnk;
-        lastrnk = currentrnk;
+                const r0 = rankClause[currentrnk] || {};
 
-        iOutDay = (currentAgeNow - currentAge) > igPrd;
+                ieRnk = r0.eRnk || 0;
+                igRnk = r0.gRnk || 0;
+                igPrd = r0.gPrd || 0;
 
-        iRnkStr = iRnk;
-        ieRnkStr = ieRnk;
-        igRnkStr = igRnk;
-        igPrdStr = igPrd;
-        iOutDayStr = iOutDay;
-        }
+                iRnk = currentrnk;
+                lastrnk = currentrnk;
 
-        // ---------- MAIN LOGIC ----------
-        if (lvl > 0 && currentrnk !== lastrnk) {
+                iOutDay = (currentAgeNow - currentAge) > igPrd;
 
-        if (currentrnk !== iRnk) {
-
-            const r = rankClause[currentrnk] || {};
-
-            if (currentrnk > iRnk) {
-            
-            iRnk = currentrnk;
-            ieRnk = r.eRnk || 0;
-            igRnk = r.gRnk || 0;
-            igPrd = r.gPrd || 0;
-
-            iOutDay = (currentAgeNow - currentAge) > igPrd;
-
-            iRnkStr = iRnk;
-            ieRnkStr = ieRnk;
-            igRnkStr = igRnk;
-            igPrdStr = igPrd;
-            iOutDayStr = iOutDay;
+                iRnkStr = iRnk;
+                ieRnkStr = ieRnk;
+                igRnkStr = igRnk;
+                igPrdStr = igPrd;
+                iOutDayStr = iOutDay;
             }
-        }
 
-        isSkipped = !(
-            (currentrnk >= ieRnk) ||
-            (currentrnk >= igRnk && currentrnk < ieRnk && !iOutDay)
-        );
-        
-        }
+            // ---------- MAIN LOGIC ----------
+            if (lvl > 0 && currentrnk !== lastrnk) {
 
-        // ---------- RENDER ROW ----------
-        const row = document.createElement("tr");
-        row.innerHTML = `
+                if (currentrnk !== iRnk) {
+
+                    const r = rankClause[currentrnk] || {};
+
+                    if (currentrnk > iRnk) {
+
+                        iRnk = currentrnk;
+                        ieRnk = r.eRnk || 0;
+                        igRnk = r.gRnk || 0;
+                        igPrd = r.gPrd || 0;
+
+                        iOutDay = (currentAgeNow - currentAge) > igPrd;
+
+                        iRnkStr = iRnk;
+                        ieRnkStr = ieRnk;
+                        igRnkStr = igRnk;
+                        igPrdStr = igPrd;
+                        iOutDayStr = iOutDay;
+                    }
+                }
+
+                isSkipped = !(
+                    (currentrnk >= ieRnk) ||
+                    (currentrnk >= igRnk && currentrnk < ieRnk && !iOutDay)
+                );
+
+            }
+
+            // ---------- RENDER ROW ----------
+            const row = document.createElement("tr");
+            row.innerHTML = `
         <td>${lvl}</td>
         <td>${isSkipped ? "❌" : "✅"}</td>
         <td>${currentrnk}</td>
@@ -3518,26 +3516,26 @@ async function getChildren(id) {
         <td>${igPrdStr}</td>
         <td>${iOutDayStr}</td>
         `;
-        if (isSkipped) row.style.color = "#ff4d4d";       // red
-        else if (iRnkStr) row.style.color = "#00ff9f";    // green
-        else row.style.color = "#00ffff";                 // cyan
-        table.appendChild(row);
-        lastrnk = currentrnk;
+            if (isSkipped) row.style.color = "#ff4d4d";       // red
+            else if (iRnkStr) row.style.color = "#00ff9f";    // green
+            else row.style.color = "#00ffff";                 // cyan
+            table.appendChild(row);
+            lastrnk = currentrnk;
+        }
     }
- }
 
 
-  btnIncView.onclick = () => {
+    btnIncView.onclick = () => {
         const addr = input.value.trim();
         if (!addr) return alert("Enter address");
         loadIncomeView(addr);
-   };
+    };
 
-    
 
-   input.addEventListener("keypress", (e) => {
+
+    input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") btn.click();
-   });
+    });
 }
 
 
@@ -3546,7 +3544,7 @@ async function loadRule() {
     clearPanels();
     showLoader();
     try {
-        
+
         // ---------------- LEVEL CLAUSES (TABLE) ----------------
         const panelLevel = addPanel("Level Clauses");
 
@@ -3599,7 +3597,7 @@ async function loadRule() {
             }
         }
 
-       
+
         // ---------------- RANK CLAUSES (TABLE) ----------------
         const panelRank = addPanel("Rank Clauses");
 
@@ -3652,7 +3650,7 @@ async function loadRule() {
                 console.log("Rank error:", i);
             }
         }
-       // ---------------- ROYALTY CLAUSES (TABLE) ----------------
+        // ---------------- ROYALTY CLAUSES (TABLE) ----------------
         const panelRoyal = addPanel("Royalty");
 
         // create table
@@ -3685,7 +3683,7 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const rw = await rule.methods.royalityClause(i).call();
-               
+
                 if (parseInt(rw.rwNum) === 0) continue;
                 const percent = toPercent(rw.rwNum, rw.rwDen);
 
@@ -3825,7 +3823,7 @@ async function loadRule() {
         const minClaim = parseFloat(web3.utils.fromWei((await rule.methods.minClaimPerDay().call()).toString(), "ether")).toFixed(3);
         const maxClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxClaimPerDay().call()).toString(), "ether")).toFixed(3);
         const globalClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxGlobalClaimPerDay().call()).toString(), "ether")).toFixed(3)
-                const cycle = await rule.methods.eachclaimCycle().call();
+        const cycle = await rule.methods.eachclaimCycle().call();
 
         // min + max in single row
         addRow(panelClaim, "Claim Limit", `${minClaim} OZN - ${maxClaim} OZN`);
@@ -3844,7 +3842,7 @@ async function loadRule() {
 
         addRow(panelNFT, "NFT Send", `${maxSend} NFTs allowed to send in ${perCycle} days`);
 
-         // ---------------- DAO ----------------
+        // ---------------- DAO ----------------
         const panelDAO = addPanel("DAO");
 
         addRow(panelDAO, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
@@ -3874,7 +3872,7 @@ async function loadRule() {
             `Qty:${valExternal.qtyORmul} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
         );
 
-        
+
         // ---------------- CAPPING ----------------
         const panelCap = addPanel("Capping");
 
@@ -3886,7 +3884,7 @@ async function loadRule() {
         addRow(panelCap, "SELF", cap.self);
         addRow(panelCap, "YEI", cap.yei);
 
-        
+
 
         // ---------------- TOUR ----------------
         const panelTour = addPanel("Tour");
@@ -3894,9 +3892,9 @@ async function loadRule() {
         for (let i = 1; i <= 7; i++) {
             try {
                 const t = await rule.methods.tourClause(i).call();
-               
+
                 const ct = await rule.methods.computeTour(i).call();
-               
+
                 // skip if 0
                 if (parseInt(t) === 0) continue;
 
@@ -3928,7 +3926,7 @@ async function loadRule() {
         addRow(panelErr, "Error", "Failed to load rule data");
     }
 
-    
+
     const btnUplineDownline = document.createElement("button");
     btnUplineDownline.textContent = "Load View";
     btnUplineDownline.style.padding = "8px 14px";
@@ -3939,7 +3937,7 @@ async function loadRule() {
     panelUplineDownline.appendChild(btnUplineDownline);
     // ---------- CLICK ----------
     btnUplineDownline.onclick = () => {
-       renderULTreePanel();
+        renderULTreePanel();
     };
     hideLoader();
 }
@@ -3953,30 +3951,30 @@ function getGraphConfigOld(n) {
 
     // 1. Handle extremely small numbers (e.g., 0.00000004)
     if (n > 0 && n < 0.0001) {
-    const exponent = Math.floor(Math.log10(n));
-    axisTitle = `Value (×10^${exponent})`;
-    // Scaled ticks (e.g., 4.0 instead of 0.00000004)
-    formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
+        const exponent = Math.floor(Math.log10(n));
+        axisTitle = `Value (×10^${exponent})`;
+        // Scaled ticks (e.g., 4.0 instead of 0.00000004)
+        formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
     }
 
     // 2. Handle numbers with decimals (e.g., 12.004)
     else if (n % 1 !== 0) {
-    axisTitle = "Value";
-    formatter = (val) => val.toFixed(2); // Keep labels short
+        axisTitle = "Value";
+        formatter = (val) => val.toFixed(2); // Keep labels short
     }
 
     // 3. Handle standard whole numbers
     else {
-    axisTitle = "Value";
-    formatter = (val) => Math.round(val);
+        axisTitle = "Value";
+        formatter = (val) => Math.round(val);
     }
 
 
 
     return {
-    range: [0, maxRange],
-    title: axisTitle,
-    tickFormatter: formatter
+        range: [0, maxRange],
+        title: axisTitle,
+        tickFormatter: formatter
     };
 }
 
@@ -4060,7 +4058,7 @@ function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
             ticks: Array(11).fill(0),
 
             current: { value: 0, isMin: true, isMax: false },
-            burned:  { value: 0, isMin: true, isMax: false }
+            burned: { value: 0, isMin: true, isMax: false }
         };
     }
 
@@ -4090,7 +4088,7 @@ function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
 
     // 🔥 PRE-SCALE values
     const scaledCurrent = currentValue * scaleRatio;
-    const scaledBurned  = burned4x * scaleRatio;
+    const scaledBurned = burned4x * scaleRatio;
 
     // 🔥 AUTO EXPAND (prevents clipping)
     max = Math.max(max, scaledCurrent, scaledBurned);
@@ -4108,7 +4106,7 @@ function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
 
     // MAP VALUES
     const current = mapToGraph(currentValue, scaleRatio, range);
-    const burned  = mapToGraph(burned4x, scaleRatio, range);
+    const burned = mapToGraph(burned4x, scaleRatio, range);
 
     return {
         rawThreshold,
@@ -4133,17 +4131,17 @@ function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
     };
 }
 const tests = [
-    { t: 12,              c: 10,        b: 5 },
-    { t: 12.4,            c: 15,        b: 8 },
-    { t: 12.0004,         c: 20,        b: 1 },
+    { t: 12, c: 10, b: 5 },
+    { t: 12.4, c: 15, b: 8 },
+    { t: 12.0004, c: 20, b: 1 },
 
-    { t: 0.124,           c: 0.5,       b: 0.2 },
+    { t: 0.124, c: 0.5, b: 0.2 },
 
-    { t: 0.00000000124,   c: 0.54546,   b: 0.2 },
+    { t: 0.00000000124, c: 0.54546, b: 0.2 },
 
-    { t: 0,               c: 10,        b: 2 },
-    { t: null,            c: 5,         b: 1 },
-    { t: undefined,       c: 2,         b: 0.5 }
+    { t: 0, c: 10, b: 2 },
+    { t: null, c: 5, b: 1 },
+    { t: undefined, c: 2, b: 0.5 }
 ];
 /*
 tests.forEach(({ t, c, b }) => {
@@ -4179,98 +4177,97 @@ tests.forEach(({ t, c, b }) => {
 });
  */
 
-async function loadGraph(cp)
-{
-   /* cp = {
-        totalIncome: 70.6,
-        burned4x: 13.0,
-        threshold: 12.4,
-        cap: false,
-        currentValue: 11.6
-    }; */
- 
-   
-    const s = getGraphConfig(cp.threshold,cp.currentValue,cp.burned4x);
-    
+async function loadGraph(cp) {
+    /* cp = {
+         totalIncome: 70.6,
+         burned4x: 13.0,
+         threshold: 12.4,
+         cap: false,
+         currentValue: 11.6
+     }; */
+
+
+    const s = getGraphConfig(cp.threshold, cp.currentValue, cp.burned4x);
+
     console.log(s);
 
     let minvalue = s.range[0];
     let maxvalue = s.range[1];
     let alertvalue = s.ticks[8];
 
-    let statuscolor  = cp.cap ? '#ff3c00' : (s.current.value>=s.ticks[8]? '#f5e664' : '#55BF3B');
+    let statuscolor = cp.cap ? '#ff3c00' : (s.current.value >= s.ticks[8] ? '#f5e664' : '#55BF3B');
 
     Highcharts.chart('container', {
 
-    chart: {
-        type: 'gauge',
-        plotBackgroundColor: null,
-        plotBackgroundImage: null,
-        plotBorderWidth: 0,
-        plotShadow: false,
-        height: '80%',
-        backgroundColor: '#0f172a' // deep dark
-    },
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            height: '80%',
+            backgroundColor: '#0f172a' // deep dark
+        },
 
-    title: {
-       useHTML: true,
+        title: {
+            useHTML: true,
             text: `
             <span style="font-size:17px; color:#ccc;">Capping: 
                 <span style="color:${statuscolor}; font-weight:600;font-size:16px;">
-                    ${cp.cap ? 'ACTIVE' : (s.current.value>=s.ticks[8] ? 'WARNING' : 'NORMAL')}
+                    ${cp.cap ? 'ACTIVE' : (s.current.value >= s.ticks[8] ? 'WARNING' : 'NORMAL')}
                 </span> </span>
                 
             `,
             x: 10,   // 👉 move right (+) / left (-)
             y: 60     // 👉 move down (+) / up (-)
-    },
-
-    credits: {
-        enabled: false
-    },
-
-    exporting: {
-        enabled: false
-    },
-
-    pane: {
-        startAngle: -90,
-        endAngle: 89.9,
-        background: null,
-        center: ['50%', '75%'],
-        size: '110%'
-    },
-
-    // the value axis
-    yAxis: [{
-        min: s.ticks[0],
-        max: s.ticks[10],
-        tickPixelInterval: 72,
-        tickPosition: 'inside',
-        //tickColor: 'var(--highcharts-background-color, #FFFFFF)',
-        tickPositions: [s.ticks[0], s.current.value, s.ticks[9],  s.ticks[10]], // Add 72 here
-        tickLength: 20,
-        tickWidth: 2,
-        minorTickInterval: null,
-        labels: {
-            distance: 20,
-            style: {
-                fontSize: '14px',
-                color: '#fff'
-            },
-            formatter: function () {
-                var t= '<span color="grey">'+this.value.toString()+'</span>';
-               
-                //if(this.value == s.ticks[8]) t = '<span color="yellow">⚠</span>';
-                if(this.value == s.ticks[9]) t = '<span color="red">T</span>';
-                if(this.value == s.current.value) t = '<span color="'+statuscolor+'">C</span>';
-                if(this.value == s.ticks[10]) t = '<span color="grey">max</span>';
-                
-                return t;
-            }
         },
-        title: {
-            text: `<div style="text-align:center; width:220px;">
+
+        credits: {
+            enabled: false
+        },
+
+        exporting: {
+            enabled: false
+        },
+
+        pane: {
+            startAngle: -90,
+            endAngle: 89.9,
+            background: null,
+            center: ['50%', '75%'],
+            size: '110%'
+        },
+
+        // the value axis
+        yAxis: [{
+            min: s.ticks[0],
+            max: s.ticks[10],
+            tickPixelInterval: 72,
+            tickPosition: 'inside',
+            //tickColor: 'var(--highcharts-background-color, #FFFFFF)',
+            tickPositions: [s.ticks[0], s.current.value, s.ticks[9], s.ticks[10]], // Add 72 here
+            tickLength: 20,
+            tickWidth: 2,
+            minorTickInterval: null,
+            labels: {
+                distance: 20,
+                style: {
+                    fontSize: '14px',
+                    color: '#fff'
+                },
+                formatter: function () {
+                    var t = '<span color="grey">' + this.value.toString() + '</span>';
+
+                    //if(this.value == s.ticks[8]) t = '<span color="yellow">⚠</span>';
+                    if (this.value == s.ticks[9]) t = '<span color="red">T</span>';
+                    if (this.value == s.current.value) t = '<span color="' + statuscolor + '">C</span>';
+                    if (this.value == s.ticks[10]) t = '<span color="grey">max</span>';
+
+                    return t;
+                }
+            },
+            title: {
+                text: `<div style="text-align:center; width:220px;">
                         <div style="
                             font-size:16px;
                             font-weight:700;
@@ -4287,33 +4284,33 @@ async function loadGraph(cp)
 
                      
                     </div>`,
-            y: 40
-        },
-        lineWidth: 0,
-        plotBands: [
-            {
-                from: s.ticks[0],
-                to: s.ticks[9],
-                color: {
-                   linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
-                    stops: [
-                        [0, '#55BF3B'], // Start: Green
-                        [0.35, '#55BF3B'], // Middle: Yellow
-                        [0.7, '#DDDF0D'], // Middle: Yellow
-                        [0.95, '#DDDF0D'], // Middle: Yellow
-                        [1, '#8B0000']  // End: Dark Red
-                    ]
-                },
-                thickness: 15
+                y: 40
             },
-            {
-                from: s.ticks[9],
-                to: s.ticks[10],
-                color: '#7f1d1d', // dark red
-                thickness: 20
-            }
-        ]
-    },{
+            lineWidth: 0,
+            plotBands: [
+                {
+                    from: s.ticks[0],
+                    to: s.ticks[9],
+                    color: {
+                        linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+                        stops: [
+                            [0, '#55BF3B'], // Start: Green
+                            [0.35, '#55BF3B'], // Middle: Yellow
+                            [0.7, '#DDDF0D'], // Middle: Yellow
+                            [0.95, '#DDDF0D'], // Middle: Yellow
+                            [1, '#8B0000']  // End: Dark Red
+                        ]
+                    },
+                    thickness: 15
+                },
+                {
+                    from: s.ticks[9],
+                    to: s.ticks[10],
+                    color: '#7f1d1d', // dark red
+                    thickness: 20
+                }
+            ]
+        }, {
             min: s.ticks[0],
             max: s.ticks[10],
             /*title: {
@@ -4329,9 +4326,9 @@ async function loadGraph(cp)
             labels: {
                 distance: 5,
                 //rotation: 'auto',
-                formatter: function() {
-                    var t = '<span>'+this.value+'</span>';
-                    if(this.value == s.burned.value) t = `<span style="
+                formatter: function () {
+                    var t = '<span>' + this.value + '</span>';
+                    if (this.value == s.burned.value) t = `<span style="
                             display:inline-flex;
                             align-items:center;
                             justify-content:center;
@@ -4343,63 +4340,63 @@ async function loadGraph(cp)
                         ">
                             B
                         </span>`;
-                    if(this.value == s.ticks[10]) t = '<span">max</span>';
+                    if (this.value == s.ticks[10]) t = '<span">max</span>';
                     return t;
                 },
                 style: {
-                        color: 'Violet',
-                        fontWeight: 'normal',
-                        fontSize: '13px'
+                    color: 'Violet',
+                    fontWeight: 'normal',
+                    fontSize: '13px'
                 }
-               
+
             },
             tickLength: 5,
-            
+
             minorTickLength: 1,
             endOnTick: false,
             plotBands: [{
                 from: s.ticks[0],
                 to: s.burned.value,
                 color: 'Violet', // Violet
-                thickness:5,
+                thickness: 5,
                 innerRadius: '60%',  // Tuck this band INSIDE
                 outerRadius: '55%',
-             
-            }]
-        
-    }],
 
-    series: [{
-        name: 'current: ',
-        data: [s.current.value],
-        tooltip: {
-          enabled: false
-        },
-        dataLabels: {
-            useHTML: true,
-            x: -10,   // move right (+) or left (-)
-            y: 20,   // move up (-) or down (+)
-            format: `<!-- 📊 INFO BLOCK -->
+            }]
+
+        }],
+
+        series: [{
+            name: 'current: ',
+            data: [s.current.value],
+            tooltip: {
+                enabled: false
+            },
+            dataLabels: {
+                useHTML: true,
+                x: -10,   // move right (+) or left (-)
+                y: 20,   // move up (-) or down (+)
+                format: `<!-- 📊 INFO BLOCK -->
                         <table align="left" style="color:grey; letter-spacing:1px;line-spacing:1px; text-align: left;font-weight: normal;width: 137%; border-collapse: collapse;" cellpadding="2"><tbody>
                         <tr><td width="100px">Income</td><td>${cp.totalIncome}</td></tr>
                         <tr><td>Threshold</td><td>${cp.threshold}</td></tr>
                         <tr><td>BurnedX</td><td>${cp.burned4x}</td></tr>
                         </tbody></table>`,
-            borderWidth: 0,
-           
-            style: {
-                fontSize: '13px'
-            }
-        },
-        /*dial: {
-            radius: '80%',
-            backgroundColor: 'white',
-            baseColor: 'red',
-            baseWidth: 10,
-            baseLength: '0%',
-            rearLength: '0%'
-        }*/
-        dial: {
+                borderWidth: 0,
+
+                style: {
+                    fontSize: '13px'
+                }
+            },
+            /*dial: {
+                radius: '80%',
+                backgroundColor: 'white',
+                baseColor: 'red',
+                baseWidth: 10,
+                baseLength: '0%',
+                rearLength: '0%'
+            }*/
+            dial: {
                 radius: '100%',
                 baseWidth: 0,
                 rearLength: '0%',
@@ -4407,18 +4404,18 @@ async function loadGraph(cp)
                 backgroundColor: '#F5F5F5',
                 borderWidth: 0,
             },
-        pivot: {
-            backgroundColor: 'grey',
-            radius: 9
-        }
+            pivot: {
+                backgroundColor: 'grey',
+                radius: 9
+            }
 
-    },{ 
-        name: 'Burned',
-        data: [0.1],
-        tooltip: {
-          enabled: false
-        },
-        dial: {
+        }, {
+            name: 'Burned',
+            data: [0.1],
+            tooltip: {
+                enabled: false
+            },
+            dial: {
                 radius: '60%',
                 baseWidth: 1,
                 rearLength: '0%',
@@ -4426,11 +4423,11 @@ async function loadGraph(cp)
                 backgroundColor: 'red',
                 borderWidth: 0,
             },
-        pivot: {
-            backgroundColor: 'grey',
-            radius: 9
-        },
-    }]
+            pivot: {
+                backgroundColor: 'grey',
+                radius: 9
+            },
+        }]
 
     });
 
@@ -4447,39 +4444,39 @@ async function connectWallet() {
     currentInstance = null;
     currentStor = null;
 
-  if (!window.ethereum) {
-      alert("MetaMask not installed");
-      return;
-  }
+    if (!window.ethereum) {
+        alert("MetaMask not installed");
+        return;
+    }
 
-  try {
+    try {
 
-      const accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts'
-      });
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts'
+        });
 
-      currentAccount = accounts[0];
+        currentAccount = accounts[0];
 
-      showWallet();
-      await addConnectedUserPanel();
-  } catch (err) {
-      console.error(err);
-  }
+        showWallet();
+        await addConnectedUserPanel();
+    } catch (err) {
+        console.error(err);
+    }
 
 }
-function showWallet(){
+function showWallet() {
 
-    const short = currentAccount.slice(0,6) + "..." + currentAccount.slice(-4);
+    const short = currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4);
 
     document.getElementById("walletAddr").innerText = short;
 
     document.getElementById("connectBtn").style.display = "none";
     document.getElementById("walletInfoLine").style.display = "flex";
-    
+
 
 }
 
-function disconnectWallet(){
+function disconnectWallet() {
 
     currentAccount = null;
     currentInstance = null;
@@ -4491,9 +4488,9 @@ function disconnectWallet(){
 
 }
 
-function copyWallet(){
+function copyWallet() {
 
-    if(!currentAccount) return;
+    if (!currentAccount) return;
 
     navigator.clipboard.writeText(currentAccount);
 
