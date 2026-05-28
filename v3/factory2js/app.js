@@ -501,12 +501,10 @@ async function loadSystem() {
     const nodes = await nested.methods.getNodesCount().call();
     sysAge = await nested.methods.systemAge().call();
     document.getElementById("sysAgeid").innerHTML = sysAge;
-    const forms = await transferRequests.methods.getFormsCount().call();
     const isSafe = await safeguard.methods.isSafe().call();
-
+   
     addRow(panelSys,"Nodes Count",nodes);
     addRow(panelSys,"System Age",`${getAgeDateRange(sysAge).start} {${sysAge}}`);
-    addRow(panelSys,"Form Count",forms);
     addRow(panelSys,"Is Safe",isSafe);
 
     addRow(panelSys,"Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
@@ -551,6 +549,9 @@ async function loadSystemTreasuriesNSecurebase(){
     const deployer = await hexBase.methods.inDeployerAsRoot().call();
     addRow(panelBase,"DeployerAsRoot",deployer);
     
+    const deployerasservice = await hexBase.methods.inDeployerAService().call();
+    addRow(panelBase,"DeployerAsService",deployerasservice);
+    
     addRow(panelBase,"inPrice",inPrice);
 
     const old741 = await hexBase.methods.in741Old().call();
@@ -586,16 +587,28 @@ async function loadSystemTreasuriesNSecurebase(){
     addRow(panelByteCode,"Bytecode", byteCodeStandard);
     addRow(panelByteCode,"Download ABI", "https://drive.google.com/drive/folders/1O4J0hFtdSdbBcDyA5SxrLUOM8NqtQl0-");
     
-
+    //////////////////////////////////////////
+    ///////////////////////////////////////////
+    
     const panelSecure = addPanel("SECUREBASE");
-    const safe = await safeguard.methods.isSecureBase(insafeguard).call();
-
-
-    addRow(panelSecure,"safeguard",safe);
     const propSafe = await safeguard.methods.isSecureBase(prop0).call();
     addRow(panelSecure,"proposal(0)",propSafe);
 
+    //////////////////////////////////////////
+    ///////////////////////////////////////////
     
+    const panelPorp = addPanel("PROPOSALS(0)");
+    const importedNodeCount = await transferRequests.methods.getimportedNodeCount().call();
+    const forms = await transferRequests.methods.getFormsCount().call();
+    const actualTVL = await transferRequests.methods.actualTVL().call();
+    
+    addRow(panelPorp,"Form Count",forms);
+    addRow(panelPorp,"Imported Users",importedNodeCount);
+    addRow(panelPorp,"ActualTVL",formatOZN(actualTVL));
+  
+    //////////////////////////////////////////
+    ///////////////////////////////////////////
+
     const panelBusiness= addPanel("Business");
       
     const rBusiness=document.createElement("div");
