@@ -1508,7 +1508,7 @@ async function loadMyStor(id, panel) {
             });*/
 
 
-            debugger;
+
 
             const minpaydollartozonewei = await rule.methods.computeDollarToOzone(compute.minpaydollar.toString()).call();
             const minpaydollartozone = formatOZN(minpaydollartozonewei);
@@ -1586,6 +1586,16 @@ async function loadMyStor(id, panel) {
             btnCapBurn.onclick = () => {
                 onCapBurn();
             };
+
+            const btnTVLRefresh = document.createElement("button");
+            btnTVLRefresh.innerText = "TVLRefresh";
+            btnTVLRefresh.style.marginLeft = "10px";
+
+            btnTVLRefresh.onclick = () => {
+                onTVLRefresh();
+            };
+
+            right.appendChild(btnTVLRefresh);
             right.appendChild(btnClaim);
             right.appendChild(btnCapBurn);
 
@@ -2437,20 +2447,29 @@ async function loadMyNFT() {
         innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
     }));
 
+    let mintid = 1;
+    if (parseInt(mintCount) == 0) mintid = 0;
 
+    const btnMintLoad = document.createElement("button");
+    btnMintLoad.innerText = "Load Mints: " + mintid + "/" + mintCount;
+    btnMintLoad.style.marginLeft = "10px";
+    btnMintLoad.onclick = () => {
+        onMintLoad();
+    };
+    addRow(panel, "", btnMintLoad);
+    async function onMintLoad() {
 
-    for (let i = 1; i <= parseInt(mintCount); i++) {
+        if (mintid > parseInt(mintCount)) return;
 
-        const mint = await storeContract.methods.mints(i).call();
+        const mint = await storeContract.methods.mints(mintid).call();
         const nftAddr = mint.nft;
 
         const nft = new web3.eth.Contract(IORC1155ABI.abi, nftAddr);
 
         const mintedUser = await nft.methods.mintedUser().call();
 
-        if (mintedUser.toLowerCase() !== user.toLowerCase()) {
-            continue;
-        }
+        if (mintedUser.toLowerCase() !== user.toLowerCase()) return;
+
 
         const tokenId = await nft.methods.ids(0).call();
         const tokenName = await nft.methods.names(0).call();
@@ -2489,8 +2508,6 @@ async function loadMyNFT() {
         img.src = meta.image;
         img.width = 40;
         img.height = 40;
-
-
 
         rowTop.appendChild(idSpan);
         rowTop.appendChild(img);
@@ -2571,6 +2588,9 @@ async function loadMyNFT() {
             className: "row",
             innerHTML: `Mint LSB[${parseInt(mintedAge) + 2 + 600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(mintedAge) + 2 + 600).call(), "ether")}`
         }));
+
+        mintid++;
+
     }
 
 
@@ -2706,6 +2726,55 @@ async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead
 }
 
 
+async function onTVLRefresh() {
+    showLoader();
+
+    try {
+        // Prompt for recipient
+        const input = document.getElementById("userAddrInput");
+        const user = input.value.trim();
+
+        if (!user || !web3.utils.isAddress(user)) {
+            alert("Enter a valid address");
+            return;
+        }
+
+        const id = await nested.methods.UserToId(user).call();
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (user.trim().toLowerCase() !== accounts[0].toLowerCase()) {
+            throw "Incorrect account selected";
+        }
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // Enable wallet
+        const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
+
+        const tx = await nestedContractV1.methods
+            .TVLrefresh(id)
+            .send({
+                from: accounts[0]
+            });
+
+        if (tx.status) {
+            alert("TVLrefresh succeeded");
+        } else {
+            alert("TVLrefresh failed");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("TVLrefresh failed: " + (err.message || err));
+    }
+
+    hideLoader();
+}
 
 
 async function onCapBurn() {
