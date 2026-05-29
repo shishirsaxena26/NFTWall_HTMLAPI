@@ -2451,6 +2451,7 @@ async function loadMyNFT() {
     if (parseInt(mintCount) == 0) mintid = 0;
 
     const mintspan = document.createElement("span");
+    mintspan.id = "mintspan";
     mintspan.innerText = mintid + " / " + mintCount;
 
     const btnMintLoad = document.createElement("button");
@@ -2460,7 +2461,7 @@ async function loadMyNFT() {
         document.getElementById("mintspan").innerText = "Loadin mint...";
         mintid++;
         onMintLoad();
-        document.getElementById("mintspan").innerText = mintid + " / " + mintCount;
+
     };
     addRow(panel, btnMintLoad, mintspan);
     async function onMintLoad() {
@@ -2594,6 +2595,8 @@ async function loadMyNFT() {
             className: "row",
             innerHTML: `Mint LSB[${parseInt(mintedAge) + 2 + 600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(mintedAge) + 2 + 600).call(), "ether")}`
         }));
+
+        document.getElementById("mintspan").innerText = mintid + " / " + mintCount;
     }
 
 
