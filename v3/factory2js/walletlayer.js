@@ -851,6 +851,7 @@ async function loadApprove() {
 	await addSafeOwner("Service(9Oct) for PrimeProxy", PrimeProxy);
 
 	await addSafeOwner("Nested (New)", newNested);
+	await addSafeOwner("TVLNested (New)", TVLNested);
 
 	await _loadApprovePrime();
 }
