@@ -83,7 +83,7 @@ const Nftwall_Offer_15Oct_05Nov = '0x9Bac3b448cf6027f1a371f7faB93349212Eb5D50'
 const NFTValidatorsLocals = '0x68dB6c84eFdC641E7dff1421fbBaEa19D98e81d4'
 
 const newNested = "0xa4cb3f45F46B3c31780D70568b0627b3339eB76d"
-const TVLNested = "0x7f4331Bb1f776fb0F21b996432e5D8380D2e8efb"
+const TVLNested = "0x97d0C37812089F58C8b4cf3ce753d81E9f6e44c1"
 
 
 
