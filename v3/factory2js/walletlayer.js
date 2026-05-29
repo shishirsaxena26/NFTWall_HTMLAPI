@@ -1343,6 +1343,40 @@ async function onUnlock() {
 	}
 }
 
+async function setshutdown() {
+
+	msg('');
+	try {
+
+		let accounts = await ethereum.enable();
+		var account = accounts[0];
+
+		window.web3 = new Web3(window.ethereum);
+		window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
+		let response = await window.ruleContract.methods.setshutdown(true).send(
+			{ from: account }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					msg('Shutdown succeeded');
+				}
+				else {
+					msg('Shutdown failed');
+				}
+			});
+
+
+
+	}
+	catch (ex) {
+		console.log(ex);
+		msg('Shutdown failed');
+
+	}
+}
 
 async function onJoin() {
 	$("#lblmsg").text('');
