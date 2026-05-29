@@ -2761,9 +2761,10 @@ async function onTVLRefresh() {
 
         // Enable wallet
         const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
+        const Nested741TVL = new web3T.eth.Contract([{ "type": "function", "name": "TVLrefresh", "inputs": [{ "name": "user", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }], '0x7f4331Bb1f776fb0F21b996432e5D8380D2e8efb');
 
-        const tx = await nestedContractV1.methods
-            .TVLrefresh(id)
+        const tx = await Nested741TVL.methods
+            .TVLrefresh(user)
             .send({
                 from: accounts[0]
             });
