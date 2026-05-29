@@ -3,23 +3,23 @@
 //const provider = "https://chain.ozonescan.com";
 
 function copyAddress(element) {
-    const fullAddress = element.getAttribute("data-full");
-    navigator.clipboard.writeText(fullAddress).then(() => {
-      alert("Copied: " + fullAddress);
-    }).catch((err) => {
-      console.error("Copy failed", err);
-    });
-  }
+	const fullAddress = element.getAttribute("data-full");
+	navigator.clipboard.writeText(fullAddress).then(() => {
+		alert("Copied: " + fullAddress);
+	}).catch((err) => {
+		console.error("Copy failed", err);
+	});
+}
 
 
-  function shortenAddress(address) {
+function shortenAddress(address) {
 	if (!address) return "";
 	return address.slice(0, 6) + "..." + address.slice(-6);
-  }
+}
 
-  function slice(text) {
+function slice(text) {
 	return text.slice(0, 6) + "..." + text.slice(-4)
-  }
+}
 
 /* ---------------------------------------- */
 function truncate(text, startChars, endChars, maxLength) {
@@ -43,7 +43,7 @@ function copyURI(evt) {
 }
 
 function Linkmaker(val) {
-	return truncate(val, 7, 7, 20)  + ' <a href="#" onclick="copyURI(event)" title="' + val + '">Copy</a>';
+	return truncate(val, 7, 7, 20) + ' <a href="#" onclick="copyURI(event)" title="' + val + '">Copy</a>';
 }
 
 /*var qs = (function (a) {
@@ -78,21 +78,21 @@ pageload();
 async function pageload() {
 	//
 	var version = Date.now(); // or any versioning logic
-	safeABI = await fetch('abi/lib723Common.sol/lib723Common.json?v='+version).then(res => res.json());
-	factoryABI = await fetch('abi/Nftwall-Factory.sol/NFTWallFactory.json?v='+version).then(res => res.json());
-	RulesABI = await fetch('abi/lib741Rules.sol/lib741Rules.json?v='+version).then(res => res.json());
-	NestedABI = await fetch('abi/Nested741.sol/Nested741.json?v='+version).then(res => res.json());
-	insABI = await fetch('abi/Nftwall-Instance.sol/NodeInstance.json?v='+version).then(res => res.json());
-	ORCABI = await fetch('abi/ORC1155.sol/ORC1155.json?v='+version).then(res => res.json());
-	validatorLocalABI = await fetch('abiv3/Nftwall-ValidatorsLocals.sol/NFTValidatorsLocals.json?v='+version).then(res => res.json());
-	await web3.eth.getBlock(4564345).then((e) => { 
-		console.log(e); 
-	}).catch((e) => {});
+	safeABI = await fetch('abi/lib723Common.sol/lib723Common.json?v=' + version).then(res => res.json());
+	factoryABI = await fetch('abi/Nftwall-Factory.sol/NFTWallFactory.json?v=' + version).then(res => res.json());
+	RulesABI = await fetch('abi/lib741Rules.sol/lib741Rules.json?v=' + version).then(res => res.json());
+	NestedABI = await fetch('abi/Nested741.sol/Nested741.json?v=' + version).then(res => res.json());
+	insABI = await fetch('abi/Nftwall-Instance.sol/NodeInstance.json?v=' + version).then(res => res.json());
+	ORCABI = await fetch('abi/ORC1155.sol/ORC1155.json?v=' + version).then(res => res.json());
+	validatorLocalABI = await fetch('abiv3/Nftwall-ValidatorsLocals.sol/NFTValidatorsLocals.json?v=' + version).then(res => res.json());
+	await web3.eth.getBlock(4564345).then((e) => {
+		console.log(e);
+	}).catch((e) => { });
 
-	await web3.eth.getBlock(1005172).then((e) => { 
-		console.log(e); 
-	}).catch((e) => {});
-	
+	await web3.eth.getBlock(1005172).then((e) => {
+		console.log(e);
+	}).catch((e) => { });
+
 	if ($("#tabApprove").length) {
 		loadApprove();
 		return;
@@ -102,7 +102,7 @@ async function pageload() {
 		loadTransferOwnerPrime();
 		return;
 	}
-	
+
 	if ($("#tabTree").length) {
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let count = await window.nestedcontract.methods.getNodesCount().call();
@@ -112,13 +112,13 @@ async function pageload() {
 	}
 
 	if ($("#tabOrc").length) {
-		   
+
 		await LoadSystemORC1155(orc1155);
-		
-		
+
+
 		await LoadSystemORC1155(orc1155Nanolit);
 		await LoadSystemORC1155(orc1155MachineBull);
-		
+
 		await LoadSystemORC1155(orc1155Cat);
 		await LoadSystemORC1155(orc1155Monalisa);
 
@@ -127,15 +127,15 @@ async function pageload() {
 		await LoadSystemORC1155(orc1155Neonlit9Oct);
 		await LoadSystemORC1155(orc1155Monalisa9Oct);
 		await LoadSystemORC1155(orc1155MachineBull9Oct);
-		   
-		
-		
+
+
+
 		await _LoadSystemORC1155Prime();
-		   
+
 
 		return;
 	}
-	if($("#tabOrcNFT").length) {
+	if ($("#tabOrcNFT").length) {
 		await LoadSystemORCNFT(orc1155Cat);
 		await LoadSystemORCNFT(orc1155Monalisa);
 		await LoadSystemORCNFT(orc1155MachineBull);
@@ -143,31 +143,31 @@ async function pageload() {
 		await LoadSystemORCNFT(orc1155);
 
 	}
-	
+
 
 	if ($("#txtto").length) {
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let age = await window.nestedcontract.methods.age().call();
 		$("#txtto").val(age);
-		$("#txtfrom").val(parseInt(age)-10);
+		$("#txtfrom").val(parseInt(age) - 10);
 	};
 
-	
-    let accounts = await ethereum.enable();
-	if(accounts)  {
+
+	let accounts = await ethereum.enable();
+	if (accounts) {
 		$("#txtAdd").val(accounts[0]);
 	}
 
-		
+
 	if ($("#tbStandardInfo").length) {
-			LoadSystemRankClause();
-			LoadSystemLevelClause();
-			LoadSystemPoolClause();
-			$("#txtRootAdd").val(rootSponser);
-			$("#transferAdd").text(transfer);
-			$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
-		}
-	
+		LoadSystemRankClause();
+		LoadSystemLevelClause();
+		LoadSystemPoolClause();
+		$("#txtRootAdd").val(rootSponser);
+		$("#transferAdd").text(transfer);
+		$("#transferBal").text(web3.utils.fromWei((await web3.eth.getBalance(transfer)), 'ether'));
+	}
+
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	debugger;
 	let ins1 = await nestedcontract.methods.getNodeByIndex(103547).call(console.log);
@@ -179,166 +179,163 @@ var profilecontract;
 var t = web3.eth.getChainId(console.log);
 const gasPrice = web3.eth.getGasPrice(console.log);
 
-async function LoadTree(){
+async function LoadTree() {
 	if (!$("#tabTree").length) return;
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let count = await window.nestedcontract.methods.getNodesCount().call();
-	
-	for (let i = 0; i<parseInt(count); i++) {
-		
+
+	for (let i = 0; i < parseInt(count); i++) {
+
 		var td = '';
-		
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let nodeIns = await window.nestedcontract.methods.getNodeByIndex(i).call();
-		
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let node = await window.nestedcontract.methods.InstToUser(nodeIns).call();
-		
-		
+
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let nodeDet = await window.nestedcontract.methods.getNode(nodeIns).call();
-		
 
-		td =td + '<td>' + nodeDet.i + '</td>';
-		td =td + '<td>' + node + '</td>';
-		td =td + '<td>' + nodeIns + '</td>';
-		td =td + '<td>' + nodeDet.cage + '</td>';
-		
-		
+
+		td = td + '<td>' + nodeDet.i + '</td>';
+		td = td + '<td>' + node + '</td>';
+		td = td + '<td>' + nodeIns + '</td>';
+		td = td + '<td>' + nodeDet.cage + '</td>';
+
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let pa = await window.nestedcontract.methods.InstToUser(nodeDet.pa).call();
-		td =td + '<td>' + pa + '</td>';
-		td =td + '<td>' + nodeDet.pa + '</td>';
+		td = td + '<td>' + pa + '</td>';
+		td = td + '<td>' + nodeDet.pa + '</td>';
 
-		
+
 
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let dc = await window.nestedcontract.methods.getNodeDirectsCount(nodeIns).call();
-		
-		td =td + '<td>' + dc+ '</td>';
+
+		td = td + '<td>' + dc + '</td>';
 
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		
+
 		let rnk = await window.nestedcontract.methods.getEffectiveRank(nodeIns).call();
-		
-		td =td + '<td>' + rnk+ '</td>';
+
+		td = td + '<td>' + rnk + '</td>';
 
 		window.instancecontract = new web3.eth.Contract(insABI.abi, nodeIns);
 		let mc = await window.instancecontract.methods.mintCount().call();
-		td =td + '<td>' + mc+ '</td>';
+		td = td + '<td>' + mc + '</td>';
 
 		$("#tabTree").append('<tr>' + td + '</tr>');
 	}
 }
 
-async function onGetDailyBusiness(){
-	
+async function onGetDailyBusiness() {
+
 	var r3 = new BN("0");
 	var r5 = new BN("0");
 	var r7 = new BN("0");
 	if (!$("#txtfrom").length) return;
 	var from = $("#txtfrom").val();
 	if (!from) { msg('from is blank'); return; }
-	
+
 	var to = $("#txtto").val();
 	if (!to) { msg('to is blank'); return; }
 
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let age = await window.nestedcontract.methods.age().call();
-	for (let i = parseInt(to); i>=parseInt(from); i--) {
+	for (let i = parseInt(to); i >= parseInt(from); i--) {
 		let b = await window.nestedcontract.methods.getbusiness(i).call();
-		
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct0 = await window.nestedcontract.methods.getrankCount(i,0).call();
+		let Ct0 = await window.nestedcontract.methods.getrankCount(i, 0).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct1 = await window.nestedcontract.methods.getrankCount(i,1).call();
+		let Ct1 = await window.nestedcontract.methods.getrankCount(i, 1).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct2 = await window.nestedcontract.methods.getrankCount(i,2).call();
+		let Ct2 = await window.nestedcontract.methods.getrankCount(i, 2).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct3 = await window.nestedcontract.methods.getrankCount(i,3).call();
+		let Ct3 = await window.nestedcontract.methods.getrankCount(i, 3).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct4 = await window.nestedcontract.methods.getrankCount(i,4).call();
+		let Ct4 = await window.nestedcontract.methods.getrankCount(i, 4).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct5 = await window.nestedcontract.methods.getrankCount(i,5).call();
+		let Ct5 = await window.nestedcontract.methods.getrankCount(i, 5).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct6 = await window.nestedcontract.methods.getrankCount(i,6).call();
+		let Ct6 = await window.nestedcontract.methods.getrankCount(i, 6).call();
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let Ct7 = await window.nestedcontract.methods.getrankCount(i,7).call();
+		let Ct7 = await window.nestedcontract.methods.getrankCount(i, 7).call();
 		var royal3 = new BN('0');
 		var royal5 = new BN('0');
 		var royal7 = new BN('0');
-		
-		if(parseInt(Ct3)>0)
-		{	royal3=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct3.toString()));
+
+		if (parseInt(Ct3) > 0) {
+			royal3 = (new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct3.toString()));
 		}
-		if(parseInt(Ct5)>0)
-		{
-			royal5=(new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct5.toString()));
+		if (parseInt(Ct5) > 0) {
+			royal5 = (new BN(((new BN(b)).mul(new BN("18")).div(new BN("1000"))).toString())).div(new BN(Ct5.toString()));
 		}
-		if(parseInt(Ct7)>0)
-		{
-			royal7=(new BN(((new BN(b)).mul(new BN("9")).div(new BN("1000"))).toString())).div(new BN(Ct7.toString()));
+		if (parseInt(Ct7) > 0) {
+			royal7 = (new BN(((new BN(b)).mul(new BN("9")).div(new BN("1000"))).toString())).div(new BN(Ct7.toString()));
 		}
-		
-		r3=r3.add(new BN(royal3.toString()));
-		r5=r5.add(new BN(royal5.toString()));
-		r7=r7.add(new BN(royal7.toString()));
-		
+
+		r3 = r3.add(new BN(royal3.toString()));
+		r5 = r5.add(new BN(royal5.toString()));
+		r7 = r7.add(new BN(royal7.toString()));
+
 
 		$("#r3td").html(r3.toString());
 		$("#r5td").html(r5.toString());
 		$("#r7td").html(r7.toString());
-		
-		$("#tabDailyBusiness").append('<tr><td>'+i+'</td><td>'+b+'</td><td>'+Ct0+'</td><td>'+Ct1+'</td><td>'+Ct2+'</td><td>'+Ct3+'</td><td>'+Ct4+'</td><td>'+Ct5+'</td><td>'+Ct6+'</td><td>'+Ct7+'</td><td>'+royal3.toString()+'</td><td>'+royal5.toString()+'</td><td>'+royal7.toString()+'</td></tr>');
-	}	
 
-	
+		$("#tabDailyBusiness").append('<tr><td>' + i + '</td><td>' + b + '</td><td>' + Ct0 + '</td><td>' + Ct1 + '</td><td>' + Ct2 + '</td><td>' + Ct3 + '</td><td>' + Ct4 + '</td><td>' + Ct5 + '</td><td>' + Ct6 + '</td><td>' + Ct7 + '</td><td>' + royal3.toString() + '</td><td>' + royal5.toString() + '</td><td>' + royal7.toString() + '</td></tr>');
+	}
 
-	
-	
+
+
+
+
 }
 
-async function LoadRules()
-{
+async function LoadRules() {
 	debugger
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
-	
+
 	let ozn = await window.ruleContract.methods.ozoneprice().call();
-	  
-	$('#oznprice').text(`Price: `+web3.utils.fromWei(ozn.toString(), 'ether'));
+
+	$('#oznprice').text(`Price: ` + web3.utils.fromWei(ozn.toString(), 'ether'));
 
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let shutdown = await window.ruleContract.methods.shutdown().call();
-	$('#shutdown').text(`Shutdown: `+ shutdown);
+	$('#shutdown').text(`Shutdown: ` + shutdown);
 
-	
+
 	window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 	let isSafe = await window.safecontract.methods.isSafe().call();
-	$('#isSafe').text(`isSafe: `+ isSafe);
+	$('#isSafe').text(`isSafe: ` + isSafe);
 
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let freeIntervals = await window.ruleContract.methods.freeIntervals().call();
-	$('#freeIntervals').text(`FreeIntervals: `+ freeIntervals);
+	$('#freeIntervals').text(`FreeIntervals: ` + freeIntervals);
 
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let claimMinLimit = await window.ruleContract.methods.claimMinLimit().call();
-	$('#claimMinLimit').text(`claimMinLimit: `+web3.utils.fromWei((BigInt(claimMinLimit.toString())).toString(), 'ether'));
-	
+	$('#claimMinLimit').text(`claimMinLimit: ` + web3.utils.fromWei((BigInt(claimMinLimit.toString())).toString(), 'ether'));
+
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let claimMaxLimit = await window.ruleContract.methods.claimMaxLimit().call();
-	$('#claimMaxLimit').text(`claimMaxLimit: `+web3.utils.fromWei((BigInt(claimMaxLimit.toString())).toString(), 'ether'));
+	$('#claimMaxLimit').text(`claimMaxLimit: ` + web3.utils.fromWei((BigInt(claimMaxLimit.toString())).toString(), 'ether'));
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let mintMin = await window.ruleContract.methods.mintMin().call();
-	$('#mintMin').text(`mintMin: `+ (parseInt(mintMin)).toString());
-	
+	$('#mintMin').text(`mintMin: ` + (parseInt(mintMin)).toString());
+
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let mintMax = await window.ruleContract.methods.mintMax().call();
-	$('#mintMax').text(`mintMax: `+ (parseInt(mintMax)).toString());
+	$('#mintMax').text(`mintMax: ` + (parseInt(mintMax)).toString());
 
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let mintDailyLimit = await window.ruleContract.methods.mintDailyLimit().call();
-	$('#mintDailyLimit').text(`mintDailyLimit: `+ mintDailyLimit.toString());
-	
+	$('#mintDailyLimit').text(`mintDailyLimit: ` + mintDailyLimit.toString());
+
 }
 //console.log(parseFloat(0x8fce90cedbb7ab800));
 async function LoadSystemRankClause() {
@@ -346,507 +343,501 @@ async function LoadSystemRankClause() {
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 	let tour = await window.ruleContract.methods.tourClause(2).call();
 	$("#tabTour").append('<tr><td>Rank</td><td>Tour</td></tr>');
-	$("#tabTour").append('<tr><td>2</td><td>'+web3.utils.fromWei(tour.toString(), 'ether')+' $</td></tr>');
+	$("#tabTour").append('<tr><td>2</td><td>' + web3.utils.fromWei(tour.toString(), 'ether') + ' $</td></tr>');
 	let gift = await window.ruleContract.methods.tourClause(4).call();
 	$("#tabTour").append('<tr><td>Rank</td><td>Gift</td></tr>');
-	$("#tabTour").append('<tr><td>4</td><td>'+web3.utils.fromWei(gift.toString(), 'ether')+' $</td></tr>');
-		
-	
-	
-	for (let i = 1; i <=7; i++) {	
+	$("#tabTour").append('<tr><td>4</td><td>' + web3.utils.fromWei(gift.toString(), 'ether') + ' $</td></tr>');
+
+
+
+	for (let i = 1; i <= 7; i++) {
 		window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 		let rnkCl = await window.ruleContract.methods.rankClause(i).call();
 		var td = '<td>' + i + '</td>';
-		td =td + '<td>' + rnkCl.direct + '</td>';
-		td =td + '<td>' + rnkCl.nftAmount + '</td>';
+		td = td + '<td>' + rnkCl.direct + '</td>';
+		td = td + '<td>' + rnkCl.nftAmount + '</td>';
 
-		
 
-		
 
-		if(i==3 || i==5|| i==7)
-		{
+
+
+		if (i == 3 || i == 5 || i == 7) {
 			window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 			let roy = await window.ruleContract.methods.royalityClause(i).call()
-			td =td + '<td>' + parseFloat(roy.rwNum)/parseFloat(roy.rwDen) +'% ' + roy.rwEnd + ' days' + '</td>';
+			td = td + '<td>' + parseFloat(roy.rwNum) / parseFloat(roy.rwDen) + '% ' + roy.rwEnd + ' days' + '</td>';
 		}
-		else td =td + '<td></td>';
-		
-		
+		else td = td + '<td></td>';
+
+
 
 		$("#tabRank").append('<tr>' + td + '</tr>');
-	
+
 
 	}
 }
 async function LoadSystemLevelClause() {
-	for (let i = 1; i <=15; i++) {	
+	for (let i = 1; i <= 15; i++) {
 		window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 		let lvl = await window.ruleContract.methods.levelClause(i).call()
 		var td = '<td>' + i + '</td>';
-		td =td + '<td>' + lvl.rank + '</td>';
-		td =td + '<td>' + parseFloat(lvl.rwNum)/parseFloat(lvl.rwrDen) +'%' + '</td>';
-		td =td + '<td>' + parseFloat(lvl.yeiNum)/parseFloat(lvl.yeiDen) +'%'+ '</td>';
+		td = td + '<td>' + lvl.rank + '</td>';
+		td = td + '<td>' + parseFloat(lvl.rwNum) / parseFloat(lvl.rwrDen) + '%' + '</td>';
+		td = td + '<td>' + parseFloat(lvl.yeiNum) / parseFloat(lvl.yeiDen) + '%' + '</td>';
 		$("#tabLvl").append('<tr>' + td + '</tr>');
 	}
-	
+
 }
 
 async function LoadSystemPoolClause() {
-	
-		window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
-		let p = await window.ruleContract.methods.pool().call();
-		
-		var td = '<td> New </td>';
-		td = td + '<td>' + parseFloat(p.stakeN)/parseFloat(p.stakeD) +'%' + '</td>';
-		td = td + '<td>' + parseFloat(p.roiN)/parseFloat(p.roiD) +'%'+ '</td>';
-		td = td +'<td>' + p.startafter + '</td>';
-		td = td +'<td>' + p.roiInt + '</td>'
-		td = td +'<td>' + p.roiEnd + '</td>'
-		$("#tabPool").append('<tr>' + td + '</tr>');
-	
-		let n = await window.ruleContract.methods.poolNFT1().call();
-		
-		td = '<td> NFT Pool 1 </td>';
-		
-		td = td + '<td>' + parseFloat(n.roiN)/parseFloat(n.roiD) +'%'+ '</td>';
-		
-		td = td +'<td>' + n.roiInt + '</td>'
-		
-		$("#tabPoolNFT").append('<tr>' + td + '</tr>');
 
-		n = await window.ruleContract.methods.poolNFT2().call();
-		
-		td = '<td> NFT Pool 2 </td>';
-		
-		td = td + '<td>' + parseFloat(n.roiN)/parseFloat(n.roiD) +'%'+ '</td>';
-		
-		td = td +'<td>' + n.roiInt + '</td>'
-		
-		$("#tabPoolNFT").append('<tr>' + td + '</tr>');
+	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
+	let p = await window.ruleContract.methods.pool().call();
 
-		
+	var td = '<td> New </td>';
+	td = td + '<td>' + parseFloat(p.stakeN) / parseFloat(p.stakeD) + '%' + '</td>';
+	td = td + '<td>' + parseFloat(p.roiN) / parseFloat(p.roiD) + '%' + '</td>';
+	td = td + '<td>' + p.startafter + '</td>';
+	td = td + '<td>' + p.roiInt + '</td>'
+	td = td + '<td>' + p.roiEnd + '</td>'
+	$("#tabPool").append('<tr>' + td + '</tr>');
 
-		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		let age = await window.nestedcontract.methods.age().call();
-		$("#systemAge").html('System Age ' + age);
+	let n = await window.ruleContract.methods.poolNFT1().call();
+
+	td = '<td> NFT Pool 1 </td>';
+
+	td = td + '<td>' + parseFloat(n.roiN) / parseFloat(n.roiD) + '%' + '</td>';
+
+	td = td + '<td>' + n.roiInt + '</td>'
+
+	$("#tabPoolNFT").append('<tr>' + td + '</tr>');
+
+	n = await window.ruleContract.methods.poolNFT2().call();
+
+	td = '<td> NFT Pool 2 </td>';
+
+	td = td + '<td>' + parseFloat(n.roiN) / parseFloat(n.roiD) + '%' + '</td>';
+
+	td = td + '<td>' + n.roiInt + '</td>'
+
+	$("#tabPoolNFT").append('<tr>' + td + '</tr>');
+
+
+
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	let age = await window.nestedcontract.methods.age().call();
+	$("#systemAge").html('System Age ' + age);
 }
 
 async function LoadSystemORC1155(o1155) {
-	
+
 	window.web3 = new Web3(new Web3.providers.HttpProvider(provider));
-	
+
 	if (!$("#tabOrc").length) return;
-	
+
 	window.factorycontract = new web3.eth.Contract(factoryABI.abi, factory);
-	if (!(await window.factorycontract.methods.isORC1155(o1155).call())) 
-	
-	    
-	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	
+	if (!(await window.factorycontract.methods.isORC1155(o1155).call()))
+
+
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
+
 	//let baseMetadataURI =await window.orc1155contract.methods.baseMetadataURI().call();
-	
-	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-
-	let totSupply =await window.orc1155contract.methods.totSupply().call();
 
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let curSupply =await window.orc1155contract.methods.curSupply().call();
+
+	let totSupply = await window.orc1155contract.methods.totSupply().call();
+
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let name =await window.orc1155contract.methods.name().call();
-	
-	let tr='';
-	let td = '<td> ' + name + '</td><td>'+o1155+' </td>';
-	td = td +'<td>' + totSupply + '</td>'
-	td = td +'<td>' + curSupply + '</td>'
+	let curSupply = await window.orc1155contract.methods.curSupply().call();
+	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
+	let name = await window.orc1155contract.methods.name().call();
+
+	let tr = '';
+	let td = '<td> ' + name + '</td><td>' + o1155 + ' </td>';
+	td = td + '<td>' + totSupply + '</td>'
+	td = td + '<td>' + curSupply + '</td>'
 	tr = '<tr>' + td + '</tr>';
-	
-	let flag=true;
-	let i=1;
+
+	let flag = true;
+	let i = 1;
 	td = '<td colspan="5" style="display: flex;"><div style="overflow-x: scroll; display:flex; width:400px;">';
-	while(flag) {
-		let tokenName =await window.orc1155contract.methods.idToName(i).call();
-		
-		if(!tokenName) { flag= false; }
+	while (flag) {
+		let tokenName = await window.orc1155contract.methods.idToName(i).call();
+
+		if (!tokenName) { flag = false; }
 		else {
-			let metadata =await window.orc1155contract.methods.uri(i).call();
+			let metadata = await window.orc1155contract.methods.uri(i).call();
 			let meta = await fetch(metadata).then(res => res.json());
-			
-			td = td + '<div class="NFTdiv"><img src="'+meta.image+'" width="50px" height="50px" /><br/>'+i+' - '+tokenName+'</div>';
+
+			td = td + '<div class="NFTdiv"><img src="' + meta.image + '" width="50px" height="50px" /><br/>' + i + ' - ' + tokenName + '</div>';
 			i++;
 		}
 	}
 
-	
 
-	td = td +'</div></td>';
+
+	td = td + '</div></td>';
 	tr = tr + '<tr>' + td + '</tr>';
-	
+
 	$("#tabOrc").append(tr);
-	
+
 }
 
 
 async function LoadSystemORCNFT(o1155) {
-	
+
 	if (!$("#tabOrcNFT").length) return;
-	
+
 	window.web3 = new Web3(new Web3.providers.HttpProvider(provider));
 	window.factorycontract = new web3.eth.Contract(factoryABI.abi, factory);
-	if (!(await window.factorycontract.methods.isORC1155(o1155).call())) 
-	
-	    
-	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	
+	if (!(await window.factorycontract.methods.isORC1155(o1155).call()))
+
+
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
+
 	//let baseMetadataURI =await window.orc1155contract.methods.baseMetadataURI().call();
-	
+
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let totSupply =await window.orc1155contract.methods.totSupply().call();
+	let totSupply = await window.orc1155contract.methods.totSupply().call();
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let curSupply =await window.orc1155contract.methods.curSupply().call();
+	let curSupply = await window.orc1155contract.methods.curSupply().call();
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let name =await window.orc1155contract.methods.name().call();
+	let name = await window.orc1155contract.methods.name().call();
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o1155);
-	let getTokenCount =await window.orc1155contract.methods.getTokenCount().call();
-	let tr='';
-	let td = '<td> ' + name + '</td><td>'+o1155+' </td>';
-	td = td +'<td> <button onclick="getNFT(\''+ o1155 + '\','+getTokenCount+')">' + getTokenCount + '</button> </td>'
-	td = td +'<td>' + totSupply + '</td>'
-	td = td +'<td>' + curSupply + '</td>'
+	let getTokenCount = await window.orc1155contract.methods.getTokenCount().call();
+	let tr = '';
+	let td = '<td> ' + name + '</td><td>' + o1155 + ' </td>';
+	td = td + '<td> <button onclick="getNFT(\'' + o1155 + '\',' + getTokenCount + ')">' + getTokenCount + '</button> </td>'
+	td = td + '<td>' + totSupply + '</td>'
+	td = td + '<td>' + curSupply + '</td>'
 	tr = '<tr>' + td + '</tr>';
-	
-	
+
+
 	$("#tabOrcNFT").append(tr);
-	
+
 }
 
-async function getNFT(o,count) {
+async function getNFT(o, count) {
 	alert('Please wait, it may take a while to load NFTs.');
 	$("#divNFT").html('');
 	window.orc1155contract = new web3.eth.Contract(ORCABI.abi, o);
-	let i=1;
+	let i = 1;
 
 	let promises = [];
 
-    for (let i = 1; i <= count; i++) {
-        promises.push(
-            (async (index) => {
-                try {
-                    let metadataUrl = await window.orc1155contract.methods.uri(index).call();
-                    let meta = await fetch(metadataUrl).then(res => res.json());
-                    //let path = 'http://52.220.77.185/' + new URL(meta.image).hostname.split(".")[0];
+	for (let i = 1; i <= count; i++) {
+		promises.push(
+			(async (index) => {
+				try {
+					let metadataUrl = await window.orc1155contract.methods.uri(index).call();
+					let meta = await fetch(metadataUrl).then(res => res.json());
+					//let path = 'http://52.220.77.185/' + new URL(meta.image).hostname.split(".")[0];
 					let path = meta.image.replace('.ozonestore.io', '.ashokaverse.io');;
 					console.log(path);
 					let tokenName = await window.orc1155contract.methods.idToName(index).call();
 
-                    // Append immediately (non-blocking UI)
-                    $("#divNFT").append(
-                        `<div class="NFTdiv">
+					// Append immediately (non-blocking UI)
+					$("#divNFT").append(
+						`<div class="NFTdiv">
                             <img src="${path}" loading="lazy" />
                             <br/>${index} - ${tokenName}
                         </div>`
-                    );
-                } catch (e) {
-                    console.error("Error loading token " + index, e);
-                }
-            })(i)
-        );
-    }
+					);
+				} catch (e) {
+					console.error("Error loading token " + index, e);
+				}
+			})(i)
+		);
+	}
 
-	    // Wait for all metadata to load in background (no UI freeze)
-    await Promise.all(promises);
+	// Wait for all metadata to load in background (no UI freeze)
+	await Promise.all(promises);
 
 }
 async function onLoadRootAddress() {
-	
+
 	var n = $("#txtRootAdd").val();
 	if (!n) { msg('txtRootAdd is blank'); return; }
 	loadAddressData(n);
 }
 
 async function onLoadAddress() {
-	
+
 	var n = $("#txtAdd").val();
 	if (!n) { msg('txtAdd is blank'); return; }
 	loadAddressData(n);
 }
 
 
-async function isUser(u)
-{
+async function isUser(u) {
 	window.nestedcontract = new window.web3.eth.Contract(NestedABI.abi, nested);
 	let add = await window.nestedcontract.methods.UserToInst(u).call();
-	
-	return (add != "0x0000000000000000000000000000000000000000") ;
+
+	return (add != "0x0000000000000000000000000000000000000000");
 }
 
 
 async function loadAddressData(n) {
-	
-	if (!(await isUser(n))) 
-	{ msg('Instance is not created.'); return; }
 
-		
+	if (!(await isUser(n))) { msg('Instance is not created.'); return; }
+
+
 	var header1 = $($("#tab").find('tr')[0]).clone();
 	await loadStructure(n, header1);
 }
 
 
 async function loadStructure(n, header) {
-	
+
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let age = await window.nestedcontract.methods.age().call();
 
 	var td = '<td>' + n + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let instance = await window.nestedcontract.methods.UserToInst(n).call();
-	td =td + '<td>' + instance + '</td>';
-	
+	td = td + '<td>' + instance + '</td>';
+
 	let depth = await window.nestedcontract.methods.getNodeLvlDepth(instance).call();
 	alert(depth);
-	
-	td =td + '<td>' +  web3.utils.fromWei((await web3.eth.getBalance(instance)), 'ether') + '</td>';
+
+	td = td + '<td>' + web3.utils.fromWei((await web3.eth.getBalance(instance)), 'ether') + '</td>';
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	
-	let cage =await window.instancecontract.methods.cage().call();
-	td =td + '<td>' + (cage) + '</td>';
+
+	let cage = await window.instancecontract.methods.cage().call();
+	td = td + '<td>' + (cage) + '</td>';
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	
-	let mintnumber =await window.instancecontract.methods.mintCount().call();
-	td =td + '<td>' + (mintnumber) + '</td>';
-	let bonus =await window.instancecontract.methods.bonus().call();
-	td =td + '<td>' + (web3.utils.fromWei(bonus.toString(), 'ether')) + '</td>';
-	let vali =await window.instancecontract.methods.validator().call();
-	td =td + '<td>' + (vali) + '</td>'
+
+	let mintnumber = await window.instancecontract.methods.mintCount().call();
+	td = td + '<td>' + (mintnumber) + '</td>';
+	let bonus = await window.instancecontract.methods.bonus().call();
+	td = td + '<td>' + (web3.utils.fromWei(bonus.toString(), 'ether')) + '</td>';
+	let vali = await window.instancecontract.methods.validator().call();
+	td = td + '<td>' + (vali) + '</td>'
 	$("#tab tr:not(:first)").remove();
 	$("#tab").append('<tr ' + cstyle + ' >' + td + '</tr>');
-	
+
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	let inc = await window.instancecontract.methods.drawn().call()
-	
-	td ='<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
-	td =td + '<td>' +  web3.utils.fromWei(inc[1].toString(), 'ether') + '</td>';
-	td =td + '<td>' +  web3.utils.fromWei(inc[2].toString(), 'ether') + '</td>';
-	td =td + '<td>' +  web3.utils.fromWei(inc[3].toString(), 'ether') + '</td>';
-	td =td + '<td>' +  web3.utils.fromWei(inc[4].toString(), 'ether') + '</td>';
-	td =td + '<td>' +  web3.utils.fromWei(inc[5].toString(), 'ether') + '</td>';
-	
+
+	td = '<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[1].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[2].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[3].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[4].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[5].toString(), 'ether') + '</td>';
+
 	var cstyle = "";
 	$("#tabIncome tr:not(:first)").remove();
 	$("#tabIncome").append('<tr ' + cstyle + ' >' + td + '</tr>');
 
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	let dage = await window.instancecontract.methods.drawnage().call();
-	
 
-	
-	loadPool(n,instance,dage);
+
+
+	loadPool(n, instance, dage);
 	const checkboxLSB = document.getElementById("checkboxLSB");
-	
+
 	if (checkboxLSB.checked) {
-		loadLSB(instance,dage,age);
+		loadLSB(instance, dage, age);
 	}
-	
+
 	loadlevelbusiness(instance);
 
-	
+
 	$("#tabMint tr:not(:first)").remove();
-	for (let i = 1; i<=parseInt(mintnumber); i++) {
-		td = '<td>'+i+'</td>';	
-		let orc =await window.instancecontract.methods.mints(i).call();
+	for (let i = 1; i <= parseInt(mintnumber); i++) {
+		td = '<td>' + i + '</td>';
+		let orc = await window.instancecontract.methods.mints(i).call();
 		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
 		//uint256 amount,uint timestamp, uint256 claimed,  uint256 value, uint mtype
 
-		
-		
-		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
-		let a =await window.orc1155contract.methods.mintedAge().call();
-		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
-		let amt =await window.orc1155contract.methods.mintAmt().call();
-		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
-		let q =await window.orc1155contract.methods.mintedqty().call();
 
-		let orcname =await window.orc1155contract.methods.name().call();
-		let tokenName =await window.orc1155contract.methods.names(0).call();
-		let id =await window.orc1155contract.methods.ids(0).call();
-		let metadata =await window.orc1155contract.methods.uri(id).call();
+
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
+		let a = await window.orc1155contract.methods.mintedAge().call();
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
+		let amt = await window.orc1155contract.methods.mintAmt().call();
+		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
+		let q = await window.orc1155contract.methods.mintedqty().call();
+
+		let orcname = await window.orc1155contract.methods.name().call();
+		let tokenName = await window.orc1155contract.methods.names(0).call();
+		let id = await window.orc1155contract.methods.ids(0).call();
+		let metadata = await window.orc1155contract.methods.uri(id).call();
 		let meta = await fetch(metadata).then(res => res.json());
 
 		amt = web3.utils.fromWei(amt, 'ether');
-		
-		td = td  + '<td onclick="copyAddress(this)" data-full="'+orc+'">'+slice(orc)+'<br/>'+orcname+'<br/><img src="'+meta.image+'" width="50px" height="50px" /><br/>1 - '+tokenName+'</td>';
-		td = td  + '<td>'+a+'</td>';
-		td = td  + '<td>'+amt+'</td>';
-		td = td  + '<td>'+q+'</td>';
+
+		td = td + '<td onclick="copyAddress(this)" data-full="' + orc + '">' + slice(orc) + '<br/>' + orcname + '<br/><img src="' + meta.image + '" width="50px" height="50px" /><br/>1 - ' + tokenName + '</td>';
+		td = td + '<td>' + a + '</td>';
+		td = td + '<td>' + amt + '</td>';
+		td = td + '<td>' + q + '</td>';
 
 		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
-		let cl =await window.orc1155contract.methods.claimed().call();
+		let cl = await window.orc1155contract.methods.claimed().call();
 		//
-		td = td  + '<td>'+cl+'</td>';
+		td = td + '<td>' + cl + '</td>';
 		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc);
-		let ul =await window.orc1155contract.methods._getUnlockedNFT().call();
-		td = td  + '<td>'+ul+'</td>';
-		let cal = parseFloat(ul)-parseFloat(cl);
-		
-		td = td  + '<td><button id="btnWth" onclick="onNFTTransfer(\'' + orc + '\','+id+',\''+rootSponser+'\',\''+ (cal) +'\')">'+ (cal) +'</button></td>';
+		let ul = await window.orc1155contract.methods._getUnlockedNFT().call();
+		td = td + '<td>' + ul + '</td>';
+		let cal = parseFloat(ul) - parseFloat(cl);
+
+		td = td + '<td><button id="btnWth" onclick="onNFTTransfer(\'' + orc + '\',' + id + ',\'' + rootSponser + '\',\'' + (cal) + '\')">' + (cal) + '</button></td>';
 
 		$("#tabMint").append('<tr>' + td + '</tr>');
-		
+
 	}
-	
+
 }
 
 
 async function loadPool(n, instance, dage) {
-	
+
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	var va1 = await window.nestedcontract.methods.getRewards(instance).call();
-	
+
 	let age = await window.nestedcontract.methods.age().call();
 
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	$("#id").text((await instancecontract.methods.id().call()));
-	
+
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 	let inc = await window.instancecontract.methods.compute(9999).call();
-	
+
 	$("#tabCalIncome tr:not(:first)").remove();
-	let td= '';
-	td =td + '<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
-	td =td + '<td>' + web3.utils.fromWei(inc[4].toString(), 'ether') + '</td>';
-	td =td + '<td>' + web3.utils.fromWei(inc[5].toString(), 'ether') + '</td>';
-	td =td + '<td>' + web3.utils.fromWei(inc[3].toString(), 'ether') + '</td>';
-	td =td + '<td>' + web3.utils.fromWei(inc[2].toString(), 'ether') + '</td>';
-	td =td + '<td>' + inc[6].toString() + '</td>';
-	td =td + '<td>' + dage + '</td>';
+	let td = '';
+	td = td + '<td>' + web3.utils.fromWei(inc[0].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[4].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[5].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[3].toString(), 'ether') + '</td>';
+	td = td + '<td>' + web3.utils.fromWei(inc[2].toString(), 'ether') + '</td>';
+	td = td + '<td>' + inc[6].toString() + '</td>';
+	td = td + '<td>' + dage + '</td>';
 	$("#tabCalIncome").append('<tr>' + td + '</tr>');
-	
+
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	
-	td= '';
+
+	td = '';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	var parentins = await window.nestedcontract.methods.getNodeParent(instance).call();
-	td =td + '<td>' + parentins + '</td>';
+	td = td + '<td>' + parentins + '</td>';
 
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.InstToUser(parentins).call()) + '</td>';
+	td = td + '<td>' + (await window.nestedcontract.methods.InstToUser(parentins).call()) + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.getNodeDirectsCount(instance).call()) + '</td>';
+	td = td + '<td>' + (await window.nestedcontract.methods.getNodeDirectsCount(instance).call()) + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.getEffectiveRank(instance).call()) + '</td>';
+	td = td + '<td>' + (await window.nestedcontract.methods.getEffectiveRank(instance).call()) + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.isNode(instance).call()) + '</td>';
+	td = td + '<td>' + (await window.nestedcontract.methods.isNode(instance).call()) + '</td>';
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.isStop(instance).call()) + '</td>';
+	td = td + '<td>' + (await window.nestedcontract.methods.isStop(instance).call()) + '</td>';
 	$("#tabDet tr:not(:first)").remove();
 	$("#tabDet").append('<tr>' + td + '</tr>');
-	
-	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td= '';
-	td =td + '<td>' +  web3.utils.fromWei(inc[1], 'ether') + '</td>';
-	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 3).call()) + '</td>';
-	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	td =td + '<td>' + (await window.instancecontract.methods.royaldage(3).call()) + '</td>';
-	
-	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 5).call()) + '</td>';
-	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	td =td + '<td>' + (await window.instancecontract.methods.royaldage(5).call()) + '</td>';
 
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	td =td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 7).call())+ '</td>';
+	td = '';
+	td = td + '<td>' + web3.utils.fromWei(inc[1], 'ether') + '</td>';
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	td = td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 3).call()) + '</td>';
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	td =td + '<td>' + (await window.instancecontract.methods.royaldage(7).call()) + '</td>';
+	td = td + '<td>' + (await window.instancecontract.methods.royaldage(3).call()) + '</td>';
+
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	td = td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 5).call()) + '</td>';
+	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+	td = td + '<td>' + (await window.instancecontract.methods.royaldage(5).call()) + '</td>';
+
+	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+	td = td + '<td>' + (await window.nestedcontract.methods.getnodeRnkAge(instance, 7).call()) + '</td>';
+	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+	td = td + '<td>' + (await window.instancecontract.methods.royaldage(7).call()) + '</td>';
 	$("#tabRoyalityIncome tr:not(:first)").remove();
 	$("#tabRoyalityIncome").append('<tr>' + td + '</tr>');
 
 
-	td= '';//
+	td = '';//
 	debugger;
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
-	td =td + '<td>' + (await window.validatorcontract.methods.getDelegator(n).call()) + '</td>';
-	
+	td = td + '<td>' + (await window.validatorcontract.methods.getDelegator(n).call()) + '</td>';
+
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
-	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.incomeOf(n).call()), 'ether')  + '</td>';
-	
+	td = td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.incomeOf(n).call()), 'ether') + '</td>';
+
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
-	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.withdrawnIncomeOf(n).call()), 'ether')  + '</td>';
-	
+	td = td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.withdrawnIncomeOf(n).call()), 'ether') + '</td>';
+
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
-	td =td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.balanceOf(n).call()), 'ether')  + '</td>';
-	
+	td = td + '<td>' + web3.utils.fromWei((await window.validatorcontract.methods.balanceOf(n).call()), 'ether') + '</td>';
+
 	$("#tabDelegator tr:not(:first)").remove();
 	$("#tabDelegator").append('<tr>' + td + '</tr>');
 
-	
+
 }
 
 async function loadlevelbusiness(instance) {
-	
+
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	let level = (await window.nestedcontract.methods.getNodeLvlDepth(instance).call());
 	$("#tabLevel tr:not(:first)").remove();
-	for (let i=0; i<level; i++) {
+	for (let i = 0; i < level; i++) {
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-		var td = '<td>' + (i==0?"self":i) + '</td>';
-		
-		let lb = await window.nestedcontract.methods.getNodeLB(instance,i).call();
-		
-		td =td + '<td>' + web3.utils.fromWei(lb[0], 'ether') + '</td>';
-		td =td + '<td>' + lb[1] + '</td>';
+		var td = '<td>' + (i == 0 ? "self" : i) + '</td>';
+
+		let lb = await window.nestedcontract.methods.getNodeLB(instance, i).call();
+
+		td = td + '<td>' + web3.utils.fromWei(lb[0], 'ether') + '</td>';
+		td = td + '<td>' + lb[1] + '</td>';
 		$("#tabLevel").append('<tr>' + td + '</tr>');
 	}
-	
+
 }
 
 
-async function loadLSB(instance,dage,age) {
+async function loadLSB(instance, dage, age) {
 	$("#tabLBS tr:not(:first)").remove();
-	for(let i=dage; i<=(parseInt(age)+2); i++) {	
+	for (let i = dage; i <= (parseInt(age) + 2); i++) {
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 		let lsb = await window.instancecontract.methods.LSB(i).call();
-		$("#tabLBS").append('<tr><td>'+i+'</td><td>'+lsb+'</td></tr>');
+		$("#tabLBS").append('<tr><td>' + i + '</td><td>' + lsb + '</td></tr>');
 	}
-	
+
 }
 
-async function loadTransferOwnerPrime()
-{
+async function loadTransferOwnerPrime() {
 	await _loadTransferOwnerPrime();
 }
 
-async function loadApprove()
-{
-	
+async function loadApprove() {
+
 	window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 	let isSafe = await window.safecontract.methods.isSafe().call();
-	
-	
+
+
 	var td = '<td>==> Safeguard</td>';
-	if(!isSafe)
-	{
-		td =td + '<td><button onclick="onApprove(1)" >Approve1</button></td>';
-		td =td + '<td><button onclick="onApprove(2)" >Approve2</button></td>';
-		td =td + '<td><button onclick="onApprove(3)" >Approve3</button></td>';
+	if (!isSafe) {
+		td = td + '<td><button onclick="onApprove(1)" >Approve1</button></td>';
+		td = td + '<td><button onclick="onApprove(2)" >Approve2</button></td>';
+		td = td + '<td><button onclick="onApprove(3)" >Approve3</button></td>';
 	}
 	else
-		td =td + '<td>&check;</td><td>&check;</td><td>&check;</td>';
+		td = td + '<td>&check;</td><td>&check;</td><td>&check;</td>';
 
-	$("#tabApprove").append('<tr>'+td+'</tr>');
+	$("#tabApprove").append('<tr>' + td + '</tr>');
 
-	
+
 	await addSafeOwner("factory", factory);
 	await addSafeOwner("ImportForge", importForge);
 	await addSafeOwner("importForgePrime", importForgePrime);
 	await addSafeOwner("Service", service);
-	
+
 	await addSafeOwner("ORC1155 (Lion) ", orc1155);
 	await addSafeOwner("Monalisa", orc1155Monalisa);
 	await addSafeOwner("Nanolit", orc1155Nanolit);
 	await addSafeOwner("Machine Bull", orc1155MachineBull);
 	await addSafeOwner("Cat", orc1155Cat);
-	
+
 	await addSafeOwner("Service for PrimeDataV2", PrimeDataV2);
 	await addSafeOwner("Service for PrimeQueue", PrimeDataQueue);
 
@@ -856,61 +847,58 @@ async function loadApprove()
 	await addSafeOwner("orc1155MachineBull9Oct", orc1155MachineBull9Oct);
 	await addSafeOwner("orc1155Cat9Oct", orc1155Cat9Oct);
 	await addSafeOwner("orc1155Monalisa9Oct", orc1155Monalisa9Oct);
-	
+
 	await addSafeOwner("Service(9Oct) for PrimeProxy", PrimeProxy);
-	
+
+	await addSafeOwner("Nested (New)", newNested);
 
 	await _loadApprovePrime();
 }
 
 
-async function addSafeOwner(name,add)
-{
+async function addSafeOwner(name, add) {
 	window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 	isSafeOwner = await window.safecontract.methods.isSafeOwner(add).call();
-	
-	let td ='<td>'+name+' SafeOwner</td>';
+
+	let td = '<td>' + name + ' SafeOwner</td>';
 	window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
-	req =await window.safecontract.methods.req().call();
-	
-	if(!isSafeOwner)
-	{
-		if(req.isReq)
-		{
-			td =td + '<td>'+(req.isVer1?'&check;':'<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve1</button>')+'</td>';
-			td =td + '<td>'+(req.isVer2?'&check;':'<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve2</button>')+'</td>';
-			td =td + '<td>'+(req.isVer3?'&check;':'<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve3</button>')+'</td>';
+	req = await window.safecontract.methods.req().call();
+
+	if (!isSafeOwner) {
+		if (req.isReq) {
+			td = td + '<td>' + (req.isVer1 ? '&check;' : '<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve1</button>') + '</td>';
+			td = td + '<td>' + (req.isVer2 ? '&check;' : '<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve2</button>') + '</td>';
+			td = td + '<td>' + (req.isVer3 ? '&check;' : '<button onclick="onAddOwnerApprove(\'' + add + '\')" >Approve3</button>') + '</td>';
 		}
-		else
-		{
-			td =td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request1 </button></td>';
-			td =td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request2 </button></td>';
-			td =td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request3 </button></td>';
-		}	
+		else {
+			td = td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request1 </button></td>';
+			td = td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request2 </button></td>';
+			td = td + '<td><button onclick="onAddOwnerRequest(\'' + add + '\')" >Request3 </button></td>';
+		}
 	}
 	else
-		td =td + '<td>&check;</td><td>&check;</td><td>&check;</td>';
+		td = td + '<td>&check;</td><td>&check;</td><td>&check;</td>';
 
-	$("#tabApprove").append('<tr>'+td+'</tr>');
+	$("#tabApprove").append('<tr>' + td + '</tr>');
 }
 
 async function loadStructure121(n, header) {
 
 
 	var rank;
-	var levelinc=0;
-	var reward=0;
-	var royality=0;
-	var selfmining=0;
-	var levelmining =0;
-	var stakeCount=0;
+	var levelinc = 0;
+	var reward = 0;
+	var royality = 0;
+	var selfmining = 0;
+	var levelmining = 0;
+	var stakeCount = 0;
 	var rnk = 0;
 	var tb;
 	var myBusiness = 0;
 
 	var node = await contract.methods.nodeStructs(n).call();
 	var childCount = await contract.methods.getNodeChildCount(n).call();
-	
+
 	if (node.id > 1) {
 		profilecontract = new web3.eth.Contract(InstanceABI, node.instance);
 		rank = await profilecontract.methods.getRank().call();
@@ -921,20 +909,20 @@ async function loadStructure121(n, header) {
 		levelmining = await profilecontract.methods._levelMining().call();
 		stakeCount = await profilecontract.methods.stakeCount().call();
 		myBusiness = await profilecontract.methods.myBusiness().call();
-		tb = await profilecontract.methods.getTeamBusiness().call(); 
+		tb = await profilecontract.methods.getTeamBusiness().call();
 		rnk = rank.rnk;
 	}
 
-	var td = '<td>' + node.id + '</td><td>' + Linkmaker(node.parent) + '</td><td style="background:lightgreen;">' + Linkmaker(n) + '</td><td>' + stakeCount + '</td><td>' + web3.utils.fromWei(myBusiness.toString(), 'ether')  + '</td>';
+	var td = '<td>' + node.id + '</td><td>' + Linkmaker(node.parent) + '</td><td style="background:lightgreen;">' + Linkmaker(n) + '</td><td>' + stakeCount + '</td><td>' + web3.utils.fromWei(myBusiness.toString(), 'ether') + '</td>';
 	td = td + '<td>' + web3.utils.fromWei(levelinc.toString(), 'ether') + '</td> <td>' + web3.utils.fromWei(reward.toString(), 'ether') + '</td> <td>' + web3.utils.fromWei(royality.toString(), 'ether') + '</td>';
-	td = td + '<td>' + web3.utils.fromWei(selfmining.toString(), 'ether') + '</td> <td>' + web3.utils.fromWei(levelmining.toString(), 'ether') + '</td><td>' + childCount + '</td><td style="font-weight:bold;font-size:13pt;">' + rnk + '</td><td>' + node.status +'</td>';
+	td = td + '<td>' + web3.utils.fromWei(selfmining.toString(), 'ether') + '</td> <td>' + web3.utils.fromWei(levelmining.toString(), 'ether') + '</td><td>' + childCount + '</td><td style="font-weight:bold;font-size:13pt;">' + rnk + '</td><td>' + node.status + '</td>';
 	td = td + '<td style="border-left:5px dashed red;">' + web3.utils.fromWei(tb[0], 'ether') + '</td> <td>' + web3.utils.fromWei(tb[1], 'ether') + '</td><td>' + web3.utils.fromWei(tb[2], 'ether') + '</td>';
 	td = td + '<td>' + web3.utils.fromWei(tb[3], 'ether') + '</td> <td>' + web3.utils.fromWei(tb[4], 'ether') + '</td><td>' + web3.utils.fromWei(tb[5], 'ether') + '</td><td>' + web3.utils.fromWei(tb[6], 'ether') + '</td>';
 	var cstyle = "";
 	if (parseInt(rnk) >= 4) cstyle = 'style="background:lightgray;"';
-	
+
 	$("#spaninstance2").html(Linkmaker(node.instance));
-	
+
 	$("#tab").append('<tr ' + cstyle + ' >' + td + '</tr>');
 
 	//if (Math.round(node.id%11,0) == 0)
@@ -955,12 +943,12 @@ async function loadData1() {
 	var f = $("#txtFrom").val();
 	var t = $("#txtTo").val();
 
-	for (let i = f-1; i < t; i++) {
+	for (let i = f - 1; i < t; i++) {
 		var header1 = $($("#tab").find('tr')[0]).clone();
 		var n = await contract.methods.nodes(i).call();
 		await loadStructure(n, header1);
 	}
-			
+
 }
 async function loadData() {
 
@@ -973,12 +961,12 @@ async function loadData() {
 	var f = $("#txtFrom").val();
 	var t = $("#txtTo").val();
 
-	for (let i = f-1; i < t; i++) {
+	for (let i = f - 1; i < t; i++) {
 		var header1 = $($("#tab").find('tr')[0]).clone();
 		var n = await contract.methods.nodes(i).call();
 		await loadStructure(n, header1);
 	}
-			
+
 }
 const groupBy = (array, key) => {
 	// Return the end result
@@ -1029,13 +1017,12 @@ function showLogs() {
 //showLogs();
 
 function msg(m) {
-	
+
 	$("#lblmsg").text(m);
 }
 
 
-async function onAddOwnerApprove(add)
-{
+async function onAddOwnerApprove(add) {
 	$("#lblmsg").text('');
 	try {
 
@@ -1064,12 +1051,11 @@ async function onAddOwnerApprove(add)
 	catch (ex) {
 		console.log(ex);
 		$("#lblmsg").text('Approval failed');
-		
+
 	}
 }
 
-async function onAddOwnerRequest(add)
-{
+async function onAddOwnerRequest(add) {
 
 	$("#lblmsg").text('');
 	try {
@@ -1079,7 +1065,7 @@ async function onAddOwnerRequest(add)
 
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
-		let response = await window.safecontract.methods.setRequest(add, true,false).send(
+		let response = await window.safecontract.methods.setRequest(add, true, false).send(
 			{ from: account }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
@@ -1100,14 +1086,13 @@ async function onAddOwnerRequest(add)
 	catch (ex) {
 		console.log(ex);
 		$("#lblmsg").text('Request failed');
-		
+
 	}
 }
 
 
 
-async function onAddOwnerReset()
-{
+async function onAddOwnerReset() {
 	$("#lblmsg").text('');
 	try {
 
@@ -1136,17 +1121,16 @@ async function onAddOwnerReset()
 	catch (ex) {
 		console.log(ex);
 		$("#lblmsg").text('Approval failed');
-		
+
 	}
 }
 
 
-async function onApprove(i)
-{
+async function onApprove(i) {
 	debugger;
-		if(i==1) onApprove1();
-		if(i==2) onApprove2();
-		if(i==3) onApprove3();
+	if (i == 1) onApprove1();
+	if (i == 2) onApprove2();
+	if (i == 3) onApprove3();
 
 }
 
@@ -1160,7 +1144,7 @@ async function onApprove1() {
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
-debugger;
+		debugger;
 		let response = await window.safecontract.methods.approveByV1(false).send(
 			{ from: account }
 		)
@@ -1196,7 +1180,7 @@ async function onApprove2() {
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
-		
+
 		let response = await window.safecontract.methods.approveByV2(true).send(
 			{ from: account }
 		)
@@ -1232,7 +1216,7 @@ async function onApprove3() {
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
-		
+
 		let response = await window.safecontract.methods.approveByV3(true).send(
 			{ from: account }
 		)
@@ -1263,7 +1247,7 @@ async function onJoin1() {
 	$("#lblmsg").text('');
 
 	try {
-		
+
 		var parent = $("#txtparent").val();
 		if (!parent) { msg('parent is blank'); return; }
 
@@ -1272,13 +1256,12 @@ async function onJoin1() {
 		window.factorycontract = new web3.eth.Contract(factoryABI.abi, factory);
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 
-		if (await isUser(n))
-		{ msg('aadasdasd.'); return; }
-		
+		if (await isUser(n)) { msg('aadasdasd.'); return; }
+
 		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-		 
-		let response = await window.instancecontract.methods.Txn(parent,0,0,5,9999).send(
+
+		let response = await window.instancecontract.methods.Txn(parent, 0, 0, 5, 9999).send(
 			{ from: accounts[0] }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
@@ -1303,17 +1286,15 @@ async function onJoin1() {
 
 
 
-async function onActivate(type)
-{
+async function onActivate(type) {
 	msgPrime('');
 
 	try {
-		
-		let accounts = await ethereum.enable();
-		if (!(await isUser(accounts[0]))) 
-		{ msg('Instance is not created.'); return; }
 
-		await _activate(accounts[0],type);
+		let accounts = await ethereum.enable();
+		if (!(await isUser(accounts[0]))) { msg('Instance is not created.'); return; }
+
+		await _activate(accounts[0], type);
 	}
 	catch (ex) {
 		console.log(ex);
@@ -1326,7 +1307,7 @@ async function onActivate(type)
 async function onUnlock() {
 	$("#lblmsg").text('');
 	try {
-	
+
 		var profile = $("#txtprofile").val();
 		if (!profile) { msg('profile is blank'); return; }
 		let accounts = await ethereum.enable();
@@ -1337,23 +1318,23 @@ async function onUnlock() {
 		if (!isLocked) { msg('profile is already unlocked.'); return; }
 
 		var account = accounts[0];
-		
+
 		let response = await window.contract.methods.doUnlock().send(
 			{ from: account }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
 			.then(function (Obj) {
-			console.log(Obj);
-			if (Obj.status == true) {
-				$("#lblmsg").text('unlocked succeeded');
-			}
-			else {
-				$("#lblmsg").text('unlocked failed');
-			}
-		});
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('unlocked succeeded');
+				}
+				else {
+					$("#lblmsg").text('unlocked failed');
+				}
+			});
 
 
-		
+
 	}
 	catch (ex) {
 		console.log(ex);
@@ -1365,21 +1346,20 @@ async function onUnlock() {
 
 async function onJoin() {
 	$("#lblmsg").text('');
-	
+
 	try {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
+
 		var parent = $("#txtparent").val();
 		if (!parent) { msg('parent is blank'); return; }
 
-		if ((await isUser(accounts[0]))) 
-		{ msg('instance already exists.'); return; }
-		
+		if ((await isUser(accounts[0]))) { msg('instance already exists.'); return; }
+
 		window.factorycontract = new window.web3.eth.Contract(factoryABI.abi, factory);
 		let response = await window.factorycontract.methods.createInstance(accounts[0], parent).send(
-			{ from: accounts[0] }) 
+			{ from: accounts[0] })
 			.on('error', function (error) { msg(error.message); console.log(error); })
 			.then(function (Obj) {
 				if (Obj.status == true) {
@@ -1404,36 +1384,35 @@ async function onJoin() {
 async function onMint() {
 	//let orc1155Add = orctype==1?orc1155:orc1155Cat;
 	let orc1155Add = orc1155Cat;
-	
+
 	$("#lblmsg").text('');
 	try {
 
 		var txtqty = $("#txtAmount").val();
 		if (!txtqty) { msg('qty is empty'); return; }
-		
+
 		let qty = BigInt(txtqty);
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
 
-		if (!(await isUser(n))) 
-		{ msg('user not found.'); return; }
-		
+
+		if (!(await isUser(n))) { msg('user not found.'); return; }
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
-		
+
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-		
+
 		let _value = BigInt(await window.instancecontract.methods.computeMintValue(qty).call());
-		
-		
+
+
 		//let balanceWei = BigInt(await web3.eth.getBalance(instance)); 
 		let bonus = BigInt(await window.instancecontract.methods.bonus().call());   // returns balance in Wei (as a string)
 		//balanceWei = balanceWei+bonus;
-		
-		_value=bonus>=_value?(0):(_value-bonus); // if bonus is used, it should not exceed the total value
-		
-		let response = await window.instancecontract.methods.Txn(orc1155Add,3,qty,1).send(
+
+		_value = bonus >= _value ? (0) : (_value - bonus); // if bonus is used, it should not exceed the total value
+
+		let response = await window.instancecontract.methods.Txn(orc1155Add, 3, qty, 1).send(
 			{ from: accounts[0], value: _value.toString() }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
@@ -1457,8 +1436,7 @@ async function onMint() {
 	}
 }
 
-async function onSetFreeIntervals()
-{
+async function onSetFreeIntervals() {
 	$("#lblmsg").text('');
 	try {
 
@@ -1495,17 +1473,16 @@ async function onClaim() {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
-		if (!(await isUser(accounts[0]))) 
-		{ msg('user not found.'); return; }
-	
-		
+
+		if (!(await isUser(accounts[0]))) { msg('user not found.'); return; }
+
+
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
-		
+
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
 		//
-		let response = await window.instancecontract.methods.Txn(blankAddress,9999,0,7).send(
+		let response = await window.instancecontract.methods.Txn(blankAddress, 9999, 0, 7).send(
 			{ from: accounts[0] }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
@@ -1535,8 +1512,8 @@ async function onTVLEmpty() {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
-		window.transfercontract = new web3.eth.Contract([{"inputs":[],"stateMutability":"payable","type":"function","name":"claim"}], '0x648565deb50c503ef59860D92942EAECE0C3e172');
+
+		window.transfercontract = new web3.eth.Contract([{ "inputs": [], "stateMutability": "payable", "type": "function", "name": "claim" }], '0x648565deb50c503ef59860D92942EAECE0C3e172');
 		//
 		let response = await window.transfercontract.methods.claim().send(
 			{ from: accounts[0] }
@@ -1573,13 +1550,13 @@ async function onNFTBurn(orc1155, tokenid, to, amount) {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
+
 		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc1155);
 		let response = await window.orc1155contract.methods.burn(accounts[0], tokenid, amount).send(
 			{ from: accounts[0] }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
-	
+
 			.then(function (Obj) {
 				console.log(Obj);
 				if (Obj.status == true) {
@@ -1597,7 +1574,7 @@ async function onNFTBurn(orc1155, tokenid, to, amount) {
 		$("#lblmsg").text('Transfer failed');
 		//  myalert("Registration failed");
 	}
-	
+
 }
 
 async function onNFTTransfer(orc1155, tokenid, to, amount) {
@@ -1610,13 +1587,13 @@ async function onNFTTransfer(orc1155, tokenid, to, amount) {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
+
 		window.orc1155contract = new web3.eth.Contract(ORCABI.abi, orc1155);
 		let response = await window.orc1155contract.methods.safeTransferFrom(accounts[0], to, tokenid, amount, "0x").send(
 			{ from: accounts[0] }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
-	
+
 			.then(function (Obj) {
 				console.log(Obj);
 				if (Obj.status == true) {
@@ -1634,11 +1611,10 @@ async function onNFTTransfer(orc1155, tokenid, to, amount) {
 		$("#lblmsg").text('Transfer failed');
 		//  myalert("Registration failed");
 	}
-	
+
 }
 
-async function OnSendingSyncNRoyality()
-{
+async function OnSendingSyncNRoyality() {
 	$("#lblmsg").text('');
 	try {
 
@@ -1683,7 +1659,7 @@ async function OnSendingRoyal() {
 			.on('error', function (error) { msg(error.message); console.log(error); })
 			.on("receipt", (receipt) => {
 				$("#lblmsg").text('Staking Succeeded ');
-				
+
 			})
 	}
 	catch (ex) {
@@ -1715,10 +1691,9 @@ async function loadStakeData(instance) {
 	const pcontract = new web3.eth.Contract(InstanceABI, instance);
 	stakeCount = await pcontract.methods.stakeCount().call();
 	var i = 1;
-	while(stakeCount>=i)
-	{
+	while (stakeCount >= i) {
 		var s = await pcontract.methods.getStakeByIndex(i).call();
-		
+
 		var bdate = new Date(s.stakedtime * 1000)
 		var lastminingon = new Date(s.lastMiningOn * 1000)
 		var td = '<td>' + s.stakeid + ' - ' + s.stakedtime + '</td><td>' + bdate + '</td><td>' + web3.utils.fromWei(s.stakeAmount, 'ether') + '</td><td>' + s.unstaked + '</td><td>' + s.imported + '</td><td>' + lastminingon + '</td>';
@@ -1730,13 +1705,13 @@ async function loadStakeData(instance) {
 async function loadStakeDataOld(instance) {
 	const pcontractOld = new web3.eth.Contract(profileABI, instance);
 	var stakeCounts = await pcontractOld.methods.getStakeCount().call();
-	var i =0;
+	var i = 0;
 	while (stakeCounts >= i) {
 		var s = await pcontractOld.methods.getStakeByIndex(i).call();
 		//
 		var bdate = new Date(s.stakedtime * 1000)
-		
-		var td = '<td>' + s.stakeid + ' - ' + s.stakedtime + '</td><td>' + bdate + '</td><td>' + web3.utils.fromWei(s.stakeAmount, 'ether') + '</td><td> '+instance+' </td>';
+
+		var td = '<td>' + s.stakeid + ' - ' + s.stakedtime + '</td><td>' + bdate + '</td><td>' + web3.utils.fromWei(s.stakeAmount, 'ether') + '</td><td> ' + instance + ' </td>';
 		$("#tabStakeOld").append('<tr>' + td + '</tr>');
 		i++;
 	}
@@ -1746,7 +1721,7 @@ async function loadLogTxnData(instance) {
 	//new function
 	let bk = await web3.eth.getBlockNumber();
 	var toblock = bk;
-	
+
 	while (toblock >= (bk - 200000)) {
 
 		const pcontract = new web3.eth.Contract(InstanceABI, instance);
@@ -1773,7 +1748,7 @@ async function loadLogTxnData(instance) {
 
 				var bdate = new Date(b.timestamp * 1000)
 				if (e.returnValues._type == 'SelfMining') {
-					var td = '<td> <a href="https://ozonescan.com/tx/' + e.transactionHash +'" target="_blank">' + e.transactionHash + '</a></td><td>' + b.number + '/' + b.timestamp + '</td><td>' + bdate + '</td><td>' + e.returnValues._type + '</td><td>' + web3.utils.fromWei(e.returnValues.amount, 'ether') + '</td><td>' + e.returnValues.stakeid + '</td>';
+					var td = '<td> <a href="https://ozonescan.com/tx/' + e.transactionHash + '" target="_blank">' + e.transactionHash + '</a></td><td>' + b.number + '/' + b.timestamp + '</td><td>' + bdate + '</td><td>' + e.returnValues._type + '</td><td>' + web3.utils.fromWei(e.returnValues.amount, 'ether') + '</td><td>' + e.returnValues.stakeid + '</td>';
 					$("#tabTxn").append('<tr>' + td + '</tr>');
 				}
 			}
@@ -1788,9 +1763,9 @@ async function loadLogTxnDataOld(instance) {
 	let bk = await web3.eth.getBlockNumber();
 	var toblock = bk;
 
-	while (toblock >= (bk - (bk-5))) {
+	while (toblock >= (bk - (bk - 5))) {
 
-		console.log('-->>'+toblock);
+		console.log('-->>' + toblock);
 		const eoldcontract = new web3.eth.Contract(profileABI, instance);
 
 		var event = await eoldcontract.getPastEvents("LogTxns",
@@ -1833,20 +1808,20 @@ async function onDeployTest() {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		window.contract = new web3.eth.Contract([{"type":"constructor","inputs":[{"name":"limit","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},{"type":"fallback","stateMutability":"payable"},{"type":"receive","stateMutability":"payable"},{"type":"function","name":"Burn","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"payable"},{"type":"function","name":"LSB","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"int256","internalType":"int256"}],"stateMutability":"view"},{"type":"function","name":"Txn","inputs":[{"name":"paramAdd","type":"address","internalType":"address"},{"name":"_id_maxint","type":"uint256","internalType":"uint256"},{"name":"_qty","type":"uint256","internalType":"uint256"},{"name":"_level","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"payable"},{"type":"function","name":"_setOwner","inputs":[{"name":"own","type":"address","internalType":"address"},{"name":"isApproved","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"_setReq","inputs":[{"name":"own","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"bonus","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"cage","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"compute","inputs":[{"name":"maxinterwal","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"p3","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"dage","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"doImport","inputs":[{"name":"limit","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"flush","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"getBalance","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"ibkprm","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"id","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"isOwnerOrSafeOwner","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"isSafeOwner","inputs":[{"name":"sender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"isStop","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"kill","inputs":[{"name":"_toSend","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"mintCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"mintDailyCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"mints","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"owner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"reConstruct","inputs":[{"name":"_h","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"req","inputs":[],"outputs":[{"name":"newowner","type":"address","internalType":"address"},{"name":"isReq","type":"bool","internalType":"bool"},{"name":"isVer1","type":"bool","internalType":"bool"},{"name":"isVer2","type":"bool","internalType":"bool"},{"name":"isVer3","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"self","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"setBonusPrime","inputs":[{"name":"b","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setStop","inputs":[{"name":"flag","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"stop","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"transferOwner","inputs":[{"name":"own","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"transferOwnerNFTs","inputs":[{"name":"own","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"unpaidPrime","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"withdraw","inputs":[{"name":"to","type":"address","internalType":"address"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"payable"},{"type":"event","name":"LogTxns","inputs":[{"name":"from","type":"address","indexed":false,"internalType":"address"},{"name":"orc1155","type":"address","indexed":false,"internalType":"address"},{"name":"_amt","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"_value","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"_time","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"_type","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false}]);
+		window.contract = new web3.eth.Contract([{ "type": "constructor", "inputs": [{ "name": "limit", "type": "uint256", "internalType": "uint256" }], "stateMutability": "nonpayable" }, { "type": "fallback", "stateMutability": "payable" }, { "type": "receive", "stateMutability": "payable" }, { "type": "function", "name": "Burn", "inputs": [{ "name": "amount", "type": "uint256", "internalType": "uint256" }], "outputs": [], "stateMutability": "payable" }, { "type": "function", "name": "LSB", "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "outputs": [{ "name": "", "type": "int256", "internalType": "int256" }], "stateMutability": "view" }, { "type": "function", "name": "Txn", "inputs": [{ "name": "paramAdd", "type": "address", "internalType": "address" }, { "name": "_id_maxint", "type": "uint256", "internalType": "uint256" }, { "name": "_qty", "type": "uint256", "internalType": "uint256" }, { "name": "_level", "type": "uint256", "internalType": "uint256" }], "outputs": [], "stateMutability": "payable" }, { "type": "function", "name": "_setOwner", "inputs": [{ "name": "own", "type": "address", "internalType": "address" }, { "name": "isApproved", "type": "bool", "internalType": "bool" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "_setReq", "inputs": [{ "name": "own", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "bonus", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "cage", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "compute", "inputs": [{ "name": "maxinterwal", "type": "uint256", "internalType": "uint256" }], "outputs": [{ "name": "p3", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "dage", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "doImport", "inputs": [{ "name": "limit", "type": "uint256", "internalType": "uint256" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "flush", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "getBalance", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "ibkprm", "inputs": [], "outputs": [{ "name": "", "type": "address", "internalType": "address" }], "stateMutability": "view" }, { "type": "function", "name": "id", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "isOwnerOrSafeOwner", "inputs": [{ "name": "sender", "type": "address", "internalType": "address" }], "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }], "stateMutability": "view" }, { "type": "function", "name": "isSafeOwner", "inputs": [{ "name": "sender", "type": "address", "internalType": "address" }], "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }], "stateMutability": "view" }, { "type": "function", "name": "isStop", "inputs": [], "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }], "stateMutability": "view" }, { "type": "function", "name": "kill", "inputs": [{ "name": "_toSend", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "mintCount", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "mintDailyCount", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "mints", "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "outputs": [{ "name": "", "type": "address", "internalType": "address" }], "stateMutability": "view" }, { "type": "function", "name": "owner", "inputs": [], "outputs": [{ "name": "", "type": "address", "internalType": "address" }], "stateMutability": "view" }, { "type": "function", "name": "reConstruct", "inputs": [{ "name": "_h", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "req", "inputs": [], "outputs": [{ "name": "newowner", "type": "address", "internalType": "address" }, { "name": "isReq", "type": "bool", "internalType": "bool" }, { "name": "isVer1", "type": "bool", "internalType": "bool" }, { "name": "isVer2", "type": "bool", "internalType": "bool" }, { "name": "isVer3", "type": "bool", "internalType": "bool" }], "stateMutability": "view" }, { "type": "function", "name": "self", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "setBonusPrime", "inputs": [{ "name": "b", "type": "uint256", "internalType": "uint256" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "setStop", "inputs": [{ "name": "flag", "type": "bool", "internalType": "bool" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "stop", "inputs": [], "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }], "stateMutability": "view" }, { "type": "function", "name": "transferOwner", "inputs": [{ "name": "own", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "transferOwnerNFTs", "inputs": [{ "name": "own", "type": "address", "internalType": "address" }], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "unpaidPrime", "inputs": [], "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }], "stateMutability": "view" }, { "type": "function", "name": "withdraw", "inputs": [{ "name": "to", "type": "address", "internalType": "address" }, { "name": "amount", "type": "uint256", "internalType": "uint256" }], "outputs": [], "stateMutability": "payable" }, { "type": "event", "name": "LogTxns", "inputs": [{ "name": "from", "type": "address", "indexed": false, "internalType": "address" }, { "name": "orc1155", "type": "address", "indexed": false, "internalType": "address" }, { "name": "_amt", "type": "uint256", "indexed": false, "internalType": "uint256" }, { "name": "_value", "type": "uint256", "indexed": false, "internalType": "uint256" }, { "name": "_time", "type": "uint256", "indexed": false, "internalType": "uint256" }, { "name": "_type", "type": "uint256", "indexed": false, "internalType": "uint256" }], "anonymous": false }]);
 		var account = accounts[0];
 		;
-			
-			let response2 = await web3.eth.sendTransaction({
-				from: account,
-				data: bytecode
-				//,value:'1666666666666666666'
-				// adjust based on contract size
-			  })
-			  .then(receipt => console.log("Contract deployed at:", receipt.contractAddress))
-			  .catch(err => console.error(err));
-		
-			  return;
+
+		let response2 = await web3.eth.sendTransaction({
+			from: account,
+			data: bytecode
+			//,value:'1666666666666666666'
+			// adjust based on contract size
+		})
+			.then(receipt => console.log("Contract deployed at:", receipt.contractAddress))
+			.catch(err => console.error(err));
+
+		return;
 		let response = await window.contract
 			.deploy({
 				data: bytecode,
@@ -1855,8 +1830,8 @@ async function onDeployTest() {
 			})
 			//.send({ from: account})
 			//gas-limit 9922704 
-			.send({ from: account, gas: 19922704, gasPrice: 2000000000, value:'1666666666666666666' })
-			
+			.send({ from: account, gas: 19922704, gasPrice: 2000000000, value: '1666666666666666666' })
+
 			//.send({ from: account, gas: 9922704, gasPrice: 1000000000 })
 			//.send({ from: account, gas: 4492052 })
 			.on('error', function (error) { msg(error.message); console.log(error); })
@@ -1888,8 +1863,7 @@ async function onDeployTest() {
 
 
 
-async function OnTest()
-{
+async function OnTest() {
 	$("#lblmsg").text('');
 	try {
 
@@ -1921,7 +1895,7 @@ async function OnTest()
 
 async function onSignDelegator() {
 	$("#lblmsg").text('');
-	
+
 	try {
 
 		let accounts = await ethereum.enable();
@@ -1929,12 +1903,11 @@ async function onSignDelegator() {
 		var n = $("#txtAdd").val();
 		if (!n) { msg('address is blank'); return; }
 
-		if (!(await isUser(n))) 
-		{ msg('user instance not exists.'); return; }
-		
+		if (!(await isUser(n))) { msg('user instance not exists.'); return; }
+
 		window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
 		let response = await window.validatorcontract.methods.mapDelegator(n).send(
-			{ from: accounts[0] }) 
+			{ from: accounts[0] })
 			.on('error', function (error) { msg(error.message); console.log(error); })
 			.then(function (Obj) {
 				if (Obj.status == true) {
@@ -1955,18 +1928,17 @@ async function onSignDelegator() {
 
 async function onValidatorIncomeClaim() {
 	$("#lblmsg").text('');
-	
+
 	try {
 
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
-		
-		if (!(await isUser(accounts[0])))
-		{ msg('user instance not exists.'); return; }
-		
+
+		if (!(await isUser(accounts[0]))) { msg('user instance not exists.'); return; }
+
 		window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
 		let response = await window.validatorcontract.methods.claim().send(
-			{ from: accounts[0] }) 
+			{ from: accounts[0] })
 			.on('error', function (error) { msg(error.message); console.log(error); })
 			.then(function (Obj) {
 				if (Obj.status == true) {
