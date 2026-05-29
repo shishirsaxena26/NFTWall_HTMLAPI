@@ -408,6 +408,31 @@ function addPanel(title) {
     return panel;
 }
 
+function removePanelIfExists(title) {
+    const panels = document.querySelectorAll("#systemPanels .panel");
+    debugger;
+    panels.forEach(panel => {
+        const h3 = panel.querySelector("h3");
+
+        if (h3 && h3.innerText === title) {
+            panel.remove();
+        }
+    });
+    debugger;
+}
+
+function removePanel(title) {
+    const panels = document.querySelectorAll("#systemPanels .panel");
+
+    panels.forEach(panel => {
+        const h3 = panel.querySelector("h3");
+
+        if (h3 && h3.childNodes[0].textContent.trim() === title) {
+            panel.remove();
+        }
+    });
+}
+
 function addRow(panel, field, value) {
     const row = document.createElement("div");
     row.className = "row";
@@ -1595,9 +1620,17 @@ async function loadMyStor(id, panel) {
                 onTVLRefresh();
             };
 
+            const btnLoadBusiness = document.createElement("button");
+            btnLoadBusiness.innerText = "LoadBusiness";
+            btnLoadBusiness.style.marginLeft = "10px";
+            btnLoadBusiness.onclick = () => {
+                onLoadBusiness(storAddr);
+            };
+
             right.appendChild(btnTVLRefresh);
             right.appendChild(btnClaim);
             right.appendChild(btnCapBurn);
+            right.appendChild(btnLoadBusiness);
 
             addRow(panel, "Claim", right);
         }
@@ -2601,27 +2634,6 @@ async function loadMyNFT() {
 
 
 
-    const levelpanel = addPanel("Level Business");
-    addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
-    const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0, 15).call();
-    for (let i = 0; i <= 15; i++) {
-        const lvl = lvlBatch[i];
-        addRow(levelpanel, "Level [" + i + "]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
-    }
-
-    const getMD = await nested.methods.getMoveDownline(id).call();
-
-    const caption = getMD.op ? "Attach" : "Detach";
-
-    const btnMovedownlineProposer = document.createElement("button");
-    btnMovedownlineProposer.innerText = "Movedownline" + caption;
-    btnMovedownlineProposer.style.marginLeft = "10px";
-    btnMovedownlineProposer.style.display = getMD.exist ? "block" : "none";
-    btnMovedownlineProposer.onclick = () => {
-        onMovedownlineProposer(id);
-    };
-
-    addRow(levelpanel, "--", btnMovedownlineProposer);
     /*;
     for(let i=0; i<=15; i++){
         
@@ -2635,6 +2647,42 @@ async function loadMyNFT() {
     hideLoader();
 }
 
+async function onLoadBusiness(storAdd) {
+    showLoader();
+    try {
+        removePanelIfExists("Level Business");
+        const levelpanel = addPanel("Level Business");
+
+        const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, storAdd);
+        const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0, 15).call();
+
+        addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
+
+        for (let i = 0; i <= 15; i++) {
+            const lvl = lvlBatch[i];
+            addRow(levelpanel, "Level [" + i + "]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
+        }
+
+        const getMD = await nested.methods.getMoveDownline(id).call();
+
+        const caption = getMD.op ? "Attach" : "Detach";
+
+        const btnMovedownlineProposer = document.createElement("button");
+        btnMovedownlineProposer.innerText = "Movedownline" + caption;
+        btnMovedownlineProposer.style.marginLeft = "10px";
+        btnMovedownlineProposer.style.display = getMD.exist ? "block" : "none";
+        btnMovedownlineProposer.onclick = () => {
+            onMovedownlineProposer(id);
+        };
+
+        addRow(levelpanel, "--", btnMovedownlineProposer);
+    }
+    catch {
+
+    }
+    hideLoader();
+
+}
 
 async function getUnlockedNFT(mintedAge, mintedqty) {
     const ONE = 1e18;
