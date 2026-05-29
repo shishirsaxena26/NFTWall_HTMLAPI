@@ -22,8 +22,8 @@ interface INested741 {
     receive() external payable;
 
     function Burn(uint256 amount) external;
-    function TVLrefresh(uint256 _id) external;
     function UserToId(address) external view returns (uint256);
+    function UserToInst(address node) external view returns (address);
     function _ageNow() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
@@ -46,6 +46,7 @@ interface INested741 {
     function getBalance() external view returns (uint256);
     function getBatchRankCounts(uint256 ag) external view returns (uint256[8] memory counts);
     function getDownlineCountByLevel(uint256 uid, uint256 lvl) external view returns (uint256);
+    function getEffectiveRank(address uinst) external view returns (uint256);
     function getHexbase() external view returns (address);
     function getMoveDownline(uint256 uid) external view returns (uint256 newpid, bool exist, bool op);
     function getNode(uint256 _id)
@@ -85,6 +86,7 @@ interface INested741 {
     function importRankNBusiness(uint256 from, uint256 to) external;
     function importWithdrawal(uint256 _amt, uint256 _ag) external;
     function isNode(uint256 _id) external view returns (bool);
+    function isStop(address uinst) external view returns (bool);
     function isUserExists(address node) external view returns (bool);
     function join(address _parent, address _user) external returns (uint256 _id, address _stor);
     function joinImport(address _parent, address _user) external returns (uint256 _id, address _stor);
