@@ -3879,10 +3879,6 @@ async function loadRule() {
         const cap = await rule.methods.capping().call();
         addRow(panelCap, "Multiple", cap.multiple);
         addRow(panelCap, "multipledollar", cap.multipledollar);
-        addRow(panelCap, "RW", cap.rw);
-        addRow(panelCap, "RY", cap.ry);
-        addRow(panelCap, "SELF", cap.self);
-        addRow(panelCap, "YEI", cap.yei);
 
 
 
