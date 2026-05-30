@@ -2808,10 +2808,11 @@ async function onTVLRefresh() {
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
         // Enable wallet
-        const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
-        const Nested741TVL = new web3T.eth.Contract([{ "type": "function", "name": "JoinAsUser", "inputs": [], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "TVLrefresh", "inputs": [{ "name": "user", "type": "address", "internalType": "address" }, { "name": "maxint", "type": "uint256", "internalType": "uint256" }, { "name": "issend", "type": "bool", "internalType": "bool" }], "outputs": [], "stateMutability": "nonpayable" }], '0x308e17549a82ECeaDc9ec8E51927af547693bc3f');
+        // const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
-        const tx = await Nested741TVL.methods
+        const Nested741TVLContract = new web3T.eth.Contract([{ "type": "function", "name": "JoinAsUser", "inputs": [], "outputs": [], "stateMutability": "nonpayable" }, { "type": "function", "name": "TVLrefresh", "inputs": [{ "name": "user", "type": "address", "internalType": "address" }, { "name": "maxint", "type": "uint256", "internalType": "uint256" }, { "name": "issend", "type": "bool", "internalType": "bool" }], "outputs": [], "stateMutability": "nonpayable" }], Nested741TVL);
+
+        const tx = await Nested741TVLContract.methods
             .TVLrefresh(user, 0, true)
             .send({
                 from: accounts[0]
