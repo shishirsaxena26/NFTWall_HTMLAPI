@@ -410,7 +410,6 @@ function addPanel(title) {
 
 function removePanelIfExists(title) {
     const panels = document.querySelectorAll("#systemPanels .panel");
-    debugger;
     panels.forEach(panel => {
         const h3 = panel.querySelector("h3");
 
@@ -418,7 +417,6 @@ function removePanelIfExists(title) {
             panel.remove();
         }
     });
-    debugger;
 }
 
 function removePanel(title) {
@@ -3404,7 +3402,7 @@ async function renderULTreePanel() {
             const selfid = await nested.methods.UserToId(addr).call();
             const info = await nested.methods.getNode(selfid).call();
             const storC = new web3.eth.Contract(IInstanceStorABI.abi, info[4]);;
-            debugger
+            
             let rnk = await storC.methods.rank().call();
 
             let pid = info[2];
