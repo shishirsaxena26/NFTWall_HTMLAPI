@@ -674,7 +674,7 @@ async function loadSystemTreasuriesNSecurebase() {
     <thead>
     <tr>
     <th>Day</th><th>Business</th><th>Withdrawn</th><th>Joining</th>
-    <th>Ct0</th><th>Ct1</th><th>Ct2</th><th>Ct3</th>
+    <th>(Ct0+4)</th><th>Ct1</th><th>Ct2</th><th>Ct3</th>
     <th>Ct4</th><th>Ct5</th><th>Ct6</th><th>Ct7</th>
     <th>Royal3</th><th>Royal5</th><th>Royal7</th>
     </tr>
@@ -3402,7 +3402,7 @@ async function renderULTreePanel() {
             const selfid = await nested.methods.UserToId(addr).call();
             const info = await nested.methods.getNode(selfid).call();
             const storC = new web3.eth.Contract(IInstanceStorABI.abi, info[4]);;
-            
+
             let rnk = await storC.methods.rank().call();
 
             let pid = info[2];
