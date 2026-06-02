@@ -3698,7 +3698,7 @@ async function onCreateTemplate(tid) {
         else if (tid == 5) calldata = ClaimPerDay;
 
         // estimate gas
-        const receipt = await window.ethereum.request({
+        const txHash = await window.ethereum.request({
             method: "eth_sendTransaction",
             params: [{
                 from: accounts[0],
@@ -3707,12 +3707,15 @@ async function onCreateTemplate(tid) {
             }]
         });
 
-        if (receipt.status) {
-            alert("Template succeeded");
-        } else {
-            alert("Template failed");
-        }
+        // wait for receipt
+        const receipt = await web3.eth.getTransactionReceipt(txHash);
 
+        console.log(receipt);
+
+        if (receipt && receipt.status)
+            alert("Template succeeded");
+        else
+            alert("Template failed");
 
     } catch (err) {
         console.error(err);
@@ -4325,17 +4328,17 @@ const tests = [
 ];
 /*
 tests.forEach(({ t, c, b }) => {
-
+ 
     console.log("\n====================");
-
+ 
     const res = getGraphConfig(t, c, b);
-
+ 
     console.log("INPUT →",
         "Threshold:", t,
         "| Current:", c,
         "| Burned:", b
     );
-
+ 
     console.log("\n--- SCALED VALUES ---");
     console.log("SCALED →",
         "Threshold:",  res.threshold,
@@ -4347,11 +4350,11 @@ tests.forEach(({ t, c, b }) => {
     console.log("Scale Factor:", res.scaleFactor);
     console.log("Raw Threshold:", res.rawThreshold);
     console.log("Scaled Threshold:", res.scaledThreshold);
-
+ 
     console.log("\n--- RANGE ---");
     console.log("Range:", res.range);
     console.log("Step :", res.step);
-
+ 
     console.log("\n--- TICKS ---");
     console.log(res.ticks);
 });
