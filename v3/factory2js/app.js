@@ -3698,7 +3698,7 @@ async function onCreateTemplate(tid) {
         else if (tid == 5) calldata = ClaimPerDay;
 
         // estimate gas
-        await window.ethereum.request({
+        const receipt = await window.ethereum.request({
             method: "eth_sendTransaction",
             params: [{
                 from: accounts[0],
