@@ -1496,9 +1496,12 @@ async function loadMyStor(id, panel) {
             tableToggle.appendChild(theadToggle);
             const tbodyToggle = document.createElement("tbody");
             const values = [...Array.from({ length: 7 }, (_, i) => i + 1), 999];
+
+            let actualCap = false;
             for (const v of values) {
                 console.log(v);
                 const susCount = await stor.methods.getToggleAgeCount(v).call();
+                actualCap = susCount % 2 == 1;
                 const result = [];
                 for (let i = 0; i < susCount; i++) {
                     const value = await stor.methods.getToggleAgeValue(v, i).call();
@@ -1588,7 +1591,7 @@ async function loadMyStor(id, panel) {
             //CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old
             //BURNED, BURNED_DOLLAR, INVESTED_DOLLAR, CLAIMED_DOLLAR, 0, 0, 0
 
-            addRow(panel, "Actual CAPPING", formatOZN(misc[0]));
+            addRow(panel, "ACTUAL CAPPING", actualCap.toString().toUpperCase());
             addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[0]));
             addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[1]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
