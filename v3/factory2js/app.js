@@ -579,6 +579,7 @@ async function loadSystemTreasuriesNSecurebase() {
 
     const old741 = await hexBase.methods.in741Old().call();
     addRow(panelBase, "in741Old", old741);
+    addRow(panelBase, "in741Rule", in741Rule);
     addRow(panelBase, "in741", inNested741);
 
     const daoCore = await hexBase.methods.daocore().call();
@@ -590,6 +591,8 @@ async function loadSystemTreasuriesNSecurebase() {
     addRow(panelBase, "proposal(0)", prop0);
     const inst = await hexBase.methods.inInstance().call();
     addRow(panelBase, "instance", inst);
+    const inInstanceStor = await hexBase.methods.inInstanceStor().call();
+    addRow(panelBase, "stor", inInstanceStor);
     const nftproxy = await hexBase.methods.inNftProxy().call();
     addRow(panelBase, "NFTProxy", nftproxy);
     const nftvalidator = await hexBase.methods.invalidator().call();
