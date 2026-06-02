@@ -3696,8 +3696,8 @@ async function onCreateTemplate(tid) {
         await window.ethereum.request({
             method: "eth_sendTransaction",
             params: [{
-                from: userAddress,
-                to: contractAddress,
+                from: accounts[0],
+                to: indaocore,
                 data: calldata
             }]
         });
