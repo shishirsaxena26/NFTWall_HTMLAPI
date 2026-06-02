@@ -1135,7 +1135,7 @@ async function loginUser() {
     } catch (e) {
 
 
-        alert("Login failed: " + (err.message));
+        alert("Login failed: " + (e.message));
     }
     hideLoader();
 }
