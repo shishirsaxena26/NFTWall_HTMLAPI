@@ -1081,6 +1081,42 @@ async function initUser() {
     hideLoader();
 }
 
+async function loginUser1() {
+
+    if (!currentInstance) {
+        alert("Instance not found");
+        return;
+    }
+
+    try {
+
+        let accounts = await ethereum.enable();
+        window.web3T = new Web3(window.ethereum);
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        const instancecontract = new web3T.eth.Contract(
+            IInstanceMeABI.abi,
+            currentInstance
+        );
+
+        const tx = await instancecontract.methods.login(maxintervals).send({ from: accounts[0] });
+        if (tx.status) {
+            alert("Login succeeded");
+        }
+        else {
+            alert("Login failed");
+        }
+        // reload panel so stor address appears
+        await addConnectedUserPanel();
+
+    } catch (e) {
+
+
+        alert("Login failed: " + (e.message));
+    }
+    hideLoader();
+}
+
 async function loginUser() {
 
     if (!currentInstance) {
