@@ -3703,18 +3703,16 @@ async function onCreateTemplate(tid) {
             }]
         });
 
-
-
         if (receipt.status) {
-            alert("Claimed succeeded");
+            alert("Template succeeded");
         } else {
-            alert("Claimed failed");
+            alert("Template failed");
         }
 
 
     } catch (err) {
         console.error(err);
-        alert("Claimed failed: " + (err.message || err));
+        alert("Template failed: " + (err.message || err));
     }
 
     hideLoader();
