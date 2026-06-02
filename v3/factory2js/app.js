@@ -1737,7 +1737,7 @@ async function loadDAO() {
         };
 
         const btnCreateTemplate = document.createElement("button");
-        btnCreateTemplate.innerText = "LockUser";
+        btnCreateTemplate.innerText = "CreateTemplate";
         btnCreateTemplate.style.marginLeft = "10px";
         btnCreateTemplate.onclick = () => {
 
