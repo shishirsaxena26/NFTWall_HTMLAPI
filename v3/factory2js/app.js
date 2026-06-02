@@ -2890,7 +2890,7 @@ async function onCapBurn() {
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
         debugger;
         const amountOzoneDollar = await rule.methods.computeOzoneToDollar('15447113780431719335934').call();
-        debugger;
+
 
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
@@ -2969,13 +2969,12 @@ async function onClaim() {
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
         // estimate gas
-        /* const gas = await instancecontract.methods
-             .Txn(ZERO, maxintervals, 0, 7)
-             .estimateGas({
-                 from: accounts[0],
-                 value: "0"
-             }); */
-        const gas = 20000000
+        const gas = await instancecontract.methods
+            .Txn(ZERO, maxintervals, 0, 7)
+            .estimateGas({
+                from: accounts[0],
+                value: "0"
+            });
 
         // send tx
         const receipt = await instancecontract.methods
