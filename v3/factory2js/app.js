@@ -2890,7 +2890,7 @@ async function onCapBurn() {
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
         debugger;
         const amountOzoneDollar = await rule.methods.computeOzoneToDollar('15447113780431719335934').call();
-
+        debugger;
 
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
