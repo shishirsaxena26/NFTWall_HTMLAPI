@@ -1547,7 +1547,7 @@ async function loadMyStor(id, panel) {
 
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0, 0).call();
 
-            addRow(panelCompCap, "CAP DOLLAR", formatRow([
+            addRow(panelCompCap, "$", formatRow([
                 "Invested_Dollar",
                 "Burned_Dollar",
                 "Threshold_3X_Dollar",
@@ -1567,7 +1567,7 @@ async function loadMyStor(id, panel) {
                 compute.capdollar
             ]));
 
-            addRow(panelCompCap, "CAP OZONE", formatRow([
+            addRow(panelCompCap, "OZ", formatRow([
                 "TotalBusiness",
                 "BURNED",
                 "Threshold_3X",
