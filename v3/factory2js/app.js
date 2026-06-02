@@ -1695,6 +1695,7 @@ async function loadDAO() {
 
         // const blacklistedCount = await daoassembly.methods.blacklistedCount().call();
         const proposalsCount = await daocore.methods.getProposalsCount().call();
+        const templateCount = await daocore.methods.templateCount().call();
         const left = document.createElement("div");
 
         left.innerHTML =
@@ -1770,7 +1771,7 @@ async function loadDAO() {
         right2.appendChild(btnProposals);
 
         addRow(panel, left, "");
-        addRow(panel, 'ProposalsCount: ' + proposalsCount, "");
+        addRow(panel, 'ProposalsCount: ' + proposalsCount, 'templateCount: ' + templateCount);
         addRow(panel, left2, right2);
     } catch (err) {
         console.error(err);
