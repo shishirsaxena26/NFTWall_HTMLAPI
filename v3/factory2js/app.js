@@ -1531,7 +1531,7 @@ async function loadMyStor(id, panel) {
             });*/
 
 
-
+            const panelCompCap = addPanel("Compute Capping");
 
             const minpaydollartozonewei = await rule.methods.computeDollarToOzone(compute.minpaydollar.toString()).call();
             const minpaydollartozone = formatOZN(minpaydollartozonewei);
@@ -1540,11 +1540,11 @@ async function loadMyStor(id, panel) {
             const totincdollartozone = formatOZN(totincdollartozonewei);
 
 
-            addRow(panel, "CAP", compute.cap);
+            addRow(panelCompCap, "Compute CAP", compute.cap);
 
             const lvlBatch = await stor.methods.getNodeLvlInfoBatch(0, 0).call();
 
-            addRow(panel, "CAP DOLLAR", formatRow([
+            addRow(panelCompCap, "CAP DOLLAR", formatRow([
                 "Invested_Dollar",
                 "Burned_Dollar",
                 "Threshold_3X_Dollar",
@@ -1554,7 +1554,7 @@ async function loadMyStor(id, panel) {
                 "CAP_STATUS"
             ]));
 
-            addRow(panel, "..", formatRow([
+            addRow(panelCompCap, "..", formatRow([
                 formatOZN(consts[1]),
                 formatOZN(consts[5]),
                 formatOZN(compute.thresholdollarx),
@@ -1564,7 +1564,7 @@ async function loadMyStor(id, panel) {
                 compute.capdollar
             ]));
 
-            addRow(panel, "CAP OZONE", formatRow([
+            addRow(panelCompCap, "CAP OZONE", formatRow([
                 "TotalBusiness",
                 "BURNED",
                 "Threshold_3X",
@@ -1574,7 +1574,7 @@ async function loadMyStor(id, panel) {
                 "CAP_STATUS"
             ]));
 
-            addRow(panel, "..", formatRow([
+            addRow(panelCompCap, "..", formatRow([
                 formatOZN(consts[0]),
                 formatOZN(consts[4]),
                 formatOZN(compute.thresholdx),
@@ -1588,6 +1588,7 @@ async function loadMyStor(id, panel) {
             //CALC_SELF_PROPOSED, CALC_SELF_FLUSH_PROPOSED, inc[_RWRD_IX_].old, inc[_YEILD_IX_].old
             //BURNED, BURNED_DOLLAR, INVESTED_DOLLAR, CLAIMED_DOLLAR, 0, 0, 0
 
+            addRow(panel, "Actual CAPPING", formatOZN(misc[0]));
             addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[0]));
             addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[1]));
             addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
