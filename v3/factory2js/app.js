@@ -926,6 +926,7 @@ async function addConnectedUserPanel() {
                 "Inst " + shortAddr(currentInstance);
 
             const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);
+
             if (await instan.methods.validateToken().call()) {
 
                 const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
@@ -940,6 +941,7 @@ async function addConnectedUserPanel() {
                 }
             }
             else {
+
                 btnLogin.style.display = "block";
                 return;
             }
@@ -1168,7 +1170,7 @@ async function loginUser() {
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
 
-        console.log("Login successful");
+        alert("Login successful");
 
         // reload panel so stor address appears
         await addConnectedUserPanel();
@@ -1268,7 +1270,7 @@ async function buyNFT(o1155, tokenId) {
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+        ;
         // estimate gas
         const gas = await instancecontract.methods
             .Txn(o1155, tokenId, qty, 1)
@@ -1290,6 +1292,8 @@ async function buyNFT(o1155, tokenId) {
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
 
+
+
         if (receipt.status) {
             alert("NFT Purchased");
         } else {
@@ -1298,7 +1302,7 @@ async function buyNFT(o1155, tokenId) {
 
     } catch (e) {
         console.error(e);
-        alert("Purchased failed: " + (err.message || err));
+        alert("Purchased failed: " + (e.message || enabled));
     }
     hideLoader();
 }
@@ -2517,6 +2521,11 @@ async function loadMyNFT() {
     const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, stor);
     const mintCount = await storeContract.methods.mintCount().call();
     const currentLSBversion = await storeContract.methods.currentLSBversion().call();
+
+    const currentCycle = 0;  //await storeContract.methods.currentCycle().call();
+    const userCycleMintCount = await storeContract.methods.userCycleMintCount(currentCycle).call();
+
+
     const lsbpanel = addPanel("LSB Amount");
     let lsbindex = await storeContract.methods.withdrawlDage().call();
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
@@ -2540,15 +2549,17 @@ async function loadMyNFT() {
     const mintspan = document.createElement("span");
     mintspan.id = "mintspan";
     mintspan.innerText = mintid + " / " + mintCount;
+    mintspan.innerText = "userCycleMintCount[" + currentCycle + "]: " + userCycleMintCount + " Mints: " + mintid + " / " + mintCount;
 
     const btnMintLoad = document.createElement("button");
     btnMintLoad.innerText = "Load Mints";
     btnMintLoad.style.marginLeft = "10px";
     btnMintLoad.onclick = () => {
-        document.getElementById("mintspan").innerText = "Loadin mint...";
-        mintid++;
-        onMintLoad();
-
+        if (parseInt(mintCount) > 0) {
+            document.getElementById("mintspan").innerText = "Loading mint...";
+            mintid++;
+            onMintLoad();
+        }
     };
     addRow(panel, btnMintLoad, mintspan);
     async function onMintLoad() {
@@ -2683,7 +2694,10 @@ async function loadMyNFT() {
             innerHTML: `Mint LSB[${parseInt(mintedAge) + 2 + 600}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(mintedAge) + 2 + 600).call(), "ether")}`
         }));
 
-        document.getElementById("mintspan").innerText = mintid + " / " + mintCount;
+        const currentCycle = 0;
+        const userCycleMintCount = await storeContract.methods.userCycleMintCount(currentCycle).call();
+
+        document.getElementById("mintspan").innerText = "userCycleMintCount[" + currentCycle + "]: " + userCycleMintCount + " Mints: " + mintid + " / " + mintCount;
     }
 
 
@@ -2930,9 +2944,9 @@ async function onCapBurn() {
         const storeContract = new web3T.eth.Contract(IInstanceStorABI.abi, stor);
 
         const amountOzone = await rule.methods.computeDollarToOzone(web3.utils.toWei(amountDollar.toString(), 'ether')).call();
-        debugger;
+
         const amountOzoneDollar = await rule.methods.computeOzoneToDollar('15447113780431719335934').call();
-        debugger;
+
 
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
