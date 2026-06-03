@@ -1,5 +1,5 @@
-const provider = "https://chain.ozonescan.com"; // "https://rpc-testnet.ozonescan.com";
-const providerMain = "https://chain.ozonescan.com";
+const provider = "https://rpc-testnet.ozonescan.com"; // "https://rpc-testnet.ozonescan.com";
+const providerMain = "https://rpc-testnet.ozonescan.com";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";
