@@ -2470,7 +2470,7 @@ async function loadMarket() {
 
     try {
 
-        const o1155 = await hexBase.methods.inOrc1155(0).call();
+        const o1155 = await hexBase.methods.inOrc1155(2).call();
         const orc1155 = new web3.eth.Contract(IORC1155ABI.abi, o1155);
 
         addRow(panelMarket, "Contract", o1155);
