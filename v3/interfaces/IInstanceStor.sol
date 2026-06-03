@@ -83,6 +83,7 @@ interface IInstanceStor {
         uint256 _type,
         uint256 _ag
     ) external payable returns (uint256 _tvl, uint256 _amt);
+    function activedirectsCount() external view returns (uint256);
     function addLevelnGetRank(
         uint256 _amount,
         uint256 _qty,
@@ -95,7 +96,6 @@ interface IInstanceStor {
     function cage() external view returns (uint256);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
-    function directsCount() external view returns (uint256);
     function getAllComputeData(uint256 maxinterwal) external view returns (InstanceStor.ComputeResult memory cr);
     function getAllData(uint256 typeId, uint256 maxinterwal) external view returns (uint256[7] memory values);
     function getBalance() external view returns (uint256);
@@ -121,11 +121,12 @@ interface IInstanceStor {
     function postInit() external view returns (bool);
     function preinit(address _hex, address _own, uint256 _id, bool isnew) external;
     function rank() external view returns (uint256);
+    function resetRank() external;
+    function setActivedirect(bool addremove) external;
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
     function setburnclaimdollar(uint256 claim, uint256 claimdollar) external;
-    function setdirect(bool addremove) external;
     function storcache() external;
     function syncBaseAddr() external;
     function systemAge() external view returns (uint256);

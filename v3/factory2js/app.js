@@ -845,6 +845,8 @@ async function loadUserPanel(user) {
     const dage = await stor.methods.dage().call();
     const rankWithAge = await stor.methods.getRankWithAgeValue().call();
     const cage = await stor.methods.cage().call();
+    const activedirectsCount = await stor.methods.activedirectsCount().call();
+    addRow(userPanel, "Active Direct Count", activedirectsCount);
     addRow(userPanel, "Stor Cage", cage);
     addRow(userPanel, "Stor Dage", `${getAgeDateRange(dage).start} {${dage}}`);
     addRow(userPanel, "Stor Rank", `Rank: ${rankWithAge[0]} as on ${getAgeDateRange(rankWithAge[1]).start} {${rankWithAge[1]}}`);
@@ -1399,12 +1401,13 @@ async function loadMyStor(id, panel) {
 
 
             const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
+            const activedirectsCount = await stor.methods.activedirectsCount().call();
             const dage = await stor.methods.dage().call();
             const rankWithAge = await stor.methods.getRankWithAgeValue().call();
             const cage = await stor.methods.cage().call();
             const isLock = await stor.methods.isLock().call();
             const postInit = await stor.methods.postInit().call();
-
+            addRow(panel, "Stor Active Directs", activedirectsCount);
             addRow(panel, "Stor Cage", `${getAgeDateRange(cage).start} {${cage}}`);
             addRow(panel, "Stor Dage", `${getAgeDateRange(dage).start} {${dage}}`);
             addRow(panel, "Stor Rank", `Rank: ${rankWithAge[0]}`);
