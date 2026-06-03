@@ -1220,6 +1220,8 @@ async function buyNFT(o1155, tokenId) {
     showLoader();
     try {
 
+        //buyNFTForOther(o1155, tokenId); return;
+
         if (!currentAccount) {
             alert("Connect wallet first");
             return;
@@ -1279,6 +1281,70 @@ async function buyNFT(o1155, tokenId) {
                 value: value.toString()
             });
 
+        // send transaction
+        const receipt = await instancecontract.methods
+            .Txn(o1155, tokenId, qty, 1)
+            .send({
+                from: accounts[0],
+                value: value.toString(),
+
+                gas: Math.floor(gas * 1.1), // small buffer
+
+                maxPriorityFeePerGas: "1", // low tip
+                maxFeePerGas: (baseFee + 2n).toString() // just above base fee
+            });
+
+
+
+        if (receipt.status) {
+            alert("NFT Purchased");
+        } else {
+            alert("NFT Failed");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Purchased failed: " + (e.message || enabled));
+    }
+    hideLoader();
+}
+
+
+async function buyNFTForOther(o1155, tokenId) {
+    showLoader();
+    try {
+
+
+        const qty = prompt("Enter buy amount:");
+        if (!qty) {
+            throw 'buy amount required';
+        }
+
+        let accounts = await ethereum.enable();
+        window.web3T = new Web3(window.ethereum);
+
+        currentInstance = '0x1d37E94c45d3323cE1F1b86f87C1cd311861C8BA';
+        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
+
+        // get mint value
+        let value = BigInt(
+            await rule.methods
+                .computeMintValue(qty)
+                .call()
+        );
+        debugger;
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        debugger;
+        // estimate gas
+        const gas = await instancecontract.methods
+            .Txn(o1155, tokenId, qty, 1)
+            .estimateGas({
+                from: accounts[0],
+                value: value.toString()
+            });
+        debugger;
         // send transaction
         const receipt = await instancecontract.methods
             .Txn(o1155, tokenId, qty, 1)
@@ -3741,7 +3807,7 @@ async function onCreateTemplate(tid) {
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
         //
-     
+
         var calldata = '';
 
         if (tid == 1) calldata = ChangeParent;
