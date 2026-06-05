@@ -94,6 +94,7 @@ interface IInstanceStor {
     ) external returns (uint256 currentrnk);
     function bonus() external view returns (uint256);
     function cage() external view returns (uint256);
+    function currentCycle() external view returns (uint256);
     function currentLSBversion() external view returns (uint256);
     function dage() external view returns (uint256);
     function getAllComputeData(uint256 maxinterwal) external view returns (InstanceStor.ComputeResult memory cr);
