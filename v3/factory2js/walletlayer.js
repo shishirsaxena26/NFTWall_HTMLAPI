@@ -1354,7 +1354,7 @@ async function setshutdown() {
 
 		window.web3 = new Web3(window.ethereum);
 		window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
-		let response = await window.ruleContract.methods.setshutdown(true).send(
+		let response = await window.ruleContract.methods.setshutdown(false).send(
 			{ from: account }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
