@@ -1873,7 +1873,7 @@ async function loadDAO() {
         btnCreateTemplate.style.marginLeft = "10px";
         btnCreateTemplate.onclick = () => {
             const tid = prompt("Enter template id:");
-            onCreateTemplate(tid);
+            onCreateTemplate(parseInt(tid));
         };
 
 
