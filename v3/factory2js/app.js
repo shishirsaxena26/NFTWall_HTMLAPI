@@ -578,6 +578,7 @@ async function loadSystemTreasuriesNSecurebase() {
 
     const deployerasservice = await hexBase.methods.inDeployerAService().call();
     addRow(panelBase, "DeployerAsService", deployerasservice);
+    addRow(panelBase, "insafeguard", insafeguard);
 
     addRow(panelBase, "inPrice", inPrice);
 
