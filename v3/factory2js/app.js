@@ -605,6 +605,8 @@ async function loadSystemTreasuriesNSecurebase() {
     const nftvalidator = await hexBase.methods.invalidator().call();
     addRow(panelBase, "Validator", nftvalidator);
 
+    addRow(panelBase, "inNested741TVL", inNested741TVL);
+
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
     addRow(panelTreasury, "Factory", factory);
