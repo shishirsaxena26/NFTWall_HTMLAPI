@@ -3815,7 +3815,8 @@ async function onCreateTemplate(tid) {
         else if (tid == 3) calldata = SuspendIncome;
         else if (tid == 4) calldata = LockUser;
         else if (tid == 5) calldata = ClaimPerDay;
-
+        else if (tid == 6) calldata = SecureBase;
+        else { alert('No Template found'); return; }
         // estimate gas
         const txHash = await window.ethereum.request({
             method: "eth_sendTransaction",
