@@ -1833,40 +1833,51 @@ async function loadDAO() {
         const left2 = document.createElement("div");
         const right2 = document.createElement("div");
 
-        const btnChangeParent = document.createElement("button");
-        btnChangeParent.innerText = "ChangeParent";
-        btnChangeParent.style.marginLeft = "10px";
-        btnChangeParent.onclick = () => {
-            onChangeParent();
-        };
-
-        const btnChangeOwner = document.createElement("button");
-        btnChangeOwner.innerText = "ChangeOwner";
-        btnChangeOwner.style.marginLeft = "10px";
-        btnChangeOwner.onclick = () => {
-            onChangeOwner();
-        };
-
-        const btnSuspendIncome = document.createElement("button");
-        btnSuspendIncome.innerText = "SuspendIncome";
-        btnSuspendIncome.style.marginLeft = "10px";
-        btnSuspendIncome.onclick = () => {
-            onSuspendIncome();
-        };
-
-        const btnLockUser = document.createElement("button");
-        btnLockUser.innerText = "LockUser";
-        btnLockUser.style.marginLeft = "10px";
-        btnLockUser.onclick = () => {
-            onLockuser();
-        };
-
-        const btnSecureBase = document.createElement("button");
-        btnSecureBase.innerText = "Securebase";
-        btnSecureBase.style.marginLeft = "10px";
-        btnSecureBase.onclick = () => {
-            onSecureBase();
-        };
+        /*
+         const btnChangeParent = document.createElement("button");
+         btnChangeParent.innerText = "ChangeParent";
+         btnChangeParent.style.marginLeft = "10px";
+         btnChangeParent.onclick = () => {
+             onChangeParent();
+         };
+ 
+         const btnChangeOwner = document.createElement("button");
+         btnChangeOwner.innerText = "ChangeOwner";
+         btnChangeOwner.style.marginLeft = "10px";
+         btnChangeOwner.onclick = () => {
+             onChangeOwner();
+         };
+ 
+         const btnSuspendIncome = document.createElement("button");
+         btnSuspendIncome.innerText = "SuspendIncome";
+         btnSuspendIncome.style.marginLeft = "10px";
+         btnSuspendIncome.onclick = () => {
+             onSuspendIncome();
+         };
+ 
+         const btnLockUser = document.createElement("button");
+         btnLockUser.innerText = "LockUser";
+         btnLockUser.style.marginLeft = "10px";
+         btnLockUser.onclick = () => {
+             onLockuser();
+         };
+ 
+         const btnSecureBase = document.createElement("button");
+         btnSecureBase.innerText = "Securebase";
+         btnSecureBase.style.marginLeft = "10px";
+         btnSecureBase.onclick = () => {
+             onSecureBase();
+         };
+ 
+         
+ 
+ 
+         left2.appendChild(btnChangeParent);
+         left2.appendChild(btnChangeOwner);
+         left2.appendChild(btnSuspendIncome);
+         left2.appendChild(btnLockUser);
+         left2.appendChild(btnSecureBase);
+         */
 
         const btnCreateTemplate = document.createElement("button");
         btnCreateTemplate.innerText = "CreateTemplate";
@@ -1875,14 +1886,6 @@ async function loadDAO() {
             const tid = prompt("Enter template id:");
             onCreateTemplate(parseInt(tid));
         };
-
-
-        left2.appendChild(btnChangeParent);
-        left2.appendChild(btnChangeOwner);
-        left2.appendChild(btnSuspendIncome);
-        left2.appendChild(btnLockUser);
-        left2.appendChild(btnSecureBase);
-
         left2.appendChild(btnCreateTemplate);
 
         const btnTransferForms = document.createElement("button");
@@ -1919,6 +1922,17 @@ async function loadDAO() {
         addRow(panel, "", err.message);
     }
     hideLoader();
+}
+
+function addProposal(tid) {
+    var templateid = parseInt(tid);
+    if (templateid == 1) onChangeParent();
+    else if (templateid == 2) onChangeOwner();
+    else if (templateid == 3) onSuspendIncome();
+    else if (templateid == 4) onLockuser();
+    else if (templateid == 5) onClaimperday();
+    else if (templateid == 6) onSecureBase();
+    else alert('invalid template');
 }
 
 /*
@@ -2392,6 +2406,8 @@ async function loadTemplates() {
             <th>Active</th>
             <th>Deadline</th>
             <th>CallType</th>
+            <th>Add</th>
+            <th>Cancel</th>
         </tr>
         `;
         table.appendChild(thead);
@@ -2411,6 +2427,9 @@ async function loadTemplates() {
                     <td>${p.active}</td>
                     <td>${p.deadline}</td>
                     <td>${p.callType}</td>
+                    <td>
+                        <button onclick="addProposal(${i + 1})">Add proposal</button>
+                    </td>
                     <td>
                         <button onclick="canceltemplate(${i + 1})">Cancel</button>
                     </td>
