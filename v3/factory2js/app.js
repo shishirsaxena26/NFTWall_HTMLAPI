@@ -2150,7 +2150,7 @@ async function onSecureBase() {
         const addremove = prompt("Type- 1:add | 0:remove");
 
         if (addremove !== null && addremove !== "") {
-            if (parseInt(addremove) >= 0 && parseInt(addremove) <= 1) { alert('incorrect addremove'); return; }
+            if (!(parseInt(addremove) >= 0 && parseInt(addremove) <= 1)) { alert('incorrect addremove'); return; }
         } else {
             alert("No type entered");
             return;
