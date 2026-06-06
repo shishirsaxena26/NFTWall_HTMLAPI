@@ -174,7 +174,7 @@ async function init() {
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
 
-    nested741TVL = new web3T.eth.Contract(INested741TVLABI.abi, inNested741TVL);
+    nested741TVL = new web3.eth.Contract(INested741TVLABI.abi, inNested741TVL);
 
     inPrice = await hexBase.methods.inPrice().call();
     price = new web3.eth.Contract(IPriceABI.abi, inPrice);
