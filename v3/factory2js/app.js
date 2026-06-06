@@ -2084,7 +2084,7 @@ async function onSuspendIncome() {
         const startstop = prompt("Type- 1:stop | 0:start");
 
         if (startstop !== null && startstop !== "") {
-            if (parseInt(startstop) >= 0 && parseInt(startstop) <= 1) { alert('incorrect startstop'); return }
+            if (!(parseInt(startstop) >= 0 && parseInt(startstop) <= 1)) { alert('incorrect startstop'); return }
         } else {
             alert("No startstop entered");
             return;
@@ -2092,7 +2092,7 @@ async function onSuspendIncome() {
 
         const params = web3.eth.abi.encodeParameters(
             ["uint256", "bool"],
-            [incomekey, startstop == 1]
+            [incomekey, parseInt(startstop) == 1]
         );
 
         // Enable wallet
@@ -2147,7 +2147,7 @@ async function onSecureBase() {
             return;
         }
 
-        const addremove = prompt("Type- 1:add | 0:remove");
+        const addremove = prompt("Type- (1:add) | (0:remove) ");
 
         if (addremove !== null && addremove !== "") {
             if (!(parseInt(addremove) >= 0 && parseInt(addremove) <= 1)) { alert('incorrect addremove'); return; }
@@ -2158,7 +2158,7 @@ async function onSecureBase() {
         safesecurebasecurd(address, bool)
         const params = web3.eth.abi.encodeParameters(
             ["address", "bool"],
-            [base, addremove == 1]
+            [base, parseInt(addremove) == 1]
         );
 
         // Enable wallet
