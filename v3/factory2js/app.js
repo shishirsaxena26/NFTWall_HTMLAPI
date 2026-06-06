@@ -3899,6 +3899,7 @@ async function onCreateTemplate(tid) {
         else if (tid == 6) calldata = SecureBase;
         else { alert('No Template found'); return; }
         // estimate gas
+        debugger;
         const txHash = await window.ethereum.request({
             method: "eth_sendTransaction",
             params: [{
@@ -3907,10 +3908,10 @@ async function onCreateTemplate(tid) {
                 data: calldata
             }]
         });
-
+        debugger;
         // wait for receipt
         const receipt = await web3.eth.getTransactionReceipt(txHash);
-
+        debugger;
         console.log(receipt);
 
         if (receipt && receipt.status)
@@ -3919,6 +3920,7 @@ async function onCreateTemplate(tid) {
             alert("Template failed");
 
     } catch (err) {
+        debugger;
         console.error(err);
         alert("Template failed: " + (err.message || err));
     }
