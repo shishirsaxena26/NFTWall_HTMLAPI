@@ -1892,6 +1892,13 @@ async function loadDAO() {
             loadTransferForms();
         };
 
+        const btnTemplates = document.createElement("button");
+        btnTemplates.innerText = "AllTemplates";
+        btnTemplates.style.marginLeft = "10px";
+        btnTemplates.onclick = () => {
+            loadTemplates();
+        };
+
         const btnProposals = document.createElement("button");
         btnProposals.innerText = "Proposals";
         btnProposals.style.marginLeft = "10px";
@@ -2346,6 +2353,80 @@ async function onSubmitTrasfer() {
         alert("SubmitTrasfer failed: " + (err.message || err));
     }
 
+}
+
+/*
+
+    struct ProposalTemplate {
+        string desc;
+        address target;
+        bytes4 selector;
+        bool active;
+        uint256 deadline;
+        uint256 callType; //0-system.1-userinstance,2-userstor
+    }
+
+    mapping(uint256 => ProposalTemplate)
+        public proposalTemplates;
+
+    uint256 public ;
+ * 
+*/
+async function loadTemplates() {
+    const panel = addPanel("Templates");
+    try {
+        const count = await daocore.methods.templateCount().call();
+        const table = document.createElement("table");
+        table.border = "1";
+        table.cellPadding = "5";
+        table.style.width = "100%";
+        // ✅ THEAD (Header)
+        const thead = document.createElement("thead");
+        thead.innerHTML = `
+        <tr>
+            <th>#</th>
+            <th>Desc</th>
+            <th>Telector</th>
+            <th>Selector</th>
+            <th>Active</th>
+            <th>Deadline</th>
+            <th>CallType</th>
+        </tr>
+        `;
+        table.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        for (let i = 1; i <= count; i++) {
+
+            const p = await daocore.methods.proposalTemplates(i).call();
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                    <td>${i}</td>
+                    <td title="${p.desc}">${p.desc}</td>
+                    <td class="shortAddr" title="${p.target}">${shortAddr(p.target)}</td>
+                    
+                    <td>${p.selector}</td>
+                    <td>${p.active}</td>
+                    <td>${p.deadline}</td>
+                    <td>${p.callType}</td>
+                    <td>
+                        <button onclick="canceltemplate(${i})">Cancel</button>
+                    </td>
+                `;
+
+            tbody.appendChild(row);
+            limit--;
+        }
+
+        // ✅ Attach tbody
+        table.appendChild(tbody);
+
+        addRow(panel, "", table);
+    } catch (err) {
+        console.error(err);
+        addRow(panel, "", err.message);
+    }
 }
 
 async function loadProposals() {
