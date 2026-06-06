@@ -1886,20 +1886,21 @@ async function loadDAO() {
             const tid = prompt("Enter template id:");
             onCreateTemplate(parseInt(tid));
         };
+        const btnTemplates = document.createElement("button");
+        btnTemplates.innerText = "AllTemplates";
+        btnTemplates.style.marginLeft = "10px";
+        btnTemplates.onclick = () => {
+            loadTemplates();
+        };
+
         left2.appendChild(btnCreateTemplate);
+        left2.appendChild(btnTemplates);
 
         const btnTransferForms = document.createElement("button");
         btnTransferForms.innerText = "TransferForms";
         btnTransferForms.style.marginLeft = "10px";
         btnTransferForms.onclick = () => {
             loadTransferForms();
-        };
-
-        const btnTemplates = document.createElement("button");
-        btnTemplates.innerText = "AllTemplates";
-        btnTemplates.style.marginLeft = "10px";
-        btnTemplates.onclick = () => {
-            loadTemplates();
         };
 
         const btnProposals = document.createElement("button");
@@ -1910,12 +1911,12 @@ async function loadDAO() {
         };
 
 
-        right2.appendChild(btnTemplates);
+
         right2.appendChild(btnTransferForms);
         right2.appendChild(btnProposals);
 
         addRow(panel, left, "");
-        addRow(panel, 'ProposalsCount: ' + proposalsCount, 'templateCount: ' + templateCount);
+        addRow(panel, 'TemplateCount: ' + templateCount, 'ProposalsCount: ' + proposalsCount);
         addRow(panel, left2, right2);
     } catch (err) {
         console.error(err);
