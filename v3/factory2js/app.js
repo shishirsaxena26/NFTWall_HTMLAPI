@@ -2163,7 +2163,7 @@ async function onSecureBase() {
             alert("No type entered");
             return;
         }
-        safesecurebasecurd(address, bool)
+
         const params = web3.eth.abi.encodeParameters(
             ["address", "bool"],
             [base, parseInt(addremove) == 1]
