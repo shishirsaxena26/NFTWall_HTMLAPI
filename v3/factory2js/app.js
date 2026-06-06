@@ -578,6 +578,7 @@ async function loadSystemTreasuriesNSecurebase() {
 
     const deployerasservice = await hexBase.methods.inDeployerAService().call();
     addRow(panelBase, "DeployerAsService", deployerasservice);
+
     addRow(panelBase, "insafeguard", insafeguard);
 
     addRow(panelBase, "inPrice", inPrice);
@@ -597,6 +598,7 @@ async function loadSystemTreasuriesNSecurebase() {
     const inst = await hexBase.methods.inInstance().call();
     addRow(panelBase, "instance", inst);
     const inInstanceStor = await hexBase.methods.inInstanceStor().call();
+
     addRow(panelBase, "stor", inInstanceStor);
     const nftproxy = await hexBase.methods.inNftProxy().call();
     addRow(panelBase, "NFTProxy", nftproxy);
@@ -636,10 +638,14 @@ async function loadSystemTreasuriesNSecurebase() {
     addRow(panelPorp, "Form Count", forms);
     addRow(panelPorp, "Imported Users", importedNodeCount);
     addRow(panelPorp, "ActualTVL", formatOZN(actualTVL));
+    try {
+        const panelOther = addPanel("OTHERS");
+        const currentnode = await nested741TVL.methods.currentnode().call();
+        addRow(panelOther, "Currentnode", currentnode);
+    }
+    catch {
 
-    const panelOther = addPanel("OTHERS");
-    const currentnode = await nested741TVL.methods.currentnode().call();
-    addRow(panelOther, "Currentnode", currentnode);
+    }
     //////////////////////////////////////////
     ///////////////////////////////////////////
 
@@ -732,7 +738,7 @@ async function onSetDefaultRankCount() {
     const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
     const tx = await nestedContractV1.methods
-        .setDefaultRankCount(350)
+        .setDefaultRankCount(400)
         .send({
             from: accounts[0]
         });
@@ -1340,11 +1346,11 @@ async function buyNFTForOther(o1155, tokenId) {
                 .computeMintValue(qty)
                 .call()
         );
-        debugger;
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-        debugger;
+
         // estimate gas
         const gas = await instancecontract.methods
             .Txn(o1155, tokenId, qty, 1)
@@ -1352,7 +1358,7 @@ async function buyNFTForOther(o1155, tokenId) {
                 from: accounts[0],
                 value: value.toString()
             });
-        debugger;
+
         // send transaction
         const receipt = await instancecontract.methods
             .Txn(o1155, tokenId, qty, 1)
@@ -4001,7 +4007,7 @@ async function onCreateTemplate(tid) {
         else if (tid == 6) calldata = SecureBase;
         else { alert('No Template found'); return; }
         // estimate gas
-        debugger;
+
         const txHash = await window.ethereum.request({
             method: "eth_sendTransaction",
             params: [{
@@ -4010,10 +4016,10 @@ async function onCreateTemplate(tid) {
                 data: calldata
             }]
         });
-        debugger;
+
         // wait for receipt
         const receipt = await web3.eth.getTransactionReceipt(txHash);
-        debugger;
+
         console.log(receipt);
 
         if (receipt && receipt.status)
@@ -4022,7 +4028,7 @@ async function onCreateTemplate(tid) {
             alert("Template failed");
 
     } catch (err) {
-        debugger;
+
         console.error(err);
         alert("Template failed: " + (err.message || err));
     }
