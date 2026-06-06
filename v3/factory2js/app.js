@@ -1860,6 +1860,13 @@ async function loadDAO() {
             onLockuser();
         };
 
+        const btnSecureBase = document.createElement("button");
+        btnSecureBase.innerText = "Securebase";
+        btnSecureBase.style.marginLeft = "10px";
+        btnSecureBase.onclick = () => {
+            onSecureBase();
+        };
+
         const btnCreateTemplate = document.createElement("button");
         btnCreateTemplate.innerText = "CreateTemplate";
         btnCreateTemplate.style.marginLeft = "10px";
@@ -1873,6 +1880,8 @@ async function loadDAO() {
         left2.appendChild(btnChangeOwner);
         left2.appendChild(btnSuspendIncome);
         left2.appendChild(btnLockUser);
+        left2.appendChild(btnSecureBase);
+
         left2.appendChild(btnCreateTemplate);
 
         const btnTransferForms = document.createElement("button");
@@ -2098,6 +2107,71 @@ async function onSuspendIncome() {
 
         // prepare method
         const method = daoContract.methods.newProposal(3, useraddress, params, 0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
+            alert("NewProposer succeeded");
+        } else {
+            alert("NewProposer failed");
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        alert("NewProposer failed: " + (err.message || err));
+    }
+}
+
+async function onSecureBase() {
+    try {
+
+        const base = prompt("Enter base address needs to be add/remove:");
+
+        if (base == null && base == "") {
+            alert("No Base entered");
+            return;
+        }
+
+        const addremove = prompt("Type- 1:add | 0:remove");
+
+        if (addremove !== null && addremove !== "") {
+            if (parseInt(addremove) >= 0 && parseInt(addremove) <= 1) { alert('incorrect addremove'); return; }
+        } else {
+            alert("No type entered");
+            return;
+        }
+        safesecurebasecurd(address, bool)
+        const params = web3.eth.abi.encodeParameters(
+            ["address", "bool"],
+            [base, addremove == 1]
+        );
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        // prepare method
+        const method = daoContract.methods.newProposal(6, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
