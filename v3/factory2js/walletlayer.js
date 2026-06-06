@@ -611,7 +611,8 @@ async function loadStructure(n, header) {
 	let bonus = await window.instancecontract.methods.bonus().call();
 	td = td + '<td>' + (web3.utils.fromWei(bonus.toString(), 'ether')) + '</td>';
 	let vali = await window.instancecontract.methods.validator().call();
-	td = td + '<td>' + (vali) + '</td>'
+	let _owner = await window.instancecontract.methods.owner().call();
+	td = td + '<td>' + _owner + '</td>'
 	$("#tab tr:not(:first)").remove();
 	$("#tab").append('<tr ' + cstyle + ' >' + td + '</tr>');
 
