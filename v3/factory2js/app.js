@@ -2800,6 +2800,29 @@ async function loadMyNFT() {
         innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
     }));
 
+    lsbindex = parseInt(lsbindex) + 1;
+    debugger;
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
+    }));
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
+    }));
+
+    lsbindex = parseInt(lsbindex) + 1;
+    debugger;
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
+    }));
+    lsbpanel.appendChild(Object.assign(document.createElement("div"), {
+        className: "row",
+        innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
+    }));
+    debugger;
+
     let mintid = 0;
     if (parseInt(mintCount) == 0) mintid = 0;
 
