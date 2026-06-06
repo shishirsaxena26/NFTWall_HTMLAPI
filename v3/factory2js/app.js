@@ -1907,6 +1907,7 @@ async function loadDAO() {
         };
 
 
+        right2.appendChild(btnTemplates);
         right2.appendChild(btnTransferForms);
         right2.appendChild(btnProposals);
 
@@ -2386,7 +2387,7 @@ async function loadTemplates() {
         <tr>
             <th>#</th>
             <th>Desc</th>
-            <th>Telector</th>
+            <th>Target</th>
             <th>Selector</th>
             <th>Active</th>
             <th>Deadline</th>
@@ -2395,14 +2396,14 @@ async function loadTemplates() {
         `;
         table.appendChild(thead);
         const tbody = document.createElement("tbody");
-        for (let i = 1; i <= count; i++) {
+        for (let i = 0; i < count; i++) {
 
             const p = await daocore.methods.proposalTemplates(i).call();
 
             const row = document.createElement("tr");
 
             row.innerHTML = `
-                    <td>${i}</td>
+                    <td>${i + 1}</td>
                     <td title="${p.desc}">${p.desc}</td>
                     <td class="shortAddr" title="${p.target}">${shortAddr(p.target)}</td>
                     
@@ -2411,12 +2412,11 @@ async function loadTemplates() {
                     <td>${p.deadline}</td>
                     <td>${p.callType}</td>
                     <td>
-                        <button onclick="canceltemplate(${i})">Cancel</button>
+                        <button onclick="canceltemplate(${i + 1})">Cancel</button>
                     </td>
                 `;
 
             tbody.appendChild(row);
-            limit--;
         }
 
         // ✅ Attach tbody
