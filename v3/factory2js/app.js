@@ -2423,15 +2423,15 @@ async function loadTemplates() {
                     <td title="${p.desc}">${p.desc}</td>
                     <td class="shortAddr" title="${p.target}">${shortAddr(p.target)}</td>
                     
-                    <td>${p.selector}</td>
+                    <td class="shortAddr paramsCell">${p.selector}</td>
                     <td>${p.active}</td>
                     <td>${p.deadline}</td>
                     <td>${p.callType}</td>
-                    <td>
-                        <button onclick="addProposal(${i + 1})">Add proposal</button>
+                    <td class="shortAddr paramsCell">
+                        <button class="vote-btn" onclick="addProposal(${i + 1})">Add proposal</button>
                     </td>
-                    <td>
-                        <button onclick="canceltemplate(${i + 1})">Cancel</button>
+                    <td class="shortAddr paramsCell">
+                        <button class="vote-btn" onclick="canceltemplate(${i + 1})">Cancel</button>
                     </td>
                 `;
 
@@ -2497,7 +2497,7 @@ async function loadProposals() {
           <td>${r[4]}</td>
           <td>${approve}</td>
           <td class="shortAddr paramsCell" title="${p[5]}">${p[6]}</td>
-          <td>
+          <td >
             <button class="vote-btn upvote" onclick="vote(${i}, true)">Vote(Y)</button>
             <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
           </td>
