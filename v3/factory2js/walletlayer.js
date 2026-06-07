@@ -570,8 +570,9 @@ async function onLoadAddress() {
 
 async function isUser(u) {
 	window.nestedcontract = new window.web3.eth.Contract(NestedABI.abi, nested);
+	debugger;
 	let add = await window.nestedcontract.methods.UserToInst(u).call();
-
+	debugger;
 	return (add != "0x0000000000000000000000000000000000000000");
 }
 
