@@ -1941,6 +1941,8 @@ function addProposal(tid) {
     else if (templateid == 4) onLockuser();
     else if (templateid == 5) onClaimperday();
     else if (templateid == 6) onSecureBase();
+    else if (templateid == 7) onDAOWinPer();
+    else if (templateid == 8) onDAOBlacklist();
     else alert('invalid template');
 }
 
@@ -2230,6 +2232,129 @@ async function onSecureBase() {
     } catch (err) {
         console.error(err);
         alert("NewProposer failed: " + (err.message || err));
+    }
+}
+
+async function onDAOWinPer() {
+    try {
+
+        const winper = prompt("Type- Wining percent");
+
+        if (winper !== null && winper !== "") {
+            if (!(parseInt(winper) >= 0)) { alert('incorrect Wining percent'); return; }
+        } else {
+            alert("No winper entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["uint256"],
+            [parseInt(winper)]
+        );
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        // prepare method
+        const method = daoContract.methods.newProposal(7, ZERO, params, 0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
+            alert("DAO WinPer succeeded");
+        } else {
+            alert("DAO WinPer failed");
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        alert("DAO WinPer  failed: " + (err.message || err));
+    }
+}
+
+async function onDAOBlacklist() {
+    try {
+
+        const base = prompt("Enter DAO address needs to be whitelist/blacklist:");
+
+        if (base == null && base == "") {
+            alert("No Base entered");
+            return;
+        }
+
+        const addremove = prompt("Type- (1:blacklist) | (0:whitelist) ");
+
+        if (addremove !== null && addremove !== "") {
+            if (!(parseInt(addremove) >= 0 && parseInt(addremove) <= 1)) { alert('incorrect Type'); return; }
+        } else {
+            alert("No Type entered");
+            return;
+        }
+
+        const params = web3.eth.abi.encodeParameters(
+            ["address", "bool"],
+            [base, parseInt(addremove) == 1]
+        );
+
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
+
+        // prepare method
+        const method = daoContract.methods.newProposal(8, ZERO, params, 0);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
+            alert("DAOBlacklist succeeded");
+        } else {
+            alert("DAOBlacklist failed");
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        alert("DAOBlacklist failed: " + (err.message || err));
     }
 }
 
@@ -4030,6 +4155,8 @@ async function onCreateTemplate(tid) {
         else if (tid == 4) calldata = LockUser;
         else if (tid == 5) calldata = ClaimPerDay;
         else if (tid == 6) calldata = SecureBase;
+        else if (tid == 7) calldata = DAOWinPer;
+        else if (tid == 8) calldata = DAOBlacklist;
         else { alert('No Template found'); return; }
         // estimate gas
 
