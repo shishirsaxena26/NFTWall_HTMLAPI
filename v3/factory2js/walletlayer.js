@@ -704,7 +704,7 @@ async function loadPool(n, instance, dage) {
 	$("#id").text((await instancecontract.methods.id().call()));
 
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	let inc = await window.instancecontract.methods.compute(0).call();
+	let inc = await window.instancecontract.methods.compute(300).call();
 
 	$("#tabCalIncome tr:not(:first)").remove();
 	let td = '';
