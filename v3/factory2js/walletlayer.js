@@ -704,7 +704,7 @@ async function loadPool(n, instance, dage) {
 	$("#id").text((await instancecontract.methods.id().call()));
 
 	window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-	let inc = await window.instancecontract.methods.compute(300).call();
+	let inc = await window.instancecontract.methods.compute(999).call();
 
 	$("#tabCalIncome tr:not(:first)").remove();
 	let td = '';
@@ -1149,7 +1149,7 @@ async function onApprove1() {
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
 		debugger;
-		let response = await window.safecontract.methods.approveByV1(true).send(
+		let response = await window.safecontract.methods.approveByV1(false).send(
 			{ from: account }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
