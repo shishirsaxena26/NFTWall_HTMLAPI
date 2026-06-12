@@ -977,23 +977,29 @@ function updatePanelWithInstance(instance) {
 
 async function joinUser() {
     try {
-        const _p = prompt("Enter parent address:");
-        const parent = _p.trim();
-        if (!parent || !web3.utils.isAddress(parent)) {
-            alert("Enter a valid parent");
-            return;
-        }
 
+        let accounts = await ethereum.enable();
+        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
+
+        window.web3T = new Web3(window.ethereum);
         if (!currentAccount || !web3.utils.isAddress(currentAccount)) {
             alert("Connect to wallet");
             return;
         }
 
 
+        let parent;
+        const resolveTarget = transferRequests.methods.resolveTransferTarget(currentAccount);
+        if (resolveTarget != ZERO) {
+            const _p = prompt("Enter parent address:");
+            parent = _p.trim();
+            if (!parent || !web3.utils.isAddress(parent)) {
+                alert("Enter a valid parent");
+                return;
+            }
+        }
+        parent = ZERO;
 
-        let accounts = await ethereum.enable();
-        if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
-        window.web3T = new Web3(window.ethereum);
         // encode constructor args
         //const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
         //const encodedArgs = iface.encodeDeploy([hexBaseAddress, parent]);
