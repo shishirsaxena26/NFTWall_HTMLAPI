@@ -150,7 +150,7 @@ async function init() {
     INested741TVLABI = await fetch('abistandardv3/Nested741TVL.sol/Nested741TVL.json?v=' + version).then(res => res.json());
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
-    debugger;
+
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
     sysAge = await nested.methods.systemAge().call();
@@ -1157,7 +1157,7 @@ async function loginUser() {
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-        debugger;
+
         // estimate gas
         const gas = await instancecontract.methods
             .login(maxintervals, doTVLClaim, doClaim)
@@ -1195,7 +1195,7 @@ async function loginUser() {
 async function importUser() {
 
     try {
-        debugger;
+
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
         if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
@@ -1455,6 +1455,7 @@ async function loadUser() {
         addRow(panel, "StorAddr", node[4]);
 
         await loadMyStor(id, panel);
+        await loadMyOldStorData(id);
 
         await loadMyNFT();
     } catch (err) {
@@ -1472,6 +1473,16 @@ function formatRow(arr, width = 15) {
     return arr
         .map(v => String(v).padStart(width, " "))
         .join(' | ');
+}
+async function loadMyOldStorData(id) {
+    nestedOld = new web3.eth.Contract(INested741ABI.abi, "0xa4cb3f45F46B3c31780D70568b0627b3339eB76d");
+    const node = await nestedOld.methods.getNode(id).call();
+    const storAddr = node[4];
+    if (storAddr != "0x0000000000000000000000000000000000000000") {
+        const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
+        const drawn = await stor.methods.getAllData(4, 0).call();
+        console.log(`OLDLevel: ${drawn}`)
+    }
 }
 
 async function loadMyStor(id, panel) {
@@ -2967,7 +2978,7 @@ async function loadMyNFT() {
     }));
 
     lsbindex = parseInt(lsbindex) + 1;
-    debugger;
+
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
         innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
@@ -2978,7 +2989,7 @@ async function loadMyNFT() {
     }));
 
     lsbindex = parseInt(lsbindex) + 1;
-    debugger;
+
     lsbpanel.appendChild(Object.assign(document.createElement("div"), {
         className: "row",
         innerHTML: `Dage: ${getAgeDateRange(lsbindex).start} {${lsbindex}}`
@@ -2987,7 +2998,7 @@ async function loadMyNFT() {
         className: "row",
         innerHTML: `Dage LSB[${parseInt(lsbindex)}]: ${web3.utils.fromWei(await storeContract.methods.LSB(currentLSBversion, parseInt(lsbindex)).call(), "ether")}`
     }));
-    debugger;
+
 
     let mintid = 0;
     if (parseInt(mintCount) == 0) mintid = 0;
