@@ -988,9 +988,9 @@ async function joinUser() {
         }
 
 
-        let parent;
+        let parent = ZERO;;
         const resolveTarget = transferRequests.methods.resolveTransferTarget(currentAccount);
-        if (resolveTarget != ZERO) {
+        if (resolveTarget == ZERO) {
             const _p = prompt("Enter parent address:");
             parent = _p.trim();
             if (!parent || !web3.utils.isAddress(parent)) {
@@ -998,7 +998,7 @@ async function joinUser() {
                 return;
             }
         }
-        parent = ZERO;
+
 
         // encode constructor args
         //const iface = new ethers.utils.Interface(IInstanceMeABI.abi);
