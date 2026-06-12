@@ -1758,7 +1758,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(compute.thresholdollarx),
                 formatOZN(compute.totIncdollar),
                 formatOZN(consts[3]),
-                parseFloat(formatOZN(compute.minpaydollar)) + '(' + minpaydollartozone + ')',
+                parseFloat(formatOZN(compute.minpaydollar)),
                 compute.capdollar
             ]));
 
@@ -1768,7 +1768,7 @@ async function loadMyStor(id, panel) {
                 " ",
                 '(' + totincdollartozone + ')',
                 " ",
-                " ",
+                '(' + minpaydollartozone + ')',
                 " "
             ]));
 
