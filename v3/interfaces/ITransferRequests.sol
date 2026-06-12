@@ -1,6 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
 
+library TransferRequests {
+    struct UserOldDataStr {
+        uint256 rwrd;
+        uint256 royl;
+        uint256 self;
+        uint256 yei;
+        uint256 tour1;
+        uint256 tour2;
+        uint256 tvl;
+        uint256 claimeddollar;
+        uint256 oldRWRD;
+        uint256 oldYEILD;
+        bool exists;
+    }
+}
+
 interface ITransferRequests {
     error CallFailed();
     error InvalidAddress();
@@ -21,6 +37,7 @@ interface ITransferRequests {
 
     function Burn(uint256 amount) external;
     function UserToForm(address) external view returns (uint256);
+    function Withdraw() external;
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _isDelegatorNode(address sender) external view returns (bool);
@@ -36,10 +53,12 @@ interface ITransferRequests {
     function getFormsCount() external view returns (uint256);
     function getHexbase() external view returns (address);
     function getImportedNodeByIndex(uint256 index) external view returns (address node);
+    function getUserOldData(address user) external view returns (TransferRequests.UserOldDataStr memory uold);
     function getimportedNodeCount() external view returns (uint256 nodesCount);
     function importRankBusiness(uint256 _fromAge, uint256 _toAge) external;
+    function importStorActiveParent(address[] memory users) external;
     function importedNode(uint256) external view returns (address);
-    function importuser(uint256 batchSize) external;
+    function isStorActivateParentDone(address) external view returns (bool);
     function owner() external view returns (address);
     function refreshusers(uint256 batchSize, uint256 maxintervals, uint256 lastdays) external;
     function resolveParent(address) external view returns (address);
@@ -56,5 +75,22 @@ interface ITransferRequests {
     function submitTransferForm(address _from, address _to) external;
     function syncBaseAddr() external;
     function syncSystem() external;
+    function syncusers(uint256 batchSize) external;
     function systemAge() external view returns (uint256);
+    function updateData1(
+        address[] memory users,
+        uint256[] memory tvls,
+        uint256[] memory claimdollar,
+        uint256[] memory tour1,
+        uint256[] memory tour2,
+        uint256 action
+    ) external;
+    function updateData2(
+        address[] memory users,
+        uint256[] memory rwrd,
+        uint256[] memory royl,
+        uint256[] memory self,
+        uint256[] memory yei,
+        uint256 action
+    ) external;
 }

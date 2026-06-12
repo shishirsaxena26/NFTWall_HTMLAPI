@@ -224,6 +224,10 @@
       word-break: break-all;
       white-space: normal;
     }
+
+    .spltword {
+      word-break: break-all;
+    }
   </style>
 </head>
 
@@ -303,7 +307,10 @@
         document.head.appendChild(script);
       }
 
-      loadScript('factory2js/appaddress.js', function () {
+      var path = 'factory2js/appaddress.js';
+      //var path = 'factory2js/appaddresstestnet.js'
+
+      loadScript(path, function () {
         loadScript('factory2js/app.js', function () {
           console.log('All scripts loaded');
         });

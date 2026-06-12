@@ -46,10 +46,6 @@ interface IHexBase {
     function inTreaseryTVLMining() external view returns (address);
     function inTreaseryTVLMiningImport() external view returns (address);
     function inTreaseryTVLMiningPrime() external view returns (address);
-    function inTreaseryTVLReward() external view returns (address);
-    function inTreaseryTVLRoyality() external view returns (address);
-    function inTreaseryTVLTour() external view returns (address);
-    function inTreaseryTVLValidator() external view returns (address);
     function inblank() external view returns (address);
     function incointransfer() external view returns (address);
     function infactoryold() external view returns (address);
@@ -110,12 +106,8 @@ interface IHexBase {
     function updateSafeguardPrimeOld(address addr) external;
     function updateTreaseryFactory(address addr) external;
     function updateTreaseryTVLMiningImport(address addr) external;
-    function updateTreaseryTVLValidator(address addr) external;
     function updateTreasuryTVLMining(address addr) external;
     function updateTreasuryTVLMiningPrime(address addr) external;
-    function updateTreasuryTVLReward(address addr) external;
-    function updateTreasuryTVLRoyality(address addr) external;
-    function updateTreasuryTVLTour(address addr) external;
     function updateValidator(address addr) external;
     function updateValidatorOld(address addr) external;
 }

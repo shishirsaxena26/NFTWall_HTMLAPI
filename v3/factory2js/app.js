@@ -1,9 +1,6 @@
 let web3;
 web3 = new Web3(provider);
 
-let web3Main;
-web3Main = new Web3(providerMain);
-
 var BN = web3.utils.BN;
 var bs1 = new web3.utils.BN("0");
 
@@ -49,6 +46,9 @@ let currentInstance = null;
 let currentStor = null;
 
 const maxintervals = 30;
+const doTVLClaim = false;
+const doClaim = false;
+
 
 const treeData = {
     id: "1",
@@ -150,7 +150,7 @@ async function init() {
     INested741TVLABI = await fetch('abistandardv3/Nested741TVL.sol/Nested741TVL.json?v=' + version).then(res => res.json());
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
-
+    debugger;
     inNested741 = await hexBase.methods.in741().call();
     nested = new web3.eth.Contract(INested741ABI.abi, inNested741);
     sysAge = await nested.methods.systemAge().call();
@@ -940,31 +940,25 @@ async function addConnectedUserPanel() {
             currentStor = node[4];
             document.getElementById("walletInst").innerText =
                 "Inst " + shortAddr(currentInstance);
+            document.getElementById("walletStor").innerText =
+                "Stor " + shortAddr(currentStor);
 
-            const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);
-
-            if (await instan.methods.validateToken().call()) {
-
-                const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
-                const postInit = await stor.methods.postInit().call();
-                if (!postInit) {
-                    btnImport.style.display = "block";
-                    return;
-                } else {
-
-                    document.getElementById("walletStor").innerText =
-                        "Stor " + shortAddr(currentStor);
-                }
-            }
-            else {
-
-                btnLogin.style.display = "block";
+            const stor = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
+            const postInit = await stor.methods.postInit().call();
+            if (!postInit) {
+                btnImport.style.display = "block";
                 return;
+            } else {
+                const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);
+                if (await instan.methods.validateToken().call()) {
+                }
+                else {
+                    btnLogin.style.display = "block";
+                    return;
+                }
             }
 
         }
-
-
 
     } catch (e) {
         console.log(e);
@@ -1121,8 +1115,7 @@ async function loginUser1() {
             IInstanceMeABI.abi,
             currentInstance
         );
-
-        const tx = await instancecontract.methods.login(maxintervals).send({ from: accounts[0] });
+        const tx = await instancecontract.methods.login(maxintervals, doTVLClaim, doClaim).send({ from: accounts[0] });
         if (tx.status) {
             alert("Login succeeded");
         }
@@ -1164,18 +1157,18 @@ async function loginUser() {
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+        debugger;
         // estimate gas
         const gas = await instancecontract.methods
-            .login(maxintervals)
+            .login(maxintervals, doTVLClaim, doClaim)
             .estimateGas({
                 from: currentAccount,
                 value: "0"
             });
 
         // send transaction
-        const receipt = await instancecontract.methods
-            .login(maxintervals)
+        const tx = await instancecontract.methods.
+            login(maxintervals, doTVLClaim, doClaim)
             .send({
                 from: currentAccount,
                 value: "0",
@@ -1202,20 +1195,24 @@ async function loginUser() {
 async function importUser() {
 
     try {
-
+        debugger;
         let accounts = await ethereum.enable();
         window.web3T = new Web3(window.ethereum);
         if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
         const userId = await nested.methods.UserToId(currentAccount).call();
         if (userId == 0) { alert("Invalid user"); return; }
-        const limit = 5; // change according to your import batch size
 
-        const nestedcontract = new web3T.eth.Contract(
-            INested741ABI.abi,
-            inNested741
-        );
-        await nestedcontract.methods
-            .importOld(userId, limit)
+        const stor = new
+            web3T.eth.Contract(IInstanceStorABI.abi,
+                currentStor);
+
+        const postInit = await stor.methods.postInit().call();
+
+        if (postInit) { alert('already imported'); return; }
+
+        const limit = 5; // change according to your import batch size
+        await stor.methods
+            .importOld(limit)
             .send({
                 from: currentAccount,
                 value: "0"
@@ -1227,7 +1224,7 @@ async function importUser() {
 
     } catch (e) {
         console.log(e);
-        alert("Transfer failed: " + (err.message || err));
+        alert("Transfer failed: " + (e.message || e));
     }
     hideLoader();
 }
@@ -1551,12 +1548,13 @@ async function loadMyStor(id, panel) {
            */
 
 
+
             // Drawn, Flushed, Unpaid, Compute
             const drawn = await stor.methods.getAllData(1, 0).call();
-            const flushed = await stor.methods.getAllData(2, 0).call();
-            const unpaid = await stor.methods.getAllData(3, 0).call();
-            const misc = await stor.methods.getAllData(4, 0).call();
-            const consts = await stor.methods.getAllData(5, 0).call();
+
+            const misc = await stor.methods.getAllData(2, 0).call();
+            const consts = await stor.methods.getAllData(4, 0).call();
+
 
             let compute;
             try {
@@ -1571,29 +1569,98 @@ async function loadMyStor(id, panel) {
 
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
+            const TVL = await stor.methods.TVL().call();
+            const label = "TVL " + formatOZN(TVL);
             // Add a header row
-            addRow(panel, "Income Type", formatRow(["Compute", "ComputeFlush", "Drawn", "Flushed", "Unpaid"]));
+            addRow(panel, label, formatRow(["Compute", "ComputeFlush", "Drawn"]));
 
             for (let i = 0; i < 7; i++) {
                 const comp = formatOZN(compute[`p${i + 1}`]);
                 const compFlush = formatOZN(compute[`f${i + 1}`]);
                 const drwn = formatOZN(drawn[i]);
-                const flsh = formatOZN(flushed[i]);
-                const unpaidVal = formatOZN(unpaid[i]);
+
                 const susCount = await stor.methods.getToggleAgeCount(i + 1).call();
 
                 addRow(panel, `${incomeTypes[i]} (${parseInt(susCount) % 2 == 1 ? "F" : "T"})`,
                     formatRow([
                         String(comp),
                         String(compFlush),
-                        String(drwn),
-                        String(flsh),
-                        String(unpaidVal)
+                        String(drwn)
                     ])
                 );
             }
 
+            const tableuf = document.createElement("table");
+            tableuf.border = "0";
+            tableuf.cellPadding = "1";
+            tableuf.style.width = "50%";
+            tableuf.style.display = "table-cell";
+            addRow(panel, "->", tableuf);
+            // ✅ THEAD (Header)
+            const theaduf = document.createElement("thead");
+            theaduf.innerHTML = `
+                <tr>
+                    <th>TVL</th>
+                    <th>Unpaid</th>
+                    <th>Unpaid Self</th>
+                    <th>Flushed</th>
+                </tr>
+                `;
+            tableuf.appendChild(theaduf);
 
+            const tbodyuf = document.createElement("tbody");
+            const row = document.createElement("tr")
+            row.innerHTML = `
+                    <td>${formatOZN(TVL)}</td>
+                    <td>${formatOZN(misc[0])}</td>
+                    <td>${formatOZN(misc[1])}</td>
+                    <td>${formatOZN(misc[2])}</td>
+            `;
+
+            tbodyuf.appendChild(row);
+
+            // ✅ Attach tbody
+            tableuf.appendChild(tbodyuf);
+
+
+
+            const right = document.createElement("div");
+            const btnClaim = document.createElement("button");
+            btnClaim.innerText = "Claim";
+            btnClaim.style.marginLeft = "10px";
+            btnClaim.onclick = () => {
+                onClaim();
+            };
+
+            const btnCapBurn = document.createElement("button");
+            btnCapBurn.innerText = "CapBurn";
+            btnCapBurn.style.marginLeft = "10px";
+
+            btnCapBurn.onclick = () => {
+                onCapBurn();
+            };
+
+            const btnTVLRefresh = document.createElement("button");
+            btnTVLRefresh.innerText = "TVLRefresh";
+            btnTVLRefresh.style.marginLeft = "10px";
+
+            btnTVLRefresh.onclick = () => {
+                onTVLRefresh();
+            };
+
+            const btnLoadBusiness = document.createElement("button");
+            btnLoadBusiness.innerText = "LoadBusiness";
+            btnLoadBusiness.style.marginLeft = "10px";
+            btnLoadBusiness.onclick = () => {
+                onLoadBusiness(storAddr);
+            };
+
+            right.appendChild(btnTVLRefresh);
+            right.appendChild(btnClaim);
+            right.appendChild(btnCapBurn);
+            right.appendChild(btnLoadBusiness);
+
+            addRow(panel, "->", right);
 
             const toggleAgeListdiv = document.createElement("div");
             toggleAgeListdiv.style.display = "-webkit-inline-box";
@@ -1689,10 +1756,20 @@ async function loadMyStor(id, panel) {
                 formatOZN(consts[1]),
                 formatOZN(consts[5]),
                 formatOZN(compute.thresholdollarx),
-                formatOZN(compute.totIncdollar) + '(' + totincdollartozone + ')',
+                formatOZN(compute.totIncdollar),
                 formatOZN(consts[3]),
                 parseFloat(formatOZN(compute.minpaydollar)) + '(' + minpaydollartozone + ')',
                 compute.capdollar
+            ]));
+
+            addRow(panelCompCap, "..", formatRow([
+                " ",
+                " ",
+                " ",
+                '(' + totincdollartozone + ')',
+                " ",
+                " ",
+                " "
             ]));
 
             addRow(panelCompCap, "OZ", formatRow([
@@ -1720,49 +1797,13 @@ async function loadMyStor(id, panel) {
             //BURNED, BURNED_DOLLAR, INVESTED_DOLLAR, CLAIMED_DOLLAR, 0, 0, 0
 
             addRow(panel, "ACTUAL CAPPING", actualCap.toString().toUpperCase());
-            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[0]));
-            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[1]));
-            addRow(panel, "OLD_RWRD", formatOZN(misc[2]));
-            addRow(panel, "OLD_YEILD", formatOZN(misc[3]));
+            addRow(panel, "CALC_SELF_PROPOSED", formatOZN(misc[2]));
+            addRow(panel, "CALC_SELF_FLUSH_PROPOSED", formatOZN(misc[3]));
+            addRow(panel, "OLD_RWRD", formatOZN(misc[4]));
+            addRow(panel, "OLD_YEILD", formatOZN(misc[5]));
             addRow(panel, "LOCKED", isLock);
 
-            const right = document.createElement("div");
-            const btnClaim = document.createElement("button");
-            btnClaim.innerText = "Claim";
-            btnClaim.style.marginLeft = "10px";
-            btnClaim.onclick = () => {
-                onClaim();
-            };
 
-            const btnCapBurn = document.createElement("button");
-            btnCapBurn.innerText = "CapBurn";
-            btnCapBurn.style.marginLeft = "10px";
-
-            btnCapBurn.onclick = () => {
-                onCapBurn();
-            };
-
-            const btnTVLRefresh = document.createElement("button");
-            btnTVLRefresh.innerText = "TVLRefresh";
-            btnTVLRefresh.style.marginLeft = "10px";
-
-            btnTVLRefresh.onclick = () => {
-                onTVLRefresh();
-            };
-
-            const btnLoadBusiness = document.createElement("button");
-            btnLoadBusiness.innerText = "LoadBusiness";
-            btnLoadBusiness.style.marginLeft = "10px";
-            btnLoadBusiness.onclick = () => {
-                onLoadBusiness(storAddr);
-            };
-
-            right.appendChild(btnTVLRefresh);
-            right.appendChild(btnClaim);
-            right.appendChild(btnCapBurn);
-            right.appendChild(btnLoadBusiness);
-
-            addRow(panel, "Claim", right);
         }
     } catch (err) {
 

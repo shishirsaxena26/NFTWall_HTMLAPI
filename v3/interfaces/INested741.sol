@@ -80,11 +80,10 @@ interface INested741 {
     function getrankCount(uint256 ag, uint256 rnk) external view returns (uint256 count);
     function gettotqty(uint256 ag) external view returns (uint256);
     function getwithdrawn(uint256 ag) external view returns (uint256);
-    function importBusiness(uint256 _amt, uint256 _ag) external;
-    function importJoining(uint256 _cnt, uint256 _ag) external;
-    function importOld(uint256 _id, uint256 _limit) external payable;
+    function importBusiness(uint256 _amt, uint256 _ag, bool _action) external;
+    function importJoining(uint256 _cnt, uint256 _ag, bool _action) external;
     function importRankNBusiness(uint256 from, uint256 to) external;
-    function importWithdrawal(uint256 _amt, uint256 _ag) external;
+    function importWithdrawal(uint256 _amt, uint256 _ag, bool _action) external;
     function isNode(uint256 _id) external view returns (bool);
     function isStop(address uinst) external view returns (bool);
     function isUserExists(address node) external view returns (bool);

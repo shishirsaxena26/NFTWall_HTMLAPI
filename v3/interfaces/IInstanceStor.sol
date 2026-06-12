@@ -68,14 +68,18 @@ interface IInstanceStor {
     function Burn(uint256 amount) external;
     function BurnCoin(uint256 _dollar, uint256 maxinterwal) external payable;
     function LSB(uint256, uint256) external view returns (int256);
+    function TVL() external view returns (uint256);
     function _delegatorCount() external view returns (uint256);
     function _getImplementation(address clone) external view returns (address impl);
     function _isDelegatorNode(address sender) external view returns (bool);
     function _isSafe() external view returns (bool);
     function _isSecureBase(address sender) external view returns (bool);
     function _isSigner(address sender) external view returns (bool);
-    function _txnType7(uint256 _maxint, uint256 _ag) external payable returns (uint256[9] memory CALC_INC);
-    function _txnType_1_0(
+    function _txnType107(uint256 _maxint, uint256 _ag)
+        external
+        payable
+        returns (uint256 net, uint256 _self, uint256 _selfflush);
+    function _txnType_101_100(
         address paramAdd,
         uint256 _id_maxint,
         uint256 _qty,
@@ -127,7 +131,7 @@ interface IInstanceStor {
     function setBonus(uint256 b) external;
     function setLock(bool flag) external;
     function setSuspend(uint256 key, bool value) external;
-    function setburnclaimdollar(uint256 claim, uint256 claimdollar) external;
+    function setburnclaimdollar(uint256 claim, uint256 claimdollar, uint256 _tvl, bool action) external;
     function storcache() external;
     function syncBaseAddr() external;
     function systemAge() external view returns (uint256);

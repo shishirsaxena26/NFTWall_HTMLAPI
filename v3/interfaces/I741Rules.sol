@@ -41,7 +41,7 @@ interface I741Rules {
         external
         view
         returns (address target1, uint256 roiN1, uint256 roiD1, address target2, uint256 roiN2, uint256 roiD2);
-    function capping() external view returns (uint256 multiple, uint256 multipledollar);
+    function capping() external view returns (uint256 multiple, uint256 multipledollar, bool onOzone, bool onDollar);
     function computeDollarToOzone(uint256 _dollar) external view returns (uint256);
     function computeMintValue(uint256 _qty) external view returns (uint256);
     function computeOzoneToDollar(uint256 _ozone) external view returns (uint256);
@@ -99,7 +99,7 @@ interface I741Rules {
         uint256 _roiN2,
         uint256 _roiD2
     ) external;
-    function setCapping(uint256 _multiple, uint256 _multipledollar) external;
+    function setCapping(uint256 _multiple, uint256 _multipledollar, bool _onOzone, bool _onDollar) external;
     function setClaimPerDay(uint256 _min, uint256 _max) external;
     function setCoinPool(
         uint256 _start,
@@ -120,6 +120,7 @@ interface I741Rules {
     function setNFTAgePointer(uint256 _point, uint256 _leq) external;
     function setNFTSendPerCycle(uint256 _d) external;
     function setNftPool(uint256 _type, uint256 _roiN, uint256 _roiD, uint256 _roiInt, uint256 _startfrom) external;
+    function setPauseSystem(bool _login, bool _mint, bool _claim, bool _reJoin, bool _newJoin, bool _shutdown) external;
     function setRoyalityClause(uint256 _rank, uint256 _rwNum, uint256 _rwDen, uint256 _rwEnd) external;
     function setSessionTTL(uint256 _s) external;
     function setTourClause(uint256 _rank, uint256 _tw) external;
@@ -135,9 +136,11 @@ interface I741Rules {
     ) external;
     function setrankClause(uint256 rnk, uint256 dirc, uint256 nftAmt, uint256 ernk, uint256 grnk, uint256 gprd) external;
     function setrankforDAO(uint256 _r) external;
-    function setshutdown(bool _shutdown) external;
-    function shutdown() external view returns (bool);
     function syncBaseAddr() external;
+    function system()
+        external
+        view
+        returns (bool login, bool mint, bool claim, bool reJoin, bool newJoin, bool shutdown);
     function systemAge() external view returns (uint256);
     function tourClause(uint256) external view returns (uint256);
     function valExternal() external view returns (uint256 qtyORmul, uint256 roiN, uint256 roiD, uint256 roiInt);

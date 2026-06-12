@@ -1,11 +1,15 @@
-const provider = "https://chain.ozonescan.com"; // "https://rpc-testnet.ozonescan.com";
-const providerMain = "https://chain.ozonescan.com";
+const provider = "https://chain.ozonescan.com";
+// "https://chain.ozonescan.com"
+// "https://rpc-testnet.ozonescan.com"
+
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";
 
 //✅ 
-let hexBaseAddress = "0xc6FD95404BB7CdFe8dB941f7b657CA09F4FF961B";
+let hexBaseAddress = "0x6ae52622f45579f113feb05fB6030e75982b654a";
+
+//let hexBaseAddress = "0x0979A686CACfAB6518957Db4849b1AC604F0D72c";
 //let hexBaseAddress = "0x4d11ac6e7186DA32e9bb1CB4479A8B69277d1Dac";
 //let hexBaseAddress = "0xada9eAE3542D48d4248536BBbF36bC0c0F08B58c";
 //let Nested741TVL = '0x34cA950F9AffD0f4320D47c1424ea898229f7f50'
