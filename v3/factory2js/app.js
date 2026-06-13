@@ -613,12 +613,14 @@ async function loadSystemTreasuriesNSecurebase() {
     addRow(panelTreasury, "Factory", factory);
     const mining = await hexBase.methods.inTreaseryTVLMining().call();
     addRow(panelTreasury, "TVL Mining", mining);
+    /*
     const reward = await hexBase.methods.inTreaseryTVLReward().call();
     addRow(panelTreasury, "TVL Reward", reward);
     const roy = await hexBase.methods.inTreaseryTVLRoyality().call();
     addRow(panelTreasury, "TVL Royality", roy);
     const val = await hexBase.methods.inTreaseryTVLValidator().call();
     addRow(panelTreasury, "TVL Validator", val);
+    */
     const panelByteCode = addPanel("BYTECODE");
     addRow(panelByteCode, "Bytecode", byteCodeStandard);
     addRow(panelByteCode, "Download ABI", "https://drive.google.com/drive/folders/1O4J0hFtdSdbBcDyA5SxrLUOM8NqtQl0-");
@@ -4238,7 +4240,7 @@ async function renderULTreePanel() {
 
 
 async function renderTxLogPanel() {
-    clearPanels();
+
     const panel = addPanel("📜 Transaction Event Logs");
 
     // ---------- INPUT UI ----------
