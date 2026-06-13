@@ -3224,7 +3224,8 @@ async function getUnlockedNFT(mintedAge, mintedqty) {
     sysAge = await nested.methods.systemAge().call();
     document.getElementById("sysAgeid").innerHTML = sysAge;
     // if shutdown()
-    const isShutdown = await rule.methods.shutdown().call();
+    const system = await rule.methods.system().call();
+    const isShutdown = system.shutdown;
     if (isShutdown) {
         return mintedqty;
     }
@@ -3271,7 +3272,8 @@ async function getUnlockedNFT(mintedAge, mintedqty) {
 async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead = 5000) {
     const ONE = 1e18;
 
-    const isShutdown = await rule.methods.shutdown().call();
+    const system = await rule.methods.system().call();
+    const isShutdown = system.shutdown;
     if (isShutdown) return null;
 
     const processPool = (ag, pool) => {
@@ -4621,7 +4623,8 @@ async function loadRule() {
         document.getElementById("sysAgeid").innerHTML = sysAge;
         addRow(panelOthers, "Owner", await rule.methods.owner().call());
         addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
-        addRow(panelOthers, "Shutdown", await rule.methods.shutdown().call());
+        const system = await rule.methods.system().call();
+        addRow(panelOthers, "Shutdown", system.shutdown);
         addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
         addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
         // ✅ NEW
