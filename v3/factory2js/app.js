@@ -128,6 +128,7 @@ async function load() {
     await init();
     //loadRule();
     renderULTreePanel();
+    renderTxLogPanel();
 
 }
 
@@ -3320,6 +3321,10 @@ async function findAgeWhenNFTExceedsOne(rule, mintedAge, mintedqty, maxLookahead
     return null;
 }
 
+async function validateLogin() {
+    const instan = new web3.eth.Contract(IInstanceMeABI.abi, currentInstance);
+    if (!(await instan.methods.validateToken().call())) throw "Login required";
+}
 
 async function onTVLRefresh() {
     showLoader();
@@ -3470,6 +3475,7 @@ async function onClaim() {
     showLoader();
 
     try {
+        validateLogin();
         // Prompt for recipient
         const input = document.getElementById("userAddrInput");
         const user = input.value.trim();
@@ -3496,7 +3502,7 @@ async function onClaim() {
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-        debugger;
+
         // estimate gas
         const gas = await instancecontract.methods
             .Txn(ZERO, maxintervals, 0, 107)
@@ -3504,7 +3510,6 @@ async function onClaim() {
                 from: accounts[0],
                 value: "0"
             });
-
         // send tx
         const receipt = await instancecontract.methods
             .Txn(ZERO, maxintervals, 0, 107)
@@ -4204,6 +4209,597 @@ async function renderULTreePanel() {
         if (e.key === "Enter") btn.click();
     });
 }
+
+
+async function renderTxLogPanel() {
+    clearPanels();
+    const panel = addPanel("📜 Transaction Event Logs");
+
+    // ---------- INPUT UI ----------
+    const inputWrap = document.createElement("div");
+    inputWrap.style.display = "flex";
+    inputWrap.style.alignItems = "center";
+    inputWrap.style.gap = "10px";
+    inputWrap.style.marginBottom = "12px";
+
+    const input = document.createElement("input");
+    input.placeholder = "Enter transaction hash (0x...)";
+    input.style.flex = "1";
+    input.style.padding = "8px 10px";
+    input.style.borderRadius = "8px";
+    input.style.border = "1px solid #2a3a5a";
+    input.style.background = "#0b0f1a";
+    input.style.color = "#00ffff";
+
+    const btn = document.createElement("button");
+    btn.textContent = "Load Logs";
+    btn.style.padding = "8px 14px";
+    btn.style.borderRadius = "8px";
+    btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btn.style.border = "none";
+
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(btn);
+    panel.appendChild(inputWrap);
+
+    // ---------- CONTAINER ----------
+    const summaryDiv = document.createElement("div");
+    summaryDiv.className = "txLogSummary";
+    panel.appendChild(summaryDiv);
+
+    const container = document.createElement("div");
+    container.className = "txLogWrap";
+    panel.appendChild(container);
+
+    // ---------- STYLE ----------
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .txLogWrap table {
+            width: 100%;
+            font-family: monospace;
+            font-size: 12px;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        .txLogWrap th, .txLogWrap td {
+            border: 1px solid #2a3a5a;
+            padding: 5px;
+            color: #00ffff;
+            word-break: break-all;
+        }
+        .txLogWrap h4 {
+            color: #3fa9ff;
+            margin: 16px 0 8px;
+        }
+        .txLogSummary .row {
+            color: #ccc;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ---------- HELPERS ----------
+    const EVENT_TOPICS = {
+        LogTxns: "0x1517c86fcf2bfb8e3468afcc539b0004955da8027797c497ea51d1f1094ab898",
+        CapReset: "0xb359d8408cffc6b8788774a87b59f0d5be825576ea5fdd7b0917fed6a07e8030",
+        TVLClaimTxnLog: "0x651be9e06b82f2bfd92524ddb5eab4f5bce9aec2963c2417fa0337eb9cdd65ee",
+        EthTransferred: "0xcec1f18c3ab8ddaaa107a1591e3c369667eec613626611a8deaedef43069fcdd",
+        TransferSingle: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62",
+        TransferBatch: "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb",
+        ApprovalForAll: "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31",
+    };
+
+    const EVENT_ABIS = {
+        LogTxns: [
+            { name: "from", type: "address", indexed: false },
+            { name: "orc1155", type: "address", indexed: false },
+            { name: "_amt", type: "uint256", indexed: false },
+            { name: "_value", type: "uint256", indexed: false },
+            { name: "_time", type: "uint256", indexed: false },
+            { name: "_type", type: "uint256", indexed: false },
+        ],
+        CapReset: [
+            { name: "invested", type: "uint256", indexed: false },
+            { name: "claimed", type: "uint256", indexed: false },
+            { name: "claimedDollar", type: "uint256", indexed: false },
+            { name: "investedDollar", type: "uint256", indexed: false },
+            { name: "burned", type: "uint256", indexed: false },
+            { name: "burnedDollar", type: "uint256", indexed: false },
+            { name: "ag", type: "uint256", indexed: false },
+        ],
+        TVLClaimTxnLog: [
+            { name: "to", type: "address", indexed: false },
+            { name: "value", type: "uint256", indexed: false },
+            { name: "flush", type: "uint256", indexed: false },
+            { name: "_time", type: "uint256", indexed: false },
+        ],
+        EthTransferred: [
+            { name: "to", type: "address", indexed: true },
+            { name: "amount", type: "uint256", indexed: false },
+        ],
+        TransferSingle: [
+            { name: "operator", type: "address", indexed: true },
+            { name: "from", type: "address", indexed: true },
+            { name: "to", type: "address", indexed: true },
+            { name: "id", type: "uint256", indexed: false },
+            { name: "value", type: "uint256", indexed: false },
+        ],
+        TransferBatch: [
+            { name: "operator", type: "address", indexed: true },
+            { name: "from", type: "address", indexed: true },
+            { name: "to", type: "address", indexed: true },
+            { name: "ids", type: "uint256[]", indexed: false },
+            { name: "values", type: "uint256[]", indexed: false },
+        ],
+        ApprovalForAll: [
+            { name: "account", type: "address", indexed: true },
+            { name: "operator", type: "address", indexed: true },
+            { name: "approved", type: "bool", indexed: false },
+        ],
+    };
+
+    const LOG_TYPE_LABELS = {
+        0: "Import",
+        1: "Level 1", 2: "Level 2", 3: "Level 3", 4: "Level 4", 5: "Level 5",
+        6: "Level 6", 7: "Level 7", 8: "Level 8", 9: "Level 9",
+        71: "Reward p1/f1", 72: "Royalty p2/f2", 73: "Self p3/f3",
+        74: "Yield p4/f4", 75: "Validator p5/f5", 76: "Tour1 p6/f6", 77: "Tour2 p7/f7",
+        78: "Cap total", 79: "Claim total",
+        100: "MintBySystem", 101: "Mint",
+        107: "Claim treasury (net)", 108: "Claim self income", 109: "Claim self flush",
+        110: "BurnCoin",
+    };
+
+    const FN_SELECTORS = {
+        "0xa3e884b0": "Txn(address,uint256,uint256,uint256)",
+        "0x9c06f470": "login(uint256,bool)",
+    };
+
+    function formatUintArray(arr) {
+        if (!arr || !arr.length) return "-";
+        return arr.map(String).join(", ");
+    }
+
+    function logTypeLabel(typeNum) {
+        if (LOG_TYPE_LABELS[typeNum]) {
+            return String(typeNum) + " (" + LOG_TYPE_LABELS[typeNum] + ")";
+        }
+        if (typeNum >= 70 && typeNum <= 77) {
+            return String(typeNum) + " (Income " + (typeNum - 70) + ")";
+        }
+        return String(typeNum);
+    }
+
+    function logAgeLabel(age) {
+        const n = Number(age);
+        if (!n) return String(age);
+        const range = getAgeDateRange(n);
+        return range.start + " {" + n + "}";
+    }
+
+    function normalizeHash(txHash) {
+        if (!txHash) return "";
+        let hash = String(txHash).trim();
+        if (!hash.startsWith("0x")) hash = "0x" + hash;
+        return hash;
+    }
+
+    function decodeLog(log) {
+        const topic0 = (log.topics && log.topics[0] || "").toLowerCase();
+
+        for (const eventName in EVENT_TOPICS) {
+            if (topic0 !== EVENT_TOPICS[eventName].toLowerCase()) continue;
+
+            const decoded = web3.eth.abi.decodeLog(
+                EVENT_ABIS[eventName],
+                log.data,
+                log.topics.slice(1)
+            );
+
+            return {
+                eventName: eventName,
+                logIndex: log.logIndex,
+                address: log.address,
+                decoded: decoded,
+            };
+        }
+        return null;
+    }
+
+    function summarizeLog(parsed) {
+        const d = parsed.decoded;
+
+        if (parsed.eventName === "LogTxns") {
+            return [
+                "from=" + shortAddr(d.from),
+                "orc1155=" + shortAddr(d.orc1155),
+                "amt=" + formatOZN(d._amt),
+                "value=" + formatOZN(d._value),
+                "time=" + logAgeLabel(d._time),
+                "type=" + logTypeLabel(Number(d._type)),
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "CapReset") {
+            return [
+                "invested=" + formatOZN(d.invested),
+                "claimed=" + formatOZN(d.claimed),
+                "claimed$=" + formatOZN(d.claimedDollar),
+                "invested$=" + formatOZN(d.investedDollar),
+                "burned=" + formatOZN(d.burned),
+                "burned$=" + formatOZN(d.burnedDollar),
+                "age=" + logAgeLabel(d.ag),
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "TVLClaimTxnLog") {
+            return [
+                "to=" + shortAddr(d.to),
+                "value=" + formatOZN(d.value),
+                "flush=" + formatOZN(d.flush),
+                "time=" + logAgeLabel(d._time),
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "EthTransferred") {
+            return [
+                "to=" + shortAddr(d.to),
+                "amount=" + formatOZN(d.amount),
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "TransferSingle") {
+            return [
+                "operator=" + shortAddr(d.operator),
+                "from=" + shortAddr(d.from),
+                "to=" + shortAddr(d.to),
+                "id=" + String(d.id),
+                "value=" + String(d.value),
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "TransferBatch") {
+            return [
+                "operator=" + shortAddr(d.operator),
+                "from=" + shortAddr(d.from),
+                "to=" + shortAddr(d.to),
+                "ids=[" + formatUintArray(d.ids) + "]",
+                "values=[" + formatUintArray(d.values) + "]",
+            ].join(" | ");
+        }
+
+        if (parsed.eventName === "ApprovalForAll") {
+            return [
+                "account=" + shortAddr(d.account),
+                "operator=" + shortAddr(d.operator),
+                "approved=" + String(d.approved),
+            ].join(" | ");
+        }
+
+        return JSON.stringify(d);
+    }
+
+    function summarizeRawLog(log) {
+        const topics = (log.topics || []).map(function (t, i) {
+            return "t" + i + "=" + t;
+        }).join(" ");
+        const data = log.data || "0x";
+        const shortData = data.length > 66 ? data.slice(0, 66) + "..." : data;
+        return (topics ? topics + " " : "") + "data=" + shortData;
+    }
+
+    function decodeInputCall(tx) {
+        if (!tx || !tx.input || tx.input === "0x" || tx.input.length < 10) {
+            return "-";
+        }
+
+        const selector = tx.input.slice(0, 10).toLowerCase();
+        const signature = FN_SELECTORS[selector];
+        if (!signature) return selector + " (unknown)";
+
+        try {
+            const types = signature.slice(signature.indexOf("(") + 1, -1).split(",");
+            const decoded = web3.eth.abi.decodeParameters(types, "0x" + tx.input.slice(10));
+            const parts = types.map(function (name, i) {
+                return name.trim() + "=" + String(decoded[i]);
+            });
+            return signature.split("(")[0] + "(" + parts.join(", ") + ")";
+        } catch (err) {
+            return signature;
+        }
+    }
+
+    function createTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No events found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (cells) {
+                const tr = document.createElement("tr");
+                cells.forEach(function (cell) {
+                    const td = document.createElement("td");
+                    td.innerText = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        table.appendChild(tbody);
+        return table;
+    }
+
+    function appendTable(parent, title, table) {
+        const heading = document.createElement("h4");
+        heading.innerText = title;
+        parent.appendChild(heading);
+        parent.appendChild(table);
+    }
+
+    // ---------- LOAD ----------
+    async function loadTxLogs(txHash) {
+
+        container.innerHTML = "⏳ Loading...";
+        summaryDiv.innerHTML = "";
+
+        try {
+            const hash = normalizeHash(txHash);
+
+            if (!hash || !web3.utils.isHex(hash) || hash.length !== 66) {
+                alert("Enter a valid transaction hash");
+                return;
+            }
+
+            const [tx, receipt] = await Promise.all([
+                web3.eth.getTransaction(hash),
+                web3.eth.getTransactionReceipt(hash),
+            ]);
+
+            if (!receipt) {
+                container.innerHTML = "❌ Receipt not found";
+                return;
+            }
+
+            const statusOk = receipt.status === true || receipt.status === "0x1" || Number(receipt.status) === 1;
+            const logs = receipt.logs || [];
+
+            const decodedEvents = {
+                LogTxns: [],
+                CapReset: [],
+                TVLClaimTxnLog: [],
+                EthTransferred: [],
+                TransferSingle: [],
+                TransferBatch: [],
+                ApprovalForAll: [],
+            };
+
+            let unknownCount = 0;
+            const allRows = [];
+
+            logs.forEach(function (log, idx) {
+                const parsed = decodeLog(log);
+                if (parsed) {
+                    decodedEvents[parsed.eventName].push(parsed);
+                } else {
+                    unknownCount++;
+                }
+
+                allRows.push([
+                    String(log.logIndex != null ? log.logIndex : idx),
+                    shortAddr(log.address),
+                    parsed ? parsed.eventName : "Unknown",
+                    parsed ? summarizeLog(parsed) : summarizeRawLog(log),
+                ]);
+            });
+
+            addRow(summaryDiv, "Tx Hash", hash);
+            addRow(summaryDiv, "Block", String(receipt.blockNumber));
+            addRow(summaryDiv, "Status", statusOk ? "Success" : "Failed");
+            addRow(summaryDiv, "From", tx ? tx.from : "-");
+            addRow(summaryDiv, "To", tx ? (tx.to || "(contract creation)") : "-");
+            addRow(summaryDiv, "Value", tx ? formatOZN(tx.value) + " OZN" : "-");
+            addRow(summaryDiv, "Gas Used", String(receipt.gasUsed));
+            addRow(summaryDiv, "Input", decodeInputCall(tx));
+            addRow(summaryDiv, "Total Logs", String(logs.length));
+            addRow(
+                summaryDiv,
+                "Matched",
+                "LogTxns: " + decodedEvents.LogTxns.length +
+                " | CapReset: " + decodedEvents.CapReset.length +
+                " | TVLClaimTxnLog: " + decodedEvents.TVLClaimTxnLog.length +
+                " | EthTransferred: " + decodedEvents.EthTransferred.length +
+                " | TransferSingle: " + decodedEvents.TransferSingle.length +
+                " | TransferBatch: " + decodedEvents.TransferBatch.length +
+                " | ApprovalForAll: " + decodedEvents.ApprovalForAll.length +
+                (unknownCount ? " | Other: " + unknownCount : "")
+            );
+
+            if (!statusOk && logs.length === 0) {
+                addRow(summaryDiv, "Note", "Failed tx reverts state — logs usually empty.");
+            }
+
+            container.innerHTML = "";
+
+            appendTable(
+                container,
+                "All Transaction Logs",
+                createTable(["#", "Contract", "Event", "Details"], allRows)
+            );
+
+            appendTable(
+                container,
+                "LogTxns",
+                createTable(
+                    ["#", "Contract", "From", "ORC1155", "Amt", "Value", "Time", "Type"],
+                    decodedEvents.LogTxns.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.from),
+                            shortAddr(d.orc1155),
+                            formatOZN(d._amt),
+                            formatOZN(d._value),
+                            logAgeLabel(d._time),
+                            logTypeLabel(Number(d._type)),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "CapReset",
+                createTable(
+                    ["#", "Contract", "Invested", "Claimed", "Claimed$", "Invested$", "Burned", "Burned$", "Age"],
+                    decodedEvents.CapReset.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            formatOZN(d.invested),
+                            formatOZN(d.claimed),
+                            formatOZN(d.claimedDollar),
+                            formatOZN(d.investedDollar),
+                            formatOZN(d.burned),
+                            formatOZN(d.burnedDollar),
+                            logAgeLabel(d.ag),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TVLClaimTxnLog",
+                createTable(
+                    ["#", "Contract", "To", "Value", "Flush", "Time"],
+                    decodedEvents.TVLClaimTxnLog.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.to),
+                            formatOZN(d.value),
+                            formatOZN(d.flush),
+                            logAgeLabel(d._time),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "EthTransferred",
+                createTable(
+                    ["#", "Contract", "To", "Amount"],
+                    decodedEvents.EthTransferred.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.to),
+                            formatOZN(d.amount),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TransferSingle (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Operator", "From", "To", "Id", "Value"],
+                    decodedEvents.TransferSingle.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.operator),
+                            shortAddr(d.from),
+                            shortAddr(d.to),
+                            String(d.id),
+                            String(d.value),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TransferBatch (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Operator", "From", "To", "Ids", "Values"],
+                    decodedEvents.TransferBatch.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.operator),
+                            shortAddr(d.from),
+                            shortAddr(d.to),
+                            formatUintArray(d.ids),
+                            formatUintArray(d.values),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "ApprovalForAll (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Account", "Operator", "Approved"],
+                    decodedEvents.ApprovalForAll.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.account),
+                            shortAddr(d.operator),
+                            String(d.approved),
+                        ];
+                    })
+                )
+            );
+
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "❌ Error: " + (e.message || e);
+        }
+    }
+
+    // ---------- CLICK ----------
+    btn.onclick = () => {
+        const hash = input.value.trim();
+        if (!hash) return alert("Enter transaction hash");
+        loadTxLogs(hash);
+    };
+
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") btn.click();
+    });
+}
+
+
+
 
 async function onCreateTemplate(tid) {
     showLoader();
