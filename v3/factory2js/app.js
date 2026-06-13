@@ -1298,7 +1298,7 @@ async function buyNFT(o1155, tokenId) {
         ;
         // estimate gas
         const gas = await instancecontract.methods
-            .Txn(o1155, tokenId, qty, 1)
+            .Txn(o1155, tokenId, qty, 101)
             .estimateGas({
                 from: accounts[0],
                 value: value.toString()
@@ -1306,7 +1306,7 @@ async function buyNFT(o1155, tokenId) {
 
         // send transaction
         const receipt = await instancecontract.methods
-            .Txn(o1155, tokenId, qty, 1)
+            .Txn(o1155, tokenId, qty, 101)
             .send({
                 from: accounts[0],
                 value: value.toString(),
@@ -1362,7 +1362,7 @@ async function buyNFTForOther(o1155, tokenId) {
 
         // estimate gas
         const gas = await instancecontract.methods
-            .Txn(o1155, tokenId, qty, 1)
+            .Txn(o1155, tokenId, qty, 101)
             .estimateGas({
                 from: accounts[0],
                 value: value.toString()
@@ -1370,7 +1370,7 @@ async function buyNFTForOther(o1155, tokenId) {
 
         // send transaction
         const receipt = await instancecontract.methods
-            .Txn(o1155, tokenId, qty, 1)
+            .Txn(o1155, tokenId, qty, 101)
             .send({
                 from: accounts[0],
                 value: value.toString(),
@@ -3499,7 +3499,7 @@ async function onClaim() {
 
         // estimate gas
         const gas = await instancecontract.methods
-            .Txn(ZERO, maxintervals, 0, 7)
+            .Txn(ZERO, maxintervals, 0, 107)
             .estimateGas({
                 from: accounts[0],
                 value: "0"
