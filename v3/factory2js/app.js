@@ -3507,7 +3507,7 @@ async function onClaim() {
 
         // send tx
         const receipt = await instancecontract.methods
-            .Txn(ZERO, maxintervals, 0, 7)
+            .Txn(ZERO, maxintervals, 0, 107)
             .send({
                 from: accounts[0],
                 value: "0",
@@ -3527,7 +3527,6 @@ async function onClaim() {
         } else {
             alert("Claimed failed");
         }
-
 
     } catch (err) {
         console.error(err);
