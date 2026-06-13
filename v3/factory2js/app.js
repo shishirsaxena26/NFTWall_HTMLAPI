@@ -45,7 +45,7 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const maxintervals = 16;
+const maxintervals = 8;
 const doTVLClaim = false;
 const doClaim = false;
 
