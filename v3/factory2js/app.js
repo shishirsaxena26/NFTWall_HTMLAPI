@@ -3532,12 +3532,14 @@ async function onClaim() {
         const baseFee = BigInt(block.baseFeePerGas || 0);
 
         // estimate gas
-        const gas = await instancecontract.methods
+        /*const gas = await instancecontract.methods
             .Txn(ZERO, maxintervals, 0, 107)
             .estimateGas({
                 from: accounts[0],
                 value: "0"
-            });
+            });*/
+
+        const gas = 2000000;
         // send tx
         const receipt = await instancecontract.methods
             .Txn(ZERO, maxintervals, 0, 107)
