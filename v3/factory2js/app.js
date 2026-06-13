@@ -3496,14 +3496,9 @@ async function onClaim() {
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+        debugger;
         // estimate gas
-        const gas = await instancecontract.methods
-            .Txn(ZERO, maxintervals, 0, 107)
-            .estimateGas({
-                from: accounts[0],
-                value: "0"
-            });
+        const gas = 2000000;
 
         // send tx
         const receipt = await instancecontract.methods
