@@ -1099,7 +1099,7 @@ async function initUser() {
 
     } catch (e) {
         console.log(e);
-        alert("Transfer failed: " + (err.message || err));
+        alert("Transfer failed: " + (e.message || e));
     }
     hideLoader();
 }
@@ -1163,10 +1163,10 @@ async function loginUser() {
 
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
+        debugger;
         // estimate gas
         const gas = await instancecontract.methods
-            .login(maxintervals, doTVLClaim, doClaim)
+            .login(maxintervals, doClaim)
             .estimateGas({
                 from: currentAccount,
                 value: "0"
@@ -1174,7 +1174,7 @@ async function loginUser() {
 
         // send transaction
         const tx = await instancecontract.methods.
-            login(maxintervals, doTVLClaim, doClaim)
+            login(maxintervals, doClaim)
             .send({
                 from: currentAccount,
                 value: "0",
@@ -1214,11 +1214,15 @@ async function importUser() {
 
         const postInit = await stor.methods.postInit().call();
 
+        const nestedcontract = new
+            web3T.eth.Contract(INested741ABI.abi,
+                inNested741);
+        debugger;
         if (postInit) { alert('already imported'); return; }
 
         const limit = 5; // change according to your import batch size
-        await stor.methods
-            .importOld(limit)
+        await nestedcontract.methods
+            .importOld(userId, limit)
             .send({
                 from: currentAccount,
                 value: "0"
