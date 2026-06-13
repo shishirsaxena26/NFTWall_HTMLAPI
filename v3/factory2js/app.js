@@ -1272,6 +1272,15 @@ async function buyNFT(o1155, tokenId) {
         const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
         const storcontract = new web3.eth.Contract(IInstanceStorABI.abi, currentStor);
 
+        const valid =
+            await instancecontract.methods.validateToken().call({
+                from: accounts[0]
+            });
+
+        if (!valid) {
+            throw "Login required";
+        }
+
         // qty = 1 (market purchase)
 
         //const tokenid = i;
@@ -1349,6 +1358,15 @@ async function buyNFTForOther(o1155, tokenId) {
 
         currentInstance = '0x1d37E94c45d3323cE1F1b86f87C1cd311861C8BA';
         const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi, currentInstance);
+
+        const valid =
+            await instancecontract.methods.validateToken().call({
+                from: accounts[0]
+            });
+
+        if (!valid) {
+            throw "Login required";
+        }
 
         // get mint value
         let value = BigInt(
@@ -3494,10 +3512,18 @@ async function onClaim() {
         }
         if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
 
-        const instancecontract = new web3T.eth.Contract(
-            IInstanceMeABI.abi,
+        const instancecontract = new web3T.eth.Contract(IInstanceMeABI.abi,
             currentInstance
         );
+
+        const valid =
+            await instancecontract.methods.validateToken().call({
+                from: accounts[0]
+            });
+
+        if (!valid) {
+            throw "Login required";
+        }
 
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
