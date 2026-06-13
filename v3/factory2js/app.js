@@ -1768,7 +1768,7 @@ async function loadMyStor(id, panel) {
                 "Burned_Dollar",
                 "Threshold_3X_Dollar",
                 "TotalInc_Dollar",
-                "Claimed_Dollar",
+                "Claimed_CAP_Dollar",
                 "MinPay_Dollar",
                 "CAP_STATUS"
             ]));
@@ -1778,7 +1778,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(consts[5]),
                 formatOZN(compute.thresholdollarx),
                 formatOZN(compute.totIncdollar),
-                formatOZN(consts[3]),
+                formatOZN(consts[6]),
                 parseFloat(formatOZN(compute.minpaydollar)),
                 compute.capdollar
             ]));
@@ -1798,7 +1798,7 @@ async function loadMyStor(id, panel) {
                 "BURNED",
                 "Threshold_3X",
                 "TotalInc",
-                "Claimed",
+                "Claimed_CAP",
                 "MinPay",
                 "CAP_STATUS"
             ]));
@@ -1808,7 +1808,7 @@ async function loadMyStor(id, panel) {
                 formatOZN(consts[4]),
                 formatOZN(compute.thresholdx),
                 formatOZN(compute.totInc),
-                formatOZN(consts[2]),
+                formatOZN(misc[6]),
                 parseFloat(formatOZN(compute.minpay)),
                 compute.capinc
             ]));
