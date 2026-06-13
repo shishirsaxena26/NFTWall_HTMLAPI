@@ -1481,6 +1481,7 @@ function formatRow(arr, width = 15) {
         .join(' | ');
 }
 async function loadMyOldStorData(id) {
+
     nestedOld = new web3.eth.Contract(INested741ABI.abi, "0xa4cb3f45F46B3c31780D70568b0627b3339eB76d");
     const node = await nestedOld.methods.getNode(id).call();
     const storAddr = node[4];
@@ -1489,6 +1490,9 @@ async function loadMyOldStorData(id) {
         const drawn = await stor.methods.getAllData(4, 0).call();
         console.log(`OLDLevel: ${drawn}`)
     }
+
+    const userOldData = await transferRequests.methods.getUserOldData(currentAccount).call();
+    console.log(`userOldData: ${userOldData}`)
 }
 
 async function loadMyStor(id, panel) {
@@ -1570,7 +1574,7 @@ async function loadMyStor(id, panel) {
             const drawn = await stor.methods.getAllData(1, 0).call();
 
             const misc = await stor.methods.getAllData(2, 0).call();
-            const consts = await stor.methods.getAllData(4, 0).call();
+            const consts = await stor.methods.getAllData(3, 0).call();
 
 
             let compute;
