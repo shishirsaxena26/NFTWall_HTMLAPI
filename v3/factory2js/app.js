@@ -992,7 +992,7 @@ async function joinUser() {
 
 
         let parent = ZERO;
-        const resolveTarget = transferRequests.methods.resolveTransferTarget(currentAccount);
+        const resolveTarget = await transferRequests.methods.resolveTransferTarget(currentAccount).call();
         if (resolveTarget == ZERO) {
             const _p = prompt("Enter parent address:");
             parent = _p.trim();
@@ -1329,8 +1329,6 @@ async function buyNFT(o1155, tokenId) {
                 maxFeePerGas: (baseFee + 2n).toString() // just above base fee
             });
 
-
-
         if (receipt.status) {
             alert("NFT Purchased");
         } else {
@@ -1339,7 +1337,7 @@ async function buyNFT(o1155, tokenId) {
 
     } catch (e) {
         console.error(e);
-        alert("Purchased failed: " + (e.message || enabled));
+        alert("Purchased failed: " + (e.message || e));
     }
     hideLoader();
 }
@@ -4241,6 +4239,7 @@ async function renderULTreePanel() {
 }
 
 
+
 async function renderTxLogPanel() {
 
     const panel = addPanel("📜 Transaction Event Logs");
@@ -4303,6 +4302,12 @@ async function renderTxLogPanel() {
         }
         .txLogSummary .row {
             color: #ccc;
+        }
+        .txTraceError td {
+            color: #ff6b6b !important;
+        }
+        .txTraceDepth td:nth-child(2) {
+            color: #8ec8ff;
         }
     `;
     document.head.appendChild(style);
@@ -4375,8 +4380,8 @@ async function renderTxLogPanel() {
         74: "Yield p4/f4", 75: "Validator p5/f5", 76: "Tour1 p6/f6", 77: "Tour2 p7/f7",
         78: "Cap total", 79: "Claim total",
         100: "MintBySystem", 101: "Mint",
-        107: "Claim treasury (net)", 108: "Claim self income", 109: "Claim self flush",
-        110: "BurnCoin",
+        107: "Claim treasury (net)", 108: "Claim (self)", 109: "Claim (self flush)",
+        110: "BurnCoin(target1)", 111: "BurnCoin(target1)"
     };
 
     const FN_SELECTORS = {
@@ -4583,6 +4588,164 @@ async function renderTxLogPanel() {
         parent.appendChild(table);
     }
 
+    function getRpcUrl() {
+        const provider = web3 && web3.currentProvider;
+        if (provider) {
+            if (provider.host) return provider.host;
+            if (provider.connection && provider.connection.url) return provider.connection.url;
+        }
+        if (typeof RPC_URL !== "undefined" && RPC_URL) return RPC_URL;
+        return null;
+    }
+
+    function hexToDec(hex) {
+        if (!hex || hex === "0x") return "-";
+        try {
+            return String(parseInt(hex, 16));
+        } catch (err) {
+            return String(hex);
+        }
+    }
+
+    function truncateHex(value, maxLen) {
+        if (!value || value === "0x") return "-";
+        const text = String(value);
+        if (text.length <= maxLen) return text;
+        return text.slice(0, maxLen) + "...";
+    }
+
+    function decodeTraceInput(input) {
+        if (!input || input === "0x" || input.length < 10) return "(fallback/receive)";
+
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = FN_SELECTORS[selector];
+        if (!signature) return selector + " " + truncateHex(input, 42);
+
+        try {
+            const types = signature.slice(signature.indexOf("(") + 1, -1).split(",");
+            const decoded = web3.eth.abi.decodeParameters(types, "0x" + input.slice(10));
+            const parts = types.map(function (name, i) {
+                return name.trim() + "=" + String(decoded[i]);
+            });
+            return signature.split("(")[0] + "(" + parts.join(", ") + ")";
+        } catch (err) {
+            return signature + " " + truncateHex(input, 42);
+        }
+    }
+
+    function summarizeTraceResult(step) {
+        if (step.error) {
+            let text = step.error;
+            if (step.revertReason) text += " | " + step.revertReason;
+            return text;
+        }
+        if (step.type === "CREATE" && step.to) return "created=" + shortAddr(step.to);
+        if (step.output && step.output !== "0x") return truncateHex(step.output, 66);
+        return "-";
+    }
+
+    function flattenTraceSteps(step, depth, seq, rows) {
+        if (!step) return;
+
+        const rowIndex = seq.counter++;
+        const hasError = !!step.error;
+
+        rows.push({
+            hasError: hasError,
+            depth: depth,
+            cells: [
+                String(rowIndex),
+                String(depth),
+                step.type || "-",
+                shortAddr(step.from || "-"),
+                shortAddr(step.to || step.address || "(create)"),
+                step.value && step.value !== "0x0" && step.value !== "0x"
+                    ? formatOZN(step.value)
+                    : "-",
+                hexToDec(step.gasUsed),
+                decodeTraceInput(step.input),
+                summarizeTraceResult(step),
+            ],
+        });
+
+        const calls = step.calls || [];
+        for (let i = 0; i < calls.length; i++) {
+            flattenTraceSteps(calls[i], depth + 1, seq, rows);
+        }
+    }
+
+    function createTraceTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No trace steps found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row) {
+                const tr = document.createElement("tr");
+                if (row.hasError) tr.className = "txTraceError";
+                else if (row.depth > 0) tr.className = "txTraceDepth";
+
+                row.cells.forEach(function (cell) {
+                    const td = document.createElement("td");
+                    td.innerText = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        table.appendChild(tbody);
+        return table;
+    }
+
+    async function fetchRawTrace(txHash) {
+        const rpcUrl = getRpcUrl();
+        if (!rpcUrl) {
+            throw new Error("RPC URL not available (web3 provider or RPC_URL)");
+        }
+
+        const response = await fetch(rpcUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                method: "debug_traceTransaction",
+                params: [txHash, { tracer: "callTracer" }],
+                id: 1,
+            }),
+        });
+
+        const payload = await response.json();
+        if (payload.error) {
+            throw new Error(payload.error.message || "debug_traceTransaction failed");
+        }
+        return payload.result || null;
+    }
+
+    function buildTraceRows(trace) {
+        const rows = [];
+        const seq = { counter: 1 };
+        flattenTraceSteps(trace, 0, seq, rows);
+        return rows;
+    }
+
     // ---------- LOAD ----------
     async function loadTxLogs(txHash) {
 
@@ -4597,9 +4760,13 @@ async function renderTxLogPanel() {
                 return;
             }
 
-            const [tx, receipt] = await Promise.all([
+            const [tx, receipt, trace] = await Promise.all([
                 web3.eth.getTransaction(hash),
                 web3.eth.getTransactionReceipt(hash),
+                fetchRawTrace(hash).catch(function (err) {
+                    console.warn("Trace fetch failed:", err);
+                    return null;
+                }),
             ]);
 
             if (!receipt) {
@@ -4663,6 +4830,15 @@ async function renderTxLogPanel() {
 
             if (!statusOk && logs.length === 0) {
                 addRow(summaryDiv, "Note", "Failed tx reverts state — logs usually empty.");
+            }
+
+            let traceRows = [];
+            if (trace) {
+                traceRows = buildTraceRows(trace);
+                addRow(summaryDiv, "Trace Root", trace.error || "Success");
+                addRow(summaryDiv, "Trace Steps", String(traceRows.length));
+            } else {
+                addRow(summaryDiv, "Trace", "Unavailable (RPC debug_traceTransaction)");
             }
 
             container.innerHTML = "";
@@ -4809,6 +4985,26 @@ async function renderTxLogPanel() {
                     })
                 )
             );
+
+            appendTable(
+                container,
+                "Raw Execution Trace (sequential)",
+                createTraceTable(
+                    ["#", "Depth", "Type", "From", "To", "Value", "Gas Used", "Input", "Output / Error"],
+                    traceRows
+                )
+            );
+
+            if (!trace) {
+                const traceNote = document.createElement("div");
+                traceNote.style.color = "#ff9f43";
+                traceNote.style.marginTop = "6px";
+                traceNote.style.fontSize = "12px";
+                traceNote.innerText =
+                    "Trace unavailable. Ensure the RPC endpoint supports debug_traceTransaction " +
+                    "(same RPC used by cast run).";
+                container.appendChild(traceNote);
+            }
 
         } catch (e) {
             console.error(e);
