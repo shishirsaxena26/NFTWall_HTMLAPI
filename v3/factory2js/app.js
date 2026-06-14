@@ -4358,6 +4358,11 @@ async function renderTxLogPanel() {
         .txInternalExternal td {
             color: #feca57 !important;
         }
+        .txLogWrap td.nobreakword,
+        .txLogWrap th.nobreakword {
+            word-break: normal;
+            white-space: nowrap;
+        }
     `;
     document.head.appendChild(style);
 
@@ -4369,7 +4374,7 @@ async function renderTxLogPanel() {
             return String(addr);
         }
 
-        return '<span class=" nobreakword shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
+        return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
             addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
     }
 
@@ -4926,10 +4931,12 @@ async function renderTxLogPanel() {
         const table = document.createElement("table");
         const thead = document.createElement("thead");
         const headRow = document.createElement("tr");
+        const statusColIndex = headers.indexOf("Status");
 
-        headers.forEach(function (h) {
+        headers.forEach(function (h, i) {
             const th = document.createElement("th");
             th.innerText = h;
+            if (i === statusColIndex) th.className = "nobreakword";
             headRow.appendChild(th);
         });
         thead.appendChild(headRow);
@@ -4950,10 +4957,10 @@ async function renderTxLogPanel() {
                 if (row.isExternal) tr.className = "txInternalExternal";
                 else if (row.hasError) tr.className = "txTraceError";
                 else if (row.hasValue) tr.className = "txInternalValue";
-                else if (row.Status) tr.className = "nobreakword";
 
-                row.cells.forEach(function (cell) {
+                row.cells.forEach(function (cell, i) {
                     const td = document.createElement("td");
+                    if (i === statusColIndex) td.className = "nobreakword";
                     setCellContent(td, cell);
                     tr.appendChild(td);
                 });
@@ -5383,7 +5390,6 @@ async function renderTxLogPanel() {
 
     bindCopyClick(panel);
 }
-
 
 
 
