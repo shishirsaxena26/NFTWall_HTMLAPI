@@ -4283,6 +4283,7 @@ async function renderULTreePanel() {
 }
 
 
+
 async function renderTxLogPanel() {
 
     const panel = addPanel("📜 Transaction Event Logs");
@@ -4362,6 +4363,11 @@ async function renderTxLogPanel() {
         .txLogWrap th.nobreakword {
             word-break: normal;
             white-space: nowrap;
+        }
+        .txLogWrap td.inputwidth,
+        .txLogWrap th.inputwidth {
+            word-break: normal;
+           width: 200px;
         }
     `;
     document.head.appendChild(style);
@@ -4932,11 +4938,14 @@ async function renderTxLogPanel() {
         const thead = document.createElement("thead");
         const headRow = document.createElement("tr");
         const statusColIndex = headers.indexOf("Status");
+        const inputColIndex = headers.indexOf("Input");
 
         headers.forEach(function (h, i) {
             const th = document.createElement("th");
             th.innerText = h;
             if (i === statusColIndex) th.className = "nobreakword";
+            if (i === inputColIndex) th.className = "inputwidth";
+
             headRow.appendChild(th);
         });
         thead.appendChild(headRow);
@@ -4961,6 +4970,7 @@ async function renderTxLogPanel() {
                 row.cells.forEach(function (cell, i) {
                     const td = document.createElement("td");
                     if (i === statusColIndex) td.className = "nobreakword";
+                    if (i === inputColIndex) td.className = "inputwidth";
                     setCellContent(td, cell);
                     tr.appendChild(td);
                 });
@@ -5025,10 +5035,22 @@ async function renderTxLogPanel() {
         const table = document.createElement("table");
         const thead = document.createElement("thead");
         const headRow = document.createElement("tr");
+        const inputColIndex = headers.indexOf("Input");
+        const outputColIndex = headers.indexOf("Output / Error");
+        const nobreakHeaders = ["#", "Depth", "Type", "Value", "Gas Used"];
 
-        headers.forEach(function (h) {
+        function traceCellClass(i) {
+            const h = headers[i];
+            if (nobreakHeaders.indexOf(h) >= 0) return "nobreakword";
+            if (i === inputColIndex || i === outputColIndex) return "inputwidth";
+            return "";
+        }
+
+        headers.forEach(function (h, i) {
             const th = document.createElement("th");
             th.innerText = h;
+            const cls = traceCellClass(i);
+            if (cls) th.className = cls;
             headRow.appendChild(th);
         });
         thead.appendChild(headRow);
@@ -5049,8 +5071,10 @@ async function renderTxLogPanel() {
                 if (row.hasError) tr.className = "txTraceError";
                 else if (row.depth > 0) tr.className = "txTraceDepth";
 
-                row.cells.forEach(function (cell) {
+                row.cells.forEach(function (cell, i) {
                     const td = document.createElement("td");
+                    const cls = traceCellClass(i);
+                    if (cls) td.className = cls;
                     setCellContent(td, cell);
                     tr.appendChild(td);
                 });
@@ -5390,7 +5414,6 @@ async function renderTxLogPanel() {
 
     bindCopyClick(panel);
 }
-
 
 
 async function onCreateTemplate(tid) {
