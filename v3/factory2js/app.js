@@ -45,10 +45,11 @@ let currentAccount = null;
 let currentInstance = null;
 let currentStor = null;
 
-const maxintervals = 2;
+const maxintervals = 30;
 const doTVLClaim = false;
 const doClaim = false;
 
+let SIGNATURES;
 
 const treeData = {
     id: "1",
@@ -149,6 +150,10 @@ async function init() {
     INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v=' + version).then(res => res.json());
     IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v=' + version).then(res => res.json());
     INested741TVLABI = await fetch('abistandardv3/Nested741TVL.sol/Nested741TVL.json?v=' + version).then(res => res.json());
+
+
+    SIGNATURES = await fetch('abistandardv3/signatures.json?v=' + version).then(res => res.json());
+
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
 
@@ -352,19 +357,24 @@ function renderAddress(value) {
         const short = document.createElement("span");
         short.className = "shortAddr";
         short.innerText = value.slice(0, 6) + "..." + value.slice(-4);
+        short.style.cursor = "pointer";
 
-        const btn = document.createElement("button");
-        btn.className = "copyBtn";
-        btn.innerText = "📋";
+        short.onclick = async () => {
+            await navigator.clipboard.writeText(value);
 
-        btn.onclick = () => {
-            navigator.clipboard.writeText(value);
-            btn.innerText = "✓";
-            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+            // flash copied effect
+            const oldText = short.innerText;
+
+            short.innerText = "Copied ✓";
+            short.style.opacity = "0.5";
+
+            setTimeout(() => {
+                short.innerText = oldText;
+                short.style.opacity = "1";
+            }, 800);
         };
 
         v.appendChild(short);
-        v.appendChild(btn);
     }
     else {
         v.innerText = value;
@@ -382,19 +392,24 @@ function renderAddressLongX(value) {
         const short = document.createElement("span");
         short.className = "shortAddr";
         short.innerText = value.slice(0, 10) + "..." + value.slice(-10);
+        short.style.cursor = "pointer";
 
-        const btn = document.createElement("button");
-        btn.className = "copyBtn";
-        btn.innerText = "📋";
+        short.onclick = async () => {
+            await navigator.clipboard.writeText(value);
 
-        btn.onclick = () => {
-            navigator.clipboard.writeText(value);
-            btn.innerText = "✓";
-            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+            // flash copied effect
+            const oldText = short.innerText;
+
+            short.innerText = "Copied ✓";
+            short.style.opacity = "0.5";
+
+            setTimeout(() => {
+                short.innerText = oldText;
+                short.style.opacity = "1";
+            }, 800);
         };
 
         v.appendChild(short);
-        v.appendChild(btn);
     }
     else {
         v.innerText = value;
@@ -435,53 +450,72 @@ function removePanel(title) {
         }
     });
 }
-
 function addRow(panel, field, value) {
+
     const row = document.createElement("div");
     row.className = "row";
     row.style.whiteSpace = "pre";
     row.style.fontFamily = "monospace";
+
     const f = document.createElement("div");
 
     if (field instanceof HTMLElement) {
-        f.appendChild(field); row.appendChild(f);
+        f.appendChild(field);
+        row.appendChild(f);
     }
     else {
-        if (field != "") { f.innerText = field; row.appendChild(f); }
+        if (field != "") {
+            f.innerText = field;
+            row.appendChild(f);
+        }
     }
 
     const v = document.createElement("div");
+
     if (value instanceof HTMLElement) {
-        // ⬅️ If value is HTML object → append it
+
         v.width = "100%";
         v.appendChild(value);
 
-    } else if (typeof value === "string" && value.startsWith("0x")) {
+    }
+    else if (typeof value === "string" && value.startsWith("0x")) {
+
         v.className = "addr";
+
         const short = document.createElement("span");
         short.className = "shortAddr";
         short.innerText = value.slice(0, 6) + "..." + value.slice(-4);
+        short.style.cursor = "pointer";
 
-        const btn = document.createElement("button");
-        btn.className = "copyBtn";
-        btn.innerText = "📋";
-        btn.onclick = () => {
-            navigator.clipboard.writeText(value);
-            btn.innerText = "✓";
-            setTimeout(() => { btn.innerText = "📋"; }, 1000);
+        // click to copy
+        short.onclick = async () => {
+
+            await navigator.clipboard.writeText(value);
+
+            const oldText = short.innerText;
+
+            short.innerText = "Copied ✓";
+            short.style.opacity = "0.5";
+
+            setTimeout(() => {
+                short.innerText = oldText;
+                short.style.opacity = "1";
+            }, 800);
         };
 
         const balpanel = document.createElement("span");
         balpanel.className = "shortAddr";
+
         printRow(value, balpanel);
 
         v.appendChild(short);
         v.append(balpanel);
-        v.appendChild(btn);
-    } else {
+
+    }
+    else {
+
         v.innerText = value;
     }
-
 
     row.appendChild(v);
     panel.appendChild(row);
@@ -3922,7 +3956,17 @@ async function renderULTreePanel() {
 
     // ---------- HELPERS ----------
     function shortAddr(addr) {
-        return addr ? addr.slice(-4) : "----";
+        if (!addr) return "----";
+
+        return `
+        <span 
+            class="shortAddr clickableAddr"
+            data-full="${addr}"
+            style="cursor:pointer;"
+        >
+            ${addr.slice(0, 6)}...${addr.slice(-4)}
+        </span>
+    `;
     }
 
     async function getNode(id) {
@@ -4239,7 +4283,6 @@ async function renderULTreePanel() {
 }
 
 
-
 async function renderTxLogPanel() {
 
     const panel = addPanel("📜 Transaction Event Logs");
@@ -4309,10 +4352,66 @@ async function renderTxLogPanel() {
         .txTraceDepth td:nth-child(2) {
             color: #8ec8ff;
         }
+        .txInternalValue td {
+            color: #7bed9f !important;
+        }
+        .txInternalExternal td {
+            color: #feca57 !important;
+        }
     `;
     document.head.appendChild(style);
 
     // ---------- HELPERS ----------
+    function shortAddr(addr) {
+        if (!addr) return "----";
+
+        if (addr === "-" || addr === "(contract creation)" || addr === "(create)" || !String(addr).startsWith("0x")) {
+            return String(addr);
+        }
+
+        return '<span class=" nobreakword shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
+            addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+    }
+
+    function setCellContent(td, cell) {
+        if (typeof cell === "string" && cell.indexOf("<") >= 0) {
+            td.innerHTML = cell;
+        } else {
+            td.innerText = cell;
+        }
+    }
+
+    function addSummaryRow(parent, label, value) {
+        const row = document.createElement("div");
+        row.className = "row";
+        if (typeof value === "string" && value.indexOf("<") >= 0) {
+            row.innerHTML = "<b>" + label + ":</b> " + value;
+        } else {
+            row.innerHTML = "<b>" + label + ":</b> " + (value != null ? value : "-");
+        }
+        parent.appendChild(row);
+    }
+
+    function bindCopyClick(root) {
+        root.addEventListener("click", function (e) {
+            const el = e.target.closest(".clickableAddr, .clickableHex");
+            if (!el) return;
+
+            const full = el.getAttribute("data-full");
+            if (!full) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(full).then(function () {
+                    const prev = el.textContent;
+                    el.textContent = "Copied!";
+                    setTimeout(function () {
+                        el.textContent = prev;
+                    }, 900);
+                }).catch(function () { });
+            }
+        });
+    }
+
     const EVENT_TOPICS = {
         LogTxns: "0x1517c86fcf2bfb8e3468afcc539b0004955da8027797c497ea51d1f1094ab898",
         CapReset: "0xb359d8408cffc6b8788774a87b59f0d5be825576ea5fdd7b0917fed6a07e8030",
@@ -4382,11 +4481,6 @@ async function renderTxLogPanel() {
         100: "MintBySystem", 101: "Mint",
         107: "Claim treasury (net)", 108: "Claim (self)", 109: "Claim (self flush)",
         110: "BurnCoin(target1)", 111: "BurnCoin(target1)"
-    };
-
-    const FN_SELECTORS = {
-        "0xa3e884b0": "Txn(address,uint256,uint256,uint256)",
-        "0x9c06f470": "login(uint256,bool)",
     };
 
     function formatUintArray(arr) {
@@ -4526,21 +4620,7 @@ async function renderTxLogPanel() {
         if (!tx || !tx.input || tx.input === "0x" || tx.input.length < 10) {
             return "-";
         }
-
-        const selector = tx.input.slice(0, 10).toLowerCase();
-        const signature = FN_SELECTORS[selector];
-        if (!signature) return selector + " (unknown)";
-
-        try {
-            const types = signature.slice(signature.indexOf("(") + 1, -1).split(",");
-            const decoded = web3.eth.abi.decodeParameters(types, "0x" + tx.input.slice(10));
-            const parts = types.map(function (name, i) {
-                return name.trim() + "=" + String(decoded[i]);
-            });
-            return signature.split("(")[0] + "(" + parts.join(", ") + ")";
-        } catch (err) {
-            return signature;
-        }
+        return decodeCalldataInput(tx.input);
     }
 
     function createTable(headers, rows) {
@@ -4570,7 +4650,7 @@ async function renderTxLogPanel() {
                 const tr = document.createElement("tr");
                 cells.forEach(function (cell) {
                     const td = document.createElement("td");
-                    td.innerText = cell;
+                    setCellContent(td, cell);
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
@@ -4607,40 +4687,300 @@ async function renderTxLogPanel() {
         }
     }
 
-    function truncateHex(value, maxLen) {
-        if (!value || value === "0x") return "-";
-        const text = String(value);
-        if (text.length <= maxLen) return text;
-        return text.slice(0, maxLen) + "...";
+    function copyableHex(hex, label) {
+        if (!hex || hex === "0x") return "-";
+        const text = String(hex);
+        if (text.length <= 20) return text;
+
+        const preview = text.slice(0, 10) + "..." + text.slice(-6);
+        const byteLen = Math.floor((text.length - 2) / 2);
+        const kind = label || "data";
+
+        return (
+            '<span class="clickableHex clickableAddr" data-full="' + text + '" ' +
+            'style="cursor:pointer;" title="Click to copy ' + kind + ' (' + byteLen + ' bytes)">' +
+            preview + " [" + byteLen + "b]" +
+            "</span>"
+        );
+    }
+
+    function getSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
+            return SIGNATURES.functions;
+        }
+        return {};
+    }
+
+    function getErrorSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.errors) {
+            return SIGNATURES.errors;
+        }
+        return {};
+    }
+
+    function splitSignatureTypes(paramsStr) {
+        const types = [];
+        let depth = 0;
+        let cur = "";
+
+        for (let i = 0; i < paramsStr.length; i++) {
+            const c = paramsStr[i];
+            if (c === "(") depth++;
+            else if (c === ")") depth--;
+            else if (c === "," && depth === 0) {
+                if (cur.trim()) types.push(cur.trim());
+                cur = "";
+                continue;
+            }
+            cur += c;
+        }
+
+        if (cur.trim()) types.push(cur.trim());
+        return types;
+    }
+
+    function parseFunctionSignature(signature) {
+        const nameEnd = signature.indexOf("(");
+        if (nameEnd < 0) return { name: signature, types: [] };
+
+        const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+        return {
+            name: signature.slice(0, nameEnd),
+            types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+        };
+    }
+
+    function isAbiDecodableType(type) {
+        const base = String(type).replace(/\[\d*\]$/, "");
+        if (["address", "bool", "string", "bytes", "bytes32", "bytes4"].indexOf(base) >= 0) return true;
+        if (/^u?int\d*$/.test(base)) return true;
+        if (/^bytes\d+$/.test(base)) return true;
+        return false;
+    }
+
+    function canDecodeSignatureTypes(types) {
+        if (!types || !types.length) return true;
+        for (let i = 0; i < types.length; i++) {
+            if (!isAbiDecodableType(types[i])) return false;
+        }
+        return true;
+    }
+
+    function formatDecodedArg(type, value) {
+        if (type === "address") return shortAddr(value);
+        if (type === "bool") return String(value);
+        if (type.endsWith("[]")) {
+            const inner = type.slice(0, -2);
+            return "[" + (value || []).map(function (v) {
+                return formatDecodedArg(inner, v);
+            }).join(", ") + "]";
+        }
+        if (type === "string" && String(value).length > 48) {
+            return '"' + String(value).slice(0, 24) + '..."';
+        }
+        return String(value);
+    }
+
+    function decodeCalldataInput(input) {
+        if (!input || input === "0x") return "(fallback/receive)";
+        if (input.length < 10) return copyableHex(input, "input");
+
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return selector + " " + copyableHex(input, "input");
+
+        const parsed = parseFunctionSignature(signature);
+        if (!parsed.types.length) return parsed.name + "()";
+
+        if (!canDecodeSignatureTypes(parsed.types)) {
+            return parsed.name + "(" + parsed.types.join(", ") + ")";
+        }
+
+        try {
+            const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
+            const parts = parsed.types.map(function (type, i) {
+                return formatDecodedArg(type, decoded[i]);
+            });
+            return parsed.name + "(" + parts.join(", ") + ")";
+        } catch (err) {
+            return parsed.name + "(" + parsed.types.join(", ") + ") " + copyableHex(input, "input");
+        }
+    }
+
+    function decodeRevertOutput(output) {
+        if (!output || output === "0x" || output.length < 10) return null;
+
+        const selector = output.slice(0, 10).toLowerCase();
+        const errSig = getErrorSignatureMap()[selector];
+        if (errSig) return errSig;
+
+        if (output.startsWith("0x08c379a0") && output.length > 10) {
+            try {
+                const reason = web3.eth.abi.decodeParameter("string", "0x" + output.slice(10));
+                return 'Error("' + reason + '")';
+            } catch (err) { }
+        }
+
+        return null;
     }
 
     function decodeTraceInput(input) {
-        if (!input || input === "0x" || input.length < 10) return "(fallback/receive)";
+        return decodeCalldataInput(input);
+    }
 
-        const selector = input.slice(0, 10).toLowerCase();
-        const signature = FN_SELECTORS[selector];
-        if (!signature) return selector + " " + truncateHex(input, 42);
-
+    function hasNonZeroValue(value) {
+        if (!value || value === "0x" || value === "0x0") return false;
         try {
-            const types = signature.slice(signature.indexOf("(") + 1, -1).split(",");
-            const decoded = web3.eth.abi.decodeParameters(types, "0x" + input.slice(10));
-            const parts = types.map(function (name, i) {
-                return name.trim() + "=" + String(decoded[i]);
-            });
-            return signature.split("(")[0] + "(" + parts.join(", ") + ")";
+            return BigInt(value) > 0n;
         } catch (err) {
-            return signature + " " + truncateHex(input, 42);
+            return false;
         }
+    }
+
+    function isInternalTxnType(type) {
+        const t = String(type || "").toUpperCase();
+        return t === "CALL" || t === "DELEGATECALL" || t === "CREATE" || t === "CREATE2" || t === "SELFDESTRUCT";
+    }
+
+    function internalTxnKind(step) {
+        const type = String(step.type || "").toUpperCase();
+        if (type === "CREATE" || type === "CREATE2") return "Contract Create";
+        if (type === "SELFDESTRUCT") return "Selfdestruct";
+        if (hasNonZeroValue(step.value)) return "Value Transfer";
+        return "Internal Call";
+    }
+
+    function flattenInternalTxns(step, depth, seq, rows) {
+        if (!step) return;
+
+        const calls = step.calls || [];
+        for (let i = 0; i < calls.length; i++) {
+            const child = calls[i];
+            if (!child || !isInternalTxnType(child.type)) continue;
+
+            const rowIndex = seq.counter++;
+            const hasError = !!child.error;
+            const hasValue = hasNonZeroValue(child.value);
+
+            rows.push({
+                hasError: hasError,
+                hasValue: hasValue,
+                cells: [
+                    String(rowIndex),
+                    String(depth + 1),
+                    internalTxnKind(child),
+                    child.type || "-",
+                    shortAddr(child.from || "-"),
+                    shortAddr(child.to || child.address || "(create)"),
+                    hasValue ? formatOZN(child.value) : "-",
+                    hexToDec(child.gasUsed),
+                    hasError ? "Failed" : "Success",
+                    decodeTraceInput(child.input),
+                ],
+            });
+
+            flattenInternalTxns(child, depth + 1, seq, rows);
+        }
+    }
+
+    function buildInternalTxnRows(trace, tx, statusOk) {
+        const rows = [];
+        const seq = { counter: 1 };
+
+        if (tx) {
+            rows.push({
+                hasError: !statusOk,
+                hasValue: hasNonZeroValue(tx.value),
+                isExternal: true,
+                cells: [
+                    "0",
+                    "0",
+                    "External Tx",
+                    "CALL",
+                    shortAddr(tx.from || "-"),
+                    shortAddr(tx.to || "(contract creation)"),
+                    hasNonZeroValue(tx.value) ? formatOZN(tx.value) : "-",
+                    "-",
+                    statusOk ? "Success" : "Failed",
+                    decodeInputCall(tx),
+                ],
+            });
+        }
+
+        if (trace) {
+            flattenInternalTxns(trace, 0, seq, rows);
+        }
+
+        return rows;
+    }
+
+    function countInternalValueTransfers(rows) {
+        let count = 0;
+        rows.forEach(function (row) {
+            if (row.hasValue && !row.isExternal) count++;
+        });
+        return count;
+    }
+
+    function createInternalTxnTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No internal transactions found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row) {
+                const tr = document.createElement("tr");
+                if (row.isExternal) tr.className = "txInternalExternal";
+                else if (row.hasError) tr.className = "txTraceError";
+                else if (row.hasValue) tr.className = "txInternalValue";
+                else if (row.Status) tr.className = "nobreakword";
+
+                row.cells.forEach(function (cell) {
+                    const td = document.createElement("td");
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        table.appendChild(tbody);
+        return table;
     }
 
     function summarizeTraceResult(step) {
         if (step.error) {
             let text = step.error;
             if (step.revertReason) text += " | " + step.revertReason;
+            if (step.output) {
+                const decodedErr = decodeRevertOutput(step.output);
+                if (decodedErr) text += " | " + decodedErr;
+            }
             return text;
         }
         if (step.type === "CREATE" && step.to) return "created=" + shortAddr(step.to);
-        if (step.output && step.output !== "0x") return truncateHex(step.output, 66);
+        if (step.output && step.output !== "0x") {
+            const decodedErr = decodeRevertOutput(step.output);
+            if (decodedErr) return decodedErr;
+            return copyableHex(step.output, "output");
+        }
         return "-";
     }
 
@@ -4704,7 +5044,7 @@ async function renderTxLogPanel() {
 
                 row.cells.forEach(function (cell) {
                     const td = document.createElement("td");
-                    td.innerText = cell;
+                    setCellContent(td, cell);
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
@@ -4809,11 +5149,11 @@ async function renderTxLogPanel() {
             addRow(summaryDiv, "Tx Hash", hash);
             addRow(summaryDiv, "Block", String(receipt.blockNumber));
             addRow(summaryDiv, "Status", statusOk ? "Success" : "Failed");
-            addRow(summaryDiv, "From", tx ? tx.from : "-");
-            addRow(summaryDiv, "To", tx ? (tx.to || "(contract creation)") : "-");
+            addSummaryRow(summaryDiv, "From", tx ? shortAddr(tx.from) : "-");
+            addSummaryRow(summaryDiv, "To", tx ? shortAddr(tx.to || "(contract creation)") : "-");
             addRow(summaryDiv, "Value", tx ? formatOZN(tx.value) + " OZN" : "-");
             addRow(summaryDiv, "Gas Used", String(receipt.gasUsed));
-            addRow(summaryDiv, "Input", decodeInputCall(tx));
+            addSummaryRow(summaryDiv, "Input", decodeInputCall(tx));
             addRow(summaryDiv, "Total Logs", String(logs.length));
             addRow(
                 summaryDiv,
@@ -4833,12 +5173,21 @@ async function renderTxLogPanel() {
             }
 
             let traceRows = [];
+            let internalTxnRows = [];
             if (trace) {
                 traceRows = buildTraceRows(trace);
+                internalTxnRows = buildInternalTxnRows(trace, tx, statusOk);
                 addRow(summaryDiv, "Trace Root", trace.error || "Success");
                 addRow(summaryDiv, "Trace Steps", String(traceRows.length));
+                addRow(
+                    summaryDiv,
+                    "Internal Txns",
+                    String(Math.max(internalTxnRows.length - 1, 0)) +
+                    " | Value transfers: " + String(countInternalValueTransfers(internalTxnRows))
+                );
             } else {
                 addRow(summaryDiv, "Trace", "Unavailable (RPC debug_traceTransaction)");
+                addRow(summaryDiv, "Internal Txns", "Unavailable (requires trace)");
             }
 
             container.innerHTML = "";
@@ -4988,6 +5337,15 @@ async function renderTxLogPanel() {
 
             appendTable(
                 container,
+                "Internal Transactions (from RPC trace)",
+                createInternalTxnTable(
+                    ["#", "Depth", "Kind", "Type", "From", "To", "Value", "Gas Used", "Status", "Input"],
+                    internalTxnRows
+                )
+            );
+
+            appendTable(
+                container,
                 "Raw Execution Trace (sequential)",
                 createTraceTable(
                     ["#", "Depth", "Type", "From", "To", "Value", "Gas Used", "Input", "Output / Error"],
@@ -5001,8 +5359,8 @@ async function renderTxLogPanel() {
                 traceNote.style.marginTop = "6px";
                 traceNote.style.fontSize = "12px";
                 traceNote.innerText =
-                    "Trace unavailable. Ensure the RPC endpoint supports debug_traceTransaction " +
-                    "(same RPC used by cast run).";
+                    "Trace / internal txns unavailable. Ensure the RPC endpoint supports debug_traceTransaction " +
+                    "(parsed locally from callTracer — no explorer API).";
                 container.appendChild(traceNote);
             }
 
@@ -5022,6 +5380,8 @@ async function renderTxLogPanel() {
     input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") btn.click();
     });
+
+    bindCopyClick(panel);
 }
 
 
@@ -6057,3 +6417,22 @@ function getAgeDateRange(age) {
 }
 
 window.onload = load;
+
+document.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("clickableAddr")) {
+
+        const fullAddr = e.target.dataset.full;
+
+        await navigator.clipboard.writeText(fullAddr);
+
+        const oldText = e.target.innerText;
+
+        e.target.innerText = "Copied ✓";
+        e.target.style.opacity = "0.5";
+
+        setTimeout(() => {
+            e.target.innerText = oldText;
+            e.target.style.opacity = "1";
+        }, 800);
+    }
+});
