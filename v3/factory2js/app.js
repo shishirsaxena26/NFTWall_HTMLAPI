@@ -991,7 +991,7 @@ async function joinUser() {
         }
 
 
-        let parent = ZERO;;
+        let parent = ZERO;
         const resolveTarget = transferRequests.methods.resolveTransferTarget(currentAccount);
         if (resolveTarget == ZERO) {
             const _p = prompt("Enter parent address:");
