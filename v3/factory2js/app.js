@@ -1591,7 +1591,6 @@ async function loadMyStor(id, panel) {
                 `;
             tableRg.appendChild(theadRg);
             const tbodyRg = document.createElement("tbody");
-
             const getRankAgeInBatch = await stor.methods.getRankAgeInBatch().call();
             for (let r = 0; r < getRankAgeInBatch.length; r++) {
                 const row = document.createElement("tr")
