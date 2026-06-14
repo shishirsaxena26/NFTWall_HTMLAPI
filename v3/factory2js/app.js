@@ -152,7 +152,7 @@ async function init() {
     INested741TVLABI = await fetch('abistandardv3/Nested741TVL.sol/Nested741TVL.json?v=' + version).then(res => res.json());
 
 
-    SIGNATURES = await fetch('abistandardv3/signatures.json?v=' + version).then(res => res.json());
+    SIGNATURES = await fetch('abistandardv3/cache/signatures.json?v=' + version).then(res => res.json());
 
     inhexBase = hexBaseAddress;
     hexBase = new web3.eth.Contract(IHexBaseABI.abi, inhexBase);
@@ -1591,6 +1591,7 @@ async function loadMyStor(id, panel) {
                 `;
             tableRg.appendChild(theadRg);
             const tbodyRg = document.createElement("tbody");
+
             const getRankAgeInBatch = await stor.methods.getRankAgeInBatch().call();
             for (let r = 0; r < getRankAgeInBatch.length; r++) {
                 const row = document.createElement("tr")
