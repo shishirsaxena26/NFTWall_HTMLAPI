@@ -4550,6 +4550,7 @@ async function renderTxLogPanel() {
         }
         return null;
     }
+    //"amt=" + parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
 
     function summarizeLog(parsed) {
         const d = parsed.decoded;
@@ -5247,7 +5248,7 @@ async function renderTxLogPanel() {
                             shortAddr(ev.address),
                             shortAddr(d.from),
                             shortAddr(d.orc1155),
-                            formatOZN(d._amt),
+                            parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
                             formatOZN(d._value),
                             logAgeLabel(d._time),
                             logTypeLabel(Number(d._type)),
