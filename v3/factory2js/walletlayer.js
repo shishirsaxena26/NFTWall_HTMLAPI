@@ -854,6 +854,8 @@ async function loadApprove() {
 
 	await addSafeOwner("Nested (New)", newNested);
 	await addSafeOwner("TVLNested (New)", TVLNested);
+	await addSafeOwner("Nested741OwnerChange (New)", Nested741OwnerChange);
+
 
 
 	await _loadApprovePrime();
