@@ -1643,9 +1643,9 @@ async function loadMyStor(id, panel) {
                 // Fallback → prevent UI break
                 //compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
-            
-            
-            
+
+
+
             console.log(`compute: ` + compute);
             console.log(`drawn: ` + drawn);
             console.log(`misc: ` + misc);
@@ -4491,7 +4491,7 @@ async function renderTxLogPanel() {
     const LOG_TYPE_LABELS = {
         0: "Import",
         1: "Level 1", 2: "Level 2", 3: "Level 3", 4: "Level 4", 5: "Level 5",
-        6: "Level 6", 7: "Level 7", 8: "Level 8", 9: "Level 9",
+        6: "Level 6", 7: "Level 7", 8: "Level 8", 9: "Level 9", 10: "Level 10", 11: "Level 11", 12: "Level 12", 13: "Level 13", 14: "Level 14", 15: "Level 15",
         71: "Reward p1/f1", 72: "Royalty p2/f2", 73: "Self p3/f3",
         74: "Yield p4/f4", 75: "Validator p5/f5", 76: "Tour1 p6/f6", 77: "Tour2 p7/f7",
         78: "Cap total", 79: "Claim total",
