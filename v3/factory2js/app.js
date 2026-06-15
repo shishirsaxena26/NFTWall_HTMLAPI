@@ -4491,7 +4491,7 @@ async function renderTxLogPanel() {
         78: "Cap total", 79: "Claim total",
         100: "MintBySystem", 101: "Mint",
         107: "Claim treasury (net)", 108: "Claim (self)", 109: "Claim (self flush)",
-        110: "BurnCoin(target1)", 111: "BurnCoin(target1)"
+        110: "BurnCoin(target1)", 111: "BurnCoin(target2)"
     };
 
     function formatUintArray(arr) {
