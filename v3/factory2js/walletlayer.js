@@ -1151,7 +1151,7 @@ async function onApprove1() {
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
 		debugger;
-		let response = await window.safecontract.methods.approveByV1(false).send(
+		let response = await window.safecontract.methods.approveByV1(true).send(
 			{ from: account }
 		)
 			.on('error', function (error) { msg(error.message); console.log(error); })
