@@ -1643,11 +1643,18 @@ async function loadMyStor(id, panel) {
                 // Fallback → prevent UI break
                 //compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
+            
+            
+            
             console.log(`compute: ` + compute);
+            console.log(`drawn: ` + drawn);
+            console.log(`misc: ` + misc);
+            console.log(`consts: ` + consts);
 
             const incomeTypes = ["Reward", "Royali", "Self", "Yeild", "Validator", "Tour", "Gift"];
 
             const TVL = await stor.methods.TVL().call();
+            console.log(`TVL: ` + TVL);
             const label = "TVL " + formatOZN(TVL);
             // Add a header row
             addRow(panel, label, formatRow(["Compute", "ComputeFlush", "Drawn"]));
@@ -1667,7 +1674,6 @@ async function loadMyStor(id, panel) {
                     ])
                 );
             }
-
             const tableuf = document.createElement("table");
             tableuf.border = "0";
             tableuf.cellPadding = "1";

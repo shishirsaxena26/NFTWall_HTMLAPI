@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Income Dashboard</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f5f7;
+      padding: 20px;
+      color: #374151;
+    }
+
+    /* =========================
+   SUMMARY CARDS
+========================= */
+
+    .summary-wrapper {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 92px;
+      border: 1px solid transparent;
+    }
+
+    .card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .card-value {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    /* GREEN */
+
+    .green-card {
+      background: #dff3e8;
+      border-color: #a7e0bf;
+    }
+
+    .green-card .card-title {
+      color: #059669;
+    }
+
+    .green-card .card-value {
+      color: #047857;
+    }
+
+    .green-card .card-icon {
+      background: #10b981;
+    }
+
+    /* BLUE */
+
+    .blue-card {
+      background: #e8effd;
+      border-color: #bdd0fb;
+    }
+
+    .blue-card .card-title {
+      color: #2563eb;
+    }
+
+    .blue-card .card-value {
+      color: #1d4ed8;
+    }
+
+    .blue-card .card-icon {
+      background: #3b82f6;
+    }
+
+    /* ORANGE */
+
+    .orange-card {
+      background: #fbf4df;
+      border-color: #f4d37d;
+    }
+
+    .orange-card .card-title {
+      color: #ea580c;
+    }
+
+    .orange-card .card-value {
+      color: #b45309;
+    }
+
+    .orange-card .card-icon {
+      background: #f59e0b;
+    }
+
+    /* =========================
+   TABLE
+========================= */
+
+    .table-wrapper {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead tr:first-child {
+      background: #f3f4f6;
+    }
+
+    thead tr:nth-child(2) {
+      background: #f7f7f7;
+    }
+
+    th,
+    td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    th {
+      font-weight: 700;
+    }
+
+    .income-col {
+      text-align: left;
+      width: 180px;
+    }
+
+    /* HEAD COLORS */
+
+    .earned-head {
+      background: #edf7ef;
+      color: #16a34a;
+    }
+
+    .earned-bg {
+      background: #edf7ef;
+    }
+
+    .claimed-head {
+      background: #f3f4f6;
+    }
+
+    .mini-head {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .mini-box {
+      background: #d6d6d6;
+      padding: 2px 6px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* TEXT COLORS */
+
+    .reward {
+      color: #3cb371;
+      font-weight: 700;
+    }
+
+    .royalty {
+      color: #4f6df5;
+      font-weight: 700;
+    }
+
+    .level {
+      color: #6366f1;
+      font-weight: 700;
+    }
+
+    .validator {
+      color: #ef4444;
+      font-weight: 700;
+    }
+
+    .tour {
+      color: #d97706;
+      font-weight: 700;
+    }
+
+    /* FOOTER */
+
+    tfoot td {
+      background: #fafafa;
+      font-weight: 700;
+      border-top: 2px solid #d1d5db;
+    }
+
+    .nested-wrapper {
+      padding: 0;
+    }
+
+    .nested-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .nested-table td {
+      border: none;
+      border-right: 1px solid #d1d5db;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      background: #f9fafb;
+    }
+
+    .nested-table td:last-child {
+      border-right: none;
+    }
+
+    /* MOBILE */
+
+    @media(max-width:768px) {
+
+      .summary-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        padding: 10px 6px;
+        font-size: 13px;
+      }
+
+      .income-col {
+        width: 120px;
+      }
+
+      .nested-table td {
+        font-size: 12px;
+        padding: 10px 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+     TOP SUMMARY CARDS
+========================= -->
+
+  <div class="summary-wrapper">
+
+    <div class="card green-card">
+
+      <div class="card-left">
+        <div class="card-title">UNPAID</div>
+        <div class="card-value">0.0000</div>
+      </div>
+
+      <div class="card-icon">💰</div>
+
+    </div>
+
+    <div class="card blue-card">
+
+      <div class="card-left">
+        <div class="card-title">UNPAID SELF</div>
+        <div class="card-value">0.0000</div>
+      </div>
+
+      <div class="card-icon">👤</div>
+
+    </div>
+
+    <div class="card orange-card">
+
+      <div class="card-left">
+        <div class="card-title">FLUSHED</div>
+        <div class="card-value">0.0000</div>
+      </div>
+
+      <div class="card-icon">🧾</div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================
+     TABLE SECTION
+========================= -->
+
+  <div class="table-wrapper">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th rowspan="2" class="income-col">Income</th>
+
+          <th colspan="2" class="earned-head">
+            Earned
+          </th>
+
+          <th class="claimed-head">
+            Claimed
+          </th>
+        </tr>
+
+        <tr>
+
+          <th class="earned-bg mini-head">
+            <span class="mini-box">Claimable</span>
+          </th>
+
+          <th class="earned-bg mini-head">
+            <span class="mini-box">Flush</span>
+          </th>
+
+          <th class="mini-head">
+            <span class="mini-box">Drawn</span>
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td class="income-col reward">Reward</td>
+          <td class="earned-bg">0.0000</td>
+          <td class="earned-bg">4730.0430</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col royalty">Royalty</td>
+          <td class="earned-bg">0.0000</td>
+          <td class="earned-bg">0.0000</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col">Self</td>
+          <td class="earned-bg">0.1800</td>
+          <td class="earned-bg">186.4862</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col level">Level INC</td>
+          <td class="earned-bg">0.0000</td>
+          <td class="earned-bg">8437.6751</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col validator">Validator</td>
+          <td class="earned-bg">0.0000</td>
+          <td class="earned-bg">0.0000</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col tour">Tour</td>
+          <td class="earned-bg">0.0050</td>
+          <td class="earned-bg">0.0000</td>
+          <td>0.0000</td>
+        </tr>
+
+        <tr>
+          <td class="income-col">Gift</td>
+          <td class="earned-bg">0.0500</td>
+          <td class="earned-bg">0.0000</td>
+          <td>0.0000</td>
+        </tr>
+
+      </tbody>
+
+      <tfoot>
+
+        <tr>
+
+          <td>Total</td>
+
+          <td class="earned-bg">
+            0.2350
+          </td>
+
+          <td class="earned-bg">
+            13354.2043
+          </td>
+
+          <td class="nested-wrapper">
+
+            <table class="nested-table">
+              <tr>
+                <td>
+                  Total Drawn<br>
+                  0.0000
+                </td>
+
+                <td>
+                  Total Flush<br>
+                  0.0000
+                </td>
+
+                <td>
+                  Net Balance<br>
+                  13354.4393
+                </td>
+              </tr>
+            </table>
+
+          </td>
+
+        </tr>
+
+      </tfoot>
+
+    </table>
+
+  </div>
+
+</body>
+
+</html>
