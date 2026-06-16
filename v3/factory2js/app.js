@@ -3115,6 +3115,7 @@ async function loadMyNFT() {
         const clonedOf = await nft.methods.clonedOf().call();
         const balance = await nft.methods.balanceOf(user, tokenId).call();
         const getNftPool = await rule.methods.getNftPool(1, mintedAge).call();
+        const getNftPool2 = await rule.methods.getNftPool(2, mintedAge).call();
 
         const jsunlocked = await getUnlockedNFT(parseInt(mintedAge), parseInt(mintedqty));
         ;
@@ -3122,6 +3123,7 @@ async function loadMyNFT() {
         const claimed = await nft.methods.claimed().call();
 
         const startfrom = getNftPool._startfrom;
+        const startfrom2 = getNftPool2._startfrom;
 
         const uri = await nft.methods.uri(tokenId).call();
         const meta = await fetch(uri).then(r => r.json());
@@ -3186,7 +3188,7 @@ async function loadMyNFT() {
             " | Minted : " + mintedqty +
             " | Unlocked: " + unlocked +
             " | Claimed: " + claimed +
-            " | startAge: " + startfrom + "";
+            " | startAge: " + startfrom + "" + " | startAge2: " + startfrom2;
 
         //" | Age: "+ `${getAgeDateRange(mintedAge).start} {${mintedAge}}`+" ";
         /* CHECKBOX */
