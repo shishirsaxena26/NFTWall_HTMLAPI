@@ -5425,6 +5425,341 @@ async function renderTxLogPanel() {
 }
 
 
+async function renderLatestSolidityTxPanel() {
+
+    const TOP_N = 20;
+    const MAX_BLOCKS = 3000;
+
+    const INSTANCE_BYTECODE_PREFIX =
+        "608034620000c157601f6200280c38819003918201601f19168301916001600160401b03831184841017620000c6578084926040948552833981010312";
+
+    const CREATE_INSTANCE_SEL = ["0x4159b3f5", "0xece318c9"];
+    const INIT_SEL = ["0x8129fc1c"];
+    const LOGIN_SEL = ["0x3dbfd97c", "0x9c06f470", "0x74a0b7be"];
+    const CLAIM_SEL = ["0x4e71d92d"];
+    const MINT_SEL = ["0x40c10f19", "0xa3e884b0"]; // mint() + Txn(...,101)
+
+    const panel = addPanel("🔍 Latest Solidity Transactions (top " + TOP_N + ")");
+
+    const inputWrap = document.createElement("div");
+    inputWrap.style.display = "flex";
+    inputWrap.style.alignItems = "center";
+    inputWrap.style.gap = "10px";
+    inputWrap.style.marginBottom = "12px";
+
+    const btn = document.createElement("button");
+    btn.textContent = "Fetch Latest";
+    btn.style.padding = "8px 14px";
+    btn.style.borderRadius = "8px";
+    btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btn.style.border = "none";
+    btn.style.cursor = "pointer";
+
+    const status = document.createElement("span");
+    status.style.color = "#ccc";
+    status.style.fontSize = "12px";
+
+    inputWrap.appendChild(btn);
+    inputWrap.appendChild(status);
+    panel.appendChild(inputWrap);
+
+    const container = document.createElement("div");
+    container.className = "latestSolidityWrap";
+    container.innerHTML = '<div style="color:#888;font-size:12px;margin-top:8px;">Click <b>Fetch Latest</b> to scan recent blocks.</div>';
+    panel.appendChild(container);
+
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .latestSolidityWrap table {
+            width: 100%;
+            font-family: monospace;
+            font-size: 12px;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        .latestSolidityWrap th, .latestSolidityWrap td {
+            border: 1px solid #2a3a5a;
+            padding: 5px;
+            color: #00ffff;
+            word-break: break-all;
+        }
+        .latestSolidityWrap td.nobreakword {
+            word-break: normal;
+            white-space: nowrap;
+        }
+    `;
+    document.head.appendChild(style);
+
+    function shortAddr(addr) {
+        if (!addr) return "----";
+        if (addr === "(contract creation)" || addr === "(CreateInstance)" || !String(addr).startsWith("0x")) {
+            return String(addr);
+        }
+        return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
+            addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+    }
+
+    function setCellContent(td, cell) {
+        if (typeof cell === "string" && cell.indexOf("<") >= 0) {
+            td.innerHTML = cell;
+        } else {
+            td.innerText = cell;
+        }
+    }
+
+    function getSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
+            return SIGNATURES.functions;
+        }
+        return {};
+    }
+
+    function splitSignatureTypes(paramsStr) {
+        const types = [];
+        let depth = 0;
+        let cur = "";
+        for (let i = 0; i < paramsStr.length; i++) {
+            const c = paramsStr[i];
+            if (c === "(") depth++;
+            else if (c === ")") depth--;
+            else if (c === "," && depth === 0) {
+                if (cur.trim()) types.push(cur.trim());
+                cur = "";
+                continue;
+            }
+            cur += c;
+        }
+        if (cur.trim()) types.push(cur.trim());
+        return types;
+    }
+
+    function parseFunctionSignature(signature) {
+        const nameEnd = signature.indexOf("(");
+        if (nameEnd < 0) return { name: signature, types: [] };
+        const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+        return {
+            name: signature.slice(0, nameEnd),
+            types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+        };
+    }
+
+    function formatDecodedArg(type, value) {
+        if (type === "address") return shortAddr(value);
+        if (type === "bool") return String(value);
+        if (type.endsWith("[]")) {
+            const inner = type.slice(0, -2);
+            return "[" + (value || []).map(function (v) {
+                return formatDecodedArg(inner, v);
+            }).join(", ") + "]";
+        }
+        return String(value);
+    }
+
+    function decodeParams(input) {
+        if (!input || input === "0x" || input.length < 10) return "-";
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return "-";
+        const parsed = parseFunctionSignature(signature);
+        if (!parsed.types.length) return "-";
+        try {
+            const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
+            return parsed.types.map(function (type, i) {
+                return parsed.name + "." + (i + 1) + "=" + formatDecodedArg(type, decoded[i]);
+            }).join(", ");
+        } catch (err) {
+            return "-";
+        }
+    }
+
+    function methodName(input) {
+        if (!input || input === "0x" || input.length < 10) return "-";
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return selector;
+        return parseFunctionSignature(signature).name;
+    }
+
+    function isInstanceDeploy(input) {
+        if (!input || input === "0x") return false;
+        return input.toLowerCase().replace(/^0x/, "").startsWith(INSTANCE_BYTECODE_PREFIX.toLowerCase());
+    }
+
+    function includes(arr, sel) {
+        return arr.indexOf(sel) >= 0;
+    }
+
+    function isMintTxn(input) {
+        const sel = input.slice(0, 10).toLowerCase();
+        if (sel === "0x40c10f19") return true;
+        if (sel !== "0xa3e884b0") return false;
+        try {
+            const decoded = web3.eth.abi.decodeParameters(
+                ["address", "uint256", "uint256", "uint256"],
+                "0x" + input.slice(10)
+            );
+            return String(decoded[3]) === "101";
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function classifyTx(tx) {
+        const input = tx.input || "0x";
+        const from = tx.from || "-";
+        const to = tx.to;
+
+        if (!to && isInstanceDeploy(input)) {
+            return {
+                txHash: tx.hash,
+                from: from,
+                to: "(CreateInstance)",
+                method: "CreateInstance",
+                params: "-",
+            };
+        }
+
+        if (!input || input.length < 10) return null;
+        const sel = input.slice(0, 10).toLowerCase();
+
+        if (includes(CREATE_INSTANCE_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "CreateInstance", params: decodeParams(input) };
+        }
+        if (includes(INIT_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "initialize", params: decodeParams(input) };
+        }
+        if (includes(LOGIN_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Login", params: decodeParams(input) };
+        }
+        if (includes(CLAIM_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Claim", params: decodeParams(input) };
+        }
+        if (isMintTxn(input)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Mint", params: decodeParams(input) };
+        }
+
+        return null;
+    }
+
+    function createTable(rows) {
+        const table = document.createElement("table");
+        const headers = ["#", "Block", "Tx Hash", "From", "To", "Method", "Params"];
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            if (h === "#" || h === "Block" || h === "Method") th.className = "nobreakword";
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No matching transactions found in scanned window";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row, idx) {
+                const tr = document.createElement("tr");
+                [
+                    String(idx + 1),
+                    String(row.blockNumber),
+                    row.txHash,
+                    shortAddr(row.from),
+                    row.to,
+                    row.method,
+                    row.params,
+                ].forEach(function (cell) {
+                    const td = document.createElement("td");
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+        table.appendChild(tbody);
+        return table;
+    }
+
+    let scanning = false;
+
+    async function fetchLatest() {
+        if (scanning) return;
+        scanning = true;
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.textContent = "Fetching...";
+        container.innerHTML = "⏳ Scanning latest blocks...";
+        status.innerText = "";
+
+        try {
+            const results = [];
+            const latestBlock = Number(await web3.eth.getBlockNumber());
+
+            for (let bn = latestBlock; bn >= 0 && results.length < TOP_N; bn--) {
+                if (latestBlock - bn >= MAX_BLOCKS) break;
+
+                status.innerText = "Block " + bn + " — found " + results.length + " / " + TOP_N;
+
+                const block = await web3.eth.getBlock(bn, true);
+                if (!block || !block.transactions || !block.transactions.length) continue;
+
+                const txs = block.transactions.slice().reverse();
+                for (let i = 0; i < txs.length && results.length < TOP_N; i++) {
+                    const match = classifyTx(txs[i]);
+                    if (!match) continue;
+                    results.push({
+                        blockNumber: bn,
+                        txHash: match.txHash,
+                        from: match.from,
+                        to: match.to,
+                        method: match.method,
+                        params: match.params,
+                    });
+                }
+            }
+
+            container.innerHTML = "";
+            status.innerText =
+                "Showing " + results.length + " most recent match(es) — updated " +
+                new Date().toLocaleTimeString();
+            container.appendChild(createTable(results));
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "❌ Error: " + (e.message || e);
+            status.innerText = "";
+        } finally {
+            scanning = false;
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.textContent = "Fetch Latest";
+        }
+    }
+
+    btn.onclick = () => fetchLatest();
+
+    panel.addEventListener("click", function (e) {
+        const el = e.target.closest(".clickableAddr");
+        if (!el) return;
+        const full = el.getAttribute("data-full");
+        if (!full || !navigator.clipboard) return;
+        navigator.clipboard.writeText(full).then(function () {
+            const prev = el.textContent;
+            el.textContent = "Copied!";
+            setTimeout(function () { el.textContent = prev; }, 900);
+        }).catch(function () { });
+    });
+
+}
+
+
+
 async function onCreateTemplate(tid) {
     showLoader();
 
