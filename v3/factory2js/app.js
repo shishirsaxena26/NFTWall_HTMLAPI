@@ -2153,9 +2153,9 @@ async function onChangeParent() {
     try {
 
         const userId = prompt("Enter User id needs to be moved:");
-
+        debugger
         if (userId !== null && userId !== "") {
-            if (!nested.method.isNode(userId)) { alert('incorrect id'); return }
+            if (!nested.methods.isNode(userId)) { alert('incorrect id'); return }
         } else {
             alert("No User ID entered");
             return;
@@ -2164,7 +2164,7 @@ async function onChangeParent() {
         const parentId = prompt("Enter parent id needs to be switched:");
 
         if (parentId !== null && parentId !== "") {
-            if (!nested.method.isNode(parentId)) { alert('incorrect id'); return }
+            if (!nested.methods.isNode(parentId)) { alert('incorrect id'); return }
         } else {
             alert("No Parent ID entered");
             return;
