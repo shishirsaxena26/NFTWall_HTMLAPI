@@ -130,6 +130,7 @@ async function load() {
     //loadRule();
     renderULTreePanel();
     renderTxLogPanel();
+    renderLatestSolidityTxPanel();
 
 }
 
@@ -1644,7 +1645,7 @@ async function loadMyStor(id, panel) {
                 //compute = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
             }
 
-
+            debugger;
 
             console.log(`compute: ` + compute);
             console.log(`drawn: ` + drawn);
