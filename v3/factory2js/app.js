@@ -4037,6 +4037,42 @@ async function renderULTreePanel() {
             box-shadow: 0 0 8px #3fa9ff33;
         }
 
+        .incTreeWrap .inc-irnk {
+            border-color: #ffd166;
+            box-shadow: 0 0 12px #ffd16666;
+            background: #ffd16618;
+        }
+
+        .incTreeWrap .inc-badge-irnk {
+            background: #ffd166;
+            color: #1a1500;
+            animation: incIrnkPulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes incIrnkPulse {
+            0%, 100% { box-shadow: 0 0 0 #ffd16600; }
+            50% { box-shadow: 0 0 8px #ffd166aa; }
+        }
+
+        .incTreeWrap .clickableAddr:hover {
+            text-decoration: underline;
+            color: #3fa9ff;
+        }
+
+        .incTreeWrap .inc-copy {
+            cursor: pointer;
+            opacity: 0.7;
+            font-size: 11px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            border: 1px solid #2a3a5a;
+        }
+
+        .incTreeWrap .inc-copy:hover {
+            opacity: 1;
+            background: #2a3a5a;
+        }
+
         .incSummary {
             display: flex;
             gap: 16px;
@@ -4081,7 +4117,42 @@ async function renderULTreePanel() {
     }
 
     function incomeNodeCaption(node, isSelf) {
-        return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}*${isSelf ? " 🧑‍💻" : ""}`;
+        return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}* | ${shortAddr(node.address)}${isSelf ? " 🧑‍💻" : ""}`;
+    }
+
+    function incomeNodeCopyText(node, isSelf) {
+        return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}* | ${node.address}${isSelf ? " (buyer)" : ""}`;
+    }
+
+    function flashCopied(el) {
+        if (!el) return;
+        const prev = el.textContent;
+        el.textContent = "Copied!";
+        setTimeout(() => { el.textContent = prev; }, 900);
+    }
+
+    function copyText(text, el) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => flashCopied(el)).catch(() => { });
+        }
+    }
+
+    function bindIncTreeCopy(root) {
+        root.addEventListener("click", (e) => {
+            const copyBtn = e.target.closest(".inc-copy");
+            if (copyBtn) {
+                e.stopPropagation();
+                copyText(copyBtn.getAttribute("data-copy"), copyBtn);
+                return;
+            }
+
+            const addrEl = e.target.closest(".clickableAddr");
+            if (addrEl) {
+                e.stopPropagation();
+                copyText(addrEl.getAttribute("data-full"), addrEl);
+            }
+        });
     }
 
     async function getNode(id) {
@@ -4246,6 +4317,8 @@ async function renderULTreePanel() {
     }
 
     function updateRankAfterLevel(currentrnk, currentrankage, lvl, iRnk, ieRnk, igRnk, igPrd, isExpired, ageNow, rankClause) {
+        let iRnkUpdated = false;
+
         if (currentrnk > iRnk || lvl === 0) {
             const clause = getRankClauseValues(currentrnk, rankClause);
             ieRnk = clause.ieRnk;
@@ -4253,8 +4326,10 @@ async function renderULTreePanel() {
             igPrd = clause.igPrd;
             iRnk = currentrnk;
             isExpired = (ageNow - currentrankage) > igPrd;
+            iRnkUpdated = true;
         }
-        return { iRnk, ieRnk, igRnk, igPrd, isExpired };
+
+        return { iRnk, ieRnk, igRnk, igPrd, isExpired, iRnkUpdated };
     }
 
     async function loadIncomeView(addr) {
@@ -4322,6 +4397,8 @@ async function renderULTreePanel() {
             let payLabel = "N/A";
             let payClass = "inc-na";
             let badgeClass = "inc-badge-na";
+            let becameIRnk = false;
+            let iRnkSetTo = null;
 
             const shouldProcess =
                 storAddr !== ZERO_ADDR
@@ -4347,6 +4424,9 @@ async function renderULTreePanel() {
                     currentAgeNow,
                     rankClause
                 );
+
+                becameIRnk = updated.iRnkUpdated;
+                if (becameIRnk) iRnkSetTo = updated.iRnk;
 
                 iRnk = updated.iRnk;
                 ieRnk = updated.ieRnk;
@@ -4377,6 +4457,8 @@ async function renderULTreePanel() {
                 payLabel,
                 payClass,
                 badgeClass,
+                becameIRnk,
+                iRnkSetTo,
                 iRnk,
                 ieRnk,
                 igRnk,
@@ -4392,11 +4474,15 @@ async function renderULTreePanel() {
         const ul = document.createElement("ul");
 
         ul.addEventListener("click", (e) => {
+            if (e.target.closest(".clickableAddr") || e.target.closest(".inc-copy")) return;
+
             const li = e.target.closest("li");
             if (!li || !li.addr) return;
             input.value = li.addr;
             loadIncomeView(li.addr);
         });
+
+        bindIncTreeCopy(ul);
 
         let currentUL = ul;
 
@@ -4407,9 +4493,11 @@ async function renderULTreePanel() {
             li.addr = n.address;
 
             li.innerHTML = `
-                <span class="node ${n.payClass}${isSelf ? " inc-self" : ""}" title="${n.address}">
+                <span class="node ${n.payClass}${isSelf ? " inc-self" : ""}${n.becameIRnk ? " inc-irnk" : ""}">
                     <span class="inc-caption">${incomeNodeCaption(n, isSelf)}</span>
+                    ${n.becameIRnk ? `<span class="inc-badge inc-badge-irnk">iRnk → ${n.iRnkSetTo}</span>` : ""}
                     <span class="inc-badge ${n.badgeClass}">${n.payLabel}</span>
+                    <span class="inc-copy" data-copy="${incomeNodeCopyText(n, isSelf)}" title="Copy node">📋</span>
                 </span>`;
 
             const nextUL = document.createElement("ul");
@@ -4434,6 +4522,7 @@ async function renderULTreePanel() {
             const paid = trace.filter(n => n.processed && !n.isSkipped).length;
             const skipped = trace.filter(n => n.processed && n.isSkipped).length;
             const na = trace.filter(n => !n.processed).length;
+            const iRnkHits = trace.filter(n => n.becameIRnk).length;
 
             panel.innerHTML = "";
 
@@ -4447,6 +4536,7 @@ async function renderULTreePanel() {
                 <span style="color:#00ff9f">✅ PAY: ${paid}</span>
                 <span style="color:#ff4d4d">❌ NO PAY: ${skipped}</span>
                 <span style="color:#8899aa">— N/A: ${na}</span>
+                <span style="color:#ffd166">★ iRnk set: ${iRnkHits}</span>
                 <span style="color:#00ffff">Total nodes: ${trace.length}</span>`;
             panel.appendChild(summary);
 
@@ -4455,8 +4545,12 @@ async function renderULTreePanel() {
             legend.style.color = "#8899aa";
             legend.style.marginBottom = "10px";
             legend.innerHTML =
-                "Top → root upline &nbsp;|&nbsp; Bottom → buyer &nbsp;|&nbsp; Click node to re-run trace";
+                "Top → root upline &nbsp;|&nbsp; Bottom → buyer &nbsp;|&nbsp; " +
+                "<span style='color:#ffd166'>★ gold = iRnk updated</span> &nbsp;|&nbsp; " +
+                "Click addr = copy &nbsp;|&nbsp; 📋 = copy node &nbsp;|&nbsp; Click row = re-run";
             panel.appendChild(legend);
+
+            bindIncTreeCopy(panel);
 
             const wrap = document.createElement("div");
             wrap.className = "incTreeWrap";
@@ -4482,7 +4576,6 @@ async function renderULTreePanel() {
         if (e.key === "Enter") btn.click();
     });
 }
-
 
 
 
