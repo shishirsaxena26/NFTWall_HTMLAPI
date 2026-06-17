@@ -2085,19 +2085,19 @@ echo "$SUBJECT"
 async function onChangeOwner() {
     try {
 
-        const olduseraddress = prompt("Enter old User id needs to be changed");
+        const olduseraddress = prompt("Enter old User address needs to be changed");
 
         if (olduseraddress !== null && olduseraddress !== "") {
-            if (!nested.method.isUserExists(olduseraddress)) { alert('incorrect address'); return }
+            if (!nested.methods.isUserExists(olduseraddress)) { alert('incorrect address'); return }
         } else {
             alert("No User address entered");
             return;
         }
 
-        const newuseraddress = prompt("Enter new User id needs to be update");
+        const newuseraddress = prompt("Enter new User address needs to be update");
 
         if (newuseraddress !== null && newuseraddress !== "") {
-            if (nested.method.isUserExists(newuseraddress)) { alert('already exists'); return }
+            if (nested.methods.isUserExists(newuseraddress)) { alert('already exists'); return }
         } else {
             alert("No User address entered");
             return;
