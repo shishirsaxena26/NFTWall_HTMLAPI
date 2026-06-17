@@ -6122,8 +6122,9 @@ async function onCreateTemplate(tid) {
         const receipt = await web3.eth.getTransactionReceipt(txHash);
 
         console.log(receipt);
+        const statusOk = receipt.status === true || receipt.status === "0x1" || Number(receipt.status) === 1;
 
-        if (receipt && receipt.status)
+        if (receipt && statusOk)
             alert("Template succeeded");
         else
             alert("Template failed");
