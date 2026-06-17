@@ -2066,7 +2066,7 @@ function addProposal(tid) {
     else if (templateid == 3) onChangeOwner(templateid);
     else if (templateid == 4) onSuspendIncome(templateid);
     else if (templateid == 5) onLockuser(templateid);
-    else if (templateid == 6) onClaimperday(templateid);
+    else if (templateid == 6) onChangeOwner(templateid);
     else if (templateid == 7) onSecureBase(templateid);
     else if (templateid == 8) onDAOWinPer(templateid);
     else if (templateid == 9) onDAOBlacklist(templateid);
