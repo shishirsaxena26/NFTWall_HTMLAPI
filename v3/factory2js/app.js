@@ -6522,7 +6522,7 @@ async function loadRule() {
         // ✅ NEW
         addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
         addRow(panelOthers, "Session_TTL (Seconds)", await rule.methods.sessionTTLSeconds().call());
-        addRow(panelOthers, "Win Per", await daoCore.methods.WIN_PER().call());
+        addRow(panelOthers, "Win Per", await daocore.methods.WIN_PER().call());
 
 
     } catch (err) {
