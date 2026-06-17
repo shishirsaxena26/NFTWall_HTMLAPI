@@ -1519,7 +1519,7 @@ async function loadUser() {
         addRow(panel, "StorAddr", node[4]);
 
         await loadMyStor(id, panel);
-        await loadMyOldStorData(id);
+        //await loadMyOldStorData(id);
 
         await loadMyNFT();
     } catch (err) {
