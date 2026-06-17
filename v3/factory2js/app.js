@@ -889,10 +889,12 @@ async function loadUserPanel(user) {
         const instId = await inst.methods.id().call();
         const instParent = await inst.methods.parent().call();
         const instStor = await inst.methods.stor().call();
+        const stopLogin = await inst.methods.stopLogin().call();
 
         addRow(userPanel, "Instance ID", instId);
         addRow(userPanel, "Instance Parent", instParent);
         addRow(userPanel, "Instance Stor", instStor);
+        addRow(userPanel, "Instance Stop Login", stopLogin);
     }
 
     const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
@@ -1009,7 +1011,7 @@ function updatePanelWithInstance(instance) {
     document.getElementById("walletInst").innerText =
         "Inst " + shortAddr(instance);
 
-    document.getElementById("btnJoin").style.display = "none";
+    //document.getElementById("btnJoin").style.display = "none";
     document.getElementById("btnInit").style.display = "block";
 }
 
@@ -1511,9 +1513,12 @@ async function loadUser() {
             const instId = await inst.methods.id().call();
             const instParent = await inst.methods.parent().call();
             const instStor = await inst.methods.stor().call();
+            debugger;
+            const stopLogin = await inst.methods.stopLogin().call();
             addRow(panel, "Instance ID", instId);
             addRow(panel, "Instance Parent", instParent);
             addRow(panel, "Instance Stor", instStor);
+            addRow(panel, "Instance Stop Login", stopLogin);
         }
         addRow(panel, "STOR---", "");
         addRow(panel, "StorAddr", node[4]);
@@ -2870,7 +2875,7 @@ async function vote(proposalId, support) {
         if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
 
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
-
+        debugger
         const tx = await daoContract.methods.vote(proposalId, support).send({ from: accounts[0] });
         if (tx.status) {
             alert("vote succeeded");
@@ -6517,6 +6522,8 @@ async function loadRule() {
         // ✅ NEW
         addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
         addRow(panelOthers, "Session_TTL (Seconds)", await rule.methods.sessionTTLSeconds().call());
+        addRow(panelOthers, "Win Per", await daoCore.methods.WIN_PER().call());
+
 
     } catch (err) {
         console.error(err);
