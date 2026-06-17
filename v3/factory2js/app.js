@@ -2061,14 +2061,15 @@ async function loadDAO() {
 
 function addProposal(tid) {
     var templateid = parseInt(tid);
-    if (templateid == 1) onChangeParent();
-    else if (templateid == 2) onChangeOwner();
-    else if (templateid == 3) onSuspendIncome();
-    else if (templateid == 4) onLockuser();
-    else if (templateid == 5) onClaimperday();
-    else if (templateid == 6) onSecureBase();
-    else if (templateid == 7) onDAOWinPer();
-    else if (templateid == 8) onDAOBlacklist();
+    if (templateid == 1) onChangeParent(templateid);
+    else if (templateid == 2) onChangeParent(templateid);
+    else if (templateid == 3) onChangeOwner(templateid);
+    else if (templateid == 4) onSuspendIncome(templateid);
+    else if (templateid == 5) onLockuser(templateid);
+    else if (templateid == 6) onClaimperday(templateid);
+    else if (templateid == 7) onSecureBase(templateid);
+    else if (templateid == 8) onDAOWinPer(templateid);
+    else if (templateid == 9) onDAOBlacklist(templateid);
     else alert('invalid template');
 }
 
@@ -2082,7 +2083,7 @@ echo "$SUBJECT"
 #send "$PKKEY" "$DAOAssemblyCore" "0" "newProposal(string,address,uint256,bytes,uint256)" "$SUBJECT" "$TARGET" "$VALUE_SUCCESS" "$DATA_SUCCESS" "7" 
 */
 //function setMoveDownlineApproval(uint256 _id, address parent, bool approval)
-async function onChangeOwner() {
+async function onChangeOwner(templateid) {
     try {
         debugger;
         const olduseraddress = prompt("Enter old User address needs to be changed");
@@ -2120,7 +2121,7 @@ async function onChangeOwner() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(2, ZERO, params, 0);
+        const method = daoContract.methods.newProposal(templateid, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2150,7 +2151,7 @@ async function onChangeOwner() {
     }
 }
 
-async function onChangeParent() {
+async function onChangeParent(templateid) {
     try {
 
         const userId = prompt("Enter User id needs to be moved:");
@@ -2188,7 +2189,7 @@ async function onChangeParent() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(1, ZERO, params, 0);
+        const method = daoContract.methods.newProposal(templateid, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2218,7 +2219,7 @@ async function onChangeParent() {
     }
 }
 
-async function onSuspendIncome() {
+async function onSuspendIncome(templateid) {
     try {
 
         const userId = prompt("Enter User id needs to be suspend:");
@@ -2266,7 +2267,7 @@ async function onSuspendIncome() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(3, useraddress, params, 0);
+        const method = daoContract.methods.newProposal(templateid, useraddress, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2296,7 +2297,7 @@ async function onSuspendIncome() {
     }
 }
 
-async function onSecureBase() {
+async function onSecureBase(templateid) {
     try {
 
         const base = prompt("Enter base address needs to be add/remove:");
@@ -2331,7 +2332,7 @@ async function onSecureBase() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(6, ZERO, params, 0);
+        const method = daoContract.methods.newProposal(templateid, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2361,7 +2362,7 @@ async function onSecureBase() {
     }
 }
 
-async function onDAOWinPer() {
+async function onDAOWinPer(templateid) {
     try {
 
         const winper = prompt("Type- Wining percent");
@@ -2389,7 +2390,7 @@ async function onDAOWinPer() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(7, ZERO, params, 0);
+        const method = daoContract.methods.newProposal(templateid, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2419,7 +2420,7 @@ async function onDAOWinPer() {
     }
 }
 
-async function onDAOBlacklist() {
+async function onDAOBlacklist(templateid) {
     try {
 
         const base = prompt("Enter DAO address needs to be whitelist/blacklist:");
@@ -2454,7 +2455,7 @@ async function onDAOBlacklist() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(8, ZERO, params, 0);
+        const method = daoContract.methods.newProposal(templateid, ZERO, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
@@ -2484,7 +2485,7 @@ async function onDAOBlacklist() {
     }
 }
 
-async function onLockuser() {
+async function onLockuser(templateid) {
     try {
 
         const userId = prompt("Enter User id needs to be locked:");
@@ -2522,7 +2523,7 @@ async function onLockuser() {
         const daoContract = new web3T.eth.Contract(IDAOCoreABI.abi, indaocore);
 
         // prepare method
-        const method = daoContract.methods.newProposal(4, useraddress, params, 0);
+        const method = daoContract.methods.newProposal(templateid, useraddress, params, 0);
 
         // estimate gas
         const gas = await method.estimateGas({
