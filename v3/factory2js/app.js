@@ -2084,11 +2084,11 @@ echo "$SUBJECT"
 //function setMoveDownlineApproval(uint256 _id, address parent, bool approval)
 async function onChangeOwner() {
     try {
-
+        debugger;
         const olduseraddress = prompt("Enter old User address needs to be changed");
 
         if (olduseraddress !== null && olduseraddress !== "") {
-            if (!nested.methods.isUserExists(olduseraddress)) { alert('incorrect address'); return }
+            if (!(await nested.methods.isUserExists(olduseraddress).call())) { alert('incorrect address'); return }
         } else {
             alert("No User address entered");
             return;
@@ -2097,7 +2097,7 @@ async function onChangeOwner() {
         const newuseraddress = prompt("Enter new User address needs to be update");
 
         if (newuseraddress !== null && newuseraddress !== "") {
-            if (nested.methods.isUserExists(newuseraddress)) { alert('already exists'); return }
+            if (await nested.methods.isUserExists(newuseraddress).call()) { alert('already exists'); return }
         } else {
             alert("No User address entered");
             return;
