@@ -3891,6 +3891,7 @@ async function loadValidatorPage() {
     hideLoader();
 }
 
+
 async function renderULTreePanel() {
     clearPanels();
     const panel = addPanel("🌳 Upline + Downline View");
@@ -3962,11 +3963,18 @@ async function renderULTreePanel() {
             border-radius: 4px;
         }
 
+        .incTreeWrap {
+            max-height: 72vh;
+            overflow-y: auto;
+            overflow-x: auto;
+            padding-right: 4px;
+        }
+
         .incTreeWrap ul {
             list-style: none;
-            padding-left: 18px;
+            padding-left: 10px;
             border-left: 1px dashed #2a3a5a;
-            margin-left: 6px;
+            margin-left: 3px;
         }
 
         .incTreeWrap > ul {
@@ -3976,27 +3984,31 @@ async function renderULTreePanel() {
         }
 
         .incTreeWrap li {
-            margin: 6px 0;
-            font-size: 12px;
+            margin: 1px 0;
+            font-size: 10px;
+            line-height: 1.15;
         }
 
         .incTreeWrap .node {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 4px 8px;
-            border-radius: 6px;
+            gap: 4px;
+            flex-wrap: nowrap;
+            padding: 1px 5px;
+            border-radius: 4px;
             border: 1px solid #2a3a5a;
             background: #0b0f1a;
+            max-width: 100%;
         }
 
         .incTreeWrap .inc-badge {
             font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+            padding: 0 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            letter-spacing: 0;
+            white-space: nowrap;
+            line-height: 14px;
         }
 
         .incTreeWrap .inc-pay {
@@ -4034,24 +4046,18 @@ async function renderULTreePanel() {
 
         .incTreeWrap .inc-self {
             border-color: #3fa9ff;
-            box-shadow: 0 0 8px #3fa9ff33;
+            box-shadow: 0 0 4px #3fa9ff33;
         }
 
         .incTreeWrap .inc-irnk {
             border-color: #ffd166;
-            box-shadow: 0 0 12px #ffd16666;
-            background: #ffd16618;
+            box-shadow: 0 0 6px #ffd16655;
+            background: #ffd16614;
         }
 
         .incTreeWrap .inc-badge-irnk {
             background: #ffd166;
             color: #1a1500;
-            animation: incIrnkPulse 1.6s ease-in-out infinite;
-        }
-
-        @keyframes incIrnkPulse {
-            0%, 100% { box-shadow: 0 0 0 #ffd16600; }
-            50% { box-shadow: 0 0 8px #ffd166aa; }
         }
 
         .incTreeWrap .clickableAddr:hover {
@@ -4062,10 +4068,11 @@ async function renderULTreePanel() {
         .incTreeWrap .inc-copy {
             cursor: pointer;
             opacity: 0.7;
-            font-size: 11px;
-            padding: 1px 5px;
-            border-radius: 4px;
+            font-size: 9px;
+            padding: 0 3px;
+            border-radius: 3px;
             border: 1px solid #2a3a5a;
+            line-height: 14px;
         }
 
         .incTreeWrap .inc-copy:hover {
@@ -4075,30 +4082,45 @@ async function renderULTreePanel() {
 
         .incSummary {
             display: flex;
-            gap: 16px;
+            gap: 6px;
             flex-wrap: wrap;
-            margin: 10px 0 14px;
-            font-size: 13px;
+            margin: 6px 0 8px;
+            font-size: 10px;
         }
 
         .incSummary span {
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             border: 1px solid #2a3a5a;
         }
 
         .incTreeWrap .inc-caption {
             font-family: monospace;
             color: #00ffff;
+            font-size: 10px;
+            white-space: nowrap;
         }
 
         .incMetaRow {
             color: #ccc;
-            margin: 4px 0;
+            margin: 2px 0;
+            font-size: 11px;
         }
 
         .incMetaRow b {
             color: #3fa9ff;
+        }
+
+        .incLegend {
+            font-size: 9px;
+            color: #8899aa;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .incPanelHead {
+            font-size: 11px;
+            margin-bottom: 4px;
         }
   `;
     document.head.appendChild(style);
@@ -4117,7 +4139,7 @@ async function renderULTreePanel() {
     }
 
     function incomeNodeCaption(node, isSelf) {
-        return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}* | ${shortAddr(node.address)}${isSelf ? " 🧑‍💻" : ""}`;
+        return `L${node.lvl} | ${node.id} | R:${node.rank}* | ${shortAddr(node.address)}${isSelf ? " 👤" : ""}`;
     }
 
     function incomeNodeCopyText(node, isSelf) {
@@ -4385,7 +4407,12 @@ async function renderULTreePanel() {
         let igPrd = 0;
         let isExpired = false;
 
-        return nodes.map((node) => {
+        const rows = [];
+        let lastIRnkNodeIdx = -1;
+        let finalIRnk = 0;
+
+        for (let idx = 0; idx < nodes.length; idx++) {
+            const node = nodes[idx];
             const currentrnk = node.rank;
             const currentAge = node.age;
             const storAddr = node.stor;
@@ -4397,8 +4424,6 @@ async function renderULTreePanel() {
             let payLabel = "N/A";
             let payClass = "inc-na";
             let badgeClass = "inc-badge-na";
-            let becameIRnk = false;
-            let iRnkSetTo = null;
 
             const shouldProcess =
                 storAddr !== ZERO_ADDR
@@ -4425,8 +4450,10 @@ async function renderULTreePanel() {
                     rankClause
                 );
 
-                becameIRnk = updated.iRnkUpdated;
-                if (becameIRnk) iRnkSetTo = updated.iRnk;
+                if (updated.iRnkUpdated) {
+                    lastIRnkNodeIdx = idx;
+                    finalIRnk = updated.iRnk;
+                }
 
                 iRnk = updated.iRnk;
                 ieRnk = updated.ieRnk;
@@ -4449,7 +4476,7 @@ async function renderULTreePanel() {
                 payLabel = "NO STOR";
             }
 
-            return {
+            rows.push({
                 ...node,
                 processed,
                 isSkipped,
@@ -4457,15 +4484,23 @@ async function renderULTreePanel() {
                 payLabel,
                 payClass,
                 badgeClass,
-                becameIRnk,
-                iRnkSetTo,
+                becameIRnk: false,
+                iRnkSetTo: null,
                 iRnk,
                 ieRnk,
                 igRnk,
                 igPrd,
                 isExpired,
-            };
-        });
+            });
+        }
+
+        // only the latest iRnk holder stays highlighted (matches rolling state in Solidity)
+        if (lastIRnkNodeIdx >= 0) {
+            rows[lastIRnkNodeIdx].becameIRnk = true;
+            rows[lastIRnkNodeIdx].iRnkSetTo = finalIRnk;
+        }
+
+        return rows;
     }
 
     function buildIncomeTreeUL(traceNodes, selfAddr) {
@@ -4495,8 +4530,8 @@ async function renderULTreePanel() {
             li.innerHTML = `
                 <span class="node ${n.payClass}${isSelf ? " inc-self" : ""}${n.becameIRnk ? " inc-irnk" : ""}">
                     <span class="inc-caption">${incomeNodeCaption(n, isSelf)}</span>
-                    ${n.becameIRnk ? `<span class="inc-badge inc-badge-irnk">iRnk → ${n.iRnkSetTo}</span>` : ""}
-                    <span class="inc-badge ${n.badgeClass}">${n.payLabel}</span>
+                    ${n.becameIRnk ? `<span class="inc-badge inc-badge-irnk">iRnk:${n.iRnkSetTo}</span>` : ""}
+                    <span class="inc-badge ${n.badgeClass}">${n.payLabel === "NO PAY" ? "SKIP" : n.payLabel}</span>
                     <span class="inc-copy" data-copy="${incomeNodeCopyText(n, isSelf)}" title="Copy node">📋</span>
                 </span>`;
 
@@ -4522,32 +4557,33 @@ async function renderULTreePanel() {
             const paid = trace.filter(n => n.processed && !n.isSkipped).length;
             const skipped = trace.filter(n => n.processed && n.isSkipped).length;
             const na = trace.filter(n => !n.processed).length;
-            const iRnkHits = trace.filter(n => n.becameIRnk).length;
+            const iRnkNode = trace.find(n => n.becameIRnk);
 
             panel.innerHTML = "";
 
-            addHtmlRow(panel, "Buyer", shortAddr(selfAddr));
-            addRow(panel, "Current Age", currentAgeNow);
-            addRow(panel, "Sim amount / qty", `${amount} / ${qty}`);
+            const head = document.createElement("div");
+            head.className = "incPanelHead";
+            addHtmlRow(head, "Buyer", shortAddr(selfAddr));
+            addRow(head, "Age", currentAgeNow);
+            addRow(head, "Amt/Qty", `${amount}/${qty}`);
+            panel.appendChild(head);
 
             const summary = document.createElement("div");
             summary.className = "incSummary";
             summary.innerHTML = `
-                <span style="color:#00ff9f">✅ PAY: ${paid}</span>
-                <span style="color:#ff4d4d">❌ NO PAY: ${skipped}</span>
-                <span style="color:#8899aa">— N/A: ${na}</span>
-                <span style="color:#ffd166">★ iRnk set: ${iRnkHits}</span>
-                <span style="color:#00ffff">Total nodes: ${trace.length}</span>`;
+                <span style="color:#00ff9f">PAY:${paid}</span>
+                <span style="color:#ff4d4d">SKIP:${skipped}</span>
+                <span style="color:#8899aa">N/A:${na}</span>
+                <span style="color:#ffd166">iRnk:${iRnkNode ? `L${iRnkNode.lvl}→${iRnkNode.iRnkSetTo}` : "—"}</span>
+                <span style="color:#00ffff">Lv:${trace.length}</span>`;
             panel.appendChild(summary);
 
             const legend = document.createElement("div");
-            legend.style.fontSize = "11px";
-            legend.style.color = "#8899aa";
-            legend.style.marginBottom = "10px";
+            legend.className = "incLegend";
             legend.innerHTML =
-                "Top → root upline &nbsp;|&nbsp; Bottom → buyer &nbsp;|&nbsp; " +
-                "<span style='color:#ffd166'>★ gold = iRnk updated</span> &nbsp;|&nbsp; " +
-                "Click addr = copy &nbsp;|&nbsp; 📋 = copy node &nbsp;|&nbsp; Click row = re-run";
+                "↑ root → buyer ↓ &nbsp;|&nbsp; " +
+                "<span style='color:#ffd166'>gold=iRnk</span> &nbsp;|&nbsp; " +
+                "addr=copy &nbsp;|&nbsp; 📋=node &nbsp;|&nbsp; row=re-run";
             panel.appendChild(legend);
 
             bindIncTreeCopy(panel);
@@ -4575,774 +4611,55 @@ async function renderULTreePanel() {
     input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") btn.click();
     });
-    async function renderULTreePanel() {
-        clearPanels();
-        const panel = addPanel("🌳 Upline + Downline View");
+}
 
-        // ---------- INPUT UI ----------
-        const inputWrap = document.createElement("div");
-        inputWrap.style.display = "flex";
-        inputWrap.style.alignItems = "center";
-        inputWrap.style.gap = "10px";
-        inputWrap.style.marginBottom = "12px";
 
-        const input = document.createElement("input");
-        input.placeholder = "Enter wallet address...";
-        input.style.flex = "1";
-        input.style.padding = "8px 10px";
-        input.style.borderRadius = "8px";
-        input.style.border = "1px solid #2a3a5a";
-        input.style.background = "#0b0f1a";
-        input.style.color = "#00ffff";
 
-        const btn = document.createElement("button");
-        btn.textContent = "Load Tree";
-        btn.style.padding = "8px 14px";
-        btn.style.borderRadius = "8px";
-        btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-        btn.style.border = "none";
 
-        const btnIncView = document.createElement("button");
-        btnIncView.textContent = "Income View";
-        btnIncView.style.padding = "8px 14px";
-        btnIncView.style.borderRadius = "8px";
-        btnIncView.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-        btnIncView.style.border = "none";
 
-        inputWrap.appendChild(input);
-        inputWrap.appendChild(btn);
-        inputWrap.appendChild(btnIncView);
-        panel.appendChild(inputWrap);
+async function renderTxLogPanel() {
 
-        // ---------- CONTAINER ----------
-        const container = document.createElement("div");
-        container.className = "ulTreeWrap";
-        panel.appendChild(container);
+    const panel = addPanel("📜 Transaction Event Logs");
 
-        // ---------- STYLE ----------
-        const style = document.createElement("style");
-        style.innerHTML = `
-        .ulTreeWrap ul { 
-            list-style:none; 
-            padding-left:15px; 
-        }
+    // ---------- INPUT UI ----------
+    const inputWrap = document.createElement("div");
+    inputWrap.style.display = "flex";
+    inputWrap.style.alignItems = "center";
+    inputWrap.style.gap = "10px";
+    inputWrap.style.marginBottom = "12px";
 
-        .ulTreeWrap li { 
-            margin:3px 0; 
-            color:#00ffff; 
-            font-size:12px;
-        }
+    const input = document.createElement("input");
+    input.placeholder = "Enter transaction hash (0x...)";
+    input.style.flex = "1";
+    input.style.padding = "8px 10px";
+    input.style.borderRadius = "8px";
+    input.style.border = "1px solid #2a3a5a";
+    input.style.background = "#0b0f1a";
+    input.style.color = "#00ffff";
 
-        /* 👇 clickable area ONLY */
-        .ulTreeWrap .node {
-            display: inline-block;
-            cursor: pointer;
-            padding: 2px 6px;
-            transition: all 0.2s ease;
-        }
+    const btn = document.createElement("button");
+    btn.textContent = "Load Logs";
+    btn.style.padding = "8px 14px";
+    btn.style.borderRadius = "8px";
+    btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btn.style.border = "none";
 
-        .ulTreeWrap .node:hover {
-            background: rgba(0,255,255,0.15);
-            border-radius: 4px;
-        }
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(btn);
+    panel.appendChild(inputWrap);
 
-        .incTreeWrap {
-            max-height: 72vh;
-            overflow-y: auto;
-            overflow-x: auto;
-            padding-right: 4px;
-        }
+    // ---------- CONTAINER ----------
+    const summaryDiv = document.createElement("div");
+    summaryDiv.className = "txLogSummary";
+    panel.appendChild(summaryDiv);
 
-        .incTreeWrap ul {
-            list-style: none;
-            padding-left: 10px;
-            border-left: 1px dashed #2a3a5a;
-            margin-left: 3px;
-        }
+    const container = document.createElement("div");
+    container.className = "txLogWrap";
+    panel.appendChild(container);
 
-        .incTreeWrap > ul {
-            border-left: none;
-            padding-left: 0;
-            margin-left: 0;
-        }
-
-        .incTreeWrap li {
-            margin: 1px 0;
-            font-size: 10px;
-            line-height: 1.15;
-        }
-
-        .incTreeWrap .node {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: nowrap;
-            padding: 1px 5px;
-            border-radius: 4px;
-            border: 1px solid #2a3a5a;
-            background: #0b0f1a;
-            max-width: 100%;
-        }
-
-        .incTreeWrap .inc-badge {
-            font-weight: bold;
-            padding: 0 4px;
-            border-radius: 3px;
-            font-size: 9px;
-            letter-spacing: 0;
-            white-space: nowrap;
-            line-height: 14px;
-        }
-
-        .incTreeWrap .inc-pay {
-            color: #00ff9f;
-            border-color: #00ff9f44;
-            background: #00ff9f11;
-        }
-
-        .incTreeWrap .inc-badge-pay {
-            background: #00ff9f;
-            color: #001a12;
-        }
-
-        .incTreeWrap .inc-skip {
-            color: #ff4d4d;
-            border-color: #ff4d4d44;
-            background: #ff4d4d11;
-        }
-
-        .incTreeWrap .inc-badge-skip {
-            background: #ff4d4d;
-            color: #1a0000;
-        }
-
-        .incTreeWrap .inc-na {
-            color: #8899aa;
-            border-color: #8899aa44;
-            background: #8899aa11;
-        }
-
-        .incTreeWrap .inc-badge-na {
-            background: #8899aa;
-            color: #0b0f1a;
-        }
-
-        .incTreeWrap .inc-self {
-            border-color: #3fa9ff;
-            box-shadow: 0 0 4px #3fa9ff33;
-        }
-
-        .incTreeWrap .inc-irnk {
-            border-color: #ffd166;
-            box-shadow: 0 0 6px #ffd16655;
-            background: #ffd16614;
-        }
-
-        .incTreeWrap .inc-badge-irnk {
-            background: #ffd166;
-            color: #1a1500;
-        }
-
-        .incTreeWrap .clickableAddr:hover {
-            text-decoration: underline;
-            color: #3fa9ff;
-        }
-
-        .incTreeWrap .inc-copy {
-            cursor: pointer;
-            opacity: 0.7;
-            font-size: 9px;
-            padding: 0 3px;
-            border-radius: 3px;
-            border: 1px solid #2a3a5a;
-            line-height: 14px;
-        }
-
-        .incTreeWrap .inc-copy:hover {
-            opacity: 1;
-            background: #2a3a5a;
-        }
-
-        .incSummary {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin: 6px 0 8px;
-            font-size: 10px;
-        }
-
-        .incSummary span {
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #2a3a5a;
-        }
-
-        .incTreeWrap .inc-caption {
-            font-family: monospace;
-            color: #00ffff;
-            font-size: 10px;
-            white-space: nowrap;
-        }
-
-        .incMetaRow {
-            color: #ccc;
-            margin: 2px 0;
-            font-size: 11px;
-        }
-
-        .incMetaRow b {
-            color: #3fa9ff;
-        }
-
-        .incLegend {
-            font-size: 9px;
-            color: #8899aa;
-            margin-bottom: 6px;
-            line-height: 1.3;
-        }
-
-        .incPanelHead {
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-  `;
-        document.head.appendChild(style);
-
-        // ---------- HELPERS ----------
-        function shortAddr(addr) {
-            if (!addr) return "----";
-            return `<span class="shortAddr clickableAddr" data-full="${addr}" style="cursor:pointer;">${addr.slice(0, 6)}...${addr.slice(-4)}</span>`;
-        }
-
-        function addHtmlRow(parent, label, htmlValue) {
-            const row = document.createElement("div");
-            row.className = "incMetaRow";
-            row.innerHTML = `<b>${label}:</b> ${htmlValue}`;
-            parent.appendChild(row);
-        }
-
-        function incomeNodeCaption(node, isSelf) {
-            return `L${node.lvl} | ${node.id} | R:${node.rank}* | ${shortAddr(node.address)}${isSelf ? " 👤" : ""}`;
-        }
-
-        function incomeNodeCopyText(node, isSelf) {
-            return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}* | ${node.address}${isSelf ? " (buyer)" : ""}`;
-        }
-
-        function flashCopied(el) {
-            if (!el) return;
-            const prev = el.textContent;
-            el.textContent = "Copied!";
-            setTimeout(() => { el.textContent = prev; }, 900);
-        }
-
-        function copyText(text, el) {
-            if (!text) return;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => flashCopied(el)).catch(() => { });
-            }
-        }
-
-        function bindIncTreeCopy(root) {
-            root.addEventListener("click", (e) => {
-                const copyBtn = e.target.closest(".inc-copy");
-                if (copyBtn) {
-                    e.stopPropagation();
-                    copyText(copyBtn.getAttribute("data-copy"), copyBtn);
-                    return;
-                }
-
-                const addrEl = e.target.closest(".clickableAddr");
-                if (addrEl) {
-                    e.stopPropagation();
-                    copyText(addrEl.getAttribute("data-full"), addrEl);
-                }
-            });
-        }
-
-        async function getNode(id) {
-            const n = await nested.methods.getNode(id).call();
-            const storC = new web3.eth.Contract(IInstanceStorABI.abi, n[4]);
-
-            let rnk = await storC.methods.rank().call();
-
-            return { id: n[0].toString(), pid: n[2], address: n[1], rank: rnk };
-        }
-
-        async function getChildren(id) {
-
-            const getNodeDirectsCount = await nested.methods.getNodeDirectsCount(id).call()
-            const arr = [];
-
-            for (let i = 0; i < getNodeDirectsCount && i < 10; i++) {
-                arr.push(await getNode(await nested.methods.getNodeChild(id, i).call()));
-            }
-            return arr;
-        }
-
-        // ---------- BUILD DOWNLINE ----------
-        async function buildDownline(parentId, level = 1) {
-            if (level > MAX_LEVEL) return null;
-
-            const children = await getChildren(parentId);
-            if (!children.length) return null;
-
-            const ul = document.createElement("ul");
-
-            for (let c of children) {
-                const li = document.createElement("li");
-
-                li.addr = c.address;
-                li.innerHTML = `<span class="node">${c.id} (${c.rank}*...${shortAddr(c.address)})</span>`;
-
-                // 🔁 recursive call
-                const childUL = await buildDownline(c.id, level + 1);
-                if (childUL) li.appendChild(childUL);
-
-                ul.appendChild(li);
-            }
-
-            return ul;
-        }
-        // ---------- LOAD ----------
-        const MAX_LEVEL = 7; // 👈 change this anytime (2,3,4...)
-        async function loadTree(addr) {
-
-            container.innerHTML = "⏳ Loading...";
-
-            try {
-                const selfid = await nested.methods.UserToId(addr).call();
-                const info = await nested.methods.getNode(selfid).call();
-                const storC = new web3.eth.Contract(IInstanceStorABI.abi, info[4]);;
-
-                let rnk = await storC.methods.rank().call();
-
-                let pid = info[2];
-
-                const chain = [];
-
-                // 🔥 SELF NODE
-                const selfNode = { id: selfid, pid: pid, address: addr, rank: rnk };
-                chain.push(selfNode);
-
-                // 🔼 UPLINE
-                while (pid != 0) {
-
-                    const node = await getNode(pid);
-                    chain.push(node);
-                    pid = node.pid;
-                }
-
-                chain.reverse();
-
-                // ---------- BUILD TREE ----------
-                const ul = document.createElement("ul");
-                ul.id = "mainTree";
-
-                // ✅ ADD CLICK HERE 👇
-                ul.addEventListener("click", (e) => {
-                    const li = e.target.closest("li");
-                    if (!li || !li.addr) return;
-
-                    console.log("👤 Clicked (main UL):", li.addr);
-
-                    // reload tree OR call your panel
-                    loadTree(li.addr);   // OR renderULTreePanel(li.addr)
-                });
-
-
-
-
-                let currentUL = ul;
-                let lastLI = null;
-
-                for (let i = 0; i < chain.length; i++) {
-
-                    const n = chain[i];
-
-                    const li = document.createElement("li");
-                    if (n.id == selfid)
-                        li.innerHTML = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})🧑‍💻</span>`;
-                    else
-                        li.innerHTML = `<span class="node">${n.id} (${n.rank}*...${shortAddr(n.address)})</span>`;
-                    const nextUL = document.createElement("ul");
-
-                    li.addr = n.address;
-                    li.appendChild(nextUL);
-                    currentUL.appendChild(li);
-
-                    currentUL = nextUL;
-                    lastLI = li;
-                }
-
-                // 🔽 ADD DOWNLINE (ONLY FOR SELF NODE)
-                if (selfid) {
-                    const downUL = await buildDownline(selfid, 1);
-                    if (downUL) lastLI.appendChild(downUL);
-                }
-                container.innerHTML = "";
-                container.appendChild(ul);
-
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = "❌ Error";
-            }
-        }
-
-        // ---------- CLICK ----------
-        btn.onclick = () => {
-            const addr = input.value.trim();
-            if (!addr) return alert("Enter address");
-            loadTree(addr);
-        };
-
-
-        // ---------- LOAD INCOME VIEW (matches Nested741._addLvlIncome) ----------
-        const MAX_NETWORK_LEVEL = 15;
-        const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
-
-        function isLvlSkipped(parentrnk, ieRnk, igRnk, isExpired) {
-            return !(
-                parentrnk >= ieRnk
-                || (
-                    !isExpired
-                    && parentrnk >= igRnk
-                    && parentrnk < ieRnk
-                )
-            );
-        }
-
-        function getRankClauseValues(rnk, rankClause) {
-            const c = rankClause[rnk] || {};
-            return {
-                ieRnk: Number(c.eRnk || 0),
-                igRnk: Number(c.gRnk || 0),
-                igPrd: Number(c.gPrd || 0),
-            };
-        }
-
-        function updateRankAfterLevel(currentrnk, currentrankage, lvl, iRnk, ieRnk, igRnk, igPrd, isExpired, ageNow, rankClause) {
-            let iRnkUpdated = false;
-
-            if (currentrnk > iRnk || lvl === 0) {
-                const clause = getRankClauseValues(currentrnk, rankClause);
-                ieRnk = clause.ieRnk;
-                igRnk = clause.igRnk;
-                igPrd = clause.igPrd;
-                iRnk = currentrnk;
-                isExpired = (ageNow - currentrankage) > igPrd;
-                iRnkUpdated = true;
-            }
-
-            return { iRnk, ieRnk, igRnk, igPrd, isExpired, iRnkUpdated };
-        }
-
-        async function loadIncomeView(addr) {
-            const nodes = await buildDataSet(addr);
-            renderIncomeTree(nodes, rankClauses);
-        }
-
-        async function buildDataSet(addr) {
-
-            const nodes = [];
-
-            // walk buyer → upline (same as _addLvlIncome)
-            let uid = await nested.methods.UserToId(addr).call();
-
-            for (let lvl = 0; lvl <= MAX_NETWORK_LEVEL && uid != 0; lvl++) {
-
-                const node = await nested.methods.getNode(uid).call();
-                const storAddr = node[4];
-
-                let rank = 0;
-                let age = 0;
-
-                if (storAddr !== ZERO_ADDR) {
-                    const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
-                    const res = await stor.methods.getRankWithAgeValue().call();
-                    rank = Number(res[0]);
-                    age = Number(res[1]);
-                }
-
-                nodes.push({
-                    lvl,
-                    id: String(uid),
-                    address: node[1],
-                    stor: storAddr,
-                    rank,
-                    age,
-                });
-
-                uid = node[2];
-            }
-
-            return nodes;
-        }
-
-        function simulateIncomeTrace(nodes, rankClause, amount = 1, qty = 1) {
-            const currentAgeNow = Number(sysAge);
-            const amt = BigInt(amount || 0);
-            const q = BigInt(qty || 0);
-
-            let iRnk = 0;
-            let ieRnk = 0;
-            let igRnk = 0;
-            let igPrd = 0;
-            let isExpired = false;
-
-            const rows = [];
-            let lastIRnkNodeIdx = -1;
-            let finalIRnk = 0;
-
-            for (let idx = 0; idx < nodes.length; idx++) {
-                const node = nodes[idx];
-                const currentrnk = node.rank;
-                const currentAge = node.age;
-                const storAddr = node.stor;
-                const lvl = node.lvl;
-
-                let processed = false;
-                let isSkipped = false;
-                let payStatus = "N/A";
-                let payLabel = "N/A";
-                let payClass = "inc-na";
-                let badgeClass = "inc-badge-na";
-
-                const shouldProcess =
-                    storAddr !== ZERO_ADDR
-                    && ((lvl > 0 && amt > 0n) || q > 0n);
-
-                if (shouldProcess) {
-                    processed = true;
-
-                    if (lvl > 0) {
-                        const parentrnk = currentrnk;
-                        isSkipped = isLvlSkipped(parentrnk, ieRnk, igRnk, isExpired);
-                    }
-
-                    const updated = updateRankAfterLevel(
-                        currentrnk,
-                        currentAge,
-                        lvl,
-                        iRnk,
-                        ieRnk,
-                        igRnk,
-                        igPrd,
-                        isExpired,
-                        currentAgeNow,
-                        rankClause
-                    );
-
-                    if (updated.iRnkUpdated) {
-                        lastIRnkNodeIdx = idx;
-                        finalIRnk = updated.iRnk;
-                    }
-
-                    iRnk = updated.iRnk;
-                    ieRnk = updated.ieRnk;
-                    igRnk = updated.igRnk;
-                    igPrd = updated.igPrd;
-                    isExpired = updated.isExpired;
-
-                    if (isSkipped) {
-                        payStatus = "NO PAY";
-                        payLabel = "NO PAY";
-                        payClass = "inc-skip";
-                        badgeClass = "inc-badge-skip";
-                    } else {
-                        payStatus = "PAY";
-                        payLabel = "PAY";
-                        payClass = "inc-pay";
-                        badgeClass = "inc-badge-pay";
-                    }
-                } else if (storAddr === ZERO_ADDR) {
-                    payLabel = "NO STOR";
-                }
-
-                rows.push({
-                    ...node,
-                    processed,
-                    isSkipped,
-                    payStatus,
-                    payLabel,
-                    payClass,
-                    badgeClass,
-                    becameIRnk: false,
-                    iRnkSetTo: null,
-                    iRnk,
-                    ieRnk,
-                    igRnk,
-                    igPrd,
-                    isExpired,
-                });
-            }
-
-            // only the latest iRnk holder stays highlighted (matches rolling state in Solidity)
-            if (lastIRnkNodeIdx >= 0) {
-                rows[lastIRnkNodeIdx].becameIRnk = true;
-                rows[lastIRnkNodeIdx].iRnkSetTo = finalIRnk;
-            }
-
-            return rows;
-        }
-
-        function buildIncomeTreeUL(traceNodes, selfAddr) {
-            // top = root upline, bottom = buyer (same layout as loadTree upline)
-            const chain = [...traceNodes].reverse();
-            const ul = document.createElement("ul");
-
-            ul.addEventListener("click", (e) => {
-                if (e.target.closest(".clickableAddr") || e.target.closest(".inc-copy")) return;
-
-                const li = e.target.closest("li");
-                if (!li || !li.addr) return;
-                input.value = li.addr;
-                loadIncomeView(li.addr);
-            });
-
-            bindIncTreeCopy(ul);
-
-            let currentUL = ul;
-
-            for (let i = 0; i < chain.length; i++) {
-                const n = chain[i];
-                const isSelf = n.address.toLowerCase() === selfAddr.toLowerCase();
-                const li = document.createElement("li");
-                li.addr = n.address;
-
-                li.innerHTML = `
-                <span class="node ${n.payClass}${isSelf ? " inc-self" : ""}${n.becameIRnk ? " inc-irnk" : ""}">
-                    <span class="inc-caption">${incomeNodeCaption(n, isSelf)}</span>
-                    ${n.becameIRnk ? `<span class="inc-badge inc-badge-irnk">iRnk:${n.iRnkSetTo}</span>` : ""}
-                    <span class="inc-badge ${n.badgeClass}">${n.payLabel === "NO PAY" ? "SKIP" : n.payLabel}</span>
-                    <span class="inc-copy" data-copy="${incomeNodeCopyText(n, isSelf)}" title="Copy node">📋</span>
-                </span>`;
-
-                const nextUL = document.createElement("ul");
-                li.appendChild(nextUL);
-                currentUL.appendChild(li);
-                currentUL = nextUL;
-            }
-
-            return ul;
-        }
-
-        async function renderIncomeTree(nodes, rankClause, amount = 1, qty = 1) {
-
-            const panel = addPanel("📊 Income Trace Tree");
-            panel.innerHTML = "⏳ Loading...";
-
-            try {
-                const trace = simulateIncomeTrace(nodes, rankClause, amount, qty);
-                const selfAddr = nodes[0]?.address || "";
-                const currentAgeNow = Number(sysAge);
-
-                const paid = trace.filter(n => n.processed && !n.isSkipped).length;
-                const skipped = trace.filter(n => n.processed && n.isSkipped).length;
-                const na = trace.filter(n => !n.processed).length;
-                const iRnkNode = trace.find(n => n.becameIRnk);
-
-                panel.innerHTML = "";
-
-                const head = document.createElement("div");
-                head.className = "incPanelHead";
-                addHtmlRow(head, "Buyer", shortAddr(selfAddr));
-                addRow(head, "Age", currentAgeNow);
-                addRow(head, "Amt/Qty", `${amount}/${qty}`);
-                panel.appendChild(head);
-
-                const summary = document.createElement("div");
-                summary.className = "incSummary";
-                summary.innerHTML = `
-                <span style="color:#00ff9f">PAY:${paid}</span>
-                <span style="color:#ff4d4d">SKIP:${skipped}</span>
-                <span style="color:#8899aa">N/A:${na}</span>
-                <span style="color:#ffd166">iRnk:${iRnkNode ? `L${iRnkNode.lvl}→${iRnkNode.iRnkSetTo}` : "—"}</span>
-                <span style="color:#00ffff">Lv:${trace.length}</span>`;
-                panel.appendChild(summary);
-
-                const legend = document.createElement("div");
-                legend.className = "incLegend";
-                legend.innerHTML =
-                    "↑ root → buyer ↓ &nbsp;|&nbsp; " +
-                    "<span style='color:#ffd166'>gold=iRnk</span> &nbsp;|&nbsp; " +
-                    "addr=copy &nbsp;|&nbsp; 📋=node &nbsp;|&nbsp; row=re-run";
-                panel.appendChild(legend);
-
-                bindIncTreeCopy(panel);
-
-                const wrap = document.createElement("div");
-                wrap.className = "incTreeWrap";
-                wrap.appendChild(buildIncomeTreeUL(trace, selfAddr));
-                panel.appendChild(wrap);
-
-            } catch (e) {
-                console.error(e);
-                panel.innerHTML = "❌ Error: " + (e.message || e);
-            }
-        }
-
-
-        btnIncView.onclick = () => {
-            const addr = input.value.trim();
-            if (!addr) return alert("Enter address");
-            loadIncomeView(addr);
-        };
-
-
-
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") btn.click();
-        });
-    }
-
-
-
-
-
-    async function renderTxLogPanel() {
-
-        const panel = addPanel("📜 Transaction Event Logs");
-
-        // ---------- INPUT UI ----------
-        const inputWrap = document.createElement("div");
-        inputWrap.style.display = "flex";
-        inputWrap.style.alignItems = "center";
-        inputWrap.style.gap = "10px";
-        inputWrap.style.marginBottom = "12px";
-
-        const input = document.createElement("input");
-        input.placeholder = "Enter transaction hash (0x...)";
-        input.style.flex = "1";
-        input.style.padding = "8px 10px";
-        input.style.borderRadius = "8px";
-        input.style.border = "1px solid #2a3a5a";
-        input.style.background = "#0b0f1a";
-        input.style.color = "#00ffff";
-
-        const btn = document.createElement("button");
-        btn.textContent = "Load Logs";
-        btn.style.padding = "8px 14px";
-        btn.style.borderRadius = "8px";
-        btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-        btn.style.border = "none";
-
-        inputWrap.appendChild(input);
-        inputWrap.appendChild(btn);
-        panel.appendChild(inputWrap);
-
-        // ---------- CONTAINER ----------
-        const summaryDiv = document.createElement("div");
-        summaryDiv.className = "txLogSummary";
-        panel.appendChild(summaryDiv);
-
-        const container = document.createElement("div");
-        container.className = "txLogWrap";
-        panel.appendChild(container);
-
-        // ---------- STYLE ----------
-        const style = document.createElement("style");
-        style.innerHTML = `
+    // ---------- STYLE ----------
+    const style = document.createElement("style");
+    style.innerHTML = `
         .txLogWrap table {
             width: 100%;
             font-family: monospace;
@@ -5386,1098 +4703,1098 @@ async function renderULTreePanel() {
            width: 200px;
         }
     `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
 
-        // ---------- HELPERS ----------
-        function shortAddr(addr) {
-            if (!addr) return "----";
+    // ---------- HELPERS ----------
+    function shortAddr(addr) {
+        if (!addr) return "----";
 
-            if (addr === "-" || addr === "(contract creation)" || addr === "(create)" || !String(addr).startsWith("0x")) {
-                return String(addr);
-            }
-
-            return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
-                addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+        if (addr === "-" || addr === "(contract creation)" || addr === "(create)" || !String(addr).startsWith("0x")) {
+            return String(addr);
         }
 
-        function setCellContent(td, cell) {
-            if (typeof cell === "string" && cell.indexOf("<") >= 0) {
-                td.innerHTML = cell;
-            } else {
-                td.innerText = cell;
-            }
+        return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
+            addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+    }
+
+    function setCellContent(td, cell) {
+        if (typeof cell === "string" && cell.indexOf("<") >= 0) {
+            td.innerHTML = cell;
+        } else {
+            td.innerText = cell;
         }
+    }
 
-        function addSummaryRow(parent, label, value) {
-            const row = document.createElement("div");
-            row.className = "row";
-            if (typeof value === "string" && value.indexOf("<") >= 0) {
-                row.innerHTML = "<b>" + label + ":</b> " + value;
-            } else {
-                row.innerHTML = "<b>" + label + ":</b> " + (value != null ? value : "-");
-            }
-            parent.appendChild(row);
+    function addSummaryRow(parent, label, value) {
+        const row = document.createElement("div");
+        row.className = "row";
+        if (typeof value === "string" && value.indexOf("<") >= 0) {
+            row.innerHTML = "<b>" + label + ":</b> " + value;
+        } else {
+            row.innerHTML = "<b>" + label + ":</b> " + (value != null ? value : "-");
         }
+        parent.appendChild(row);
+    }
 
-        function bindCopyClick(root) {
-            root.addEventListener("click", function (e) {
-                const el = e.target.closest(".clickableAddr, .clickableHex");
-                if (!el) return;
+    function bindCopyClick(root) {
+        root.addEventListener("click", function (e) {
+            const el = e.target.closest(".clickableAddr, .clickableHex");
+            if (!el) return;
 
-                const full = el.getAttribute("data-full");
-                if (!full) return;
+            const full = el.getAttribute("data-full");
+            if (!full) return;
 
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(full).then(function () {
-                        const prev = el.textContent;
-                        el.textContent = "Copied!";
-                        setTimeout(function () {
-                            el.textContent = prev;
-                        }, 900);
-                    }).catch(function () { });
-                }
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(full).then(function () {
+                    const prev = el.textContent;
+                    el.textContent = "Copied!";
+                    setTimeout(function () {
+                        el.textContent = prev;
+                    }, 900);
+                }).catch(function () { });
+            }
+        });
+    }
+
+    const EVENT_TOPICS = {
+        LogTxns: "0x1517c86fcf2bfb8e3468afcc539b0004955da8027797c497ea51d1f1094ab898",
+        CapReset: "0xb359d8408cffc6b8788774a87b59f0d5be825576ea5fdd7b0917fed6a07e8030",
+        TVLClaimTxnLog: "0x651be9e06b82f2bfd92524ddb5eab4f5bce9aec2963c2417fa0337eb9cdd65ee",
+        EthTransferred: "0xcec1f18c3ab8ddaaa107a1591e3c369667eec613626611a8deaedef43069fcdd",
+        TransferSingle: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62",
+        TransferBatch: "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb",
+        ApprovalForAll: "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31",
+    };
+
+    const EVENT_ABIS = {
+        LogTxns: [
+            { name: "from", type: "address", indexed: false },
+            { name: "orc1155", type: "address", indexed: false },
+            { name: "_amt", type: "uint256", indexed: false },
+            { name: "_value", type: "uint256", indexed: false },
+            { name: "_time", type: "uint256", indexed: false },
+            { name: "_type", type: "uint256", indexed: false },
+        ],
+        CapReset: [
+            { name: "invested", type: "uint256", indexed: false },
+            { name: "claimed", type: "uint256", indexed: false },
+            { name: "claimedDollar", type: "uint256", indexed: false },
+            { name: "investedDollar", type: "uint256", indexed: false },
+            { name: "burned", type: "uint256", indexed: false },
+            { name: "burnedDollar", type: "uint256", indexed: false },
+            { name: "ag", type: "uint256", indexed: false },
+        ],
+        TVLClaimTxnLog: [
+            { name: "to", type: "address", indexed: false },
+            { name: "value", type: "uint256", indexed: false },
+            { name: "flush", type: "uint256", indexed: false },
+            { name: "_time", type: "uint256", indexed: false },
+        ],
+        EthTransferred: [
+            { name: "to", type: "address", indexed: true },
+            { name: "amount", type: "uint256", indexed: false },
+        ],
+        TransferSingle: [
+            { name: "operator", type: "address", indexed: true },
+            { name: "from", type: "address", indexed: true },
+            { name: "to", type: "address", indexed: true },
+            { name: "id", type: "uint256", indexed: false },
+            { name: "value", type: "uint256", indexed: false },
+        ],
+        TransferBatch: [
+            { name: "operator", type: "address", indexed: true },
+            { name: "from", type: "address", indexed: true },
+            { name: "to", type: "address", indexed: true },
+            { name: "ids", type: "uint256[]", indexed: false },
+            { name: "values", type: "uint256[]", indexed: false },
+        ],
+        ApprovalForAll: [
+            { name: "account", type: "address", indexed: true },
+            { name: "operator", type: "address", indexed: true },
+            { name: "approved", type: "bool", indexed: false },
+        ],
+    };
+
+    const LOG_TYPE_LABELS = {
+        0: "Import",
+        1: "Level 1", 2: "Level 2", 3: "Level 3", 4: "Level 4", 5: "Level 5",
+        6: "Level 6", 7: "Level 7", 8: "Level 8", 9: "Level 9", 10: "Level 10", 11: "Level 11", 12: "Level 12", 13: "Level 13", 14: "Level 14", 15: "Level 15",
+        71: "Reward p1/f1", 72: "Royalty p2/f2", 73: "Self p3/f3",
+        74: "Yield p4/f4", 75: "Validator p5/f5", 76: "Tour1 p6/f6", 77: "Tour2 p7/f7",
+        78: "Cap total", 79: "Claim total",
+        100: "MintBySystem", 101: "Mint",
+        107: "Claim treasury (net)", 108: "Claim (self)", 109: "Claim (self flush)",
+        110: "BurnCoin(target1)", 111: "BurnCoin(target2)"
+    };
+
+    function formatUintArray(arr) {
+        if (!arr || !arr.length) return "-";
+        return arr.map(String).join(", ");
+    }
+
+    function logTypeLabel(typeNum) {
+        if (LOG_TYPE_LABELS[typeNum]) {
+            return String(typeNum) + " (" + LOG_TYPE_LABELS[typeNum] + ")";
         }
-
-        const EVENT_TOPICS = {
-            LogTxns: "0x1517c86fcf2bfb8e3468afcc539b0004955da8027797c497ea51d1f1094ab898",
-            CapReset: "0xb359d8408cffc6b8788774a87b59f0d5be825576ea5fdd7b0917fed6a07e8030",
-            TVLClaimTxnLog: "0x651be9e06b82f2bfd92524ddb5eab4f5bce9aec2963c2417fa0337eb9cdd65ee",
-            EthTransferred: "0xcec1f18c3ab8ddaaa107a1591e3c369667eec613626611a8deaedef43069fcdd",
-            TransferSingle: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62",
-            TransferBatch: "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb",
-            ApprovalForAll: "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31",
-        };
-
-        const EVENT_ABIS = {
-            LogTxns: [
-                { name: "from", type: "address", indexed: false },
-                { name: "orc1155", type: "address", indexed: false },
-                { name: "_amt", type: "uint256", indexed: false },
-                { name: "_value", type: "uint256", indexed: false },
-                { name: "_time", type: "uint256", indexed: false },
-                { name: "_type", type: "uint256", indexed: false },
-            ],
-            CapReset: [
-                { name: "invested", type: "uint256", indexed: false },
-                { name: "claimed", type: "uint256", indexed: false },
-                { name: "claimedDollar", type: "uint256", indexed: false },
-                { name: "investedDollar", type: "uint256", indexed: false },
-                { name: "burned", type: "uint256", indexed: false },
-                { name: "burnedDollar", type: "uint256", indexed: false },
-                { name: "ag", type: "uint256", indexed: false },
-            ],
-            TVLClaimTxnLog: [
-                { name: "to", type: "address", indexed: false },
-                { name: "value", type: "uint256", indexed: false },
-                { name: "flush", type: "uint256", indexed: false },
-                { name: "_time", type: "uint256", indexed: false },
-            ],
-            EthTransferred: [
-                { name: "to", type: "address", indexed: true },
-                { name: "amount", type: "uint256", indexed: false },
-            ],
-            TransferSingle: [
-                { name: "operator", type: "address", indexed: true },
-                { name: "from", type: "address", indexed: true },
-                { name: "to", type: "address", indexed: true },
-                { name: "id", type: "uint256", indexed: false },
-                { name: "value", type: "uint256", indexed: false },
-            ],
-            TransferBatch: [
-                { name: "operator", type: "address", indexed: true },
-                { name: "from", type: "address", indexed: true },
-                { name: "to", type: "address", indexed: true },
-                { name: "ids", type: "uint256[]", indexed: false },
-                { name: "values", type: "uint256[]", indexed: false },
-            ],
-            ApprovalForAll: [
-                { name: "account", type: "address", indexed: true },
-                { name: "operator", type: "address", indexed: true },
-                { name: "approved", type: "bool", indexed: false },
-            ],
-        };
-
-        const LOG_TYPE_LABELS = {
-            0: "Import",
-            1: "Level 1", 2: "Level 2", 3: "Level 3", 4: "Level 4", 5: "Level 5",
-            6: "Level 6", 7: "Level 7", 8: "Level 8", 9: "Level 9", 10: "Level 10", 11: "Level 11", 12: "Level 12", 13: "Level 13", 14: "Level 14", 15: "Level 15",
-            71: "Reward p1/f1", 72: "Royalty p2/f2", 73: "Self p3/f3",
-            74: "Yield p4/f4", 75: "Validator p5/f5", 76: "Tour1 p6/f6", 77: "Tour2 p7/f7",
-            78: "Cap total", 79: "Claim total",
-            100: "MintBySystem", 101: "Mint",
-            107: "Claim treasury (net)", 108: "Claim (self)", 109: "Claim (self flush)",
-            110: "BurnCoin(target1)", 111: "BurnCoin(target2)"
-        };
-
-        function formatUintArray(arr) {
-            if (!arr || !arr.length) return "-";
-            return arr.map(String).join(", ");
+        if (typeNum >= 70 && typeNum <= 77) {
+            return String(typeNum) + " (Income " + (typeNum - 70) + ")";
         }
+        return String(typeNum);
+    }
 
-        function logTypeLabel(typeNum) {
-            if (LOG_TYPE_LABELS[typeNum]) {
-                return String(typeNum) + " (" + LOG_TYPE_LABELS[typeNum] + ")";
-            }
-            if (typeNum >= 70 && typeNum <= 77) {
-                return String(typeNum) + " (Income " + (typeNum - 70) + ")";
-            }
-            return String(typeNum);
-        }
+    function logAgeLabel(age) {
+        const n = Number(age);
+        if (!n) return String(age);
+        const range = getAgeDateRange(n);
+        return range.start + " {" + n + "}";
+    }
 
-        function logAgeLabel(age) {
-            const n = Number(age);
-            if (!n) return String(age);
-            const range = getAgeDateRange(n);
-            return range.start + " {" + n + "}";
-        }
+    function normalizeHash(txHash) {
+        if (!txHash) return "";
+        let hash = String(txHash).trim();
+        if (!hash.startsWith("0x")) hash = "0x" + hash;
+        return hash;
+    }
 
-        function normalizeHash(txHash) {
-            if (!txHash) return "";
-            let hash = String(txHash).trim();
-            if (!hash.startsWith("0x")) hash = "0x" + hash;
-            return hash;
-        }
+    function decodeLog(log) {
+        const topic0 = (log.topics && log.topics[0] || "").toLowerCase();
 
-        function decodeLog(log) {
-            const topic0 = (log.topics && log.topics[0] || "").toLowerCase();
+        for (const eventName in EVENT_TOPICS) {
+            if (topic0 !== EVENT_TOPICS[eventName].toLowerCase()) continue;
 
-            for (const eventName in EVENT_TOPICS) {
-                if (topic0 !== EVENT_TOPICS[eventName].toLowerCase()) continue;
-
-                const decoded = web3.eth.abi.decodeLog(
-                    EVENT_ABIS[eventName],
-                    log.data,
-                    log.topics.slice(1)
-                );
-
-                return {
-                    eventName: eventName,
-                    logIndex: log.logIndex,
-                    address: log.address,
-                    decoded: decoded,
-                };
-            }
-            return null;
-        }
-        //"amt=" + parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
-
-        function summarizeLog(parsed) {
-            const d = parsed.decoded;
-
-            if (parsed.eventName === "LogTxns") {
-                return [
-                    "from=" + shortAddr(d.from),
-                    "orc1155=" + shortAddr(d.orc1155),
-                    "amt=" + formatOZN(d._amt),
-                    "value=" + formatOZN(d._value),
-                    "time=" + logAgeLabel(d._time),
-                    "type=" + logTypeLabel(Number(d._type)),
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "CapReset") {
-                return [
-                    "invested=" + formatOZN(d.invested),
-                    "claimed=" + formatOZN(d.claimed),
-                    "claimed$=" + formatOZN(d.claimedDollar),
-                    "invested$=" + formatOZN(d.investedDollar),
-                    "burned=" + formatOZN(d.burned),
-                    "burned$=" + formatOZN(d.burnedDollar),
-                    "age=" + logAgeLabel(d.ag),
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "TVLClaimTxnLog") {
-                return [
-                    "to=" + shortAddr(d.to),
-                    "value=" + formatOZN(d.value),
-                    "flush=" + formatOZN(d.flush),
-                    "time=" + logAgeLabel(d._time),
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "EthTransferred") {
-                return [
-                    "to=" + shortAddr(d.to),
-                    "amount=" + formatOZN(d.amount),
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "TransferSingle") {
-                return [
-                    "operator=" + shortAddr(d.operator),
-                    "from=" + shortAddr(d.from),
-                    "to=" + shortAddr(d.to),
-                    "id=" + String(d.id),
-                    "value=" + String(d.value),
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "TransferBatch") {
-                return [
-                    "operator=" + shortAddr(d.operator),
-                    "from=" + shortAddr(d.from),
-                    "to=" + shortAddr(d.to),
-                    "ids=[" + formatUintArray(d.ids) + "]",
-                    "values=[" + formatUintArray(d.values) + "]",
-                ].join(" | ");
-            }
-
-            if (parsed.eventName === "ApprovalForAll") {
-                return [
-                    "account=" + shortAddr(d.account),
-                    "operator=" + shortAddr(d.operator),
-                    "approved=" + String(d.approved),
-                ].join(" | ");
-            }
-
-            return JSON.stringify(d);
-        }
-
-        function summarizeRawLog(log) {
-            const topics = (log.topics || []).map(function (t, i) {
-                return "t" + i + "=" + t;
-            }).join(" ");
-            const data = log.data || "0x";
-            const shortData = data.length > 66 ? data.slice(0, 66) + "..." : data;
-            return (topics ? topics + " " : "") + "data=" + shortData;
-        }
-
-        function decodeInputCall(tx) {
-            if (!tx || !tx.input || tx.input === "0x" || tx.input.length < 10) {
-                return "-";
-            }
-            return decodeCalldataInput(tx.input);
-        }
-
-        function createTable(headers, rows) {
-            const table = document.createElement("table");
-            const thead = document.createElement("thead");
-            const headRow = document.createElement("tr");
-
-            headers.forEach(function (h) {
-                const th = document.createElement("th");
-                th.innerText = h;
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement("tbody");
-            if (!rows.length) {
-                const tr = document.createElement("tr");
-                const td = document.createElement("td");
-                td.colSpan = headers.length;
-                td.innerText = "No events found";
-                td.style.textAlign = "center";
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-            } else {
-                rows.forEach(function (cells) {
-                    const tr = document.createElement("tr");
-                    cells.forEach(function (cell) {
-                        const td = document.createElement("td");
-                        setCellContent(td, cell);
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-            }
-
-            table.appendChild(tbody);
-            return table;
-        }
-
-        function appendTable(parent, title, table) {
-            const heading = document.createElement("h4");
-            heading.innerText = title;
-            parent.appendChild(heading);
-            parent.appendChild(table);
-        }
-
-        function getRpcUrl() {
-            const provider = web3 && web3.currentProvider;
-            if (provider) {
-                if (provider.host) return provider.host;
-                if (provider.connection && provider.connection.url) return provider.connection.url;
-            }
-            if (typeof RPC_URL !== "undefined" && RPC_URL) return RPC_URL;
-            return null;
-        }
-
-        function hexToDec(hex) {
-            if (!hex || hex === "0x") return "-";
-            try {
-                return String(parseInt(hex, 16));
-            } catch (err) {
-                return String(hex);
-            }
-        }
-
-        function copyableHex(hex, label) {
-            if (!hex || hex === "0x") return "-";
-            const text = String(hex);
-            if (text.length <= 20) return text;
-
-            const preview = text.slice(0, 10) + "..." + text.slice(-6);
-            const byteLen = Math.floor((text.length - 2) / 2);
-            const kind = label || "data";
-
-            return (
-                '<span class="clickableHex clickableAddr" data-full="' + text + '" ' +
-                'style="cursor:pointer;" title="Click to copy ' + kind + ' (' + byteLen + ' bytes)">' +
-                preview + " [" + byteLen + "b]" +
-                "</span>"
+            const decoded = web3.eth.abi.decodeLog(
+                EVENT_ABIS[eventName],
+                log.data,
+                log.topics.slice(1)
             );
-        }
 
-        function getSignatureMap() {
-            if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
-                return SIGNATURES.functions;
-            }
-            return {};
-        }
-
-        function getErrorSignatureMap() {
-            if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.errors) {
-                return SIGNATURES.errors;
-            }
-            return {};
-        }
-
-        function splitSignatureTypes(paramsStr) {
-            const types = [];
-            let depth = 0;
-            let cur = "";
-
-            for (let i = 0; i < paramsStr.length; i++) {
-                const c = paramsStr[i];
-                if (c === "(") depth++;
-                else if (c === ")") depth--;
-                else if (c === "," && depth === 0) {
-                    if (cur.trim()) types.push(cur.trim());
-                    cur = "";
-                    continue;
-                }
-                cur += c;
-            }
-
-            if (cur.trim()) types.push(cur.trim());
-            return types;
-        }
-
-        function parseFunctionSignature(signature) {
-            const nameEnd = signature.indexOf("(");
-            if (nameEnd < 0) return { name: signature, types: [] };
-
-            const paramsStr = signature.slice(nameEnd + 1, -1).trim();
             return {
-                name: signature.slice(0, nameEnd),
-                types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+                eventName: eventName,
+                logIndex: log.logIndex,
+                address: log.address,
+                decoded: decoded,
             };
         }
+        return null;
+    }
+    //"amt=" + parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
 
-        function isAbiDecodableType(type) {
-            const base = String(type).replace(/\[\d*\]$/, "");
-            if (["address", "bool", "string", "bytes", "bytes32", "bytes4"].indexOf(base) >= 0) return true;
-            if (/^u?int\d*$/.test(base)) return true;
-            if (/^bytes\d+$/.test(base)) return true;
-            return false;
+    function summarizeLog(parsed) {
+        const d = parsed.decoded;
+
+        if (parsed.eventName === "LogTxns") {
+            return [
+                "from=" + shortAddr(d.from),
+                "orc1155=" + shortAddr(d.orc1155),
+                "amt=" + formatOZN(d._amt),
+                "value=" + formatOZN(d._value),
+                "time=" + logAgeLabel(d._time),
+                "type=" + logTypeLabel(Number(d._type)),
+            ].join(" | ");
         }
 
-        function canDecodeSignatureTypes(types) {
-            if (!types || !types.length) return true;
-            for (let i = 0; i < types.length; i++) {
-                if (!isAbiDecodableType(types[i])) return false;
-            }
-            return true;
+        if (parsed.eventName === "CapReset") {
+            return [
+                "invested=" + formatOZN(d.invested),
+                "claimed=" + formatOZN(d.claimed),
+                "claimed$=" + formatOZN(d.claimedDollar),
+                "invested$=" + formatOZN(d.investedDollar),
+                "burned=" + formatOZN(d.burned),
+                "burned$=" + formatOZN(d.burnedDollar),
+                "age=" + logAgeLabel(d.ag),
+            ].join(" | ");
         }
 
-        function formatDecodedArg(type, value) {
-            if (type === "address") return shortAddr(value);
-            if (type === "bool") return String(value);
-            if (type.endsWith("[]")) {
-                const inner = type.slice(0, -2);
-                return "[" + (value || []).map(function (v) {
-                    return formatDecodedArg(inner, v);
-                }).join(", ") + "]";
-            }
-            if (type === "string" && String(value).length > 48) {
-                return '"' + String(value).slice(0, 24) + '..."';
-            }
-            return String(value);
+        if (parsed.eventName === "TVLClaimTxnLog") {
+            return [
+                "to=" + shortAddr(d.to),
+                "value=" + formatOZN(d.value),
+                "flush=" + formatOZN(d.flush),
+                "time=" + logAgeLabel(d._time),
+            ].join(" | ");
         }
 
-        function decodeCalldataInput(input) {
-            if (!input || input === "0x") return "(fallback/receive)";
-            if (input.length < 10) return copyableHex(input, "input");
-
-            const selector = input.slice(0, 10).toLowerCase();
-            const signature = getSignatureMap()[selector];
-            if (!signature) return selector + " " + copyableHex(input, "input");
-
-            const parsed = parseFunctionSignature(signature);
-            if (!parsed.types.length) return parsed.name + "()";
-
-            if (!canDecodeSignatureTypes(parsed.types)) {
-                return parsed.name + "(" + parsed.types.join(", ") + ")";
-            }
-
-            try {
-                const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
-                const parts = parsed.types.map(function (type, i) {
-                    return formatDecodedArg(type, decoded[i]);
-                });
-                return parsed.name + "(" + parts.join(", ") + ")";
-            } catch (err) {
-                return parsed.name + "(" + parsed.types.join(", ") + ") " + copyableHex(input, "input");
-            }
+        if (parsed.eventName === "EthTransferred") {
+            return [
+                "to=" + shortAddr(d.to),
+                "amount=" + formatOZN(d.amount),
+            ].join(" | ");
         }
 
-        function decodeRevertOutput(output) {
-            if (!output || output === "0x" || output.length < 10) return null;
-
-            const selector = output.slice(0, 10).toLowerCase();
-            const errSig = getErrorSignatureMap()[selector];
-            if (errSig) return errSig;
-
-            if (output.startsWith("0x08c379a0") && output.length > 10) {
-                try {
-                    const reason = web3.eth.abi.decodeParameter("string", "0x" + output.slice(10));
-                    return 'Error("' + reason + '")';
-                } catch (err) { }
-            }
-
-            return null;
+        if (parsed.eventName === "TransferSingle") {
+            return [
+                "operator=" + shortAddr(d.operator),
+                "from=" + shortAddr(d.from),
+                "to=" + shortAddr(d.to),
+                "id=" + String(d.id),
+                "value=" + String(d.value),
+            ].join(" | ");
         }
 
-        function decodeTraceInput(input) {
-            return decodeCalldataInput(input);
+        if (parsed.eventName === "TransferBatch") {
+            return [
+                "operator=" + shortAddr(d.operator),
+                "from=" + shortAddr(d.from),
+                "to=" + shortAddr(d.to),
+                "ids=[" + formatUintArray(d.ids) + "]",
+                "values=[" + formatUintArray(d.values) + "]",
+            ].join(" | ");
         }
 
-        function hasNonZeroValue(value) {
-            if (!value || value === "0x" || value === "0x0") return false;
-            try {
-                return BigInt(value) > 0n;
-            } catch (err) {
-                return false;
-            }
+        if (parsed.eventName === "ApprovalForAll") {
+            return [
+                "account=" + shortAddr(d.account),
+                "operator=" + shortAddr(d.operator),
+                "approved=" + String(d.approved),
+            ].join(" | ");
         }
 
-        function isInternalTxnType(type) {
-            const t = String(type || "").toUpperCase();
-            return t === "CALL" || t === "DELEGATECALL" || t === "CREATE" || t === "CREATE2" || t === "SELFDESTRUCT";
-        }
+        return JSON.stringify(d);
+    }
 
-        function internalTxnKind(step) {
-            const type = String(step.type || "").toUpperCase();
-            if (type === "CREATE" || type === "CREATE2") return "Contract Create";
-            if (type === "SELFDESTRUCT") return "Selfdestruct";
-            if (hasNonZeroValue(step.value)) return "Value Transfer";
-            return "Internal Call";
-        }
+    function summarizeRawLog(log) {
+        const topics = (log.topics || []).map(function (t, i) {
+            return "t" + i + "=" + t;
+        }).join(" ");
+        const data = log.data || "0x";
+        const shortData = data.length > 66 ? data.slice(0, 66) + "..." : data;
+        return (topics ? topics + " " : "") + "data=" + shortData;
+    }
 
-        function flattenInternalTxns(step, depth, seq, rows) {
-            if (!step) return;
-
-            const calls = step.calls || [];
-            for (let i = 0; i < calls.length; i++) {
-                const child = calls[i];
-                if (!child || !isInternalTxnType(child.type)) continue;
-
-                const rowIndex = seq.counter++;
-                const hasError = !!child.error;
-                const hasValue = hasNonZeroValue(child.value);
-
-                rows.push({
-                    hasError: hasError,
-                    hasValue: hasValue,
-                    cells: [
-                        String(rowIndex),
-                        String(depth + 1),
-                        internalTxnKind(child),
-                        child.type || "-",
-                        shortAddr(child.from || "-"),
-                        shortAddr(child.to || child.address || "(create)"),
-                        hasValue ? formatOZN(child.value) : "-",
-                        hexToDec(child.gasUsed),
-                        hasError ? "Failed" : "Success",
-                        decodeTraceInput(child.input),
-                    ],
-                });
-
-                flattenInternalTxns(child, depth + 1, seq, rows);
-            }
-        }
-
-        function buildInternalTxnRows(trace, tx, statusOk) {
-            const rows = [];
-            const seq = { counter: 1 };
-
-            if (tx) {
-                rows.push({
-                    hasError: !statusOk,
-                    hasValue: hasNonZeroValue(tx.value),
-                    isExternal: true,
-                    cells: [
-                        "0",
-                        "0",
-                        "External Tx",
-                        "CALL",
-                        shortAddr(tx.from || "-"),
-                        shortAddr(tx.to || "(contract creation)"),
-                        hasNonZeroValue(tx.value) ? formatOZN(tx.value) : "-",
-                        "-",
-                        statusOk ? "Success" : "Failed",
-                        decodeInputCall(tx),
-                    ],
-                });
-            }
-
-            if (trace) {
-                flattenInternalTxns(trace, 0, seq, rows);
-            }
-
-            return rows;
-        }
-
-        function countInternalValueTransfers(rows) {
-            let count = 0;
-            rows.forEach(function (row) {
-                if (row.hasValue && !row.isExternal) count++;
-            });
-            return count;
-        }
-
-        function createInternalTxnTable(headers, rows) {
-            const table = document.createElement("table");
-            const thead = document.createElement("thead");
-            const headRow = document.createElement("tr");
-            const statusColIndex = headers.indexOf("Status");
-            const inputColIndex = headers.indexOf("Input");
-
-            headers.forEach(function (h, i) {
-                const th = document.createElement("th");
-                th.innerText = h;
-                if (i === statusColIndex) th.className = "nobreakword";
-                if (i === inputColIndex) th.className = "inputwidth";
-
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement("tbody");
-            if (!rows.length) {
-                const tr = document.createElement("tr");
-                const td = document.createElement("td");
-                td.colSpan = headers.length;
-                td.innerText = "No internal transactions found";
-                td.style.textAlign = "center";
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-            } else {
-                rows.forEach(function (row) {
-                    const tr = document.createElement("tr");
-                    if (row.isExternal) tr.className = "txInternalExternal";
-                    else if (row.hasError) tr.className = "txTraceError";
-                    else if (row.hasValue) tr.className = "txInternalValue";
-
-                    row.cells.forEach(function (cell, i) {
-                        const td = document.createElement("td");
-                        if (i === statusColIndex) td.className = "nobreakword";
-                        if (i === inputColIndex) td.className = "inputwidth";
-                        setCellContent(td, cell);
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-            }
-
-            table.appendChild(tbody);
-            return table;
-        }
-
-        function summarizeTraceResult(step) {
-            if (step.error) {
-                let text = step.error;
-                if (step.revertReason) text += " | " + step.revertReason;
-                if (step.output) {
-                    const decodedErr = decodeRevertOutput(step.output);
-                    if (decodedErr) text += " | " + decodedErr;
-                }
-                return text;
-            }
-            if (step.type === "CREATE" && step.to) return "created=" + shortAddr(step.to);
-            if (step.output && step.output !== "0x") {
-                const decodedErr = decodeRevertOutput(step.output);
-                if (decodedErr) return decodedErr;
-                return copyableHex(step.output, "output");
-            }
+    function decodeInputCall(tx) {
+        if (!tx || !tx.input || tx.input === "0x" || tx.input.length < 10) {
             return "-";
         }
+        return decodeCalldataInput(tx.input);
+    }
 
-        function flattenTraceSteps(step, depth, seq, rows) {
-            if (!step) return;
+    function createTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No events found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (cells) {
+                const tr = document.createElement("tr");
+                cells.forEach(function (cell) {
+                    const td = document.createElement("td");
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        table.appendChild(tbody);
+        return table;
+    }
+
+    function appendTable(parent, title, table) {
+        const heading = document.createElement("h4");
+        heading.innerText = title;
+        parent.appendChild(heading);
+        parent.appendChild(table);
+    }
+
+    function getRpcUrl() {
+        const provider = web3 && web3.currentProvider;
+        if (provider) {
+            if (provider.host) return provider.host;
+            if (provider.connection && provider.connection.url) return provider.connection.url;
+        }
+        if (typeof RPC_URL !== "undefined" && RPC_URL) return RPC_URL;
+        return null;
+    }
+
+    function hexToDec(hex) {
+        if (!hex || hex === "0x") return "-";
+        try {
+            return String(parseInt(hex, 16));
+        } catch (err) {
+            return String(hex);
+        }
+    }
+
+    function copyableHex(hex, label) {
+        if (!hex || hex === "0x") return "-";
+        const text = String(hex);
+        if (text.length <= 20) return text;
+
+        const preview = text.slice(0, 10) + "..." + text.slice(-6);
+        const byteLen = Math.floor((text.length - 2) / 2);
+        const kind = label || "data";
+
+        return (
+            '<span class="clickableHex clickableAddr" data-full="' + text + '" ' +
+            'style="cursor:pointer;" title="Click to copy ' + kind + ' (' + byteLen + ' bytes)">' +
+            preview + " [" + byteLen + "b]" +
+            "</span>"
+        );
+    }
+
+    function getSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
+            return SIGNATURES.functions;
+        }
+        return {};
+    }
+
+    function getErrorSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.errors) {
+            return SIGNATURES.errors;
+        }
+        return {};
+    }
+
+    function splitSignatureTypes(paramsStr) {
+        const types = [];
+        let depth = 0;
+        let cur = "";
+
+        for (let i = 0; i < paramsStr.length; i++) {
+            const c = paramsStr[i];
+            if (c === "(") depth++;
+            else if (c === ")") depth--;
+            else if (c === "," && depth === 0) {
+                if (cur.trim()) types.push(cur.trim());
+                cur = "";
+                continue;
+            }
+            cur += c;
+        }
+
+        if (cur.trim()) types.push(cur.trim());
+        return types;
+    }
+
+    function parseFunctionSignature(signature) {
+        const nameEnd = signature.indexOf("(");
+        if (nameEnd < 0) return { name: signature, types: [] };
+
+        const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+        return {
+            name: signature.slice(0, nameEnd),
+            types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+        };
+    }
+
+    function isAbiDecodableType(type) {
+        const base = String(type).replace(/\[\d*\]$/, "");
+        if (["address", "bool", "string", "bytes", "bytes32", "bytes4"].indexOf(base) >= 0) return true;
+        if (/^u?int\d*$/.test(base)) return true;
+        if (/^bytes\d+$/.test(base)) return true;
+        return false;
+    }
+
+    function canDecodeSignatureTypes(types) {
+        if (!types || !types.length) return true;
+        for (let i = 0; i < types.length; i++) {
+            if (!isAbiDecodableType(types[i])) return false;
+        }
+        return true;
+    }
+
+    function formatDecodedArg(type, value) {
+        if (type === "address") return shortAddr(value);
+        if (type === "bool") return String(value);
+        if (type.endsWith("[]")) {
+            const inner = type.slice(0, -2);
+            return "[" + (value || []).map(function (v) {
+                return formatDecodedArg(inner, v);
+            }).join(", ") + "]";
+        }
+        if (type === "string" && String(value).length > 48) {
+            return '"' + String(value).slice(0, 24) + '..."';
+        }
+        return String(value);
+    }
+
+    function decodeCalldataInput(input) {
+        if (!input || input === "0x") return "(fallback/receive)";
+        if (input.length < 10) return copyableHex(input, "input");
+
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return selector + " " + copyableHex(input, "input");
+
+        const parsed = parseFunctionSignature(signature);
+        if (!parsed.types.length) return parsed.name + "()";
+
+        if (!canDecodeSignatureTypes(parsed.types)) {
+            return parsed.name + "(" + parsed.types.join(", ") + ")";
+        }
+
+        try {
+            const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
+            const parts = parsed.types.map(function (type, i) {
+                return formatDecodedArg(type, decoded[i]);
+            });
+            return parsed.name + "(" + parts.join(", ") + ")";
+        } catch (err) {
+            return parsed.name + "(" + parsed.types.join(", ") + ") " + copyableHex(input, "input");
+        }
+    }
+
+    function decodeRevertOutput(output) {
+        if (!output || output === "0x" || output.length < 10) return null;
+
+        const selector = output.slice(0, 10).toLowerCase();
+        const errSig = getErrorSignatureMap()[selector];
+        if (errSig) return errSig;
+
+        if (output.startsWith("0x08c379a0") && output.length > 10) {
+            try {
+                const reason = web3.eth.abi.decodeParameter("string", "0x" + output.slice(10));
+                return 'Error("' + reason + '")';
+            } catch (err) { }
+        }
+
+        return null;
+    }
+
+    function decodeTraceInput(input) {
+        return decodeCalldataInput(input);
+    }
+
+    function hasNonZeroValue(value) {
+        if (!value || value === "0x" || value === "0x0") return false;
+        try {
+            return BigInt(value) > 0n;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function isInternalTxnType(type) {
+        const t = String(type || "").toUpperCase();
+        return t === "CALL" || t === "DELEGATECALL" || t === "CREATE" || t === "CREATE2" || t === "SELFDESTRUCT";
+    }
+
+    function internalTxnKind(step) {
+        const type = String(step.type || "").toUpperCase();
+        if (type === "CREATE" || type === "CREATE2") return "Contract Create";
+        if (type === "SELFDESTRUCT") return "Selfdestruct";
+        if (hasNonZeroValue(step.value)) return "Value Transfer";
+        return "Internal Call";
+    }
+
+    function flattenInternalTxns(step, depth, seq, rows) {
+        if (!step) return;
+
+        const calls = step.calls || [];
+        for (let i = 0; i < calls.length; i++) {
+            const child = calls[i];
+            if (!child || !isInternalTxnType(child.type)) continue;
 
             const rowIndex = seq.counter++;
-            const hasError = !!step.error;
+            const hasError = !!child.error;
+            const hasValue = hasNonZeroValue(child.value);
 
             rows.push({
                 hasError: hasError,
-                depth: depth,
+                hasValue: hasValue,
                 cells: [
                     String(rowIndex),
-                    String(depth),
-                    step.type || "-",
-                    shortAddr(step.from || "-"),
-                    shortAddr(step.to || step.address || "(create)"),
-                    step.value && step.value !== "0x0" && step.value !== "0x"
-                        ? formatOZN(step.value)
-                        : "-",
-                    hexToDec(step.gasUsed),
-                    decodeTraceInput(step.input),
-                    summarizeTraceResult(step),
+                    String(depth + 1),
+                    internalTxnKind(child),
+                    child.type || "-",
+                    shortAddr(child.from || "-"),
+                    shortAddr(child.to || child.address || "(create)"),
+                    hasValue ? formatOZN(child.value) : "-",
+                    hexToDec(child.gasUsed),
+                    hasError ? "Failed" : "Success",
+                    decodeTraceInput(child.input),
                 ],
             });
 
-            const calls = step.calls || [];
-            for (let i = 0; i < calls.length; i++) {
-                flattenTraceSteps(calls[i], depth + 1, seq, rows);
-            }
+            flattenInternalTxns(child, depth + 1, seq, rows);
         }
-
-        function createTraceTable(headers, rows) {
-            const table = document.createElement("table");
-            const thead = document.createElement("thead");
-            const headRow = document.createElement("tr");
-            const inputColIndex = headers.indexOf("Input");
-            const outputColIndex = headers.indexOf("Output / Error");
-            const nobreakHeaders = ["#", "Depth", "Type", "Value", "Gas Used"];
-
-            function traceCellClass(i) {
-                const h = headers[i];
-                if (nobreakHeaders.indexOf(h) >= 0) return "nobreakword";
-                if (i === inputColIndex || i === outputColIndex) return "inputwidth";
-                return "";
-            }
-
-            headers.forEach(function (h, i) {
-                const th = document.createElement("th");
-                th.innerText = h;
-                const cls = traceCellClass(i);
-                if (cls) th.className = cls;
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement("tbody");
-            if (!rows.length) {
-                const tr = document.createElement("tr");
-                const td = document.createElement("td");
-                td.colSpan = headers.length;
-                td.innerText = "No trace steps found";
-                td.style.textAlign = "center";
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-            } else {
-                rows.forEach(function (row) {
-                    const tr = document.createElement("tr");
-                    if (row.hasError) tr.className = "txTraceError";
-                    else if (row.depth > 0) tr.className = "txTraceDepth";
-
-                    row.cells.forEach(function (cell, i) {
-                        const td = document.createElement("td");
-                        const cls = traceCellClass(i);
-                        if (cls) td.className = cls;
-                        setCellContent(td, cell);
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-            }
-
-            table.appendChild(tbody);
-            return table;
-        }
-
-        async function fetchRawTrace(txHash) {
-            const rpcUrl = getRpcUrl();
-            if (!rpcUrl) {
-                throw new Error("RPC URL not available (web3 provider or RPC_URL)");
-            }
-
-            const response = await fetch(rpcUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    jsonrpc: "2.0",
-                    method: "debug_traceTransaction",
-                    params: [txHash, { tracer: "callTracer" }],
-                    id: 1,
-                }),
-            });
-
-            const payload = await response.json();
-            if (payload.error) {
-                throw new Error(payload.error.message || "debug_traceTransaction failed");
-            }
-            return payload.result || null;
-        }
-
-        function buildTraceRows(trace) {
-            const rows = [];
-            const seq = { counter: 1 };
-            flattenTraceSteps(trace, 0, seq, rows);
-            return rows;
-        }
-
-        // ---------- LOAD ----------
-        async function loadTxLogs(txHash) {
-
-            container.innerHTML = "⏳ Loading...";
-            summaryDiv.innerHTML = "";
-
-            try {
-                const hash = normalizeHash(txHash);
-
-                if (!hash || !web3.utils.isHex(hash) || hash.length !== 66) {
-                    alert("Enter a valid transaction hash");
-                    return;
-                }
-
-                const [tx, receipt, trace] = await Promise.all([
-                    web3.eth.getTransaction(hash),
-                    web3.eth.getTransactionReceipt(hash),
-                    fetchRawTrace(hash).catch(function (err) {
-                        console.warn("Trace fetch failed:", err);
-                        return null;
-                    }),
-                ]);
-
-                if (!receipt) {
-                    container.innerHTML = "❌ Receipt not found";
-                    return;
-                }
-
-                const statusOk = receipt.status === true || receipt.status === "0x1" || Number(receipt.status) === 1;
-                const logs = receipt.logs || [];
-
-                const decodedEvents = {
-                    LogTxns: [],
-                    CapReset: [],
-                    TVLClaimTxnLog: [],
-                    EthTransferred: [],
-                    TransferSingle: [],
-                    TransferBatch: [],
-                    ApprovalForAll: [],
-                };
-
-                let unknownCount = 0;
-                const allRows = [];
-
-                logs.forEach(function (log, idx) {
-                    const parsed = decodeLog(log);
-                    if (parsed) {
-                        decodedEvents[parsed.eventName].push(parsed);
-                    } else {
-                        unknownCount++;
-                    }
-
-                    allRows.push([
-                        String(log.logIndex != null ? log.logIndex : idx),
-                        shortAddr(log.address),
-                        parsed ? parsed.eventName : "Unknown",
-                        parsed ? summarizeLog(parsed) : summarizeRawLog(log),
-                    ]);
-                });
-
-                addRow(summaryDiv, "Tx Hash", hash);
-                addRow(summaryDiv, "Block", String(receipt.blockNumber));
-                addRow(summaryDiv, "Status", statusOk ? "Success" : "Failed");
-                addSummaryRow(summaryDiv, "From", tx ? shortAddr(tx.from) : "-");
-                addSummaryRow(summaryDiv, "To", tx ? shortAddr(tx.to || "(contract creation)") : "-");
-                addRow(summaryDiv, "Value", tx ? formatOZN(tx.value) + " OZN" : "-");
-                addRow(summaryDiv, "Gas Used", String(receipt.gasUsed));
-                addSummaryRow(summaryDiv, "Input", decodeInputCall(tx));
-                addRow(summaryDiv, "Total Logs", String(logs.length));
-                addRow(
-                    summaryDiv,
-                    "Matched",
-                    "LogTxns: " + decodedEvents.LogTxns.length +
-                    " | CapReset: " + decodedEvents.CapReset.length +
-                    " | TVLClaimTxnLog: " + decodedEvents.TVLClaimTxnLog.length +
-                    " | EthTransferred: " + decodedEvents.EthTransferred.length +
-                    " | TransferSingle: " + decodedEvents.TransferSingle.length +
-                    " | TransferBatch: " + decodedEvents.TransferBatch.length +
-                    " | ApprovalForAll: " + decodedEvents.ApprovalForAll.length +
-                    (unknownCount ? " | Other: " + unknownCount : "")
-                );
-
-                if (!statusOk && logs.length === 0) {
-                    addRow(summaryDiv, "Note", "Failed tx reverts state — logs usually empty.");
-                }
-
-                let traceRows = [];
-                let internalTxnRows = [];
-                if (trace) {
-                    traceRows = buildTraceRows(trace);
-                    internalTxnRows = buildInternalTxnRows(trace, tx, statusOk);
-                    addRow(summaryDiv, "Trace Root", trace.error || "Success");
-                    addRow(summaryDiv, "Trace Steps", String(traceRows.length));
-                    addRow(
-                        summaryDiv,
-                        "Internal Txns",
-                        String(Math.max(internalTxnRows.length - 1, 0)) +
-                        " | Value transfers: " + String(countInternalValueTransfers(internalTxnRows))
-                    );
-                } else {
-                    addRow(summaryDiv, "Trace", "Unavailable (RPC debug_traceTransaction)");
-                    addRow(summaryDiv, "Internal Txns", "Unavailable (requires trace)");
-                }
-
-                container.innerHTML = "";
-
-                appendTable(
-                    container,
-                    "All Transaction Logs",
-                    createTable(["#", "Contract", "Event", "Details"], allRows)
-                );
-
-                appendTable(
-                    container,
-                    "LogTxns",
-                    createTable(
-                        ["#", "Contract", "From", "ORC1155", "Amt", "Value", "Time", "Type"],
-                        decodedEvents.LogTxns.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.from),
-                                shortAddr(d.orc1155),
-                                parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
-                                formatOZN(d._value),
-                                logAgeLabel(d._time),
-                                logTypeLabel(Number(d._type)),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "CapReset",
-                    createTable(
-                        ["#", "Contract", "Invested", "Claimed", "Claimed$", "Invested$", "Burned", "Burned$", "Age"],
-                        decodedEvents.CapReset.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                formatOZN(d.invested),
-                                formatOZN(d.claimed),
-                                formatOZN(d.claimedDollar),
-                                formatOZN(d.investedDollar),
-                                formatOZN(d.burned),
-                                formatOZN(d.burnedDollar),
-                                logAgeLabel(d.ag),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "TVLClaimTxnLog",
-                    createTable(
-                        ["#", "Contract", "To", "Value", "Flush", "Time"],
-                        decodedEvents.TVLClaimTxnLog.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.to),
-                                formatOZN(d.value),
-                                formatOZN(d.flush),
-                                logAgeLabel(d._time),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "EthTransferred",
-                    createTable(
-                        ["#", "Contract", "To", "Amount"],
-                        decodedEvents.EthTransferred.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.to),
-                                formatOZN(d.amount),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "TransferSingle (ERC1155)",
-                    createTable(
-                        ["#", "Contract", "Operator", "From", "To", "Id", "Value"],
-                        decodedEvents.TransferSingle.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.operator),
-                                shortAddr(d.from),
-                                shortAddr(d.to),
-                                String(d.id),
-                                String(d.value),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "TransferBatch (ERC1155)",
-                    createTable(
-                        ["#", "Contract", "Operator", "From", "To", "Ids", "Values"],
-                        decodedEvents.TransferBatch.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.operator),
-                                shortAddr(d.from),
-                                shortAddr(d.to),
-                                formatUintArray(d.ids),
-                                formatUintArray(d.values),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "ApprovalForAll (ERC1155)",
-                    createTable(
-                        ["#", "Contract", "Account", "Operator", "Approved"],
-                        decodedEvents.ApprovalForAll.map(function (ev) {
-                            const d = ev.decoded;
-                            return [
-                                String(ev.logIndex),
-                                shortAddr(ev.address),
-                                shortAddr(d.account),
-                                shortAddr(d.operator),
-                                String(d.approved),
-                            ];
-                        })
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "Internal Transactions (from RPC trace)",
-                    createInternalTxnTable(
-                        ["#", "Depth", "Kind", "Type", "From", "To", "Value", "Gas Used", "Status", "Input"],
-                        internalTxnRows
-                    )
-                );
-
-                appendTable(
-                    container,
-                    "Raw Execution Trace (sequential)",
-                    createTraceTable(
-                        ["#", "Depth", "Type", "From", "To", "Value", "Gas Used", "Input", "Output / Error"],
-                        traceRows
-                    )
-                );
-
-                if (!trace) {
-                    const traceNote = document.createElement("div");
-                    traceNote.style.color = "#ff9f43";
-                    traceNote.style.marginTop = "6px";
-                    traceNote.style.fontSize = "12px";
-                    traceNote.innerText =
-                        "Trace / internal txns unavailable. Ensure the RPC endpoint supports debug_traceTransaction " +
-                        "(parsed locally from callTracer — no explorer API).";
-                    container.appendChild(traceNote);
-                }
-
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = "❌ Error: " + (e.message || e);
-            }
-        }
-
-        // ---------- CLICK ----------
-        btn.onclick = () => {
-            const hash = input.value.trim();
-            if (!hash) return alert("Enter transaction hash");
-            loadTxLogs(hash);
-        };
-
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") btn.click();
-        });
-
-        bindCopyClick(panel);
     }
 
+    function buildInternalTxnRows(trace, tx, statusOk) {
+        const rows = [];
+        const seq = { counter: 1 };
 
-    async function renderLatestSolidityTxPanel() {
+        if (tx) {
+            rows.push({
+                hasError: !statusOk,
+                hasValue: hasNonZeroValue(tx.value),
+                isExternal: true,
+                cells: [
+                    "0",
+                    "0",
+                    "External Tx",
+                    "CALL",
+                    shortAddr(tx.from || "-"),
+                    shortAddr(tx.to || "(contract creation)"),
+                    hasNonZeroValue(tx.value) ? formatOZN(tx.value) : "-",
+                    "-",
+                    statusOk ? "Success" : "Failed",
+                    decodeInputCall(tx),
+                ],
+            });
+        }
 
-        const TOP_N = 20;
-        const MAX_BLOCKS = 3000;
+        if (trace) {
+            flattenInternalTxns(trace, 0, seq, rows);
+        }
 
-        const INSTANCE_BYTECODE_PREFIX =
-            "608034620000c157601f6200280c38819003918201601f19168301916001600160401b03831184841017620000c6578084926040948552833981010312";
+        return rows;
+    }
 
-        const CREATE_INSTANCE_SEL = ["0x4159b3f5", "0xece318c9"];
-        const INIT_SEL = ["0x8129fc1c"];
-        const LOGIN_SEL = ["0x3dbfd97c", "0x9c06f470", "0x74a0b7be"];
-        const CLAIM_SEL = ["0x4e71d92d"];
-        const MINT_SEL = ["0x40c10f19", "0xa3e884b0"]; // mint() + Txn(...,101)
+    function countInternalValueTransfers(rows) {
+        let count = 0;
+        rows.forEach(function (row) {
+            if (row.hasValue && !row.isExternal) count++;
+        });
+        return count;
+    }
 
-        const panel = addPanel("🔍 Latest Solidity Transactions (top " + TOP_N + ")");
+    function createInternalTxnTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        const statusColIndex = headers.indexOf("Status");
+        const inputColIndex = headers.indexOf("Input");
 
-        const inputWrap = document.createElement("div");
-        inputWrap.style.display = "flex";
-        inputWrap.style.alignItems = "center";
-        inputWrap.style.gap = "10px";
-        inputWrap.style.marginBottom = "12px";
+        headers.forEach(function (h, i) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            if (i === statusColIndex) th.className = "nobreakword";
+            if (i === inputColIndex) th.className = "inputwidth";
 
-        const btn = document.createElement("button");
-        btn.textContent = "Fetch Latest";
-        btn.style.padding = "8px 14px";
-        btn.style.borderRadius = "8px";
-        btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-        btn.style.border = "none";
-        btn.style.cursor = "pointer";
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
 
-        const status = document.createElement("span");
-        status.style.color = "#ccc";
-        status.style.fontSize = "12px";
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No internal transactions found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row) {
+                const tr = document.createElement("tr");
+                if (row.isExternal) tr.className = "txInternalExternal";
+                else if (row.hasError) tr.className = "txTraceError";
+                else if (row.hasValue) tr.className = "txInternalValue";
 
-        inputWrap.appendChild(btn);
-        inputWrap.appendChild(status);
-        panel.appendChild(inputWrap);
+                row.cells.forEach(function (cell, i) {
+                    const td = document.createElement("td");
+                    if (i === statusColIndex) td.className = "nobreakword";
+                    if (i === inputColIndex) td.className = "inputwidth";
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
 
-        const container = document.createElement("div");
-        container.className = "latestSolidityWrap";
-        container.innerHTML = '<div style="color:#888;font-size:12px;margin-top:8px;">Click <b>Fetch Latest</b> to scan recent blocks.</div>';
-        panel.appendChild(container);
+        table.appendChild(tbody);
+        return table;
+    }
 
-        const style = document.createElement("style");
-        style.innerHTML = `
+    function summarizeTraceResult(step) {
+        if (step.error) {
+            let text = step.error;
+            if (step.revertReason) text += " | " + step.revertReason;
+            if (step.output) {
+                const decodedErr = decodeRevertOutput(step.output);
+                if (decodedErr) text += " | " + decodedErr;
+            }
+            return text;
+        }
+        if (step.type === "CREATE" && step.to) return "created=" + shortAddr(step.to);
+        if (step.output && step.output !== "0x") {
+            const decodedErr = decodeRevertOutput(step.output);
+            if (decodedErr) return decodedErr;
+            return copyableHex(step.output, "output");
+        }
+        return "-";
+    }
+
+    function flattenTraceSteps(step, depth, seq, rows) {
+        if (!step) return;
+
+        const rowIndex = seq.counter++;
+        const hasError = !!step.error;
+
+        rows.push({
+            hasError: hasError,
+            depth: depth,
+            cells: [
+                String(rowIndex),
+                String(depth),
+                step.type || "-",
+                shortAddr(step.from || "-"),
+                shortAddr(step.to || step.address || "(create)"),
+                step.value && step.value !== "0x0" && step.value !== "0x"
+                    ? formatOZN(step.value)
+                    : "-",
+                hexToDec(step.gasUsed),
+                decodeTraceInput(step.input),
+                summarizeTraceResult(step),
+            ],
+        });
+
+        const calls = step.calls || [];
+        for (let i = 0; i < calls.length; i++) {
+            flattenTraceSteps(calls[i], depth + 1, seq, rows);
+        }
+    }
+
+    function createTraceTable(headers, rows) {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        const inputColIndex = headers.indexOf("Input");
+        const outputColIndex = headers.indexOf("Output / Error");
+        const nobreakHeaders = ["#", "Depth", "Type", "Value", "Gas Used"];
+
+        function traceCellClass(i) {
+            const h = headers[i];
+            if (nobreakHeaders.indexOf(h) >= 0) return "nobreakword";
+            if (i === inputColIndex || i === outputColIndex) return "inputwidth";
+            return "";
+        }
+
+        headers.forEach(function (h, i) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            const cls = traceCellClass(i);
+            if (cls) th.className = cls;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No trace steps found";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row) {
+                const tr = document.createElement("tr");
+                if (row.hasError) tr.className = "txTraceError";
+                else if (row.depth > 0) tr.className = "txTraceDepth";
+
+                row.cells.forEach(function (cell, i) {
+                    const td = document.createElement("td");
+                    const cls = traceCellClass(i);
+                    if (cls) td.className = cls;
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        table.appendChild(tbody);
+        return table;
+    }
+
+    async function fetchRawTrace(txHash) {
+        const rpcUrl = getRpcUrl();
+        if (!rpcUrl) {
+            throw new Error("RPC URL not available (web3 provider or RPC_URL)");
+        }
+
+        const response = await fetch(rpcUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                method: "debug_traceTransaction",
+                params: [txHash, { tracer: "callTracer" }],
+                id: 1,
+            }),
+        });
+
+        const payload = await response.json();
+        if (payload.error) {
+            throw new Error(payload.error.message || "debug_traceTransaction failed");
+        }
+        return payload.result || null;
+    }
+
+    function buildTraceRows(trace) {
+        const rows = [];
+        const seq = { counter: 1 };
+        flattenTraceSteps(trace, 0, seq, rows);
+        return rows;
+    }
+
+    // ---------- LOAD ----------
+    async function loadTxLogs(txHash) {
+
+        container.innerHTML = "⏳ Loading...";
+        summaryDiv.innerHTML = "";
+
+        try {
+            const hash = normalizeHash(txHash);
+
+            if (!hash || !web3.utils.isHex(hash) || hash.length !== 66) {
+                alert("Enter a valid transaction hash");
+                return;
+            }
+
+            const [tx, receipt, trace] = await Promise.all([
+                web3.eth.getTransaction(hash),
+                web3.eth.getTransactionReceipt(hash),
+                fetchRawTrace(hash).catch(function (err) {
+                    console.warn("Trace fetch failed:", err);
+                    return null;
+                }),
+            ]);
+
+            if (!receipt) {
+                container.innerHTML = "❌ Receipt not found";
+                return;
+            }
+
+            const statusOk = receipt.status === true || receipt.status === "0x1" || Number(receipt.status) === 1;
+            const logs = receipt.logs || [];
+
+            const decodedEvents = {
+                LogTxns: [],
+                CapReset: [],
+                TVLClaimTxnLog: [],
+                EthTransferred: [],
+                TransferSingle: [],
+                TransferBatch: [],
+                ApprovalForAll: [],
+            };
+
+            let unknownCount = 0;
+            const allRows = [];
+
+            logs.forEach(function (log, idx) {
+                const parsed = decodeLog(log);
+                if (parsed) {
+                    decodedEvents[parsed.eventName].push(parsed);
+                } else {
+                    unknownCount++;
+                }
+
+                allRows.push([
+                    String(log.logIndex != null ? log.logIndex : idx),
+                    shortAddr(log.address),
+                    parsed ? parsed.eventName : "Unknown",
+                    parsed ? summarizeLog(parsed) : summarizeRawLog(log),
+                ]);
+            });
+
+            addRow(summaryDiv, "Tx Hash", hash);
+            addRow(summaryDiv, "Block", String(receipt.blockNumber));
+            addRow(summaryDiv, "Status", statusOk ? "Success" : "Failed");
+            addSummaryRow(summaryDiv, "From", tx ? shortAddr(tx.from) : "-");
+            addSummaryRow(summaryDiv, "To", tx ? shortAddr(tx.to || "(contract creation)") : "-");
+            addRow(summaryDiv, "Value", tx ? formatOZN(tx.value) + " OZN" : "-");
+            addRow(summaryDiv, "Gas Used", String(receipt.gasUsed));
+            addSummaryRow(summaryDiv, "Input", decodeInputCall(tx));
+            addRow(summaryDiv, "Total Logs", String(logs.length));
+            addRow(
+                summaryDiv,
+                "Matched",
+                "LogTxns: " + decodedEvents.LogTxns.length +
+                " | CapReset: " + decodedEvents.CapReset.length +
+                " | TVLClaimTxnLog: " + decodedEvents.TVLClaimTxnLog.length +
+                " | EthTransferred: " + decodedEvents.EthTransferred.length +
+                " | TransferSingle: " + decodedEvents.TransferSingle.length +
+                " | TransferBatch: " + decodedEvents.TransferBatch.length +
+                " | ApprovalForAll: " + decodedEvents.ApprovalForAll.length +
+                (unknownCount ? " | Other: " + unknownCount : "")
+            );
+
+            if (!statusOk && logs.length === 0) {
+                addRow(summaryDiv, "Note", "Failed tx reverts state — logs usually empty.");
+            }
+
+            let traceRows = [];
+            let internalTxnRows = [];
+            if (trace) {
+                traceRows = buildTraceRows(trace);
+                internalTxnRows = buildInternalTxnRows(trace, tx, statusOk);
+                addRow(summaryDiv, "Trace Root", trace.error || "Success");
+                addRow(summaryDiv, "Trace Steps", String(traceRows.length));
+                addRow(
+                    summaryDiv,
+                    "Internal Txns",
+                    String(Math.max(internalTxnRows.length - 1, 0)) +
+                    " | Value transfers: " + String(countInternalValueTransfers(internalTxnRows))
+                );
+            } else {
+                addRow(summaryDiv, "Trace", "Unavailable (RPC debug_traceTransaction)");
+                addRow(summaryDiv, "Internal Txns", "Unavailable (requires trace)");
+            }
+
+            container.innerHTML = "";
+
+            appendTable(
+                container,
+                "All Transaction Logs",
+                createTable(["#", "Contract", "Event", "Details"], allRows)
+            );
+
+            appendTable(
+                container,
+                "LogTxns",
+                createTable(
+                    ["#", "Contract", "From", "ORC1155", "Amt", "Value", "Time", "Type"],
+                    decodedEvents.LogTxns.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.from),
+                            shortAddr(d.orc1155),
+                            parseInt(d._type) == 101 || parseInt(d._type) == 110 ? d._amt : formatOZN(d._amt),
+                            formatOZN(d._value),
+                            logAgeLabel(d._time),
+                            logTypeLabel(Number(d._type)),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "CapReset",
+                createTable(
+                    ["#", "Contract", "Invested", "Claimed", "Claimed$", "Invested$", "Burned", "Burned$", "Age"],
+                    decodedEvents.CapReset.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            formatOZN(d.invested),
+                            formatOZN(d.claimed),
+                            formatOZN(d.claimedDollar),
+                            formatOZN(d.investedDollar),
+                            formatOZN(d.burned),
+                            formatOZN(d.burnedDollar),
+                            logAgeLabel(d.ag),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TVLClaimTxnLog",
+                createTable(
+                    ["#", "Contract", "To", "Value", "Flush", "Time"],
+                    decodedEvents.TVLClaimTxnLog.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.to),
+                            formatOZN(d.value),
+                            formatOZN(d.flush),
+                            logAgeLabel(d._time),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "EthTransferred",
+                createTable(
+                    ["#", "Contract", "To", "Amount"],
+                    decodedEvents.EthTransferred.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.to),
+                            formatOZN(d.amount),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TransferSingle (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Operator", "From", "To", "Id", "Value"],
+                    decodedEvents.TransferSingle.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.operator),
+                            shortAddr(d.from),
+                            shortAddr(d.to),
+                            String(d.id),
+                            String(d.value),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "TransferBatch (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Operator", "From", "To", "Ids", "Values"],
+                    decodedEvents.TransferBatch.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.operator),
+                            shortAddr(d.from),
+                            shortAddr(d.to),
+                            formatUintArray(d.ids),
+                            formatUintArray(d.values),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "ApprovalForAll (ERC1155)",
+                createTable(
+                    ["#", "Contract", "Account", "Operator", "Approved"],
+                    decodedEvents.ApprovalForAll.map(function (ev) {
+                        const d = ev.decoded;
+                        return [
+                            String(ev.logIndex),
+                            shortAddr(ev.address),
+                            shortAddr(d.account),
+                            shortAddr(d.operator),
+                            String(d.approved),
+                        ];
+                    })
+                )
+            );
+
+            appendTable(
+                container,
+                "Internal Transactions (from RPC trace)",
+                createInternalTxnTable(
+                    ["#", "Depth", "Kind", "Type", "From", "To", "Value", "Gas Used", "Status", "Input"],
+                    internalTxnRows
+                )
+            );
+
+            appendTable(
+                container,
+                "Raw Execution Trace (sequential)",
+                createTraceTable(
+                    ["#", "Depth", "Type", "From", "To", "Value", "Gas Used", "Input", "Output / Error"],
+                    traceRows
+                )
+            );
+
+            if (!trace) {
+                const traceNote = document.createElement("div");
+                traceNote.style.color = "#ff9f43";
+                traceNote.style.marginTop = "6px";
+                traceNote.style.fontSize = "12px";
+                traceNote.innerText =
+                    "Trace / internal txns unavailable. Ensure the RPC endpoint supports debug_traceTransaction " +
+                    "(parsed locally from callTracer — no explorer API).";
+                container.appendChild(traceNote);
+            }
+
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "❌ Error: " + (e.message || e);
+        }
+    }
+
+    // ---------- CLICK ----------
+    btn.onclick = () => {
+        const hash = input.value.trim();
+        if (!hash) return alert("Enter transaction hash");
+        loadTxLogs(hash);
+    };
+
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") btn.click();
+    });
+
+    bindCopyClick(panel);
+}
+
+
+async function renderLatestSolidityTxPanel() {
+
+    const TOP_N = 20;
+    const MAX_BLOCKS = 3000;
+
+    const INSTANCE_BYTECODE_PREFIX =
+        "608034620000c157601f6200280c38819003918201601f19168301916001600160401b03831184841017620000c6578084926040948552833981010312";
+
+    const CREATE_INSTANCE_SEL = ["0x4159b3f5", "0xece318c9"];
+    const INIT_SEL = ["0x8129fc1c"];
+    const LOGIN_SEL = ["0x3dbfd97c", "0x9c06f470", "0x74a0b7be"];
+    const CLAIM_SEL = ["0x4e71d92d"];
+    const MINT_SEL = ["0x40c10f19", "0xa3e884b0"]; // mint() + Txn(...,101)
+
+    const panel = addPanel("🔍 Latest Solidity Transactions (top " + TOP_N + ")");
+
+    const inputWrap = document.createElement("div");
+    inputWrap.style.display = "flex";
+    inputWrap.style.alignItems = "center";
+    inputWrap.style.gap = "10px";
+    inputWrap.style.marginBottom = "12px";
+
+    const btn = document.createElement("button");
+    btn.textContent = "Fetch Latest";
+    btn.style.padding = "8px 14px";
+    btn.style.borderRadius = "8px";
+    btn.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btn.style.border = "none";
+    btn.style.cursor = "pointer";
+
+    const status = document.createElement("span");
+    status.style.color = "#ccc";
+    status.style.fontSize = "12px";
+
+    inputWrap.appendChild(btn);
+    inputWrap.appendChild(status);
+    panel.appendChild(inputWrap);
+
+    const container = document.createElement("div");
+    container.className = "latestSolidityWrap";
+    container.innerHTML = '<div style="color:#888;font-size:12px;margin-top:8px;">Click <b>Fetch Latest</b> to scan recent blocks.</div>';
+    panel.appendChild(container);
+
+    const style = document.createElement("style");
+    style.innerHTML = `
         .latestSolidityWrap table {
             width: 100%;
             font-family: monospace;
@@ -6496,345 +5813,345 @@ async function renderULTreePanel() {
             white-space: nowrap;
         }
     `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
 
-        function shortAddr(addr) {
-            if (!addr) return "----";
-            if (addr === "(contract creation)" || addr === "(CreateInstance)" || !String(addr).startsWith("0x")) {
-                return String(addr);
-            }
-            return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
-                addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+    function shortAddr(addr) {
+        if (!addr) return "----";
+        if (addr === "(contract creation)" || addr === "(CreateInstance)" || !String(addr).startsWith("0x")) {
+            return String(addr);
         }
+        return '<span class="shortAddr clickableAddr" data-full="' + addr + '" style="cursor:pointer;" title="Click to copy">' +
+            addr.slice(0, 6) + "..." + addr.slice(-4) + "</span>";
+    }
 
-        function setCellContent(td, cell) {
-            if (typeof cell === "string" && cell.indexOf("<") >= 0) {
-                td.innerHTML = cell;
-            } else {
-                td.innerText = cell;
-            }
+    function setCellContent(td, cell) {
+        if (typeof cell === "string" && cell.indexOf("<") >= 0) {
+            td.innerHTML = cell;
+        } else {
+            td.innerText = cell;
         }
+    }
 
-        function getSignatureMap() {
-            if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
-                return SIGNATURES.functions;
-            }
-            return {};
+    function getSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
+            return SIGNATURES.functions;
         }
+        return {};
+    }
 
-        function splitSignatureTypes(paramsStr) {
-            const types = [];
-            let depth = 0;
-            let cur = "";
-            for (let i = 0; i < paramsStr.length; i++) {
-                const c = paramsStr[i];
-                if (c === "(") depth++;
-                else if (c === ")") depth--;
-                else if (c === "," && depth === 0) {
-                    if (cur.trim()) types.push(cur.trim());
-                    cur = "";
-                    continue;
-                }
-                cur += c;
+    function splitSignatureTypes(paramsStr) {
+        const types = [];
+        let depth = 0;
+        let cur = "";
+        for (let i = 0; i < paramsStr.length; i++) {
+            const c = paramsStr[i];
+            if (c === "(") depth++;
+            else if (c === ")") depth--;
+            else if (c === "," && depth === 0) {
+                if (cur.trim()) types.push(cur.trim());
+                cur = "";
+                continue;
             }
-            if (cur.trim()) types.push(cur.trim());
-            return types;
+            cur += c;
         }
+        if (cur.trim()) types.push(cur.trim());
+        return types;
+    }
 
-        function parseFunctionSignature(signature) {
-            const nameEnd = signature.indexOf("(");
-            if (nameEnd < 0) return { name: signature, types: [] };
-            const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+    function parseFunctionSignature(signature) {
+        const nameEnd = signature.indexOf("(");
+        if (nameEnd < 0) return { name: signature, types: [] };
+        const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+        return {
+            name: signature.slice(0, nameEnd),
+            types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+        };
+    }
+
+    function formatDecodedArg(type, value) {
+        if (type === "address") return shortAddr(value);
+        if (type === "bool") return String(value);
+        if (type.endsWith("[]")) {
+            const inner = type.slice(0, -2);
+            return "[" + (value || []).map(function (v) {
+                return formatDecodedArg(inner, v);
+            }).join(", ") + "]";
+        }
+        return String(value);
+    }
+
+    function decodeParams(input) {
+        if (!input || input === "0x" || input.length < 10) return "-";
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return "-";
+        const parsed = parseFunctionSignature(signature);
+        if (!parsed.types.length) return "-";
+        try {
+            const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
+            return parsed.types.map(function (type, i) {
+                return parsed.name + "." + (i + 1) + "=" + formatDecodedArg(type, decoded[i]);
+            }).join(", ");
+        } catch (err) {
+            return "-";
+        }
+    }
+
+    function methodName(input) {
+        if (!input || input === "0x" || input.length < 10) return "-";
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return selector;
+        return parseFunctionSignature(signature).name;
+    }
+
+    function isInstanceDeploy(input) {
+        if (!input || input === "0x") return false;
+        return input.toLowerCase().replace(/^0x/, "").startsWith(INSTANCE_BYTECODE_PREFIX.toLowerCase());
+    }
+
+    function includes(arr, sel) {
+        return arr.indexOf(sel) >= 0;
+    }
+
+    function isMintTxn(input) {
+        const sel = input.slice(0, 10).toLowerCase();
+        if (sel === "0x40c10f19") return true;
+        if (sel !== "0xa3e884b0") return false;
+        try {
+            const decoded = web3.eth.abi.decodeParameters(
+                ["address", "uint256", "uint256", "uint256"],
+                "0x" + input.slice(10)
+            );
+            return String(decoded[3]) === "101";
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function classifyTx(tx) {
+        const input = tx.input || "0x";
+        const from = tx.from || "-";
+        const to = tx.to;
+
+        if (!to && isInstanceDeploy(input)) {
             return {
-                name: signature.slice(0, nameEnd),
-                types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+                txHash: tx.hash,
+                from: from,
+                to: "(CreateInstance)",
+                method: "CreateInstance",
+                params: "-",
             };
         }
 
-        function formatDecodedArg(type, value) {
-            if (type === "address") return shortAddr(value);
-            if (type === "bool") return String(value);
-            if (type.endsWith("[]")) {
-                const inner = type.slice(0, -2);
-                return "[" + (value || []).map(function (v) {
-                    return formatDecodedArg(inner, v);
-                }).join(", ") + "]";
-            }
-            return String(value);
+        if (!input || input.length < 10) return null;
+        const sel = input.slice(0, 10).toLowerCase();
+
+        if (includes(CREATE_INSTANCE_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "CreateInstance", params: decodeParams(input) };
+        }
+        if (includes(INIT_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "initialize", params: decodeParams(input) };
+        }
+        if (includes(LOGIN_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Login", params: decodeParams(input) };
+        }
+        if (includes(CLAIM_SEL, sel)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Claim", params: decodeParams(input) };
+        }
+        if (isMintTxn(input)) {
+            return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Mint", params: decodeParams(input) };
         }
 
-        function decodeParams(input) {
-            if (!input || input === "0x" || input.length < 10) return "-";
-            const selector = input.slice(0, 10).toLowerCase();
-            const signature = getSignatureMap()[selector];
-            if (!signature) return "-";
-            const parsed = parseFunctionSignature(signature);
-            if (!parsed.types.length) return "-";
-            try {
-                const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
-                return parsed.types.map(function (type, i) {
-                    return parsed.name + "." + (i + 1) + "=" + formatDecodedArg(type, decoded[i]);
-                }).join(", ");
-            } catch (err) {
-                return "-";
-            }
-        }
+        return null;
+    }
 
-        function methodName(input) {
-            if (!input || input === "0x" || input.length < 10) return "-";
-            const selector = input.slice(0, 10).toLowerCase();
-            const signature = getSignatureMap()[selector];
-            if (!signature) return selector;
-            return parseFunctionSignature(signature).name;
-        }
+    function createTable(rows) {
+        const table = document.createElement("table");
+        const headers = ["#", "Block", "Tx Hash", "From", "To", "Method", "Params"];
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        headers.forEach(function (h) {
+            const th = document.createElement("th");
+            th.innerText = h;
+            if (h === "#" || h === "Block" || h === "Method") th.className = "nobreakword";
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
 
-        function isInstanceDeploy(input) {
-            if (!input || input === "0x") return false;
-            return input.toLowerCase().replace(/^0x/, "").startsWith(INSTANCE_BYTECODE_PREFIX.toLowerCase());
-        }
-
-        function includes(arr, sel) {
-            return arr.indexOf(sel) >= 0;
-        }
-
-        function isMintTxn(input) {
-            const sel = input.slice(0, 10).toLowerCase();
-            if (sel === "0x40c10f19") return true;
-            if (sel !== "0xa3e884b0") return false;
-            try {
-                const decoded = web3.eth.abi.decodeParameters(
-                    ["address", "uint256", "uint256", "uint256"],
-                    "0x" + input.slice(10)
-                );
-                return String(decoded[3]) === "101";
-            } catch (err) {
-                return false;
-            }
-        }
-
-        function classifyTx(tx) {
-            const input = tx.input || "0x";
-            const from = tx.from || "-";
-            const to = tx.to;
-
-            if (!to && isInstanceDeploy(input)) {
-                return {
-                    txHash: tx.hash,
-                    from: from,
-                    to: "(CreateInstance)",
-                    method: "CreateInstance",
-                    params: "-",
-                };
-            }
-
-            if (!input || input.length < 10) return null;
-            const sel = input.slice(0, 10).toLowerCase();
-
-            if (includes(CREATE_INSTANCE_SEL, sel)) {
-                return { txHash: tx.hash, from: from, to: shortAddr(to), method: "CreateInstance", params: decodeParams(input) };
-            }
-            if (includes(INIT_SEL, sel)) {
-                return { txHash: tx.hash, from: from, to: shortAddr(to), method: "initialize", params: decodeParams(input) };
-            }
-            if (includes(LOGIN_SEL, sel)) {
-                return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Login", params: decodeParams(input) };
-            }
-            if (includes(CLAIM_SEL, sel)) {
-                return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Claim", params: decodeParams(input) };
-            }
-            if (isMintTxn(input)) {
-                return { txHash: tx.hash, from: from, to: shortAddr(to), method: "Mint", params: decodeParams(input) };
-            }
-
-            return null;
-        }
-
-        function createTable(rows) {
-            const table = document.createElement("table");
-            const headers = ["#", "Block", "Tx Hash", "From", "To", "Method", "Params"];
-            const thead = document.createElement("thead");
-            const headRow = document.createElement("tr");
-            headers.forEach(function (h) {
-                const th = document.createElement("th");
-                th.innerText = h;
-                if (h === "#" || h === "Block" || h === "Method") th.className = "nobreakword";
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement("tbody");
-            if (!rows.length) {
+        const tbody = document.createElement("tbody");
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = headers.length;
+            td.innerText = "No matching transactions found in scanned window";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            rows.forEach(function (row, idx) {
                 const tr = document.createElement("tr");
-                const td = document.createElement("td");
-                td.colSpan = headers.length;
-                td.innerText = "No matching transactions found in scanned window";
-                td.style.textAlign = "center";
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-            } else {
-                rows.forEach(function (row, idx) {
-                    const tr = document.createElement("tr");
-                    [
-                        String(idx + 1),
-                        String(row.blockNumber),
-                        row.txHash,
-                        shortAddr(row.from),
-                        row.to,
-                        row.method,
-                        row.params,
-                    ].forEach(function (cell) {
-                        const td = document.createElement("td");
-                        setCellContent(td, cell);
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
+                [
+                    String(idx + 1),
+                    String(row.blockNumber),
+                    row.txHash,
+                    shortAddr(row.from),
+                    row.to,
+                    row.method,
+                    row.params,
+                ].forEach(function (cell) {
+                    const td = document.createElement("td");
+                    setCellContent(td, cell);
+                    tr.appendChild(td);
                 });
-            }
-            table.appendChild(tbody);
-            return table;
+                tbody.appendChild(tr);
+            });
         }
+        table.appendChild(tbody);
+        return table;
+    }
 
-        let scanning = false;
+    let scanning = false;
 
-        async function fetchLatest() {
-            if (scanning) return;
-            scanning = true;
-            btn.disabled = true;
-            btn.style.opacity = "0.6";
-            btn.textContent = "Fetching...";
-            container.innerHTML = "⏳ Scanning latest blocks...";
-            status.innerText = "";
+    async function fetchLatest() {
+        if (scanning) return;
+        scanning = true;
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
+        btn.textContent = "Fetching...";
+        container.innerHTML = "⏳ Scanning latest blocks...";
+        status.innerText = "";
 
-            try {
-                const results = [];
-                const latestBlock = Number(await web3.eth.getBlockNumber());
+        try {
+            const results = [];
+            const latestBlock = Number(await web3.eth.getBlockNumber());
 
-                for (let bn = latestBlock; bn >= 0 && results.length < TOP_N; bn--) {
-                    if (latestBlock - bn >= MAX_BLOCKS) break;
+            for (let bn = latestBlock; bn >= 0 && results.length < TOP_N; bn--) {
+                if (latestBlock - bn >= MAX_BLOCKS) break;
 
-                    status.innerText = "Block " + bn + " — found " + results.length + " / " + TOP_N;
+                status.innerText = "Block " + bn + " — found " + results.length + " / " + TOP_N;
 
-                    const block = await web3.eth.getBlock(bn, true);
-                    if (!block || !block.transactions || !block.transactions.length) continue;
+                const block = await web3.eth.getBlock(bn, true);
+                if (!block || !block.transactions || !block.transactions.length) continue;
 
-                    const txs = block.transactions.slice().reverse();
-                    for (let i = 0; i < txs.length && results.length < TOP_N; i++) {
-                        const match = classifyTx(txs[i]);
-                        if (!match) continue;
-                        results.push({
-                            blockNumber: bn,
-                            txHash: match.txHash,
-                            from: match.from,
-                            to: match.to,
-                            method: match.method,
-                            params: match.params,
-                        });
-                    }
+                const txs = block.transactions.slice().reverse();
+                for (let i = 0; i < txs.length && results.length < TOP_N; i++) {
+                    const match = classifyTx(txs[i]);
+                    if (!match) continue;
+                    results.push({
+                        blockNumber: bn,
+                        txHash: match.txHash,
+                        from: match.from,
+                        to: match.to,
+                        method: match.method,
+                        params: match.params,
+                    });
                 }
-
-                container.innerHTML = "";
-                status.innerText =
-                    "Showing " + results.length + " most recent match(es) — updated " +
-                    new Date().toLocaleTimeString();
-                container.appendChild(createTable(results));
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = "❌ Error: " + (e.message || e);
-                status.innerText = "";
-            } finally {
-                scanning = false;
-                btn.disabled = false;
-                btn.style.opacity = "1";
-                btn.textContent = "Fetch Latest";
             }
+
+            container.innerHTML = "";
+            status.innerText =
+                "Showing " + results.length + " most recent match(es) — updated " +
+                new Date().toLocaleTimeString();
+            container.appendChild(createTable(results));
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "❌ Error: " + (e.message || e);
+            status.innerText = "";
+        } finally {
+            scanning = false;
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.textContent = "Fetch Latest";
         }
+    }
 
-        btn.onclick = () => fetchLatest();
+    btn.onclick = () => fetchLatest();
 
-        panel.addEventListener("click", function (e) {
-            const el = e.target.closest(".clickableAddr");
-            if (!el) return;
-            const full = el.getAttribute("data-full");
-            if (!full || !navigator.clipboard) return;
-            navigator.clipboard.writeText(full).then(function () {
-                const prev = el.textContent;
-                el.textContent = "Copied!";
-                setTimeout(function () { el.textContent = prev; }, 900);
-            }).catch(function () { });
+    panel.addEventListener("click", function (e) {
+        const el = e.target.closest(".clickableAddr");
+        if (!el) return;
+        const full = el.getAttribute("data-full");
+        if (!full || !navigator.clipboard) return;
+        navigator.clipboard.writeText(full).then(function () {
+            const prev = el.textContent;
+            el.textContent = "Copied!";
+            setTimeout(function () { el.textContent = prev; }, 900);
+        }).catch(function () { });
+    });
+
+}
+
+
+
+async function onCreateTemplate(tid) {
+    showLoader();
+
+    try {
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+
+        //
+
+        var calldata = '';
+
+        if (tid == 1) calldata = ChangeParent;
+        else if (tid == 2) calldata = ChangeOwner;
+        else if (tid == 3) calldata = SuspendIncome;
+        else if (tid == 4) calldata = LockUser;
+        else if (tid == 5) calldata = ClaimPerDay;
+        else if (tid == 6) calldata = SecureBase;
+        else if (tid == 7) calldata = DAOWinPer;
+        else if (tid == 8) calldata = DAOBlacklist;
+        else { alert('No Template found'); return; }
+        // estimate gas
+
+        const txHash = await window.ethereum.request({
+            method: "eth_sendTransaction",
+            params: [{
+                from: accounts[0],
+                to: indaocore,
+                data: calldata
+            }]
         });
 
+        // wait for receipt
+        const receipt = await web3.eth.getTransactionReceipt(txHash);
+
+        console.log(receipt);
+
+        if (receipt && receipt.status)
+            alert("Template succeeded");
+        else
+            alert("Template failed");
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Template failed: " + (err.message || err));
     }
 
+    hideLoader();
 
+}
 
-    async function onCreateTemplate(tid) {
-        showLoader();
+// -------------------- LOAD RULE --------------------
+async function loadRule() {
+    clearPanels();
+    showLoader();
+    try {
 
-        try {
-            window.web3T = new Web3(window.ethereum);
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        // ---------------- LEVEL CLAUSES (TABLE) ----------------
+        const panelLevel = addPanel("Level Clauses");
 
-            //
+        // create table
+        const table = document.createElement("table");
+        table.border = "1";
+        table.style.width = "100%";
 
-            var calldata = '';
-
-            if (tid == 1) calldata = ChangeParent;
-            else if (tid == 2) calldata = ChangeOwner;
-            else if (tid == 3) calldata = SuspendIncome;
-            else if (tid == 4) calldata = LockUser;
-            else if (tid == 5) calldata = ClaimPerDay;
-            else if (tid == 6) calldata = SecureBase;
-            else if (tid == 7) calldata = DAOWinPer;
-            else if (tid == 8) calldata = DAOBlacklist;
-            else { alert('No Template found'); return; }
-            // estimate gas
-
-            const txHash = await window.ethereum.request({
-                method: "eth_sendTransaction",
-                params: [{
-                    from: accounts[0],
-                    to: indaocore,
-                    data: calldata
-                }]
-            });
-
-            // wait for receipt
-            const receipt = await web3.eth.getTransactionReceipt(txHash);
-
-            console.log(receipt);
-
-            if (receipt && receipt.status)
-                alert("Template succeeded");
-            else
-                alert("Template failed");
-
-        } catch (err) {
-
-            console.error(err);
-            alert("Template failed: " + (err.message || err));
-        }
-
-        hideLoader();
-
-    }
-
-    // -------------------- LOAD RULE --------------------
-    async function loadRule() {
-        clearPanels();
-        showLoader();
-        try {
-
-            // ---------------- LEVEL CLAUSES (TABLE) ----------------
-            const panelLevel = addPanel("Level Clauses");
-
-            // create table
-            const table = document.createElement("table");
-            table.border = "1";
-            table.style.width = "100%";
-
-            // header
-            table.innerHTML = `
+        // header
+        table.innerHTML = `
         <thead>
         <tr>
         <th>Level</th>
@@ -6846,48 +6163,48 @@ async function renderULTreePanel() {
         <tbody id="levelClauseBody"></tbody>
         `;
 
-            panelLevel.appendChild(table);
+        panelLevel.appendChild(table);
 
-            // helper for percentage
-            function toPercent(num, den) {
-                if (parseInt(den) === 0) return "0%";
-                return (parseFloat(num) / parseFloat(den)) + "%";
-            }
+        // helper for percentage
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return (parseFloat(num) / parseFloat(den)) + "%";
+        }
 
-            // load data
-            for (let i = 1; i <= 15; i++) {
-                try {
-                    const lvl = await rule.methods.levelClause(i).call();
+        // load data
+        for (let i = 1; i <= 15; i++) {
+            try {
+                const lvl = await rule.methods.levelClause(i).call();
 
-                    const rwPercent = toPercent(lvl.rwNum, lvl.rwrDen);
-                    const yeiPercent = toPercent(lvl.yeiNum, lvl.yeiDen);
+                const rwPercent = toPercent(lvl.rwNum, lvl.rwrDen);
+                const yeiPercent = toPercent(lvl.yeiNum, lvl.yeiDen);
 
-                    document.getElementById("levelClauseBody")
-                        .insertAdjacentHTML("beforeend",
-                            `<tr>
+                document.getElementById("levelClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
                             <td>${i}</td>
                             <td>${lvl.rank}</td>
                             <td>${rwPercent}</td>
                             <td>${yeiPercent}</td>
                         </tr>`
-                        );
+                    );
 
-                } catch (e) {
-                    console.log("Level error:", i);
-                }
+            } catch (e) {
+                console.log("Level error:", i);
             }
+        }
 
 
-            // ---------------- RANK CLAUSES (TABLE) ----------------
-            const panelRank = addPanel("Rank Clauses");
+        // ---------------- RANK CLAUSES (TABLE) ----------------
+        const panelRank = addPanel("Rank Clauses");
 
-            // create table
-            const tableRank = document.createElement("table");
-            tableRank.border = "1";
-            tableRank.style.width = "100%";
+        // create table
+        const tableRank = document.createElement("table");
+        tableRank.border = "1";
+        tableRank.style.width = "100%";
 
-            // header
-            tableRank.innerHTML = `
+        // header
+        tableRank.innerHTML = `
         <thead>
         <tr>
         <th>Rank</th>
@@ -6901,22 +6218,22 @@ async function renderULTreePanel() {
         <tbody id="rankClauseBody"></tbody>
         `;
 
-            panelRank.appendChild(tableRank);
+        panelRank.appendChild(tableRank);
 
-            // load data
-            for (let i = 0; i <= 7; i++) {
-                try {
-                    const r = await rule.methods.rankClause(i).call();
-                    rankClauses[i] = {
-                        direct: Number(r.direct),
-                        nftAmount: Number(r.nftAmount),
-                        eRnk: Number(r.eRnk),
-                        gRnk: Number(r.gRnk),
-                        gPrd: Number(r.gPrd),
-                    };
-                    document.getElementById("rankClauseBody")
-                        .insertAdjacentHTML("beforeend",
-                            `<tr>
+        // load data
+        for (let i = 0; i <= 7; i++) {
+            try {
+                const r = await rule.methods.rankClause(i).call();
+                rankClauses[i] = {
+                    direct: Number(r.direct),
+                    nftAmount: Number(r.nftAmount),
+                    eRnk: Number(r.eRnk),
+                    gRnk: Number(r.gRnk),
+                    gPrd: Number(r.gPrd),
+                };
+                document.getElementById("rankClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
                             <td>${i}</td>
                             <td>${r.direct}</td>
                             <td>${r.nftAmount}</td>
@@ -6924,22 +6241,22 @@ async function renderULTreePanel() {
                             <td>${r.gRnk}</td>
                             <td>${r.gPrd}</td>
                         </tr>`
-                        );
+                    );
 
-                } catch (e) {
-                    console.log("Rank error:", i);
-                }
+            } catch (e) {
+                console.log("Rank error:", i);
             }
-            // ---------------- ROYALTY CLAUSES (TABLE) ----------------
-            const panelRoyal = addPanel("Royalty");
+        }
+        // ---------------- ROYALTY CLAUSES (TABLE) ----------------
+        const panelRoyal = addPanel("Royalty");
 
-            // create table
-            const tableRoyal = document.createElement("table");
-            tableRoyal.border = "1";
-            tableRoyal.style.width = "100%";
+        // create table
+        const tableRoyal = document.createElement("table");
+        tableRoyal.border = "1";
+        tableRoyal.style.width = "100%";
 
-            // header
-            tableRoyal.innerHTML = `
+        // header
+        tableRoyal.innerHTML = `
         <thead>
         <tr>
         <th>Royal #</th>
@@ -6950,54 +6267,54 @@ async function renderULTreePanel() {
         <tbody id="royalClauseBody"></tbody>
         `;
 
-            panelRoyal.appendChild(tableRoyal);
+        panelRoyal.appendChild(tableRoyal);
 
-            // helper for %
-            function toPercent(num, den) {
-                if (parseInt(den) === 0) return "0%";
-                let val = parseFloat(num) / parseFloat(den);
-                return parseFloat(val.toFixed(2)) + "%"; // removes trailing zeros
-            }
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            let val = parseFloat(num) / parseFloat(den);
+            return parseFloat(val.toFixed(2)) + "%"; // removes trailing zeros
+        }
 
-            // load data
-            for (let i = 1; i <= 7; i++) {
-                try {
-                    const rw = await rule.methods.royalityClause(i).call();
+        // load data
+        for (let i = 1; i <= 7; i++) {
+            try {
+                const rw = await rule.methods.royalityClause(i).call();
 
-                    if (parseInt(rw.rwNum) === 0) continue;
-                    const percent = toPercent(rw.rwNum, rw.rwDen);
+                if (parseInt(rw.rwNum) === 0) continue;
+                const percent = toPercent(rw.rwNum, rw.rwDen);
 
-                    document.getElementById("royalClauseBody")
-                        .insertAdjacentHTML("beforeend",
-                            `<tr>
+                document.getElementById("royalClauseBody")
+                    .insertAdjacentHTML("beforeend",
+                        `<tr>
                             <td>${i}</td>
                             <td>${percent}</td>
                             <td>${rw.rwEnd}</td>
                         </tr>`
-                        );
+                    );
 
-                } catch (e) {
-                    console.log("Royal error:", i);
-                }
+            } catch (e) {
+                console.log("Royal error:", i);
             }
+        }
 
-            // ---------------- POOL (TABLE - CLEAN) ----------------
-            const panelPool = addPanel("Pool");
+        // ---------------- POOL (TABLE - CLEAN) ----------------
+        const panelPool = addPanel("Pool");
 
-            const pool = await rule.methods.pool().call();
+        const pool = await rule.methods.pool().call();
 
-            // helper for %
-            function toPercent(num, den) {
-                if (parseInt(den) === 0) return "0%";
-                return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
-            }
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
 
-            // create table
-            const tablePool = document.createElement("table");
-            tablePool.border = "1";
-            tablePool.style.width = "100%";
+        // create table
+        const tablePool = document.createElement("table");
+        tablePool.border = "1";
+        tablePool.style.width = "100%";
 
-            tablePool.innerHTML = `
+        tablePool.innerHTML = `
         <thead>
         <tr>
         <th>Parameter</th>
@@ -7032,26 +6349,26 @@ async function renderULTreePanel() {
         </tbody>
         `;
 
-            panelPool.appendChild(tablePool);
+        panelPool.appendChild(tablePool);
 
-            // ---------------- NFT POOLS (TABLE) ----------------
-            const panelNFTPool = addPanel("NFT Pools (StartFrom: 270 days for 2025, 180 days for 2026))");
+        // ---------------- NFT POOLS (TABLE) ----------------
+        const panelNFTPool = addPanel("NFT Pools (StartFrom: 270 days for 2025, 180 days for 2026))");
 
-            const nft1 = await rule.methods.poolNFT1().call();
-            const nft2 = await rule.methods.poolNFT2().call();
+        const nft1 = await rule.methods.poolNFT1().call();
+        const nft2 = await rule.methods.poolNFT2().call();
 
-            // helper for %
-            function toPercent(num, den) {
-                if (parseInt(den) === 0) return "0%";
-                return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
-            }
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
 
-            // create table
-            const tableNFT = document.createElement("table");
-            tableNFT.border = "1";
-            tableNFT.style.width = "100%";
+        // create table
+        const tableNFT = document.createElement("table");
+        tableNFT.border = "1";
+        tableNFT.style.width = "100%";
 
-            tableNFT.innerHTML = `
+        tableNFT.innerHTML = `
         <thead>
         <tr>
         <th>Pool</th>
@@ -7077,474 +6394,474 @@ async function renderULTreePanel() {
         </tbody>
         `;
 
-            panelNFTPool.appendChild(tableNFT);
+        panelNFTPool.appendChild(tableNFT);
 
-            // ---------------- MINT SETTINGS ----------------
-            const panelMint = addPanel("Mint Config");
+        // ---------------- MINT SETTINGS ----------------
+        const panelMint = addPanel("Mint Config");
 
-            const minQty = await rule.methods.minMintQty().call();
-            const maxQty = await rule.methods.maxMintQty().call();
-            const fee = await rule.methods.mintFeePerQty().call();
-            const cycleDays = await rule.methods.mintCycleDays().call();
-            const maxPerCycle = await rule.methods.maxMintsPerCycle().call();
+        const minQty = await rule.methods.minMintQty().call();
+        const maxQty = await rule.methods.maxMintQty().call();
+        const fee = await rule.methods.mintFeePerQty().call();
+        const cycleDays = await rule.methods.mintCycleDays().call();
+        const maxPerCycle = await rule.methods.maxMintsPerCycle().call();
 
-            // min + max qty
-            addRow(panelMint, "Mint Quantity Range", `${minQty} - ${maxQty}`);
+        // min + max qty
+        addRow(panelMint, "Mint Quantity Range", `${minQty} - ${maxQty}`);
 
-            // cycle info
-            addRow(panelMint, "Mint Limit", `${maxPerCycle} mints allowed in ${cycleDays} days`);
+        // cycle info
+        addRow(panelMint, "Mint Limit", `${maxPerCycle} mints allowed in ${cycleDays} days`);
 
-            // fee per qty
-            addRow(panelMint, "Mint Price", `${fee}$ per NFT`);
+        // fee per qty
+        addRow(panelMint, "Mint Price", `${fee}$ per NFT`);
 
-            // ---------------- CLAIM SETTINGS ----------------
-            const panelClaim = addPanel("Claim Config");
+        // ---------------- CLAIM SETTINGS ----------------
+        const panelClaim = addPanel("Claim Config");
 
-            const minClaim = parseFloat(web3.utils.fromWei((await rule.methods.minClaimPerDay().call()).toString(), "ether")).toFixed(3);
-            const maxClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxClaimPerDay().call()).toString(), "ether")).toFixed(3);
-            const globalClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxGlobalClaimPerDay().call()).toString(), "ether")).toFixed(3)
-            const cycle = await rule.methods.eachclaimCycle().call();
+        const minClaim = parseFloat(web3.utils.fromWei((await rule.methods.minClaimPerDay().call()).toString(), "ether")).toFixed(3);
+        const maxClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxClaimPerDay().call()).toString(), "ether")).toFixed(3);
+        const globalClaim = parseFloat(web3.utils.fromWei((await rule.methods.maxGlobalClaimPerDay().call()).toString(), "ether")).toFixed(3)
+        const cycle = await rule.methods.eachclaimCycle().call();
 
-            // min + max in single row
-            addRow(panelClaim, "Claim Limit", `${minClaim} OZN - ${maxClaim} OZN`);
+        // min + max in single row
+        addRow(panelClaim, "Claim Limit", `${minClaim} OZN - ${maxClaim} OZN`);
 
-            // claim cycle meaning
-            addRow(panelClaim, "Claim Frequency", `1 claim allowed every ${cycle} days`);
+        // claim cycle meaning
+        addRow(panelClaim, "Claim Frequency", `1 claim allowed every ${cycle} days`);
 
-            // global claim meaning
-            addRow(panelClaim, "Daily Claim qouta- Global", `Max ${globalClaim} OZN claimable per day`);
+        // global claim meaning
+        addRow(panelClaim, "Daily Claim qouta- Global", `Max ${globalClaim} OZN claimable per day`);
 
-            // ---------------- NFT SETTINGS ----------------
-            const panelNFT = addPanel("NFT Config");
+        // ---------------- NFT SETTINGS ----------------
+        const panelNFT = addPanel("NFT Config");
 
-            const maxSend = await rule.methods.maxNFTSend().call();
-            const perCycle = await rule.methods.NFTSendPerCycle().call();
+        const maxSend = await rule.methods.maxNFTSend().call();
+        const perCycle = await rule.methods.NFTSendPerCycle().call();
 
-            addRow(panelNFT, "NFT Send", `${maxSend} NFTs allowed to send in ${perCycle} days`);
+        addRow(panelNFT, "NFT Send", `${maxSend} NFTs allowed to send in ${perCycle} days`);
 
-            // ---------------- DAO ----------------
-            const panelDAO = addPanel("DAO");
+        // ---------------- DAO ----------------
+        const panelDAO = addPanel("DAO");
 
-            addRow(panelDAO, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
+        addRow(panelDAO, "Eligible Rank For DAO", await rule.methods.rankforDAO().call());
 
-            // ---------------- DELEGATION Config----------------
-            const panelDelegation = addPanel("Delegation Config");
+        // ---------------- DELEGATION Config----------------
+        const panelDelegation = addPanel("Delegation Config");
 
-            // delegator count
-            addRow(panelDelegation, "Delegator Count", await rule.methods._delegatorCount().call());
+        // delegator count
+        addRow(panelDelegation, "Delegator Count", await rule.methods._delegatorCount().call());
 
-            // helper for %
-            function toPercent(num, den) {
-                if (parseInt(den) === 0) return "0%";
-                return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        // helper for %
+        function toPercent(num, den) {
+            if (parseInt(den) === 0) return "0%";
+            return parseFloat((parseFloat(num) / parseFloat(den)).toFixed(2)) + "%";
+        }
+
+        // validator configs
+        const valInternal = await rule.methods.valInternal().call();
+        const valExternal = await rule.methods.valExternal().call();
+
+        // grouped view
+        addRow(panelDelegation, "Internal",
+            `Qty:${valInternal.qtyORmul} | ROI:${toPercent(valInternal.roiN, valInternal.roiD)} (${valInternal.roiN}/${valInternal.roiD}) | Int:${valInternal.roiInt}`
+        );
+
+        addRow(panelDelegation, "External",
+            `Qty:${valExternal.qtyORmul} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
+        );
+
+
+        // ---------------- CAPPING ----------------
+        const panelCap = addPanel("Capping");
+
+        const cap = await rule.methods.capping().call();
+        addRow(panelCap, "Multiple", cap.multiple);
+        addRow(panelCap, "multipledollar", cap.multipledollar);
+
+
+
+        // ---------------- TOUR ----------------
+        const panelTour = addPanel("Tour");
+
+        for (let i = 1; i <= 7; i++) {
+            try {
+                const t = await rule.methods.tourClause(i).call();
+
+                const ct = await rule.methods.computeTour(i).call();
+
+                // skip if 0
+                if (parseInt(t) === 0) continue;
+
+                // convert wei → ether (3 decimal)
+                addRow(panelTour, `Tour ${i}`, `${t.toString()}$ ~ ${formatOZN(ct)}`);
+
+            } catch (e) {
+                console.log("Tour error:", i);
             }
-
-            // validator configs
-            const valInternal = await rule.methods.valInternal().call();
-            const valExternal = await rule.methods.valExternal().call();
-
-            // grouped view
-            addRow(panelDelegation, "Internal",
-                `Qty:${valInternal.qtyORmul} | ROI:${toPercent(valInternal.roiN, valInternal.roiD)} (${valInternal.roiN}/${valInternal.roiD}) | Int:${valInternal.roiInt}`
-            );
-
-            addRow(panelDelegation, "External",
-                `Qty:${valExternal.qtyORmul} | ROI:${toPercent(valExternal.roiN, valExternal.roiD)} (${valExternal.roiN}/${valExternal.roiD}) | Int:${valExternal.roiInt}`
-            );
-
-
-            // ---------------- CAPPING ----------------
-            const panelCap = addPanel("Capping");
-
-            const cap = await rule.methods.capping().call();
-            addRow(panelCap, "Multiple", cap.multiple);
-            addRow(panelCap, "multipledollar", cap.multipledollar);
-
-
-
-            // ---------------- TOUR ----------------
-            const panelTour = addPanel("Tour");
-
-            for (let i = 1; i <= 7; i++) {
-                try {
-                    const t = await rule.methods.tourClause(i).call();
-
-                    const ct = await rule.methods.computeTour(i).call();
-
-                    // skip if 0
-                    if (parseInt(t) === 0) continue;
-
-                    // convert wei → ether (3 decimal)
-                    addRow(panelTour, `Tour ${i}`, `${t.toString()}$ ~ ${formatOZN(ct)}`);
-
-                } catch (e) {
-                    console.log("Tour error:", i);
-                }
-            }
-
-
-            // ---------------- OTHER SETTINGS ----------------
-            const panelOthers = addPanel("OTHER SETTINGS");
-            sysAge = await rule.methods.systemAge().call();
-            document.getElementById("sysAgeid").innerHTML = sysAge;
-            addRow(panelOthers, "Owner", await rule.methods.owner().call());
-            addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
-            const system = await rule.methods.system().call();
-            addRow(panelOthers, "Shutdown", system.shutdown);
-            addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
-            addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
-            // ✅ NEW
-            addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
-            addRow(panelOthers, "Session_TTL (Seconds)", await rule.methods.sessionTTLSeconds().call());
-
-        } catch (err) {
-            console.error(err);
-            const panelErr = addPanel("Error");
-            addRow(panelErr, "Error", "Failed to load rule data");
         }
 
 
-        const btnUplineDownline = document.createElement("button");
-        btnUplineDownline.textContent = "Load View";
-        btnUplineDownline.style.padding = "8px 14px";
-        btnUplineDownline.style.borderRadius = "8px";
-        btnUplineDownline.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
-        btnUplineDownline.style.border = "none";
-        const panelUplineDownline = addPanel("🌳 Upline + Downline View");
-        panelUplineDownline.appendChild(btnUplineDownline);
-        // ---------- CLICK ----------
-        btnUplineDownline.onclick = () => {
-            renderULTreePanel();
-        };
-        hideLoader();
+        // ---------------- OTHER SETTINGS ----------------
+        const panelOthers = addPanel("OTHER SETTINGS");
+        sysAge = await rule.methods.systemAge().call();
+        document.getElementById("sysAgeid").innerHTML = sysAge;
+        addRow(panelOthers, "Owner", await rule.methods.owner().call());
+        addRow(panelOthers, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
+        const system = await rule.methods.system().call();
+        addRow(panelOthers, "Shutdown", system.shutdown);
+        addRow(panelOthers, "Is Safe", await rule.methods._isSafe().call());
+        addRow(panelOthers, "Allow Force Transfer", await rule.methods.allowForceTransfer().call());
+        // ✅ NEW
+        addRow(panelOthers, "Free Intervals", await rule.methods.freeIntervals().call());
+        addRow(panelOthers, "Session_TTL (Seconds)", await rule.methods.sessionTTLSeconds().call());
+
+    } catch (err) {
+        console.error(err);
+        const panelErr = addPanel("Error");
+        addRow(panelErr, "Error", "Failed to load rule data");
     }
 
-    function getGraphConfigOld(n) {
-        const maxRange = n + 2;
-        let axisTitle = "Value";
-        let formatter;
+
+    const btnUplineDownline = document.createElement("button");
+    btnUplineDownline.textContent = "Load View";
+    btnUplineDownline.style.padding = "8px 14px";
+    btnUplineDownline.style.borderRadius = "8px";
+    btnUplineDownline.style.background = "linear-gradient(135deg,#00ffff,#3fa9ff)";
+    btnUplineDownline.style.border = "none";
+    const panelUplineDownline = addPanel("🌳 Upline + Downline View");
+    panelUplineDownline.appendChild(btnUplineDownline);
+    // ---------- CLICK ----------
+    btnUplineDownline.onclick = () => {
+        renderULTreePanel();
+    };
+    hideLoader();
+}
+
+function getGraphConfigOld(n) {
+    const maxRange = n + 2;
+    let axisTitle = "Value";
+    let formatter;
 
 
 
-        // 1. Handle extremely small numbers (e.g., 0.00000004)
-        if (n > 0 && n < 0.0001) {
-            const exponent = Math.floor(Math.log10(n));
-            axisTitle = `Value (×10^${exponent})`;
-            // Scaled ticks (e.g., 4.0 instead of 0.00000004)
-            formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
-        }
+    // 1. Handle extremely small numbers (e.g., 0.00000004)
+    if (n > 0 && n < 0.0001) {
+        const exponent = Math.floor(Math.log10(n));
+        axisTitle = `Value (×10^${exponent})`;
+        // Scaled ticks (e.g., 4.0 instead of 0.00000004)
+        formatter = (val) => (val * Math.pow(10, -exponent)).toFixed(1);
+    }
 
-        // 2. Handle numbers with decimals (e.g., 12.004)
-        else if (n % 1 !== 0) {
-            axisTitle = "Value";
-            formatter = (val) => val.toFixed(2); // Keep labels short
-        }
+    // 2. Handle numbers with decimals (e.g., 12.004)
+    else if (n % 1 !== 0) {
+        axisTitle = "Value";
+        formatter = (val) => val.toFixed(2); // Keep labels short
+    }
 
-        // 3. Handle standard whole numbers
-        else {
-            axisTitle = "Value";
-            formatter = (val) => Math.round(val);
-        }
+    // 3. Handle standard whole numbers
+    else {
+        axisTitle = "Value";
+        formatter = (val) => Math.round(val);
+    }
 
 
 
+    return {
+        range: [0, maxRange],
+        title: axisTitle,
+        tickFormatter: formatter
+    };
+}
+
+
+
+// Examples:
+//console.log(getGraphConfigOld(0.00000004)); // Title: "Value (×10^-8)", Range: [0, 2.00000004]
+//console.log(getGraphConfigOld(12.004)); // Title: "Value", Range: [0, 14.004]
+// ----------------------------
+function round2(n) {
+    return Number(n.toFixed(2));
+}
+
+// ----------------------------
+function classifyInput(n) {
+    if (n === null || n === undefined || isNaN(n)) {
+        return { type: "zero", value: 0 };
+    }
+
+    n = Number(n);
+
+    if (n === 0) {
+        return { type: "zero", value: 0 };
+    }
+
+    return { type: "normal", value: n };
+}
+
+// ----------------------------
+function normalizeSmall(n) {
+    let value = Math.abs(n);
+    let shift = 0;
+
+    while (value < 0.1) {
+        value *= 10;
+        shift++;
+    }
+
+    return {
+        scaledValue: value,
+        scaleFactor: shift
+    };
+}
+
+// ----------------------------
+// 🔥 CORE MAPPING (CLEAN)
+// ----------------------------
+function mapToGraph(value, scaleRatio, range) {
+
+    if (!value || isNaN(value)) {
         return {
-            range: [0, maxRange],
-            title: axisTitle,
-            tickFormatter: formatter
+            value: 0,
+            isMin: true,
+            isMax: false
         };
     }
 
+    let scaled = value * scaleRatio;
 
+    let clamped = Math.max(range[0], Math.min(range[1], scaled));
 
-    // Examples:
-    //console.log(getGraphConfigOld(0.00000004)); // Title: "Value (×10^-8)", Range: [0, 2.00000004]
-    //console.log(getGraphConfigOld(12.004)); // Title: "Value", Range: [0, 14.004]
-    // ----------------------------
-    function round2(n) {
-        return Number(n.toFixed(2));
-    }
+    return {
+        value: round2(clamped),
+        isMin: clamped === range[0],
+        isMax: clamped === range[1]
+    };
+}
 
-    // ----------------------------
-    function classifyInput(n) {
-        if (n === null || n === undefined || isNaN(n)) {
-            return { type: "zero", value: 0 };
-        }
+// ----------------------------
+// 🔥 MAIN FUNCTION
+// ----------------------------
+function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
 
-        n = Number(n);
+    const classified = classifyInput(thresholdInput);
 
-        if (n === 0) {
-            return { type: "zero", value: 0 };
-        }
-
-        return { type: "normal", value: n };
-    }
-
-    // ----------------------------
-    function normalizeSmall(n) {
-        let value = Math.abs(n);
-        let shift = 0;
-
-        while (value < 0.1) {
-            value *= 10;
-            shift++;
-        }
-
+    // ZERO CASE
+    if (classified.type === "zero") {
         return {
-            scaledValue: value,
-            scaleFactor: shift
+            threshold: 0,
+            range: [0, 0],
+            ticks: Array(11).fill(0),
+
+            current: { value: 0, isMin: true, isMax: false },
+            burned: { value: 0, isMin: true, isMax: false }
         };
     }
 
-    // ----------------------------
-    // 🔥 CORE MAPPING (CLEAN)
-    // ----------------------------
-    function mapToGraph(value, scaleRatio, range) {
+    let rawThreshold = classified.value;
 
-        if (!value || isNaN(value)) {
-            return {
-                value: 0,
-                isMin: true,
-                isMax: false
-            };
-        }
+    let scaledThreshold = rawThreshold;
+    let scaleFactor = 1;
 
-        let scaled = value * scaleRatio;
-
-        let clamped = Math.max(range[0], Math.min(range[1], scaled));
-
-        return {
-            value: round2(clamped),
-            isMin: clamped === range[0],
-            isMax: clamped === range[1]
-        };
+    // SCALE SMALL VALUES
+    if (Math.abs(rawThreshold) < 0.001) {
+        const res = normalizeSmall(rawThreshold);
+        scaledThreshold = res.scaledValue;
+        scaleFactor = res.scaleFactor;
     }
 
-    // ----------------------------
-    // 🔥 MAIN FUNCTION
-    // ----------------------------
-    function getGraphConfig(thresholdInput, currentValue = 0, burned4x = 0) {
+    scaledThreshold = round2(scaledThreshold);
 
-        const classified = classifyInput(thresholdInput);
+    // GRAPH BUILD
+    const step = scaledThreshold / 9;
 
-        // ZERO CASE
-        if (classified.type === "zero") {
-            return {
-                threshold: 0,
-                range: [0, 0],
-                ticks: Array(11).fill(0),
+    let max = step * 10;
 
-                current: { value: 0, isMin: true, isMax: false },
-                burned: { value: 0, isMin: true, isMax: false }
-            };
-        }
+    // ✅ SCALE RATIO
+    const scaleRatio = rawThreshold !== 0
+        ? scaledThreshold / rawThreshold
+        : 0;
 
-        let rawThreshold = classified.value;
+    // 🔥 PRE-SCALE values
+    const scaledCurrent = currentValue * scaleRatio;
+    const scaledBurned = burned4x * scaleRatio;
 
-        let scaledThreshold = rawThreshold;
-        let scaleFactor = 1;
+    // 🔥 AUTO EXPAND (prevents clipping)
+    max = Math.max(max, scaledCurrent, scaledBurned);
 
-        // SCALE SMALL VALUES
-        if (Math.abs(rawThreshold) < 0.001) {
-            const res = normalizeSmall(rawThreshold);
-            scaledThreshold = res.scaledValue;
-            scaleFactor = res.scaleFactor;
-        }
+    max = round2(max);
 
-        scaledThreshold = round2(scaledThreshold);
+    const range = [0, max];
 
-        // GRAPH BUILD
-        const step = scaledThreshold / 9;
+    // 🔥 recompute step based on final max
+    const finalStep = max / 10;
 
-        let max = step * 10;
+    const ticks = Array.from({ length: 11 }, (_, i) =>
+        round2(i * finalStep)
+    );
 
-        // ✅ SCALE RATIO
-        const scaleRatio = rawThreshold !== 0
-            ? scaledThreshold / rawThreshold
-            : 0;
+    // MAP VALUES
+    const current = mapToGraph(currentValue, scaleRatio, range);
+    const burned = mapToGraph(burned4x, scaleRatio, range);
 
-        // 🔥 PRE-SCALE values
-        const scaledCurrent = currentValue * scaleRatio;
-        const scaledBurned = burned4x * scaleRatio;
+    return {
+        rawThreshold,
+        currentValue,
+        burned4x,
+        scaledThreshold,
+        scaleFactor,
+        scaleRatio,
+        step: round2(finalStep),
+        range,
 
-        // 🔥 AUTO EXPAND (prevents clipping)
-        max = Math.max(max, scaledCurrent, scaledBurned);
+        ticks,
 
-        max = round2(max);
+        thresholdTickIndex: 9, // approximate now (may shift slightly)
+        maxTickIndex: 10,
 
-        const range = [0, max];
+        tickAtIndex9: ticks[9],
+        tickAtIndex10: ticks[10],
 
-        // 🔥 recompute step based on final max
-        const finalStep = max / 10;
+        current,
+        burned
+    };
+}
+const tests = [
+    { t: 12, c: 10, b: 5 },
+    { t: 12.4, c: 15, b: 8 },
+    { t: 12.0004, c: 20, b: 1 },
 
-        const ticks = Array.from({ length: 11 }, (_, i) =>
-            round2(i * finalStep)
-        );
+    { t: 0.124, c: 0.5, b: 0.2 },
 
-        // MAP VALUES
-        const current = mapToGraph(currentValue, scaleRatio, range);
-        const burned = mapToGraph(burned4x, scaleRatio, range);
+    { t: 0.00000000124, c: 0.54546, b: 0.2 },
 
-        return {
-            rawThreshold,
-            currentValue,
-            burned4x,
-            scaledThreshold,
-            scaleFactor,
-            scaleRatio,
-            step: round2(finalStep),
-            range,
+    { t: 0, c: 10, b: 2 },
+    { t: null, c: 5, b: 1 },
+    { t: undefined, c: 2, b: 0.5 }
+];
+/*
+tests.forEach(({ t, c, b }) => {
+ 
+    console.log("\n====================");
+ 
+    const res = getGraphConfig(t, c, b);
+ 
+    console.log("INPUT →",
+        "Threshold:", t,
+        "| Current:", c,
+        "| Burned:", b
+    );
+ 
+    console.log("\n--- SCALED VALUES ---");
+    console.log("SCALED →",
+        "Threshold:",  res.threshold,
+        "| Current:", res.current.value,
+        "| Burned:", res.burned.value
+    );
+ 
+    console.log("\n--- SCALE INFO ---");
+    console.log("Scale Factor:", res.scaleFactor);
+    console.log("Raw Threshold:", res.rawThreshold);
+    console.log("Scaled Threshold:", res.scaledThreshold);
+ 
+    console.log("\n--- RANGE ---");
+    console.log("Range:", res.range);
+    console.log("Step :", res.step);
+ 
+    console.log("\n--- TICKS ---");
+    console.log(res.ticks);
+});
+ */
 
-            ticks,
-
-            thresholdTickIndex: 9, // approximate now (may shift slightly)
-            maxTickIndex: 10,
-
-            tickAtIndex9: ticks[9],
-            tickAtIndex10: ticks[10],
-
-            current,
-            burned
-        };
-    }
-    const tests = [
-        { t: 12, c: 10, b: 5 },
-        { t: 12.4, c: 15, b: 8 },
-        { t: 12.0004, c: 20, b: 1 },
-
-        { t: 0.124, c: 0.5, b: 0.2 },
-
-        { t: 0.00000000124, c: 0.54546, b: 0.2 },
-
-        { t: 0, c: 10, b: 2 },
-        { t: null, c: 5, b: 1 },
-        { t: undefined, c: 2, b: 0.5 }
-    ];
-    /*
-    tests.forEach(({ t, c, b }) => {
-     
-        console.log("\n====================");
-     
-        const res = getGraphConfig(t, c, b);
-     
-        console.log("INPUT →",
-            "Threshold:", t,
-            "| Current:", c,
-            "| Burned:", b
-        );
-     
-        console.log("\n--- SCALED VALUES ---");
-        console.log("SCALED →",
-            "Threshold:",  res.threshold,
-            "| Current:", res.current.value,
-            "| Burned:", res.burned.value
-        );
-     
-        console.log("\n--- SCALE INFO ---");
-        console.log("Scale Factor:", res.scaleFactor);
-        console.log("Raw Threshold:", res.rawThreshold);
-        console.log("Scaled Threshold:", res.scaledThreshold);
-     
-        console.log("\n--- RANGE ---");
-        console.log("Range:", res.range);
-        console.log("Step :", res.step);
-     
-        console.log("\n--- TICKS ---");
-        console.log(res.ticks);
-    });
-     */
-
-    async function loadGraph(cp) {
-        /* cp = {
-             totalIncome: 70.6,
-             burned4x: 13.0,
-             threshold: 12.4,
-             cap: false,
-             currentValue: 11.6
-         }; */
+async function loadGraph(cp) {
+    /* cp = {
+         totalIncome: 70.6,
+         burned4x: 13.0,
+         threshold: 12.4,
+         cap: false,
+         currentValue: 11.6
+     }; */
 
 
-        const s = getGraphConfig(cp.threshold, cp.currentValue, cp.burned4x);
+    const s = getGraphConfig(cp.threshold, cp.currentValue, cp.burned4x);
 
-        console.log(s);
+    console.log(s);
 
-        let minvalue = s.range[0];
-        let maxvalue = s.range[1];
-        let alertvalue = s.ticks[8];
+    let minvalue = s.range[0];
+    let maxvalue = s.range[1];
+    let alertvalue = s.ticks[8];
 
-        let statuscolor = cp.cap ? '#ff3c00' : (s.current.value >= s.ticks[8] ? '#f5e664' : '#55BF3B');
+    let statuscolor = cp.cap ? '#ff3c00' : (s.current.value >= s.ticks[8] ? '#f5e664' : '#55BF3B');
 
-        Highcharts.chart('container', {
+    Highcharts.chart('container', {
 
-            chart: {
-                type: 'gauge',
-                plotBackgroundColor: null,
-                plotBackgroundImage: null,
-                plotBorderWidth: 0,
-                plotShadow: false,
-                height: '80%',
-                backgroundColor: '#0f172a' // deep dark
-            },
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            height: '80%',
+            backgroundColor: '#0f172a' // deep dark
+        },
 
-            title: {
-                useHTML: true,
-                text: `
+        title: {
+            useHTML: true,
+            text: `
             <span style="font-size:17px; color:#ccc;">Capping: 
                 <span style="color:${statuscolor}; font-weight:600;font-size:16px;">
                     ${cp.cap ? 'ACTIVE' : (s.current.value >= s.ticks[8] ? 'WARNING' : 'NORMAL')}
                 </span> </span>
                 
             `,
-                x: 10,   // 👉 move right (+) / left (-)
-                y: 60     // 👉 move down (+) / up (-)
-            },
+            x: 10,   // 👉 move right (+) / left (-)
+            y: 60     // 👉 move down (+) / up (-)
+        },
 
-            credits: {
-                enabled: false
-            },
+        credits: {
+            enabled: false
+        },
 
-            exporting: {
-                enabled: false
-            },
+        exporting: {
+            enabled: false
+        },
 
-            pane: {
-                startAngle: -90,
-                endAngle: 89.9,
-                background: null,
-                center: ['50%', '75%'],
-                size: '110%'
-            },
+        pane: {
+            startAngle: -90,
+            endAngle: 89.9,
+            background: null,
+            center: ['50%', '75%'],
+            size: '110%'
+        },
 
-            // the value axis
-            yAxis: [{
-                min: s.ticks[0],
-                max: s.ticks[10],
-                tickPixelInterval: 72,
-                tickPosition: 'inside',
-                //tickColor: 'var(--highcharts-background-color, #FFFFFF)',
-                tickPositions: [s.ticks[0], s.current.value, s.ticks[9], s.ticks[10]], // Add 72 here
-                tickLength: 20,
-                tickWidth: 2,
-                minorTickInterval: null,
-                labels: {
-                    distance: 20,
-                    style: {
-                        fontSize: '14px',
-                        color: '#fff'
-                    },
-                    formatter: function () {
-                        var t = '<span color="grey">' + this.value.toString() + '</span>';
-
-                        //if(this.value == s.ticks[8]) t = '<span color="yellow">⚠</span>';
-                        if (this.value == s.ticks[9]) t = '<span color="red">T</span>';
-                        if (this.value == s.current.value) t = '<span color="' + statuscolor + '">C</span>';
-                        if (this.value == s.ticks[10]) t = '<span color="grey">max</span>';
-
-                        return t;
-                    }
+        // the value axis
+        yAxis: [{
+            min: s.ticks[0],
+            max: s.ticks[10],
+            tickPixelInterval: 72,
+            tickPosition: 'inside',
+            //tickColor: 'var(--highcharts-background-color, #FFFFFF)',
+            tickPositions: [s.ticks[0], s.current.value, s.ticks[9], s.ticks[10]], // Add 72 here
+            tickLength: 20,
+            tickWidth: 2,
+            minorTickInterval: null,
+            labels: {
+                distance: 20,
+                style: {
+                    fontSize: '14px',
+                    color: '#fff'
                 },
-                title: {
-                    text: `<div style="text-align:center; width:220px;">
+                formatter: function () {
+                    var t = '<span color="grey">' + this.value.toString() + '</span>';
+
+                    //if(this.value == s.ticks[8]) t = '<span color="yellow">⚠</span>';
+                    if (this.value == s.ticks[9]) t = '<span color="red">T</span>';
+                    if (this.value == s.current.value) t = '<span color="' + statuscolor + '">C</span>';
+                    if (this.value == s.ticks[10]) t = '<span color="grey">max</span>';
+
+                    return t;
+                }
+            },
+            title: {
+                text: `<div style="text-align:center; width:220px;">
                         <div style="
                             font-size:16px;
                             font-weight:700;
@@ -7561,51 +6878,51 @@ async function renderULTreePanel() {
 
                      
                     </div>`,
-                    y: 40
-                },
-                lineWidth: 0,
-                plotBands: [
-                    {
-                        from: s.ticks[0],
-                        to: s.ticks[9],
-                        color: {
-                            linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
-                            stops: [
-                                [0, '#55BF3B'], // Start: Green
-                                [0.35, '#55BF3B'], // Middle: Yellow
-                                [0.7, '#DDDF0D'], // Middle: Yellow
-                                [0.95, '#DDDF0D'], // Middle: Yellow
-                                [1, '#8B0000']  // End: Dark Red
-                            ]
-                        },
-                        thickness: 15
+                y: 40
+            },
+            lineWidth: 0,
+            plotBands: [
+                {
+                    from: s.ticks[0],
+                    to: s.ticks[9],
+                    color: {
+                        linearGradient: { x1: 0, y1: 0, x2: 1, y2: 0 },
+                        stops: [
+                            [0, '#55BF3B'], // Start: Green
+                            [0.35, '#55BF3B'], // Middle: Yellow
+                            [0.7, '#DDDF0D'], // Middle: Yellow
+                            [0.95, '#DDDF0D'], // Middle: Yellow
+                            [1, '#8B0000']  // End: Dark Red
+                        ]
                     },
-                    {
-                        from: s.ticks[9],
-                        to: s.ticks[10],
-                        color: '#7f1d1d', // dark red
-                        thickness: 20
-                    }
-                ]
-            }, {
-                min: s.ticks[0],
-                max: s.ticks[10],
-                /*title: {
-                    text: 'BURNED'
-                },*/
-                tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
-                lineColor: '#020102',
-                tickColor: '#8b5cf6',
-                reversed: true,
-                minorTickColor: '#8b5cf6',
-                offset: -60,
-                lineWidth: 0,
-                labels: {
-                    distance: 5,
-                    //rotation: 'auto',
-                    formatter: function () {
-                        var t = '<span>' + this.value + '</span>';
-                        if (this.value == s.burned.value) t = `<span style="
+                    thickness: 15
+                },
+                {
+                    from: s.ticks[9],
+                    to: s.ticks[10],
+                    color: '#7f1d1d', // dark red
+                    thickness: 20
+                }
+            ]
+        }, {
+            min: s.ticks[0],
+            max: s.ticks[10],
+            /*title: {
+                text: 'BURNED'
+            },*/
+            tickPositions: [s.ticks[0], s.burned.value, s.ticks[10]], // Add 72 here
+            lineColor: '#020102',
+            tickColor: '#8b5cf6',
+            reversed: true,
+            minorTickColor: '#8b5cf6',
+            offset: -60,
+            lineWidth: 0,
+            labels: {
+                distance: 5,
+                //rotation: 'auto',
+                formatter: function () {
+                    var t = '<span>' + this.value + '</span>';
+                    if (this.value == s.burned.value) t = `<span style="
                             display:inline-flex;
                             align-items:center;
                             justify-content:center;
@@ -7617,203 +6934,203 @@ async function renderULTreePanel() {
                         ">
                             B
                         </span>`;
-                        if (this.value == s.ticks[10]) t = '<span">max</span>';
-                        return t;
-                    },
-                    style: {
-                        color: 'Violet',
-                        fontWeight: 'normal',
-                        fontSize: '13px'
-                    }
-
+                    if (this.value == s.ticks[10]) t = '<span">max</span>';
+                    return t;
                 },
-                tickLength: 5,
+                style: {
+                    color: 'Violet',
+                    fontWeight: 'normal',
+                    fontSize: '13px'
+                }
 
-                minorTickLength: 1,
-                endOnTick: false,
-                plotBands: [{
-                    from: s.ticks[0],
-                    to: s.burned.value,
-                    color: 'Violet', // Violet
-                    thickness: 5,
-                    innerRadius: '60%',  // Tuck this band INSIDE
-                    outerRadius: '55%',
+            },
+            tickLength: 5,
 
-                }]
+            minorTickLength: 1,
+            endOnTick: false,
+            plotBands: [{
+                from: s.ticks[0],
+                to: s.burned.value,
+                color: 'Violet', // Violet
+                thickness: 5,
+                innerRadius: '60%',  // Tuck this band INSIDE
+                outerRadius: '55%',
 
-            }],
+            }]
 
-            series: [{
-                name: 'current: ',
-                data: [s.current.value],
-                tooltip: {
-                    enabled: false
-                },
-                dataLabels: {
-                    useHTML: true,
-                    x: -10,   // move right (+) or left (-)
-                    y: 20,   // move up (-) or down (+)
-                    format: `<!-- 📊 INFO BLOCK -->
+        }],
+
+        series: [{
+            name: 'current: ',
+            data: [s.current.value],
+            tooltip: {
+                enabled: false
+            },
+            dataLabels: {
+                useHTML: true,
+                x: -10,   // move right (+) or left (-)
+                y: 20,   // move up (-) or down (+)
+                format: `<!-- 📊 INFO BLOCK -->
                         <table align="left" style="color:grey; letter-spacing:1px;line-spacing:1px; text-align: left;font-weight: normal;width: 137%; border-collapse: collapse;" cellpadding="2"><tbody>
                         <tr><td width="100px">Income</td><td>${cp.totalIncome}</td></tr>
                         <tr><td>Threshold</td><td>${cp.threshold}</td></tr>
                         <tr><td>BurnedX</td><td>${cp.burned4x}</td></tr>
                         </tbody></table>`,
-                    borderWidth: 0,
+                borderWidth: 0,
 
-                    style: {
-                        fontSize: '13px'
-                    }
-                },
-                /*dial: {
-                    radius: '80%',
-                    backgroundColor: 'white',
-                    baseColor: 'red',
-                    baseWidth: 10,
-                    baseLength: '0%',
-                    rearLength: '0%'
-                }*/
-                dial: {
-                    radius: '100%',
-                    baseWidth: 0,
-                    rearLength: '0%',
-                    topWidth: 1,
-                    backgroundColor: '#F5F5F5',
-                    borderWidth: 0,
-                },
-                pivot: {
-                    backgroundColor: 'grey',
-                    radius: 9
+                style: {
+                    fontSize: '13px'
                 }
+            },
+            /*dial: {
+                radius: '80%',
+                backgroundColor: 'white',
+                baseColor: 'red',
+                baseWidth: 10,
+                baseLength: '0%',
+                rearLength: '0%'
+            }*/
+            dial: {
+                radius: '100%',
+                baseWidth: 0,
+                rearLength: '0%',
+                topWidth: 1,
+                backgroundColor: '#F5F5F5',
+                borderWidth: 0,
+            },
+            pivot: {
+                backgroundColor: 'grey',
+                radius: 9
+            }
 
-            }, {
-                name: 'Burned',
-                data: [0.1],
-                tooltip: {
-                    enabled: false
-                },
-                dial: {
-                    radius: '60%',
-                    baseWidth: 1,
-                    rearLength: '0%',
-                    topWidth: 1,
-                    backgroundColor: 'red',
-                    borderWidth: 0,
-                },
-                pivot: {
-                    backgroundColor: 'grey',
-                    radius: 9
-                },
-            }]
+        }, {
+            name: 'Burned',
+            data: [0.1],
+            tooltip: {
+                enabled: false
+            },
+            dial: {
+                radius: '60%',
+                baseWidth: 1,
+                rearLength: '0%',
+                topWidth: 1,
+                backgroundColor: 'red',
+                borderWidth: 0,
+            },
+            pivot: {
+                backgroundColor: 'grey',
+                radius: 9
+            },
+        }]
 
+    });
+
+
+
+
+
+}
+
+
+
+async function connectWallet() {
+    currentAccount = null;
+    currentInstance = null;
+    currentStor = null;
+
+    if (!window.ethereum) {
+        alert("MetaMask not installed");
+        return;
+    }
+
+    try {
+
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts'
         });
 
+        currentAccount = accounts[0];
 
-
-
-
+        showWallet();
+        await addConnectedUserPanel();
+    } catch (err) {
+        console.error(err);
     }
 
+}
+function showWallet() {
+
+    const short = currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4);
+
+    document.getElementById("walletAddr").innerText = short;
+
+    document.getElementById("connectBtn").style.display = "none";
+    document.getElementById("walletInfoLine").style.display = "flex";
 
 
-    async function connectWallet() {
-        currentAccount = null;
-        currentInstance = null;
-        currentStor = null;
+}
 
-        if (!window.ethereum) {
-            alert("MetaMask not installed");
-            return;
-        }
+function disconnectWallet() {
 
-        try {
+    currentAccount = null;
+    currentInstance = null;
+    currentStor = null;
 
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts'
-            });
+    document.getElementById("walletInfoLine").style.display = "none";
 
-            currentAccount = accounts[0];
+    document.getElementById("connectBtn").style.display = "inline-block";
 
-            showWallet();
-            await addConnectedUserPanel();
-        } catch (err) {
-            console.error(err);
-        }
+}
 
+function copyWallet() {
+
+    if (!currentAccount) return;
+
+    navigator.clipboard.writeText(currentAccount);
+
+}
+
+function formatDate(date) {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+}
+
+function getAgeDateRange(age) {
+    const baseDate = new Date("2025-07-17T22:00:00"); // 10:00 PM
+
+    // Start date = base + (age - 1) days
+    const start = new Date(baseDate);
+    start.setDate(start.getDate() + (age - 1));
+
+    // End date = start + 1 day
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return {
+        start: formatDate(start),
+        end: formatDate(end)
+    };
+}
+
+window.onload = load;
+
+document.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("clickableAddr")) {
+
+        const fullAddr = e.target.dataset.full;
+
+        await navigator.clipboard.writeText(fullAddr);
+
+        const oldText = e.target.innerText;
+
+        e.target.innerText = "Copied ✓";
+        e.target.style.opacity = "0.5";
+
+        setTimeout(() => {
+            e.target.innerText = oldText;
+            e.target.style.opacity = "1";
+        }, 800);
     }
-    function showWallet() {
-
-        const short = currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4);
-
-        document.getElementById("walletAddr").innerText = short;
-
-        document.getElementById("connectBtn").style.display = "none";
-        document.getElementById("walletInfoLine").style.display = "flex";
-
-
-    }
-
-    function disconnectWallet() {
-
-        currentAccount = null;
-        currentInstance = null;
-        currentStor = null;
-
-        document.getElementById("walletInfoLine").style.display = "none";
-
-        document.getElementById("connectBtn").style.display = "inline-block";
-
-    }
-
-    function copyWallet() {
-
-        if (!currentAccount) return;
-
-        navigator.clipboard.writeText(currentAccount);
-
-    }
-
-    function formatDate(date) {
-        const dd = String(date.getDate()).padStart(2, '0');
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const yyyy = date.getFullYear();
-        return `${dd}-${mm}-${yyyy}`;
-    }
-
-    function getAgeDateRange(age) {
-        const baseDate = new Date("2025-07-17T22:00:00"); // 10:00 PM
-
-        // Start date = base + (age - 1) days
-        const start = new Date(baseDate);
-        start.setDate(start.getDate() + (age - 1));
-
-        // End date = start + 1 day
-        const end = new Date(start);
-        end.setDate(end.getDate() + 1);
-
-        return {
-            start: formatDate(start),
-            end: formatDate(end)
-        };
-    }
-
-    window.onload = load;
-
-    document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("clickableAddr")) {
-
-            const fullAddr = e.target.dataset.full;
-
-            await navigator.clipboard.writeText(fullAddr);
-
-            const oldText = e.target.innerText;
-
-            e.target.innerText = "Copied ✓";
-            e.target.style.opacity = "0.5";
-
-            setTimeout(() => {
-                e.target.innerText = oldText;
-                e.target.style.opacity = "1";
-            }, 800);
-        }
-    });
+});
