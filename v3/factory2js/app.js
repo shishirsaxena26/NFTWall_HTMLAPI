@@ -3961,22 +3961,127 @@ async function renderULTreePanel() {
             background: rgba(0,255,255,0.15);
             border-radius: 4px;
         }
+
+        .incTreeWrap ul {
+            list-style: none;
+            padding-left: 18px;
+            border-left: 1px dashed #2a3a5a;
+            margin-left: 6px;
+        }
+
+        .incTreeWrap > ul {
+            border-left: none;
+            padding-left: 0;
+            margin-left: 0;
+        }
+
+        .incTreeWrap li {
+            margin: 6px 0;
+            font-size: 12px;
+        }
+
+        .incTreeWrap .node {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #2a3a5a;
+            background: #0b0f1a;
+        }
+
+        .incTreeWrap .inc-badge {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .incTreeWrap .inc-pay {
+            color: #00ff9f;
+            border-color: #00ff9f44;
+            background: #00ff9f11;
+        }
+
+        .incTreeWrap .inc-badge-pay {
+            background: #00ff9f;
+            color: #001a12;
+        }
+
+        .incTreeWrap .inc-skip {
+            color: #ff4d4d;
+            border-color: #ff4d4d44;
+            background: #ff4d4d11;
+        }
+
+        .incTreeWrap .inc-badge-skip {
+            background: #ff4d4d;
+            color: #1a0000;
+        }
+
+        .incTreeWrap .inc-na {
+            color: #8899aa;
+            border-color: #8899aa44;
+            background: #8899aa11;
+        }
+
+        .incTreeWrap .inc-badge-na {
+            background: #8899aa;
+            color: #0b0f1a;
+        }
+
+        .incTreeWrap .inc-self {
+            border-color: #3fa9ff;
+            box-shadow: 0 0 8px #3fa9ff33;
+        }
+
+        .incSummary {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 10px 0 14px;
+            font-size: 13px;
+        }
+
+        .incSummary span {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #2a3a5a;
+        }
+
+        .incTreeWrap .inc-caption {
+            font-family: monospace;
+            color: #00ffff;
+        }
+
+        .incMetaRow {
+            color: #ccc;
+            margin: 4px 0;
+        }
+
+        .incMetaRow b {
+            color: #3fa9ff;
+        }
   `;
     document.head.appendChild(style);
 
     // ---------- HELPERS ----------
     function shortAddr(addr) {
         if (!addr) return "----";
+        return `<span class="shortAddr clickableAddr" data-full="${addr}" style="cursor:pointer;">${addr.slice(0, 6)}...${addr.slice(-4)}</span>`;
+    }
 
-        return `
-        <span 
-            class="shortAddr clickableAddr"
-            data-full="${addr}"
-            style="cursor:pointer;"
-        >
-            ${addr.slice(0, 6)}...${addr.slice(-4)}
-        </span>
-    `;
+    function addHtmlRow(parent, label, htmlValue) {
+        const row = document.createElement("div");
+        row.className = "incMetaRow";
+        row.innerHTML = `<b>${label}:</b> ${htmlValue}`;
+        parent.appendChild(row);
+    }
+
+    function incomeNodeCaption(node, isSelf) {
+        return `Level-${node.lvl} | ${node.id} | Rank: ${node.rank}*${isSelf ? " 🧑‍💻" : ""}`;
     }
 
     async function getNode(id) {
@@ -4116,165 +4221,251 @@ async function renderULTreePanel() {
     };
 
 
-    // ---------- LOAD INCOME VIEW ----------
+    // ---------- LOAD INCOME VIEW (matches Nested741._addLvlIncome) ----------
+    const MAX_NETWORK_LEVEL = 15;
+    const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+
+    function isLvlSkipped(parentrnk, ieRnk, igRnk, isExpired) {
+        return !(
+            parentrnk >= ieRnk
+            || (
+                !isExpired
+                && parentrnk >= igRnk
+                && parentrnk < ieRnk
+            )
+        );
+    }
+
+    function getRankClauseValues(rnk, rankClause) {
+        const c = rankClause[rnk] || {};
+        return {
+            ieRnk: Number(c.eRnk || 0),
+            igRnk: Number(c.gRnk || 0),
+            igPrd: Number(c.gPrd || 0),
+        };
+    }
+
+    function updateRankAfterLevel(currentrnk, currentrankage, lvl, iRnk, ieRnk, igRnk, igPrd, isExpired, ageNow, rankClause) {
+        if (currentrnk > iRnk || lvl === 0) {
+            const clause = getRankClauseValues(currentrnk, rankClause);
+            ieRnk = clause.ieRnk;
+            igRnk = clause.igRnk;
+            igPrd = clause.igPrd;
+            iRnk = currentrnk;
+            isExpired = (ageNow - currentrankage) > igPrd;
+        }
+        return { iRnk, ieRnk, igRnk, igPrd, isExpired };
+    }
+
     async function loadIncomeView(addr) {
-        runTableTrace(await buildDataSet(addr), rankClauses)
+        const nodes = await buildDataSet(addr);
+        renderIncomeTree(nodes, rankClauses);
     }
 
     async function buildDataSet(addr) {
 
-        const ranks = [];
-        const ages = [];
+        const nodes = [];
 
-        // 🔹 get node info from address
+        // walk buyer → upline (same as _addLvlIncome)
         let uid = await nested.methods.UserToId(addr).call();
 
-        for (let lvl = 0; lvl < 16 && uid != 0; lvl++) {
+        for (let lvl = 0; lvl <= MAX_NETWORK_LEVEL && uid != 0; lvl++) {
 
-
-            // 🔹 get node details
             const node = await nested.methods.getNode(uid).call();
             const storAddr = node[4];
 
             let rank = 0;
             let age = 0;
 
-            if (storAddr !== "0x0000000000000000000000000000000000000000") {
-
+            if (storAddr !== ZERO_ADDR) {
                 const stor = new web3.eth.Contract(IInstanceStorABI.abi, storAddr);
                 const res = await stor.methods.getRankWithAgeValue().call();
-
                 rank = Number(res[0]);
                 age = Number(res[1]);
             }
 
-            ranks.push(rank);
-            ages.push(age);
+            nodes.push({
+                lvl,
+                id: String(uid),
+                address: node[1],
+                stor: storAddr,
+                rank,
+                age,
+            });
 
             uid = node[2];
         }
 
-        // 🔁 reverse to match Solidity (top → down)
-        //ranks.reverse();
-        //ages.reverse();
-
-        return { ranks, ages };
+        return nodes;
     }
 
-    async function runTableTrace(dataSet, rankClause) {
-
-        const panel = addPanel("📊 Income Trace");
-
+    function simulateIncomeTrace(nodes, rankClause, amount = 1, qty = 1) {
         const currentAgeNow = Number(sysAge);
-
-        addRow(panel, "Current Age", currentAgeNow);
+        const amt = BigInt(amount || 0);
+        const q = BigInt(qty || 0);
 
         let iRnk = 0;
         let ieRnk = 0;
         let igRnk = 0;
         let igPrd = 0;
-        let iOutDay = false;
+        let isExpired = false;
 
-        let lastrnk = null;
+        return nodes.map((node) => {
+            const currentrnk = node.rank;
+            const currentAge = node.age;
+            const storAddr = node.stor;
+            const lvl = node.lvl;
 
-        const length = dataSet.ranks.length;
-        const table = document.createElement("table");
-        table.style.fontFamily = "monospace";
-
-        const header = `
-    <tr>
-    <th>Lvl</th><th></th><th>Rank</th><th>Last</th><th>Age</th>
-    <th>iRnk</th><th>ieRnk</th><th>igRnk</th><th>igPrd</th><th>Out</th>
-    </tr>`;
-        table.innerHTML = header;
-        table.style.textAlign = "right";
-
-        panel.appendChild(table);
-
-        for (let lvl = 0; lvl < length; lvl++) {
-
-            const currentrnk = dataSet.ranks[lvl] ?? 0;
-            const currentAge = dataSet.ages[lvl] ?? 0;
-
+            let processed = false;
             let isSkipped = false;
+            let payStatus = "N/A";
+            let payLabel = "N/A";
+            let payClass = "inc-na";
+            let badgeClass = "inc-badge-na";
 
-            let iRnkStr = "";
-            let ieRnkStr = "";
-            let igRnkStr = "";
-            let igPrdStr = "";
-            let iOutDayStr = "";
+            const shouldProcess =
+                storAddr !== ZERO_ADDR
+                && ((lvl > 0 && amt > 0n) || q > 0n);
 
-            // ---------- LEVEL 0 ----------
-            if (lvl === 0) {
+            if (shouldProcess) {
+                processed = true;
 
-                const r0 = rankClause[currentrnk] || {};
-
-                ieRnk = r0.eRnk || 0;
-                igRnk = r0.gRnk || 0;
-                igPrd = r0.gPrd || 0;
-
-                iRnk = currentrnk;
-                lastrnk = currentrnk;
-
-                iOutDay = (currentAgeNow - currentAge) > igPrd;
-
-                iRnkStr = iRnk;
-                ieRnkStr = ieRnk;
-                igRnkStr = igRnk;
-                igPrdStr = igPrd;
-                iOutDayStr = iOutDay;
-            }
-
-            // ---------- MAIN LOGIC ----------
-            if (lvl > 0 && currentrnk !== lastrnk) {
-
-                if (currentrnk !== iRnk) {
-
-                    const r = rankClause[currentrnk] || {};
-
-                    if (currentrnk > iRnk) {
-
-                        iRnk = currentrnk;
-                        ieRnk = r.eRnk || 0;
-                        igRnk = r.gRnk || 0;
-                        igPrd = r.gPrd || 0;
-
-                        iOutDay = (currentAgeNow - currentAge) > igPrd;
-
-                        iRnkStr = iRnk;
-                        ieRnkStr = ieRnk;
-                        igRnkStr = igRnk;
-                        igPrdStr = igPrd;
-                        iOutDayStr = iOutDay;
-                    }
+                if (lvl > 0) {
+                    const parentrnk = currentrnk;
+                    isSkipped = isLvlSkipped(parentrnk, ieRnk, igRnk, isExpired);
                 }
 
-                isSkipped = !(
-                    (currentrnk >= ieRnk) ||
-                    (currentrnk >= igRnk && currentrnk < ieRnk && !iOutDay)
+                const updated = updateRankAfterLevel(
+                    currentrnk,
+                    currentAge,
+                    lvl,
+                    iRnk,
+                    ieRnk,
+                    igRnk,
+                    igPrd,
+                    isExpired,
+                    currentAgeNow,
+                    rankClause
                 );
 
+                iRnk = updated.iRnk;
+                ieRnk = updated.ieRnk;
+                igRnk = updated.igRnk;
+                igPrd = updated.igPrd;
+                isExpired = updated.isExpired;
+
+                if (isSkipped) {
+                    payStatus = "NO PAY";
+                    payLabel = "NO PAY";
+                    payClass = "inc-skip";
+                    badgeClass = "inc-badge-skip";
+                } else {
+                    payStatus = "PAY";
+                    payLabel = "PAY";
+                    payClass = "inc-pay";
+                    badgeClass = "inc-badge-pay";
+                }
+            } else if (storAddr === ZERO_ADDR) {
+                payLabel = "NO STOR";
             }
 
-            // ---------- RENDER ROW ----------
-            const row = document.createElement("tr");
-            row.innerHTML = `
-        <td>${lvl}</td>
-        <td>${isSkipped ? "❌" : "✅"}</td>
-        <td>${currentrnk}</td>
-        <td>${lastrnk}</td>
-        <td>${currentAge}</td>
-        <td>${iRnkStr}</td>
-        <td>${ieRnkStr}</td>
-        <td>${igRnkStr}</td>
-        <td>${igPrdStr}</td>
-        <td>${iOutDayStr}</td>
-        `;
-            if (isSkipped) row.style.color = "#ff4d4d";       // red
-            else if (iRnkStr) row.style.color = "#00ff9f";    // green
-            else row.style.color = "#00ffff";                 // cyan
-            table.appendChild(row);
-            lastrnk = currentrnk;
+            return {
+                ...node,
+                processed,
+                isSkipped,
+                payStatus,
+                payLabel,
+                payClass,
+                badgeClass,
+                iRnk,
+                ieRnk,
+                igRnk,
+                igPrd,
+                isExpired,
+            };
+        });
+    }
+
+    function buildIncomeTreeUL(traceNodes, selfAddr) {
+        // top = root upline, bottom = buyer (same layout as loadTree upline)
+        const chain = [...traceNodes].reverse();
+        const ul = document.createElement("ul");
+
+        ul.addEventListener("click", (e) => {
+            const li = e.target.closest("li");
+            if (!li || !li.addr) return;
+            input.value = li.addr;
+            loadIncomeView(li.addr);
+        });
+
+        let currentUL = ul;
+
+        for (let i = 0; i < chain.length; i++) {
+            const n = chain[i];
+            const isSelf = n.address.toLowerCase() === selfAddr.toLowerCase();
+            const li = document.createElement("li");
+            li.addr = n.address;
+
+            li.innerHTML = `
+                <span class="node ${n.payClass}${isSelf ? " inc-self" : ""}" title="${n.address}">
+                    <span class="inc-caption">${incomeNodeCaption(n, isSelf)}</span>
+                    <span class="inc-badge ${n.badgeClass}">${n.payLabel}</span>
+                </span>`;
+
+            const nextUL = document.createElement("ul");
+            li.appendChild(nextUL);
+            currentUL.appendChild(li);
+            currentUL = nextUL;
+        }
+
+        return ul;
+    }
+
+    async function renderIncomeTree(nodes, rankClause, amount = 1, qty = 1) {
+
+        const panel = addPanel("📊 Income Trace Tree");
+        panel.innerHTML = "⏳ Loading...";
+
+        try {
+            const trace = simulateIncomeTrace(nodes, rankClause, amount, qty);
+            const selfAddr = nodes[0]?.address || "";
+            const currentAgeNow = Number(sysAge);
+
+            const paid = trace.filter(n => n.processed && !n.isSkipped).length;
+            const skipped = trace.filter(n => n.processed && n.isSkipped).length;
+            const na = trace.filter(n => !n.processed).length;
+
+            panel.innerHTML = "";
+
+            addHtmlRow(panel, "Buyer", shortAddr(selfAddr));
+            addRow(panel, "Current Age", currentAgeNow);
+            addRow(panel, "Sim amount / qty", `${amount} / ${qty}`);
+
+            const summary = document.createElement("div");
+            summary.className = "incSummary";
+            summary.innerHTML = `
+                <span style="color:#00ff9f">✅ PAY: ${paid}</span>
+                <span style="color:#ff4d4d">❌ NO PAY: ${skipped}</span>
+                <span style="color:#8899aa">— N/A: ${na}</span>
+                <span style="color:#00ffff">Total nodes: ${trace.length}</span>`;
+            panel.appendChild(summary);
+
+            const legend = document.createElement("div");
+            legend.style.fontSize = "11px";
+            legend.style.color = "#8899aa";
+            legend.style.marginBottom = "10px";
+            legend.innerHTML =
+                "Top → root upline &nbsp;|&nbsp; Bottom → buyer &nbsp;|&nbsp; Click node to re-run trace";
+            panel.appendChild(legend);
+
+            const wrap = document.createElement("div");
+            wrap.className = "incTreeWrap";
+            wrap.appendChild(buildIncomeTreeUL(trace, selfAddr));
+            panel.appendChild(wrap);
+
+        } catch (e) {
+            console.error(e);
+            panel.innerHTML = "❌ Error: " + (e.message || e);
         }
     }
 
@@ -4291,6 +4482,9 @@ async function renderULTreePanel() {
         if (e.key === "Enter") btn.click();
     });
 }
+
+
+
 
 
 
