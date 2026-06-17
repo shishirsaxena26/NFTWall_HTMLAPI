@@ -1737,7 +1737,7 @@ async function loadMyStor(id, panel) {
             btnLoadBusiness.innerText = "LoadBusiness";
             btnLoadBusiness.style.marginLeft = "10px";
             btnLoadBusiness.onclick = () => {
-                onLoadBusiness(storAddr);
+                onLoadBusiness(storAddr, id);
             };
 
             right.appendChild(btnTVLRefresh);
@@ -3248,26 +3248,27 @@ async function loadMyNFT() {
     hideLoader();
 }
 
-async function onLoadBusiness(storAdd) {
+async function onLoadBusiness(storAdd, id) {
+    debugger;
     showLoader();
     try {
         removePanelIfExists("Level Business");
         const levelpanel = addPanel("Level Business");
-
+        debugger;
         const storeContract = new web3.eth.Contract(IInstanceStorABI.abi, storAdd);
         const lvlBatch = await storeContract.methods.getNodeLvlInfoBatch(0, 15).call();
-
+        debugger;
         addRow(levelpanel, "Level ", ` Business | Qty | Reward | Yeild `);
 
         for (let i = 0; i <= 15; i++) {
             const lvl = lvlBatch[i];
             addRow(levelpanel, "Level [" + i + "]", ` ${formatOZN(lvl[0])} | ${lvl[1]} | ${formatOZN(lvl[2])} | ${formatOZN(lvl[3])} `);
         }
-
+        debugger;
         const getMD = await nested.methods.getMoveDownline(id).call();
 
         const caption = getMD.op ? "Attach" : "Detach";
-
+        debugger;
         const btnMovedownlineProposer = document.createElement("button");
         btnMovedownlineProposer.innerText = "Movedownline" + caption;
         btnMovedownlineProposer.style.marginLeft = "10px";
@@ -3277,6 +3278,7 @@ async function onLoadBusiness(storAdd) {
         };
 
         addRow(levelpanel, "--", btnMovedownlineProposer);
+        debugger;
     }
     catch {
 
