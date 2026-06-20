@@ -815,7 +815,7 @@ async function onSetSystem() {
             login, mint, claim, reJoin, newJoin
         });
         
-        const ruleContract = new web3T.eth.Contract(I741RulesABI.abi, rule);
+        const ruleContract = new web3T.eth.Contract(I741RulesABI.abi, in741Rule);
 
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
