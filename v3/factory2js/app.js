@@ -3523,7 +3523,7 @@ async function onTVLRefresh() {
         }
 
         const id = await nested.methods.UserToId(user).call();
-debuggerl
+        debugger;
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -3535,17 +3535,18 @@ debuggerl
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
         const Nested741OwnerChange = new web3T.eth.Contract(INested741OwnerChange.abi, inNested741OwnerChange);
+        
         const tx = await Nested741OwnerChange.methods
              .TVLrefresh(user, 0, true)
              .send({
                  from: accounts[0]
              });
  
-         if (tx.status) {
+        if (tx.status) {
              alert("TVLrefresh succeeded");
-         } else {
+        } else {
              alert("TVLrefresh failed");
-         }
+        }
          
 
     } catch (err) {
