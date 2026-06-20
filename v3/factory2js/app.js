@@ -17,6 +17,7 @@ let IDAOAssemblyABI = {};
 let ITransferRequestsABI = {};
 let INFTProxyABI = {};
 let INested741TVLABI = {};
+let INested741OwnerChange = {};
 
 let inprice = {};
 let insafeguard = {};
@@ -150,7 +151,7 @@ async function init() {
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v=' + version).then(res => res.json());
     INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v=' + version).then(res => res.json());
     IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v=' + version).then(res => res.json());
-    //INested741TVLABI = await fetch('abistandardv3/Nested741TVL.sol/Nested741TVL.json?v=' + version).then(res => res.json());
+    INested741OwnerChange = await fetch('abistandardv3/Nested741OwnerChange.sol/Nested741TVL.json?v=' + version).then(res => res.json());
 
 
     SIGNATURES = await fetch('abistandardv3/cache/signatures.json?v=' + version).then(res => res.json());
@@ -180,8 +181,6 @@ async function init() {
 
     inproposals.push(await hexBase.methods.proposals(0).call());
     transferRequests = new web3.eth.Contract(ITransferRequestsABI.abi, inproposals[0]);
-
-    //nested741TVL = new web3.eth.Contract(INested741TVLABI.abi, inNested741TVL);
 
     inPrice = await hexBase.methods.inPrice().call();
     price = new web3.eth.Contract(IPriceABI.abi, inPrice);
@@ -689,7 +688,7 @@ async function loadSystemTreasuriesNSecurebase() {
     const nftvalidator = await hexBase.methods.invalidator().call();
     addRow(panelBase, "Validator", nftvalidator);
 
-    addRow(panelBase, "inNested741TVL", inNested741TVL);
+    addRow(panelBase, "inNested741OwnerChange", inNested741OwnerChange);
 
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
@@ -3540,9 +3539,9 @@ async function onTVLRefresh() {
         // Enable wallet
         // const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
 
-        //const Nested741TVLContract = new web3T.eth.Contract(INested741TVLABI.abi, inNested741TVL);
+        const Nested741OwnerChange = new web3T.eth.Contract(INested741OwnerChange.abi, inNested741OwnerChange);
 
-        /* const tx = await Nested741TVLContract.methods
+         const tx = await Nested741OwnerChange.methods
              .TVLrefresh(user, 0, true)
              .send({
                  from: accounts[0]
