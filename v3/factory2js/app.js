@@ -151,7 +151,7 @@ async function init() {
     ITransferRequestsABI = await fetch('abistandardv3/TransferRequests.sol/TransferRequests.json?v=' + version).then(res => res.json());
     INFTProxyABI = await fetch('abistandardv3/NFTProxy.sol/NFTProxy.json?v=' + version).then(res => res.json());
     IValidatorsABI = await fetch('abistandardv3/NFTwallValidators.sol/NFTwallValidators.json?v=' + version).then(res => res.json());
-    INested741OwnerChange = await fetch('abistandardv3/Nested741OwnerChange.sol/Nested741TVL.json?v=' + version).then(res => res.json());
+    INested741OwnerChange = await fetch('abistandardv3/Nested741OwnerChange.sol/Nested741OwnerChange.json?v=' + version).then(res => res.json());
 
 
     SIGNATURES = await fetch('abistandardv3/cache/signatures.json?v=' + version).then(res => res.json());
