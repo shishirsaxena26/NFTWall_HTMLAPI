@@ -557,20 +557,68 @@ async function printRow(addr, balpanel) {
 }
 
 // -------------------- LOAD SYSTEM --------------------
+// -------------------- LOAD SYSTEM --------------------
 async function loadSystem() {
     clearPanels();
     const panelSys = addPanel("System Data");
     try {
+        
+        const keys = ["login", "mint", "claim", "reJoin", "newJoin", "shutdown"];
+
+        const container = document.createElement("div");
+        container.className = "row";
+        
+        //document.body.appendChild(container);
+
+        keys.forEach(text => {
+            const wrapper = document.createElement("label");
+            wrapper.style.display = "flex";
+            wrapper.style.alignItems = "center";
+            wrapper.style.gap = "4px";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = text;
+            checkbox.id = text;      // ID from name
+
+            const labelText = document.createElement("span");
+            labelText.innerText = text;
+
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(labelText);
+
+            container.appendChild(wrapper);
+        });
+
+        // Button at the end
+        const button = document.createElement("button");
+        button.innerText = "Submit";
+
+        button.addEventListener("click", () => {
+            onSetSystem();
+        });
+
+        container.appendChild(button);
+
+        addRow(panelSys, "", container);
+
+        const systemRunning = await rule.methods.system().call();
+        // Now use names safely
+        keys.forEach((key, i) => {
+            const el = document.getElementById(key);
+            if (el) el.checked = systemRunning[i];
+        });
+
         const nodes = await nested.methods.getNodesCount().call();
         sysAge = await nested.methods.systemAge().call();
         document.getElementById("sysAgeid").innerHTML = sysAge;
         const isSafe = await safeguard.methods.isSafe().call();
-
-        addRow(panelSys, "Nodes Count", nodes);
-        addRow(panelSys, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
-        addRow(panelSys, "Is Safe", isSafe);
-
-        addRow(panelSys, "Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
+        const panelNodeDet = addPanel("System Data");
+        addRow(panelNodeDet, "Nodes Count", nodes);
+        addRow(panelNodeDet, "System Age", `${getAgeDateRange(sysAge).start} {${sysAge}}`);
+        addRow(panelNodeDet, "Is Safe", isSafe);
+        addRow(panelNodeDet, "Price Rate", formatOZN(await price.methods.ozonePriceInUSDT().call()));
+        
         await loadSystemTreasuriesNSecurebase();
 
     } catch (err) {
@@ -747,6 +795,74 @@ async function loadSystemTreasuriesNSecurebase() {
     //onGetDailyBusiness();
 
 }
+
+async function onSetSystem() {
+    showLoader();
+
+    try {
+        
+        const login = document.getElementById("login").checked;
+        const mint = document.getElementById("mint").checked;
+        const claim = document.getElementById("claim").checked;
+        const reJoin = document.getElementById("reJoin").checked;
+        const newJoin = document.getElementById("newJoin").checked;
+        const shutdown = document.getElementById("shutdown").checked;
+ 
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+
+        console.log("Sending:", {
+            login, mint, claim, reJoin, newJoin, shutdown
+        });
+        
+        const ruleContract = new web3T.eth.Contract(I741RulesABI.abi, rule);
+
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+
+        // prepare method
+        const method = ruleContract.methods.setPauseSystem(
+                login,
+                mint,
+                claim,
+                reJoin,
+                newJoin,
+                shutdown
+        );
+        
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: accounts[0]
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: accounts[0],
+            gas: Math.floor(gas * 1.1),
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
+            alert("System update succeeded");
+        } else {
+            alert("System update failed");
+        }
+
+        console.log("Tx Hash:", receipt.transactionHash);
+        console.log("Gas Used:", receipt.gasUsed);
+
+
+    } catch (err) {
+        console.error(err);
+        alert("System update failed: " + (err.message || err));
+    }
+
+    hideLoader();
+}
+
 
 async function onExecuteRoyality() {
 
