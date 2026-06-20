@@ -806,14 +806,14 @@ async function onSetSystem() {
         const claim = document.getElementById("claim").checked;
         const reJoin = document.getElementById("reJoin").checked;
         const newJoin = document.getElementById("newJoin").checked;
-        const shutdown = document.getElementById("shutdown").checked;
+        //const shutdown = document.getElementById("shutdown").checked;
  
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
         console.log("Sending:", {
-            login, mint, claim, reJoin, newJoin, shutdown
+            login, mint, claim, reJoin, newJoin
         });
         
         const ruleContract = new web3T.eth.Contract(I741RulesABI.abi, rule);
@@ -829,7 +829,7 @@ async function onSetSystem() {
                 claim,
                 reJoin,
                 newJoin,
-                shutdown
+                false
         );
         
         // estimate gas
