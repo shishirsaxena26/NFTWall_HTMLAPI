@@ -2183,14 +2183,13 @@ async function loadDAO() {
 function addProposal(tid) {
     var templateid = parseInt(tid);
     if (templateid == 1) onChangeParent(templateid);
-    else if (templateid == 2) onChangeParent(templateid);
-    else if (templateid == 3) onChangeOwner(templateid);
-    else if (templateid == 4) onSuspendIncome(templateid);
-    else if (templateid == 5) onLockuser(templateid);
-    else if (templateid == 6) onChangeOwner(templateid);
-    else if (templateid == 7) onSecureBase(templateid);
-    else if (templateid == 8) onDAOWinPer(templateid);
-    else if (templateid == 9) onDAOBlacklist(templateid);
+    else if (templateid == 2) onChangeOwner(templateid);
+    else if (templateid == 3) onSuspendIncome(templateid);
+    else if (templateid == 4) onLockuser(templateid);
+    else if (templateid == 5) onChangeOwner(templateid);
+    else if (templateid == 6) onSecureBase(templateid);
+    else if (templateid == 7) onDAOWinPer(templateid);
+    else if (templateid == 8) onDAOBlacklist(templateid);
     else alert('invalid template');
 }
 
