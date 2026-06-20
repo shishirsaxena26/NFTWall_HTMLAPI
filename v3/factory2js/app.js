@@ -3523,7 +3523,7 @@ async function onTVLRefresh() {
         }
 
         const id = await nested.methods.UserToId(user).call();
-
+debuggerl
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -3531,17 +3531,11 @@ async function onTVLRefresh() {
             throw "Incorrect account selected";
         }
         if (currentAccount != accounts[0]) { throw "Incorrect account selected"; }
-
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
-
-        // Enable wallet
-        // const nestedContractV1 = new web3T.eth.Contract(INested741ABI.abi, inNested741);
-
         const Nested741OwnerChange = new web3T.eth.Contract(INested741OwnerChange.abi, inNested741OwnerChange);
-
-         const tx = await Nested741OwnerChange.methods
+        const tx = await Nested741OwnerChange.methods
              .TVLrefresh(user, 0, true)
              .send({
                  from: accounts[0]
@@ -3552,7 +3546,7 @@ async function onTVLRefresh() {
          } else {
              alert("TVLrefresh failed");
          }
-         */
+         
 
     } catch (err) {
         console.error(err);
