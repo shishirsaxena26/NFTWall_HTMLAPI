@@ -47,8 +47,7 @@ let currentInstance = null;
 let currentStor = null;
 
 const maxintervals = 30;
-const doTVLClaim = false;
-const doClaim = false;
+const doClaim = true;
 
 let SIGNATURES;
 
@@ -1276,7 +1275,7 @@ async function loginUser1() {
             IInstanceMeABI.abi,
             currentInstance
         );
-        const tx = await instancecontract.methods.login(maxintervals, doTVLClaim, doClaim).send({ from: accounts[0] });
+        const tx = await instancecontract.methods.login(maxintervals, doClaim).send({ from: accounts[0] });
         if (tx.status) {
             alert("Login succeeded");
         }
