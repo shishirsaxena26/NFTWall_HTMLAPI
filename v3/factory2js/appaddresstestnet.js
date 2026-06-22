@@ -1,13 +1,13 @@
 const provider = "https://rpc-testnet.ozonescan.com";
 // "https://chain.ozonescan.com"
 // "https://rpc-testnet.ozonescan.com"
-
+const network = "Testnet"
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";
 
 //✅ 
-let hexBaseAddress = "0x30dba3f4E291a1E881b75215B6546B7595937327";
+let hexBaseAddress = "0xF3D94ffe7970dd548E30FbeD956f8C32D4fc2Aa8";
 //let hexBaseAddress = "0x4d11ac6e7186DA32e9bb1CB4479A8B69277d1Dac";
 //let hexBaseAddress = "0xada9eAE3542D48d4248536BBbF36bC0c0F08B58c";
 

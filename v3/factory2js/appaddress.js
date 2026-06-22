@@ -2,6 +2,7 @@ const provider = "https://chain.ozonescan.com";
 // "https://chain.ozonescan.com"
 // "https://rpc-testnet.ozonescan.com"
 
+const network = "Mainnet"
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 //let hexBaseAddress = "0x519445d757C82c8576F400F1a55d65f3e2635169";

@@ -238,7 +238,7 @@ async function _callpayload() {
         ["address", "bytes"],
         ["0xFcb3B3914e3E93040884696De45fb99b1a8Cbb90", data]
     );
-
+debugger;
     window.web3T = new Web3(window.ethereum);
     // Initialize contract
     const hexcontract = new web3T.eth.Contract(IHexBaseABI.abi, inhexBase);
@@ -687,7 +687,8 @@ async function loadSystemTreasuriesNSecurebase() {
     const nftvalidator = await hexBase.methods.invalidator().call();
     addRow(panelBase, "Validator", nftvalidator);
 
-    addRow(panelBase, "inNested741OwnerChange", inNested741OwnerChange);
+    if(network=="Mainnet")
+        addRow(panelBase, "inNested741OwnerChange", inNested741OwnerChange);
 
     const panelTreasury = addPanel("TREASURY");
     const factory = await hexBase.methods.inTreaseryFactory().call();
@@ -1849,7 +1850,8 @@ async function loadMyStor(id, panel) {
             btnTVLRefresh.style.marginLeft = "10px";
 
             btnTVLRefresh.onclick = () => {
-                onTVLRefresh();
+                //onTVLRefresh();
+                onTVLRefreshByGASPredict();
             };
 
             const btnLoadBusiness = document.createElement("button");
@@ -3556,6 +3558,53 @@ async function onTVLRefresh() {
     hideLoader();
 }
 
+async function onTVLRefreshByGASPredict() {
+    showLoader();
+
+    try {
+        // Enable wallet
+        window.web3T = new Web3(window.ethereum);
+        
+        let user = '0x84AfC240cfc1F11C5Ee3411b2f05d8efEA47B7Af'
+        // get latest base fee
+        const block = await web3T.eth.getBlock("latest");
+        const baseFee = BigInt(block.baseFeePerGas || 0);
+        const Nested741OwnerChange = new web3T.eth.Contract(INested741OwnerChange.abi, inNested741OwnerChange);
+        
+        // prepare method
+        const method = Nested741OwnerChange.methods.TVLrefresh(user, 0, true);
+
+        // estimate gas
+        const gas = await method.estimateGas({
+            from: currentAccount
+        });
+
+        // send tx
+        const receipt = await method.send({
+            from: currentAccount,
+            gas: Math.floor(gas * 1.1),
+
+            maxPriorityFeePerGas: "1",
+            maxFeePerGas: (baseFee + 2n).toString()
+        });
+
+        if (receipt.status) {
+            alert("TVLrefresh succeeded");
+        } else {
+            alert("TVLrefresh failed");
+        }
+
+        console.log("Tx Hash:", receipt.transactionHash);
+        console.log("Gas Used:", receipt.gasUsed);
+ 
+    } catch (err) {
+        console.error(err);
+        alert("TVLrefresh failed: " + (err.message || err));
+    }
+
+    hideLoader();
+}
+
 
 async function onCapBurn() {
     showLoader();
@@ -3769,7 +3818,7 @@ async function onNFTTransfer(user, orc1155, tokenId, isforce) {
                 .send({ from: user });
             if (!tx1.status) throw "Incorrect account selected";
         }
-
+debugger;
         // Send transfer
         const tx1 = await orc1155contract.methods
             .onTokenTransfer(user, to, tokenId, amount, isforce, "0x")
