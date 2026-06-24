@@ -1546,6 +1546,42 @@ async function onClaim() {
 	}
 }
 
+async function setstartstop(val) {
+	$("#lblmsg").text('');
+	try {
+
+		let accounts = await ethereum.enable();
+		window.web3 = new Web3(window.ethereum);
+
+		if (!(await isUser(accounts[0]))) { msg('user not found.'); return; }
+
+
+		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
+		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+
+		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
+		//
+		let response = await window.instancecontract.methods.setStopWithdraw(val).send(
+			{ from: accounts[0] }
+		)
+			.on('error', function (error) { msg(error.message); console.log(error); })
+
+			.then(function (Obj) {
+				console.log(Obj);
+				if (Obj.status == true) {
+					$("#lblmsg").text('Succeeded');
+				}
+				else {
+					$("#lblmsg").text('Failed');
+				}
+			});
+	}
+	catch (ex) {
+		console.log(ex);
+		$("#lblmsg").text('Failed');
+	}
+}
+
 async function onTVLEmpty() {
 	$("#lblmsg").text('');
 	try {
