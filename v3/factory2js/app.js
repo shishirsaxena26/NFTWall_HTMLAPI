@@ -1619,9 +1619,17 @@ async function loadUser() {
 
         addRow(panel, "Are you Eligible DAO Delegator ", isdelegator);
         addRow(panel, "Are you Active DAO Delegator ", isdelegatorNode);
+        
+        var mistakenested = new web3.eth.Contract(INested741ABI.abi, '0x7B754337350A5b6DD566Ba7e1A99a57E8Ae58f76');
+        const mistakenode = await mistakenested.methods.getNode(id).call();
+        
         const instAddr = node[3];
         const storAddr = node[4];
         addRow(panel, "INST---", "");
+        
+        if (mistakenode[3] != "0x0000000000000000000000000000000000000000") 
+            addRow(panel, "Mistake InstAddr", mistakenode[3]);
+        
         addRow(panel, "InstAddr", node[3]);
         if (instAddr != "0x0000000000000000000000000000000000000000") {
             const inst = new web3.eth.Contract(IInstanceMeABI.abi, instAddr);
