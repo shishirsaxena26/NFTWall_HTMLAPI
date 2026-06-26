@@ -569,6 +569,7 @@ async function onLoadAddress() {
 
 
 async function isUser(u) {
+	window.web3 = new Web3(new Web3.providers.HttpProvider(provider));
 	window.nestedcontract = new window.web3.eth.Contract(NestedABI.abi, nested);
 	debugger;
 	let add = await window.nestedcontract.methods.UserToInst(u).call();
@@ -1551,11 +1552,10 @@ async function setstartstop(val) {
 	try {
 
 		let accounts = await ethereum.enable();
-		window.web3 = new Web3(window.ethereum);
 
 		if (!(await isUser(accounts[0]))) { msg('user not found.'); return; }
 
-
+		window.web3 = new Web3(window.ethereum);
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
 
