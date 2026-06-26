@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ozone — User · Source · June-8 · New(post-22) Instances & Balances</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#0f172a;color:#e2e8f0;}
+  .wrap{max-width:1400px;margin:0 auto;padding:24px;}
+  h1{color:#38bdf8;font-size:19px;}
+  .card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:18px;margin:14px 0;}
+  label{font-weight:bold;display:block;margin-bottom:6px;}
+  input,select,button{font-size:14px;padding:8px 10px;border-radius:6px;border:1px solid #475569;background:#0f172a;color:#e2e8f0;}
+  button{background:#0284c7;border:none;color:#fff;cursor:pointer;font-weight:bold;}
+  button:disabled{background:#475569;cursor:not-allowed;}
+  button:hover:not(:disabled){background:#0369a1;}
+  .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  #prog{height:18px;background:#0f172a;border:1px solid #475569;border-radius:9px;overflow:hidden;margin-top:10px;}
+  #bar{height:100%;width:0;background:#22c55e;transition:width .2s;}
+  #stat{margin-top:8px;font-size:13px;color:#94a3b8;}
+  table{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:10px;}
+  th,td{border:1px solid #334155;padding:5px 7px;text-align:left;white-space:nowrap;}
+  th{background:#0c4a6e;position:sticky;top:0;}
+  td.bal{text-align:right;font-variant-numeric:tabular-nums;}
+  .nzS{background:#1e3a8a;} .nzJ{background:#14532d;} .nzN{background:#7c2d12;}
+  #tableWrap{max-height:470px;overflow:auto;border:1px solid #334155;border-radius:8px;}
+  .muted{color:#94a3b8;font-size:12px;}
+  .big{font-size:18px;color:#38bdf8;font-weight:bold;}
+  code{background:#0f172a;padding:1px 5px;border-radius:4px;color:#fbbf24;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔷 Ozone — User · Source · June-8 · New(post-22) Instances + Balances</h1>
+  <p class="muted">Per user shows three instances with live balances:
+  <b>Source</b> = NodeData <code>nodeIns</code> ·
+  <b>June-8</b> = <code>UserToInst(user)</code> on <code>0x7B754337…</code> ·
+  <b>New (post-22)</b> = <code>InstAddr</code> from registry <code>0x0f2f9b63…</code> method <code>0x4f0f4aa9(id)</code>.
+  All native OZN, batched from the Ozone RPC, fully in your browser.</p>
+
+  <div class="card">
+    <label>🔎 Single user lookup (works standalone; load CSV too for the Source instance)</label>
+    <div class="row">
+      <input id="oneAddr" placeholder="0x user address …" size="46">
+      <button id="oneGo">Check</button>
+    </div>
+    <div id="oneOut" style="margin-top:12px;font-size:13px;line-height:1.7"></div>
+  </div>
+
+  <div class="card">
+    <label>1. Select NodeData.csv (needs columns: id, node, nodeIns)</label>
+    <input type="file" id="file" accept=".csv">
+    <div class="row" style="margin-top:12px;">
+      <div><label>RPC URL</label><input id="rpc" value="https://chain.ozonescan.com" size="30"></div>
+      <div><label>Batch size</label><input id="batch" type="number" value="300" style="width:80px"></div>
+      <div><label>Show</label>
+        <select id="filter"><option value="any" selected>Any balance &gt; 0</option><option value="all">All rows</option><option value="new">New(post-22) &gt; 0</option><option value="june">June-8 &gt; 0</option></select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px;">
+      <button id="go" disabled>▶ Start</button>
+      <button id="dl" disabled>⬇ Download CSV</button>
+      <span id="loaded" class="muted"></span>
+    </div>
+    <div id="prog"><div id="bar"></div></div>
+    <div id="stat"></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>Shown: <span class="big" id="cntShown">0</span></div>
+      <div>Σ Source: <span class="big" id="sumS">0</span></div>
+      <div>Σ June-8: <span class="big" id="sumJ">0</span></div>
+      <div>Σ New: <span class="big" id="sumN">0</span></div>
+      <div>Checked: <span id="cntDone">0</span>/<span id="cntAll">0</span></div>
+    </div>
+    <div id="tableWrap"><table id="tbl"><thead><tr>
+      <th>#</th><th>User (node)</th>
+      <th>Source Inst</th><th class="bal">Source Bal</th>
+      <th>June-8 Inst</th><th class="bal">June-8 Bal</th>
+      <th>New Inst (post-22)</th><th class="bal">New Bal</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<script>
+let rows=[], H={}, results=[];
+const $=id=>document.getElementById(id);
+const RES_J='0x45145fd7';                 // UserToInst(address)  -> June-8 instance
+const REG='0x0f2f9b63b8d7ec1979193e64956121f4d1239dfa'; // node registry
+const REG_M='0x4f0f4aa9';                 // nodes(uint id) -> struct (InstAddr = word index 3)
+function padAddr(a){return '000000000000000000000000'+String(a).toLowerCase().replace(/^0x/,'');}
+function padId(n){return BigInt(n).toString(16).padStart(64,'0');}
+function hb(h){ if(!h||h==='0x'||h==='0x0') return 0n; try{return BigInt(h);}catch(e){return 0n;} }
+function ozn(b){ return Number(b)/1e18; }
+function word(res,i){ if(!res||res.length<2+ (i+1)*64) return '0x0000000000000000000000000000000000000000'; return '0x'+res.slice(2+i*64+24, 2+i*64+64); }
+
+$('file').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const txt=await f.text();
+  const lines=txt.split(/\r?\n/).filter(x=>x.trim());
+  const hd=lines[0].replace(/^﻿/,'').split(',').map(s=>s.trim());
+  H={id:hd.indexOf('id'), node:hd.indexOf('node'), nodeIns:hd.indexOf('nodeIns')};
+  rows=lines.slice(1).map(l=>l.split(','));
+  $('loaded').textContent=rows.length.toLocaleString()+' rows loaded';
+  $('cntAll').textContent=rows.length.toLocaleString();
+  $('go').disabled=false;
+});
+
+async function rpcBatch(RPC, reqs){
+  for(let a=0;a<4;a++){ try{ const r=await fetch(RPC,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(reqs)}); const j=await r.json(); const m={}; (Array.isArray(j)?j:[j]).forEach(x=>m[x.id]=x.result); return m; }catch(e){ await new Promise(r=>setTimeout(r,2000)); } }
+  throw new Error('RPC failed');
+}
+
+$('go').addEventListener('click',async ()=>{
+  $('go').disabled=true; $('dl').disabled=true; results=[];
+  const tb=$('tbl').querySelector('tbody'); tb.innerHTML='';
+  const RPC=$('rpc').value.trim(), B=parseInt($('batch').value)||300, flt=$('filter').value;
+  let done=0, shown=0, sS=0, sJ=0, sN=0;
+  const Z='0x0000000000000000000000000000000000000000';
+  for(let i=0;i<rows.length;i+=B){
+    const ck=rows.slice(i,i+B);
+    // 1) instance resolution: June-8 (UserToInst) + New (registry by id)
+    const cr=[];
+    ck.forEach((r,k)=>{
+      cr.push({jsonrpc:'2.0',id:'j'+k,method:'eth_call',params:[{to:'0x7B754337350A5b6DD566Ba7e1A99a57E8Ae58f76',data:RES_J+padAddr(r[H.node])},'latest']});
+      cr.push({jsonrpc:'2.0',id:'n'+k,method:'eth_call',params:[{to:REG,data:REG_M+padId(r[H.id])},'latest']});
+    });
+    let m1; try{ m1=await rpcBatch(RPC,cr); }catch(e){ $('stat').textContent='Err '+e.message; break; }
+    const june=ck.map((r,k)=>{ const x=m1['j'+k]; return (x&&x.length>=42)?word(x,0):Z; });
+    const ninst=ck.map((r,k)=>{ const x=m1['n'+k]; return (x&&x.length>=2+4*64)?word(x,3):Z; }); // word3 = InstAddr
+    // 2) balances for source, june8, new
+    const br=[];
+    ck.forEach((r,k)=>{ br.push({jsonrpc:'2.0',id:'s'+k,method:'eth_getBalance',params:[r[H.nodeIns],'latest']});
+                        br.push({jsonrpc:'2.0',id:'b'+k,method:'eth_getBalance',params:[june[k],'latest']});
+                        br.push({jsonrpc:'2.0',id:'c'+k,method:'eth_getBalance',params:[ninst[k],'latest']}); });
+    let m2; try{ m2=await rpcBatch(RPC,br); }catch(e){ $('stat').textContent='Err '+e.message; break; }
+    const Zc=Z.toLowerCase();
+    ck.forEach((r,k)=>{
+      const srcA=(r[H.nodeIns]||'').toLowerCase();
+      const sb=(srcA&&srcA!==Zc)?ozn(hb(m2['s'+k])):0;
+      const jb=(june[k].toLowerCase()!==Zc)?ozn(hb(m2['b'+k])):0;
+      const nb=(ninst[k].toLowerCase()!==Zc)?ozn(hb(m2['c'+k])):0;
+      done++;
+      const keep= flt==='all' || (flt==='any'&&(sb>0||jb>0||nb>0)) || (flt==='new'&&nb>0) || (flt==='june'&&jb>0);
+      if(keep){
+        results.push({node:r[H.node],src:r[H.nodeIns],sb,june:june[k],jb,nw:ninst[k],nb});
+        shown++; sS+=sb; sJ+=jb; sN+=nb;
+        if(results.length<=5000){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+results.length+'</td><td>'+r[H.node]+'</td>'+
+            '<td>'+r[H.nodeIns]+'</td><td class="bal '+(sb>0?'nzS':'')+'">'+sb.toFixed(6)+'</td>'+
+            '<td>'+june[k]+'</td><td class="bal '+(jb>0?'nzJ':'')+'">'+jb.toFixed(6)+'</td>'+
+            '<td>'+ninst[k]+'</td><td class="bal '+(nb>0?'nzN':'')+'">'+nb.toFixed(6)+'</td>';
+          tb.appendChild(tr);
+        }
+      }
+    });
+    $('bar').style.width=(done/rows.length*100).toFixed(1)+'%';
+    $('cntDone').textContent=done.toLocaleString(); $('cntShown').textContent=shown.toLocaleString();
+    $('sumS').textContent=sS.toLocaleString(undefined,{maximumFractionDigits:2});
+    $('sumJ').textContent=sJ.toLocaleString(undefined,{maximumFractionDigits:2});
+    $('sumN').textContent=sN.toLocaleString(undefined,{maximumFractionDigits:2});
+    $('stat').textContent='Processing… '+done.toLocaleString()+'/'+rows.length.toLocaleString();
+    await new Promise(r=>setTimeout(r,25));
+  }
+  $('stat').textContent='✅ Done. Σ Source='+sS.toLocaleString(undefined,{maximumFractionDigits:6})+', June-8='+sJ.toLocaleString(undefined,{maximumFractionDigits:6})+', New='+sN.toLocaleString(undefined,{maximumFractionDigits:6})+' OZN.';
+  if(results.length>5000) $('stat').textContent+=' (Table = first 5000; full data in CSV.)';
+  $('dl').disabled=false; $('go').disabled=false;
+});
+
+const REG_ID='0x629d671e'; // addr -> node id
+$('oneGo').addEventListener('click',async ()=>{
+  const RPC=$('rpc').value.trim(); const addr=$('oneAddr').value.trim();
+  if(!/^0x[0-9a-fA-F]{40}$/.test(addr)){ $('oneOut').textContent='Enter a valid 0x address.'; return; }
+  $('oneOut').innerHTML='⏳ checking…';
+  try{
+    // source + id from loaded CSV if available
+    let src=null, id=null;
+    if(rows.length && H.node>=0){ const r=rows.find(x=>(x[H.node]||'').toLowerCase()===addr.toLowerCase()); if(r){ src=r[H.nodeIns]; id=r[H.id]; } }
+    // resolve id on-chain if not from CSV
+    const calls=[{jsonrpc:'2.0',id:'j',method:'eth_call',params:[{to:'0x7B754337350A5b6DD566Ba7e1A99a57E8Ae58f76',data:RES_J+padAddr(addr)},'latest']}];
+    if(id===null) calls.push({jsonrpc:'2.0',id:'id',method:'eth_call',params:[{to:REG,data:REG_ID+padAddr(addr)},'latest']});
+    let m=await rpcBatch(RPC,calls);
+    const june='0x'+(m['j']||'').slice(-40);
+    if(id===null){ id=parseInt(m['id']||'0x0',16); }
+    // registry struct by id -> new instance
+    let m2=await rpcBatch(RPC,[{jsonrpc:'2.0',id:'n',method:'eth_call',params:[{to:REG,data:REG_M+padId(id)},'latest']}]);
+    const nw=(m2['n']&&m2['n'].length>=2+4*64)?word(m2['n'],3):'0x0000000000000000000000000000000000000000';
+    // balances
+    const list=[['june8',june],['new',nw]]; if(src) list.unshift(['source',src]);
+    let mb=await rpcBatch(RPC, list.map(([k,a])=>({jsonrpc:'2.0',id:k,method:'eth_getBalance',params:[a,'latest']})));
+    const Z0='0x0000000000000000000000000000000000000000';
+    const ozz=(a,h)=> (a&&a.toLowerCase()!==Z0)?ozn(hb(h)):0;
+    let html='<b>User:</b> '+addr+' &nbsp; <b>ID:</b> '+id+'<br>'+
+      '<b>Source Inst:</b> '+(src||'<i>(load CSV)</i>')+' &nbsp;→ <b>'+(src?ozz(src,mb['source']).toFixed(6):'-')+'</b> OZN<br>'+
+      '<b>June-8 Inst:</b> '+june+' &nbsp;→ <b>'+ozz(june,mb['june8']).toFixed(6)+'</b> OZN<br>'+
+      '<b>New (post-22) Inst:</b> '+nw+' &nbsp;→ <b style="color:#fb923c">'+ozz(nw,mb['new']).toFixed(6)+'</b> OZN';
+    $('oneOut').innerHTML=html;
+  }catch(e){ $('oneOut').textContent='Error: '+e.message; }
+});
+
+$('dl').addEventListener('click',()=>{
+  let csv='node,source_instance,source_balance,june8_instance,june8_balance,new_post22_instance,new_balance\n'+
+    results.map(r=>[r.node,r.src,r.sb.toFixed(18),r.june,r.jb.toFixed(18),r.nw,r.nb.toFixed(18)].join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ozone_3instances_balances.csv'; a.click();
+});
+</script>
+</body>
+</html>
