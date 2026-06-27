@@ -2842,7 +2842,7 @@ async function loadProposals() {
     try {
         const count = await daocore.methods.getProposalsCount().call();
 
-        let limit = 3;
+        let limit = 10;
 
         const table = document.createElement("table");
         table.border = "1";
