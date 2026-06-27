@@ -2930,7 +2930,6 @@ async function loadProposals() {
         if (!signature) return selector + " " + copyableHex(input, "input");
 
         const parsed = parseFunctionSignature(signature);
-        debugger;
         if (!parsed.types.length) return parsed.name + "()";
 
         if (!canDecodeSignatureTypes(parsed.types)) {
@@ -2942,7 +2941,8 @@ async function loadProposals() {
             const parts = parsed.types.map(function (type, i) {
                 return formatDecodedArg(type, decoded[i]);
             });
-            return parsed.name + "(" + parts.join(", ") + ")";
+            debugger;
+            return parsed.name  + "(" + parsed.types.join(", ") + ") " + "(" + parts.join(", ") + ")";
         } catch (err) {
             return parsed.name + "(" + parsed.types.join(", ") + ") " + copyableHex(input, "input");
         }
