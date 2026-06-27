@@ -3573,7 +3573,12 @@ async function onTVLRefreshByGASPredict() {
         // Enable wallet
         window.web3T = new Web3(window.ethereum);
         
-        let user = '0x8D5cF845127d12B3328509B32162E00a319dE929'
+        const user = prompt("Enter user address:");
+        
+         if (!user || !web3.utils.isAddress(user)) {
+             throw 'invalid user';
+        }           
+
         // get latest base fee
         const block = await web3T.eth.getBlock("latest");
         const baseFee = BigInt(block.baseFeePerGas || 0);
