@@ -1560,9 +1560,9 @@ async function setstartstop(val) {
 		window.web3 = new Web3(window.ethereum);
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 
-		let instance = await window.nestedcontract.methods.UserToInst(accounts[0]).call();
+		let instance = await window.nestedcontract.methods.UserToInst(n).call();
 		window.instancecontract = new web3.eth.Contract(insABI.abi, instance);
-		//
+		debugger;
 		let response = await window.instancecontract.methods.setStopWithdraw(val).send(
 			{ from: accounts[0] }
 		)
