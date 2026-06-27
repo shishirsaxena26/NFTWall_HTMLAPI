@@ -2838,6 +2838,116 @@ async function loadTemplates() {
 }
 
 async function loadProposals() {
+    function formatDecodedArg(type, value) {
+        if (type === "address") return shortAddr(value);
+        if (type === "bool") return String(value);
+        if (type.endsWith("[]")) {
+            const inner = type.slice(0, -2);
+            return "[" + (value || []).map(function (v) {
+                return formatDecodedArg(inner, v);
+            }).join(", ") + "]";
+        }
+        if (type === "string" && String(value).length > 48) {
+            return '"' + String(value).slice(0, 24) + '..."';
+        }
+        return String(value);
+    }
+
+
+    function copyableHex(hex, label) {
+        if (!hex || hex === "0x") return "-";
+        const text = String(hex);
+        if (text.length <= 20) return text;
+
+        const preview = text.slice(0, 10) + "..." + text.slice(-6);
+        const byteLen = Math.floor((text.length - 2) / 2);
+        const kind = label || "data";
+
+        return (
+            preview + " [" + byteLen + "b]"
+        );
+    }
+
+    function isAbiDecodableType(type) {
+        const base = String(type).replace(/\[\d*\]$/, "");
+        if (["address", "bool", "string", "bytes", "bytes32", "bytes4"].indexOf(base) >= 0) return true;
+        if (/^u?int\d*$/.test(base)) return true;
+        if (/^bytes\d+$/.test(base)) return true;
+        return false;
+    }
+
+    function canDecodeSignatureTypes(types) {
+        if (!types || !types.length) return true;
+        for (let i = 0; i < types.length; i++) {
+            if (!isAbiDecodableType(types[i])) return false;
+        }
+        return true;
+    }
+     function splitSignatureTypes(paramsStr) {
+        const types = [];
+        let depth = 0;
+        let cur = "";
+
+        for (let i = 0; i < paramsStr.length; i++) {
+            const c = paramsStr[i];
+            if (c === "(") depth++;
+            else if (c === ")") depth--;
+            else if (c === "," && depth === 0) {
+                if (cur.trim()) types.push(cur.trim());
+                cur = "";
+                continue;
+            }
+            cur += c;
+        }
+
+        if (cur.trim()) types.push(cur.trim());
+        return types;
+    }
+
+    function parseFunctionSignature(signature) {
+        const nameEnd = signature.indexOf("(");
+        if (nameEnd < 0) return { name: signature, types: [] };
+
+        const paramsStr = signature.slice(nameEnd + 1, -1).trim();
+        return {
+            name: signature.slice(0, nameEnd),
+            types: paramsStr ? splitSignatureTypes(paramsStr) : [],
+        };
+    }
+
+    function getSignatureMap() {
+        if (typeof SIGNATURES !== "undefined" && SIGNATURES && SIGNATURES.functions) {
+            return SIGNATURES.functions;
+        }
+        return {};
+    }
+    function decodeCalldataInput(input) {
+        if (!input || input === "0x") return "(fallback/receive)";
+        if (input.length < 10) return copyableHex(input, "input");
+
+        const selector = input.slice(0, 10).toLowerCase();
+        const signature = getSignatureMap()[selector];
+        if (!signature) return selector + " " + copyableHex(input, "input");
+
+        const parsed = parseFunctionSignature(signature);
+        debugger;
+        if (!parsed.types.length) return parsed.name + "()";
+
+        if (!canDecodeSignatureTypes(parsed.types)) {
+            return parsed.name + "(" + parsed.types.join(", ") + ")";
+        }
+
+        try {
+            const decoded = web3.eth.abi.decodeParameters(parsed.types, "0x" + input.slice(10));
+            const parts = parsed.types.map(function (type, i) {
+                return formatDecodedArg(type, decoded[i]);
+            });
+            return parsed.name + "(" + parts.join(", ") + ")";
+        } catch (err) {
+            return parsed.name + "(" + parsed.types.join(", ") + ") " + copyableHex(input, "input");
+        }
+    }
+
     const panel = addPanel("Proposals");
     try {
         const count = await daocore.methods.getProposalsCount().call();
@@ -2875,6 +2985,7 @@ async function loadProposals() {
             if (r[5]) approve = "RESOLVE";
 
             const row = document.createElement("tr");
+            const bytesRaw = decodeCalldataInput(p[6]);
             row.innerHTML = `
           <td>${i}</td>
           <td title="${p[0]}">${p[0]}</td>
@@ -2885,7 +2996,7 @@ async function loadProposals() {
           <td>${r[3]}</td>
           <td>${r[4]}</td>
           <td>${approve}</td>
-          <td class="shortAddr paramsCell" title="${p[5]}">${p[6]}</td>
+          <td class="shortAddr paramsCell" title="${p[5]}">${bytesRaw}</td>
           <td >
             <button class="vote-btn upvote" onclick="vote(${i}, true)">Vote(Y)</button>
             <button class="vote-btn downvote" onclick="vote(${i}, false)">Vote(N)</button>
