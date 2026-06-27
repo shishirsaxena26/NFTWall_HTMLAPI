@@ -169,7 +169,7 @@ async function pageload() {
 	}
 
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
-	debugger;
+	
 	let ins1 = await nestedcontract.methods.getNodeByIndex(103547).call(console.log);
 	let ins2 = await nestedcontract.methods.getNodeByIndex(103546).call(console.log);
 	await nestedcontract.methods.InstToUser(ins1).call(console.log);
@@ -297,7 +297,7 @@ async function onGetDailyBusiness() {
 }
 
 async function LoadRules() {
-	debugger
+	
 	window.ruleContract = new web3.eth.Contract(RulesABI.abi, rule);
 
 	let ozn = await window.ruleContract.methods.ozoneprice().call();
@@ -571,9 +571,9 @@ async function onLoadAddress() {
 async function isUser(u) {
 	window.web3 = new Web3(new Web3.providers.HttpProvider(provider));
 	window.nestedcontract = new window.web3.eth.Contract(NestedABI.abi, nested);
-	debugger;
+	
 	let add = await window.nestedcontract.methods.UserToInst(u).call();
-	debugger;
+	
 	return (add != "0x0000000000000000000000000000000000000000");
 }
 
@@ -760,7 +760,7 @@ async function loadPool(n, instance, dage) {
 
 
 	td = '';//
-	debugger;
+	
 	window.validatorcontract = new window.web3.eth.Contract(validatorLocalABI.abi, NFTValidatorsLocals);
 	td = td + '<td>' + (await window.validatorcontract.methods.getDelegator(n).call()) + '</td>';
 
@@ -1134,7 +1134,7 @@ async function onAddOwnerReset() {
 
 
 async function onApprove(i) {
-	debugger;
+	
 	if (i == 1) onApprove1();
 	if (i == 2) onApprove2();
 	if (i == 3) onApprove3();
@@ -1151,7 +1151,7 @@ async function onApprove1() {
 		window.web3 = new Web3(window.ethereum);
 		window.safecontract = new web3.eth.Contract(safeABI.abi, safe);
 
-		debugger;
+		
 		let response = await window.safecontract.methods.approveByV1(false).send(
 			{ from: account }
 		)
@@ -1555,7 +1555,7 @@ async function setstartstop(val) {
 		if (!n) { msg('txtAdd is blank'); return; }
 
 		if (!(await isUser(n))) { msg('user not found.'); return; }
-
+;
 		let accounts = await ethereum.enable();
 		window.web3 = new Web3(window.ethereum);
 		window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
