@@ -695,7 +695,7 @@ async function loadStructure(n, header) {
 
 
 async function loadPool(n, instance, dage) {
-
+debugger;
 	window.nestedcontract = new web3.eth.Contract(NestedABI.abi, nested);
 	var va1 = await window.nestedcontract.methods.getRewards(instance).call();
 
